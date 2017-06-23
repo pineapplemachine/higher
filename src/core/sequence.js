@@ -55,18 +55,34 @@ const getFancyWrapperFunction = function(name, expected, implementation){
         );
     };
     if(numbers + functions + sequences === 1){
-        return function(){
-            validate(arguments);
-            return implementation(arguments[0]);
+        if(sequences === 1 && !expected.allowIterables){
+            return function(){
+                validate(arguments);
+                return implementation(asSequence(arguments[0]));
+            };
+        }else{
+            return function(){
+                validate(arguments);
+                return implementation(arguments[0]);
+            };
         }
     }else if(
         (numbers + functions === 0) ||
         (functions + sequences === 0) ||
         (sequences + numbers === 0)
     ){
-        return function(){
-            validate(arguments);
-            return implementation(arguments);
+        if(sequences > 0 && !expected.allowIterables){
+            return function(){
+                validate(arguments);
+                let sequences = [];
+                for(let arg of arguments) sequences.push(asSequence(arg));
+                return implementation(sequences);
+            };
+        }else{
+            return function(){
+                validate(arguments);
+                return implementation(arguments);
+            };
         }
     }
     return function(){
@@ -218,7 +234,10 @@ Sequence.prototype.collapse = function(limit = -1){
             }
             write(prev.copy(), -1, true);
             breaking.collapseBreak(source, i);
-            if(next) next.source = arraySequence;
+            if(next){
+                next.source = arraySequence;
+                if(next.sources) next.sources[0] = arraySequence;
+            }
         }
         if(breaks[0] < stack.length - 1){
             write(stack[0], limit, false);
