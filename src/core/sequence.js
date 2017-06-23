@@ -142,6 +142,14 @@ function sequenceBoundsError(action, method, type, intermediate = false){
         "before collapsing it.")
     );
 }
+function sequenceCollapseCopyError(prevType, breakingType){
+    return (
+        `Collapsing the sequence failed because one of the ` +
+        `intermediate sequences of type "${prevType}" does ` +
+        `not support copying even though it appears before a ` +
+        `special collapse behavior sequence "${breakingType}".`
+    );
+}
 
 function Sequence(seed){
     for(key in seed){
@@ -214,32 +222,33 @@ Sequence.prototype.collapse = function(limit = -1){
             else source.push(value);
             i++;
         }
-        arraySequence.backIndex = i;
     }
     if(!breaks.length){
         write(this, limit, false);
     }else{
         for(let j = breaks.length - 1; j >= 0; j--){
-            let breakIndex = breaks[i];
+            let breakIndex = breaks[j];
             let breaking = stack[breakIndex];
             let prev = stack[breakIndex + 1];
             let next = stack[breakIndex - 1];
-            if(!prev.copy){
-                throw (
-                    `Collapsing the sequence failed because one of the ` +
-                    `intermediate sequences of type "${prev.type}" does ` +
-                    `not support copying even though it appears before a ` +
-                    `special collapse behavior sequence "${breaking.type}".`
-                );
+            if(prev){
+                if(!prev.collapseBreak){
+                    if(!prev.copy) throw breakCollapseCopyError(
+                        prev.type, breaking.type
+                    );
+                    write(prev.copy(), -1, true);
+                }
+            }else{
+                i = source.length;
             }
-            write(prev.copy(), -1, true);
-            breaking.collapseBreak(source, i);
+            i = breaking.collapseBreak(source, i);
             if(next){
                 next.source = arraySequence;
+                arraySequence.backIndex = i;
                 if(next.sources) next.sources[0] = arraySequence;
             }
         }
-        if(breaks[0] < stack.length - 1){
+        if(breaks[0] !== 0){
             write(stack[0], limit, false);
         }
     }

@@ -67,6 +67,7 @@ Object.assign(ReverseSequence.prototype, {
             i++;
             j--;
         }
+        return length;
     },
 });
 
