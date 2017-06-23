@@ -1,5 +1,5 @@
 const hi = {
-    version: "v1.0.0",
+    version: "0.1.0",
     isSequence: isSequence,
     asSequence: asSequence,
     seq: asSequence,
