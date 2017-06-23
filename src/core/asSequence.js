@@ -90,7 +90,7 @@ Object.assign(ArraySequence.prototype, {
 // Optionally accepts an inclusive start index and an exclusive end index.
 // When start and end indexes aren't given, the sequence enumerates the
 // entire contents of the string.
-function StringSequence(source){
+function StringSequence(source, low, high){
     this.source = source;
     this.lowIndex = isNaN(low) ? 0 : low;
     this.highIndex = isNaN(high) ? source.length : high;
