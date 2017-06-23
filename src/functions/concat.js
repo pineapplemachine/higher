@@ -25,7 +25,7 @@ Object.assign(ConcatSequence.prototype, {
     },
     done: function(){
         return this.frontSourceIndex > this.backSourceIndex || (
-            this.frontSourceIndex === this.backSourceIndex &&
+            this.frontSourceIndex === this.backSourceIndex - 1 &&
             this.sources[this.frontSourceIndex].done()
         );
     },
@@ -47,19 +47,19 @@ Object.assign(ConcatSequence.prototype, {
     popFront: function(){
         this.sources[this.frontSourceIndex].popFront();
         while(
-            this.frontSourceIndex < this.backSourceIndex &&
+            this.frontSourceIndex < this.backSourceIndex - 1 &&
             this.sources[this.frontSourceIndex].done()
         ){
             this.frontSourceIndex++;
         }
     },
     back: function(){
-        return this.sources[this.backSourceIndex].back();
+        return this.sources[this.backSourceIndex - 1].back();
     },
     popBack: function(){
         this.sources[this.backSourceIndex - 1].popBack();
         while(
-            this.frontSourceIndex < this.backSourceIndex &&
+            this.frontSourceIndex < this.backSourceIndex - 1 &&
             this.sources[this.backSourceIndex - 1].done()
         ){
             this.backSourceIndex--;
@@ -110,12 +110,6 @@ Object.assign(ConcatSequence.prototype, {
 
 const concat = registerFunction("concat", {
     sequences: "*",
-}, function(transform, sources){
-    if(sources.length === 1){
-        return new SingularMapSequence(transform, sources[0]);
-    }else if(sources.length === 0){
-        return new NullMapSequence(transform);
-    }else{
-        return new PluralMapSequence(transform, sources);
-    }
+}, function(sources){
+    return new ConcatSequence(sources);
 });
