@@ -1,9 +1,11 @@
-function FilterSequence(predicate, source){
-    while(!predicate(source.front())){
-        source.popFront();
-    }
-    if(source.back) while(!predicate(source.back())){
-        source.popBack();
+function FilterSequence(predicate, source, initialize = true){
+    if(initialize){
+        while(!predicate(source.front())){
+            source.popFront();
+        }
+        if(source.back) while(!predicate(source.back())){
+            source.popBack();
+        }
     }
     this.predicate = predicate;
     this.source = source;
@@ -44,11 +46,10 @@ Object.assign(FilterSequence.prototype, {
         return this.source.has(i) && this.predicate(this.source.get(i));
     },
     get: function(i){
-        let value = this.source.get(i);
-        return this.predicate(value) ? value : undefined;
+        return this.source.get(i);
     },
     copy: function(){
-        return new FilterSequence(this.predicate, this.source.copy());
+        return new FilterSequence(this.predicate, this.source.copy(), false);
     },
     reset: function(){
         this.source.reset();
