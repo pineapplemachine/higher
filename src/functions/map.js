@@ -20,29 +20,7 @@ function PluralMapSequence(transform, sources){
     }
 }
 
-NullMapSequence.prototype = Object.create(Sequence.prototype);
-Object.assign(NullMapSequence.prototype, {
-    bounded: () => true,
-    done: () => true,
-    length: () => 0,
-    left: () => 0,
-    front: () => undefined,
-    popFront: () => {},
-    back: () => undefined,
-    popBack: () => {},
-    index: (i) => undefined,
-    has: () => false,
-    get: () => undefined,
-    slice: function(i, j){
-        return this;
-    },
-    copy: function(){
-        return this;
-    },
-    reset: function(){
-        return this;
-    },
-});
+NullMapSequence.prototype = Object.create(EmptySequence.prototype);
 
 SingularMapSequence.prototype = Object.create(Sequence.prototype);
 Object.assign(SingularMapSequence.prototype, {
