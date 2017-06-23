@@ -5,10 +5,6 @@ function NgramSequence(ngramSize, source, currentNgram = null){
     while(!source.done() && this.currentNgram.length < this.ngramSize){
         this.currentNgram.push(source.nextFront());
     }
-    // Sequence only supports has if the source has known length.
-    if(!source.length){
-        this.has = null;
-    }
     this.maskAbsentMethods(source);
 }
 
@@ -52,12 +48,8 @@ Object.assign(NgramSequence.prototype, {
             this.ngramSize, this.source.slice(i, j + this.ngramSize)
         );
     },
-    has: function(i){
-        return Number.isInteger(i) && i >= 0 && i < this.length();
-    },
-    get: function(i){
-        return this.index(i);
-    },
+    has: null,
+    get: null,
     copy: function(){
         let copy = new NgramSequence(this.ngramSize, this.source.copy());
         copy.currentNgram = this.currentNgram.slice();
