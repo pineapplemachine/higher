@@ -62,10 +62,12 @@ Object.assign(ArraySequence.prototype, {
         this.backIndex--;
     },
     index: function(i){
-        return this.source[i - this.lowIndex];
+        return this.source[this.lowIndex + i];
     },
     slice: function(i, j){
-        return new ArraySequence(this.source, this.frontIndex, this.backIndex);
+        return new ArraySequence(
+            this.source, this.lowIndex + i, this.lowIndex + j
+        );
     },
     has: function(i){
         return Number.isInteger(i) && i >= 0 && i < this.length();
@@ -123,10 +125,12 @@ Object.assign(StringSequence.prototype, {
         this.backIndex--;
     },
     index: function(i){
-        return this.source[i];
+        return this.source[this.lowIndex + i];
     },
     slice: function(i, j){
-        return new StringSequence(this.source, this.frontIndex, this.backIndex);
+        return new StringSequence(
+            this.source, this.lowIdex + i, this.lowIndex + j
+        );
     },
     has: function(i){
         return Number.isInteger(i) && i >= 0 && i < this.length();
