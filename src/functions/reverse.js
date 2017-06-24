@@ -11,16 +11,16 @@ hi.ReverseSequence = function(source){
 hi.ReverseSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.ReverseSequence.prototype, {
     bounded: function(){
-        return this.source.bounded;
+        return this.source.bounded();
     },
     done: function(){
         return this.source.done();
     },
     length: function(){
-        return this.source.length;
+        return this.source.length();
     },
     left: function(){
-        return this.source.left;
+        return this.source.left();
     },
     front: function(){
         return this.source.back();
