@@ -222,6 +222,12 @@ hi.register("repeat", {
     numbers: "?",
     sequences: 1,
 }, function(repetitions, source){
+    if(!source.copy){
+        if(!source.bounded()) throw (
+            "Error repeating sequence: Sequence is unbounded and uncopyable."
+        );
+        source = new hi.LazyArraySequence(source);
+    }
     if(repetitions || repetitions === 0){
         return new hi.FiniteRepeatSequence(repetitions, source);
     }else{
