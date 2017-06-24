@@ -10,18 +10,21 @@
       "email": "sophiek@pineapplemachine.com"
     }
   ],
-  "dependencies": {},
   "repository": {
     "type": "git",
     "url": "https://www.github.com/pineapplemachine/higher"
   },
-  "main": "src/higher.js",
+  "main": "lib/index.js",
+  "module": "es/index.js",
+  "scripts": {
+    "build": "nwb build-web-module",
+    "clean": "nwb clean-module",
+    "test": "nwb test",
+    "test:coverage": "nwb test --coverage",
+    "test:watch": "nwb test --server"
+  },
   "devDependencies": {
-    "babel-core": "^6.25.0",
-    "gulp": "^3.9.1",
-    "gulp-babel": "^6.1.2",
-    "gulp-util": "^3.0.8",
-    "webpack": "^3.0.0",
-    "webpack-dev-server": "^2.5.0"
-  }
+    "nwb": "0.17.x"
+  },
+  "dependencies": {}
 }

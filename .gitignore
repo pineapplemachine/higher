@@ -1,3 +1,10 @@
+# Custom stuff
+/coverage
+/demo/dist
+/es
+/lib
+/umd
+
 # Logs
 logs
 *.log
