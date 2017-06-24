@@ -65,7 +65,7 @@ hi.register("dropTail", {
         return new hi.DropTailSequence(dropElements, source);
     }else if(source.bounded()){
         // Sequence must be loaded into memory to perform the operation.
-        let array = hi.array.implementation(-1, source);
+        let array = hi.array.raw(-1, source);
         return array.slice(0, array.length() - dropElements);
     }else{
         throw "Failed to drop sequence tail: Input is unbounded.";

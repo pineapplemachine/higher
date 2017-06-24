@@ -16,6 +16,7 @@ Object.assign(hi, {
             fancy: this.internal.wrap.fancy(name, expected, implementation),
         };
         this[name] = register.fancy;
+        register.fancy.raw = implementation;
         if(!hi.args.expectNone(expected.sequences)){
             prototypeMethod = this.internal.wrap.sequenceMethod(
                 name, expected, implementation
