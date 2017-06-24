@@ -11,7 +11,10 @@ hi.register("tail", {
         let length = source.length();
         let slice = length < elements ? length : elements;
         return source.slice(length - slice, length);
+    }else if(source.bounded()){
+        let array = source.array();
+        return array.slice(array.length - elements);
     }else{
-        throw "Failed to get sequence tail: Sequence can't be sliced.";
+        throw "Failed to get sequence tail: Input is unbounded.";
     }
 });
