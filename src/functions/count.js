@@ -62,17 +62,36 @@ Object.assign(SequenceCounter.prototype, {
     },
 });
 Object.assign(SequenceCounter.prototype, {
-    // Alternatives
-    notLessThan: SequenceCounter.prototype.greaterThanEqual,
-    notGreaterThan: SequenceCounter.prototype.lessThanEqual,
-    atLeast: SequenceCounter.prototype.greaterThanEqual,
-    atMost: SequenceCounter.prototype.lessThanEqual,
-    // Shorthands
-    eq: SequenceCounter.prototype.equals,
-    lt: SequenceCounter.prototype.lessThan,
-    gt: SequenceCounter.prototype.greaterThan,
-    gte: SequenceCounter.prototype.greaterThanEqual,
-    lte: SequenceCounter.prototype.lessThanEqual,
+    sumAsync: function(){
+        return new Promise((resolve, reject) => {
+            hi.callAsync(() => resolve(this.sum()));
+        });
+    },
+    equalsAsync: function(n){
+        return new Promise((resolve, reject) => {
+            hi.callAsync(() => resolve(this.equals(n)));
+        });
+    },
+    lessThanAsync: function(n){
+        return new Promise((resolve, reject) => {
+            hi.callAsync(() => resolve(this.lessThan(n)));
+        });
+    },
+    lessThanEqualAsync: function(n){
+        return new Promise((resolve, reject) => {
+            hi.callAsync(() => resolve(this.lessThanEqual(n)));
+        });
+    },
+    greaterThanAsync: function(n){
+        return new Promise((resolve, reject) => {
+            hi.callAsync(() => resolve(this.greaterThan(n)));
+        });
+    },
+    greaterThanEqualAsync: function(n){
+        return new Promise((resolve, reject) => {
+            hi.callAsync(() => resolve(this.greaterThanEqual(n)));
+        });
+    },
 });
 
 const count = registerFunction("count", {
