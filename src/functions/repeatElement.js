@@ -1,4 +1,4 @@
-function FiniteRepeatElementSequence(
+hi.FiniteRepeatElementSequence = function(
     repetitions, element, finishedRepetitions = 0
 ){
     this.repetitions = repetitions;
@@ -6,12 +6,12 @@ function FiniteRepeatElementSequence(
     this.element = element;
 }
 
-function InfiniteRepeatElementSequence(element){
+hi.InfiniteRepeatElementSequence = function(element){
     this.element = element;
 }
 
-FiniteRepeatElementSequence.prototype = Object.create(hi.Sequence.prototype);
-Object.assign(FiniteRepeatElementSequence.prototype, {
+hi.FiniteRepeatElementSequence.prototype = Object.create(hi.Sequence.prototype);
+Object.assign(hi.FiniteRepeatElementSequence.prototype, {
     seed: function(element){
         this.element = element;
     },
@@ -43,10 +43,10 @@ Object.assign(FiniteRepeatElementSequence.prototype, {
     has: (i) => false,
     get: (i) => undefined,
     slice: function(i, j){
-        return new FiniteRepeatElementSequence(this.element, j - i);
+        return new hi.FiniteRepeatElementSequence(this.element, j - i);
     },
     copy: function(){
-        return new FiniteRepeatElementSequence(
+        return new hi.FiniteRepeatElementSequence(
             this.element, this.repetitions, this.finishedRepetitions
         );
     },
@@ -56,8 +56,8 @@ Object.assign(FiniteRepeatElementSequence.prototype, {
     },
 });
 
-InfiniteRepeatElementSequence.prototype = Object.create(hi.Sequence.prototype);
-Object.assign(InfiniteRepeatElementSequence.prototype, {
+hi.InfiniteRepeatElementSequence.prototype = Object.create(hi.Sequence.prototype);
+Object.assign(hi.InfiniteRepeatElementSequence.prototype, {
     seed: function(element){
         this.element = element;
     },
@@ -79,10 +79,10 @@ Object.assign(InfiniteRepeatElementSequence.prototype, {
     has: (i) => false,
     get: (i) => undefined,
     slice: function(i, j){
-        return new FiniteRepeatElementSequence(this.element, j - i);
+        return new hi.FiniteRepeatElementSequence(this.element, j - i);
     },
     copy: function(){
-        return new InfiniteRepeatElementSequence(this.element);
+        return new hi.InfiniteRepeatElementSequence(this.element);
     },
     reset: function(){
         return this;
@@ -91,7 +91,7 @@ Object.assign(InfiniteRepeatElementSequence.prototype, {
 
 hi.repeatElement = function(){
     if(arguments.length === 1){
-        return new InfiniteRepeatElementSequence(arguments[0]);
+        return new hi.InfiniteRepeatElementSequence(arguments[0]);
     }else if(arguments.length === 2){
         if(isNaN(arguments[0])){
             throw (
@@ -100,7 +100,7 @@ hi.repeatElement = function(){
             );
         }
         let repetitions = Math.floor(+arguments[0]);
-        return new FiniteRepeatElementSequence(repetitions, arguments[1]);
+        return new hi.FiniteRepeatElementSequence(repetitions, arguments[1]);
     }else{
         throw (
             "Failed to repeat element: Function expects either one argument " +

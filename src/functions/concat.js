@@ -1,4 +1,4 @@
-function ConcatSequence(sources){
+hi.ConcatSequence = function(sources){
     this.sources = sources;
     this.source = sources[0];
     this.frontSourceIndex = 0;
@@ -15,8 +15,8 @@ function ConcatSequence(sources){
     }
 }
 
-ConcatSequence.prototype = Object.create(hi.Sequence.prototype);
-Object.assign(ConcatSequence.prototype, {
+hi.ConcatSequence.prototype = Object.create(hi.Sequence.prototype);
+Object.assign(hi.ConcatSequence.prototype, {
     bounded: function(){
         for(let source of this.sources){
             if(!source.bounded()) return false;
@@ -91,12 +91,12 @@ Object.assign(ConcatSequence.prototype, {
             }
             offset = nextOffset;
         }
-        return new ConcatSequence(sliceSources);
+        return new hi.ConcatSequence(sliceSources);
     },
     copy: function(){
         let copies = [];
         for(let source of this.sources) copies.push(source.copy());
-        let copy = new ConcatSequence(this.transform, copies);
+        let copy = new hi.ConcatSequence(this.transform, copies);
         copy.frontSourceIndex = this.frontSourceIndex;
         copy.backSourceIndex = this.backSourceIndex;
     },
@@ -111,5 +111,5 @@ Object.assign(ConcatSequence.prototype, {
 hi.register("concat", {
     sequences: "*",
 }, function(sources){
-    return new ConcatSequence(sources);
+    return new hi.ConcatSequence(sources);
 });

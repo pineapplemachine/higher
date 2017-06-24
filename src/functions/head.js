@@ -1,13 +1,13 @@
 // Fallback implementation of first function for when slicing is unavailable.
-function HeadSequence(elements, source, frontIndex = 0){
+hi.HeadSequence = function(elements, source, frontIndex = 0){
     this.elements = elements;
     this.source = source;
     this.frontIndex = frontIndex;
     this.maskAbsentMethods(source);
 }
 
-HeadSequence.prototype = Object.create(hi.Sequence.prototype);
-Object.assign(HeadSequence.prototype, {
+hi.HeadSequence.prototype = Object.create(hi.Sequence.prototype);
+Object.assign(hi.HeadSequence.prototype, {
     bounded: () => true,
     done: function(){
         return this.frontIndex >= this.elements || this.source.done();
@@ -36,7 +36,7 @@ Object.assign(HeadSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        return new HeadSequence(
+        return new hi.HeadSequence(
             this.elements, this.source.copy(), this.frontIndex
         );
     },
@@ -55,11 +55,11 @@ hi.register("head", {
     sequences: 1,
 }, function(elements, source){
     if(elements < 1){
-        return new EmptySequence();
+        return new hi.EmptySequence();
     }else if(source.length && source.slice){
         let length = source.length();
         return source.slice(0, length < elements ? length : elements);
     }else{
-        return new HeadSequence(elements, source);
+        return new hi.HeadSequence(elements, source);
     }
 });

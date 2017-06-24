@@ -1,4 +1,4 @@
-function NgramSequence(ngramSize, source, currentNgram = null){
+hi.NgramSequence = function(ngramSize, source, currentNgram = null){
     this.ngramSize = Math.floor(+ngramSize);
     this.source = source;
     this.currentNgram = currentNgram || [];
@@ -8,8 +8,8 @@ function NgramSequence(ngramSize, source, currentNgram = null){
     this.maskAbsentMethods(source);
 }
 
-NgramSequence.prototype = Object.create(hi.Sequence.prototype);
-Object.assign(NgramSequence.prototype, {
+hi.NgramSequence.prototype = Object.create(hi.Sequence.prototype);
+Object.assign(hi.NgramSequence.prototype, {
     bounded: function(){
         return this.source.bounded();
     },
@@ -42,14 +42,14 @@ Object.assign(NgramSequence.prototype, {
         }
     },
     slice: function(i, j){
-        return new NgramSequence(
+        return new hi.NgramSequence(
             this.ngramSize, this.source.slice(i, j + this.ngramSize)
         );
     },
     has: null,
     get: null,
     copy: function(){
-        let copy = new NgramSequence(this.ngramSize, this.source.copy());
+        let copy = new hi.NgramSequence(this.ngramSize, this.source.copy());
         copy.currentNgram = this.currentNgram.slice();
         return copy;
     },
@@ -68,20 +68,20 @@ hi.register("ngrams", {
     sequences: 1,
 }, function(ngramSize, source){
     if(+ngramSize < 1){
-        return new EmptySequence();
+        return new hi.EmptySequence();
     }else{
-        return new NgramSequence(ngramSize, source);
+        return new hi.NgramSequence(ngramSize, source);
     }
 });
 
 hi.register("bigrams", {
     sequences: 1,
 }, function(source){
-    return new NgramSequence(2, source);
+    return new hi.NgramSequence(2, source);
 });
 
 hi.register("trigrams", {
     sequences: 1,
 }, function(source){
-    return new NgramSequence(3, source);
+    return new hi.NgramSequence(3, source);
 });

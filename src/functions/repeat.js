@@ -1,4 +1,4 @@
-function FiniteRepeatSequence(
+hi.FiniteRepeatSequence = function(
     repetitions, source,
     originalFrontSource = null, originalBackSource = null,
     frontSource = null, backSource = null
@@ -33,7 +33,7 @@ function FiniteRepeatSequence(
     if(repetitions <= 1) this.collapseBreak = null;
 }
 
-function InfiniteRepeatSequence(source, frontSource = null, backSource = null){
+hi.InfiniteRepeatSequence = function(source, frontSource = null, backSource = null){
     if(!source.copy){
         throw "Error repeating sequence: Only copyable sequences can be repeated.";
     }
@@ -45,8 +45,8 @@ function InfiniteRepeatSequence(source, frontSource = null, backSource = null){
     this.maskAbsentMethods(source);
 }
 
-FiniteRepeatSequence.prototype = Object.create(hi.Sequence.prototype);
-Object.assign(FiniteRepeatSequence.prototype, {
+hi.FiniteRepeatSequence.prototype = Object.create(hi.Sequence.prototype);
+Object.assign(hi.FiniteRepeatSequence.prototype, {
     finishedRepetitions: function(){
         return this.frontRepetitions + this.backRepetitions;
     },
@@ -107,7 +107,7 @@ Object.assign(FiniteRepeatSequence.prototype, {
         if(j - i < length && highIndex >= lowIndex){
             return this.source.slice(lowIndex, highIndex);
         }else if(lowIndex === 0 && highIndex === 0){
-            return new FiniteRepeatSequence((j - i) / length, this.source);   
+            return new hi.FiniteRepeatSequence((j - i) / length, this.source);   
         }else{
             let repetitions = Math.ceil(j / length) - Math.floor(i / length);
             let frontSource = (
@@ -116,7 +116,7 @@ Object.assign(FiniteRepeatSequence.prototype, {
             let backSource = (
                 highIndex === 0 ? this.source : this.source.slice(0, highIndex)
             );
-            return new FiniteRepeatSequence(
+            return new hi.FiniteRepeatSequence(
                 repetitions, this.source,
                 this.source, this.source,
                 frontSource, backSource
@@ -130,7 +130,7 @@ Object.assign(FiniteRepeatSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        return new FiniteRepeatSequence(
+        return new hi.FiniteRepeatSequence(
             this.repetitions, this.source,
             this.originalFrontSource, this.originalBackSource,
             this.frontSource.copy(), this.backSource.copy()
@@ -168,8 +168,8 @@ Object.assign(FiniteRepeatSequence.prototype, {
     },
 });
 
-InfiniteRepeatSequence.prototype = Object.create(hi.Sequence.prototype);
-Object.assign(InfiniteRepeatSequence.prototype, {
+hi.InfiniteRepeatSequence.prototype = Object.create(hi.Sequence.prototype);
+Object.assign(hi.InfiniteRepeatSequence.prototype, {
     bounded: () => false,
     done: () => false,
     length: null,
@@ -196,7 +196,7 @@ Object.assign(InfiniteRepeatSequence.prototype, {
     // I'm trying not to feel too bad about this since the relevant code
     // is defined just a few tens of lines above here.
     slice: function(i, j){
-        let repeat = new FiniteRepeatSequence(
+        let repeat = new hi.FiniteRepeatSequence(
             0, this.source, null, null, null, null
         );
         return repeat.slice(i, j);
@@ -208,7 +208,7 @@ Object.assign(InfiniteRepeatSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        return new InfniteRepeatSequence(
+        return new hi.InfniteRepeatSequence(
             this.source, this.frontSource, this.backSource
         );
     },
@@ -223,8 +223,8 @@ hi.register("repeat", {
     sequences: 1,
 }, function(repetitions, source){
     if(repetitions || repetitions === 0){
-        return new FiniteRepeatSequence(repetitions, source);
+        return new hi.FiniteRepeatSequence(repetitions, source);
     }else{
-        return new InfiniteRepeatSequence(source);
+        return new hi.InfiniteRepeatSequence(source);
     }
 });

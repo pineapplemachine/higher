@@ -24,7 +24,7 @@ Object.assign(SequenceReducer.prototype, {
     // Get a sequence enumerating every step in the reduce operation,
     // including the seed (if one was provided).
     sequence: function(){
-        return new ReduceSequence(
+        return new hi.ReduceSequence(
             this.combine, asSequence(this.source),
             this.seedValue, this.hasSeed
         );
@@ -77,7 +77,7 @@ Object.assign(SequenceReducer.prototype, {
     },
 });
 
-function ReduceSequence(
+hi.ReduceSequence = function(
     combine, source, seedValue = null, hasSeed = false, initialize = true
 ){
     let done = source.done();
@@ -93,8 +93,8 @@ function ReduceSequence(
     }
 }
 
-ReduceSequence.prototype = Object.create(hi.Sequence.prototype);
-Object.assign(ReduceSequence.prototype, {
+hi.ReduceSequence.prototype = Object.create(hi.Sequence.prototype);
+Object.assign(hi.ReduceSequence.prototype, {
     bounded: function(){
         return this.source.bounded();
     },
@@ -126,7 +126,7 @@ Object.assign(ReduceSequence.prototype, {
     has: null,
     get: null,
     copy: function(){
-        return new ReduceSequence(
+        return new hi.ReduceSequence(
             this.combine, this.source.copy(),
             this.seedValue, this.hasSeed, false
         );

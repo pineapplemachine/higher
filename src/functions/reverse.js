@@ -1,4 +1,4 @@
-function ReverseSequence(source){
+hi.ReverseSequence = function(source){
     this.source = source;
     this.maskAbsentMethods(source);
     // Length property is required to support index and slice operations.
@@ -8,8 +8,8 @@ function ReverseSequence(source){
     }
 }
 
-ReverseSequence.prototype = Object.create(hi.Sequence.prototype);
-Object.assign(ReverseSequence.prototype, {
+hi.ReverseSequence.prototype = Object.create(hi.Sequence.prototype);
+Object.assign(hi.ReverseSequence.prototype, {
     bounded: function(){
         return this.source.bounded;
     },
@@ -74,9 +74,9 @@ Object.assign(ReverseSequence.prototype, {
 hi.register("reverse", {
     sequences: 1,
 }, function(source){
-    if(source instanceof ReverseSequence){
+    if(source instanceof hi.ReverseSequence){
         return source.source;
     }else{
-        return new ReverseSequence(source);
+        return new hi.ReverseSequence(source);
     }
 });

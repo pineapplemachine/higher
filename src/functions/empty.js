@@ -1,8 +1,8 @@
 // A chronically empty sequence.
-function EmptySequence(){}
+hi.EmptySequence = function(){}
 
-EmptySequence.prototype = Object.create(hi.Sequence.prototype);
-Object.assign(EmptySequence.prototype, {
+hi.EmptySequence.prototype = Object.create(hi.Sequence.prototype);
+Object.assign(hi.EmptySequence.prototype, {
     bounded: () => true,
     done: () => true,
     length: () => 0,
@@ -26,5 +26,5 @@ Object.assign(EmptySequence.prototype, {
 });
 
 hi.register("empty", {}, function(){
-    return new EmptySequence();
+    return new hi.EmptySequence();
 });

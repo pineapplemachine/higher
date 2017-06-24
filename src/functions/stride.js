@@ -8,7 +8,7 @@ const getStrideLength = function(strideLength){
 
 // Implement stride using repeated popping of elements.
 // Note that initialization potentially changes the state of the source sequence.
-function PoppingStrideSequence(strideLength, source){
+hi.PoppingStrideSequence = function(strideLength, source){
     this.strideLength = getStrideLength(strideLength);
     this.source = source;
     this.maskAbsentMethods(source);
@@ -24,7 +24,7 @@ function PoppingStrideSequence(strideLength, source){
 
 // Implement stride using indexing.
 // For this to be available, the source must support index and length methods.
-function IndexStrideSequence(strideLength, source){
+hi.IndexStrideSequence = function(strideLength, source){
     if(!source.bounded()){
         throw "Failed to create stride sequence: Source must be bounded.";
     }
@@ -36,8 +36,8 @@ function IndexStrideSequence(strideLength, source){
     this.maskAbsentMethods(source);
 }
 
-PoppingStrideSequence.prototype = Object.create(hi.Sequence.prototype);
-Object.assign(PoppingStrideSequence.prototype, {
+hi.PoppingStrideSequence.prototype = Object.create(hi.Sequence.prototype);
+Object.assign(hi.PoppingStrideSequence.prototype, {
     bounded: function(){
         return this.source.bounded();
     },
@@ -73,7 +73,7 @@ Object.assign(PoppingStrideSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        let copy = new StrideSequence(this.strideLength, this.source.copy());
+        let copy = new hi.StrideSequence(this.strideLength, this.source.copy());
     },
     reset: function(){
         this.source.reset();
@@ -81,8 +81,8 @@ Object.assign(PoppingStrideSequence.prototype, {
     },
 });
 
-IndexStrideSequence.prototype = Object.create(hi.Sequence.prototype);
-Object.assign(IndexStrideSequence.prototype, {
+hi.IndexStrideSequence.prototype = Object.create(hi.Sequence.prototype);
+Object.assign(hi.IndexStrideSequence.prototype, {
     bounded: () => true,
     done: function(){
         return this.frontIndex >= this.backIndex;
@@ -109,7 +109,7 @@ Object.assign(IndexStrideSequence.prototype, {
         return this.source.index(i * this.strideLength);
     },
     slice: function(i, j){
-        return new IndexStrideSequence(this.strideLength,
+        return new hi.IndexStrideSequence(this.strideLength,
             this.source.slice(i * this.strideLength, j * this.strideLength)
         );
     },
@@ -118,7 +118,7 @@ Object.assign(IndexStrideSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        let copy = new IndexStrideSequence(this.strideLength, this.source.copy());
+        let copy = new hi.IndexStrideSequence(this.strideLength, this.source.copy());
     },
     reset: function(){
         this.source.reset();
@@ -136,8 +136,8 @@ hi.register("stride", {
     if(strideLength === 1){
         return source;
     }else if(source.index && source.length && source.bounded()){
-        return new IndexStrideSequence(strideLength, source);
+        return new hi.IndexStrideSequence(strideLength, source);
     }else{
-        return new PoppingStrideSequence(strideLength, source);
+        return new hi.PoppingStrideSequence(strideLength, source);
     }
 });

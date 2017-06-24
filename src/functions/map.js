@@ -1,17 +1,17 @@
 // Map sequence optimized for no input sequences.
-function NullMapSequence(transform){
+hi.NullMapSequence = function(transform){
     this.transform = transform;
 }
 
 // Map sequence optimized for one input sequence.
-function SingularMapSequence(transform, source){
+hi.SingularMapSequence = function(transform, source){
     this.source = source;
     this.transform = transform;
     this.maskAbsentMethods(source);
 }
 
 // Map sequence for any number of input sequences.
-function PluralMapSequence(transform, sources){
+hi.PluralMapSequence = function(transform, sources){
     this.sources = sources;
     this.source = sources[0];
     this.transform = transform;
@@ -20,10 +20,10 @@ function PluralMapSequence(transform, sources){
     }
 }
 
-NullMapSequence.prototype = Object.create(EmptySequence.prototype);
+hi.NullMapSequence.prototype = Object.create(hi.EmptySequence.prototype);
 
-SingularMapSequence.prototype = Object.create(hi.Sequence.prototype);
-Object.assign(SingularMapSequence.prototype, {
+hi.SingularMapSequence.prototype = Object.create(hi.Sequence.prototype);
+Object.assign(hi.SingularMapSequence.prototype, {
     bounded: function(){
         return this.source.bounded();
     },
@@ -52,7 +52,7 @@ Object.assign(SingularMapSequence.prototype, {
         return this.transform(this.source.index(i));
     },
     slice: function(i, j){
-        return new SingularMapSequence(this.transform, this.source.slice(i, j));
+        return new hi.SingularMapSequence(this.transform, this.source.slice(i, j));
     },
     has: function(i){
         return this.source.has(i);
@@ -61,7 +61,7 @@ Object.assign(SingularMapSequence.prototype, {
         return this.transform(this.source.get(i));
     },
     copy: function(){
-        return new SingularMapSequence(this.transform, this.source.copy());
+        return new hi.SingularMapSequence(this.transform, this.source.copy());
     },
     reset: function(){
         this.source.reset();
@@ -69,8 +69,8 @@ Object.assign(SingularMapSequence.prototype, {
     },
 });
 
-PluralMapSequence.prototype = Object.create(hi.Sequence.prototype);
-Object.assign(PluralMapSequence.prototype, {
+hi.PluralMapSequence.prototype = Object.create(hi.Sequence.prototype);
+Object.assign(hi.PluralMapSequence.prototype, {
     bounded: function(){
         for(let source of this.sources){
             if(!source.bounded()) return false;
@@ -125,7 +125,7 @@ Object.assign(PluralMapSequence.prototype, {
     slice: function(i, j){
         let slices = [];
         for(let source of this.sources) slices.push(source.slice(i, j));
-        return new PluralMapSequence(this.transform, slices);
+        return new hi.PluralMapSequence(this.transform, slices);
     },
     has: function(i){
         for(let source of this.sources){
@@ -141,7 +141,7 @@ Object.assign(PluralMapSequence.prototype, {
     copy: function(){
         let copies = [];
         for(let source of this.sources) copies.push(source.copy());
-        return new PluralMapSequence(this.transform, copies);
+        return new hi.PluralMapSequence(this.transform, copies);
     },
     reset: function(){
         for(let source of this.sources) source.reset();
@@ -154,10 +154,10 @@ hi.register("map", {
     sequences: "*",
 }, function(transform, sources){
     if(sources.length === 1){
-        return new SingularMapSequence(transform, sources[0]);
+        return new hi.SingularMapSequence(transform, sources[0]);
     }else if(sources.length === 0){
-        return new NullMapSequence(transform);
+        return new hi.NullMapSequence(transform);
     }else{
-        return new PluralMapSequence(transform, sources);
+        return new hi.PluralMapSequence(transform, sources);
     }
 });

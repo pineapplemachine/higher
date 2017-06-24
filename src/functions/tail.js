@@ -6,7 +6,7 @@ hi.register("tail", {
     sequences: 1,
 }, function(elements, source){
     if(elements < 1){
-        return new EmptySequence();
+        return new hi.EmptySequence();
     }else if(source.length && source.slice){
         let length = source.length();
         let slice = length < elements ? length : elements;

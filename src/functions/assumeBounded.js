@@ -1,10 +1,10 @@
-function AssumeBoundedSequence(source){
+hi.AssumeBoundedSequence = function(source){
     this.source = source;
     this.maskAbsentMethods(source);
 }
 
-AssumeBoundedSequence.prototype = Object.create(hi.Sequence.prototype);
-Object.assign(AssumeBoundedSequence.prototype, {
+hi.AssumeBoundedSequence.prototype = Object.create(hi.Sequence.prototype);
+Object.assign(hi.AssumeBoundedSequence.prototype, {
     bounded: () => true,
     done: function(){
         return this.source.done();
@@ -31,10 +31,10 @@ Object.assign(AssumeBoundedSequence.prototype, {
         return this.source.index(i);
     },
     slice: function(i, j){
-        return new AssumeBoundedSequence(this.source.slice(i, j));
+        return new hi.AssumeBoundedSequence(this.source.slice(i, j));
     },
     copy: function(){
-        return new AssumeBoundedSequence(this.source.copy());
+        return new hi.AssumeBoundedSequence(this.source.copy());
     },
     has: function(i){
         return this.source.has(i);
@@ -55,5 +55,5 @@ Object.assign(AssumeBoundedSequence.prototype, {
 hi.register("assumeBounded", {
     sequences: 1,
 }, function(source){
-    return source.bounded() ? source : new AssumeBoundedSequence(source);
+    return source.bounded() ? source : new hi.AssumeBoundedSequence(source);
 });
