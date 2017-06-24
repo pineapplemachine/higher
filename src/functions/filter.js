@@ -1,12 +1,4 @@
 hi.FilterSequence = function(predicate, source, initialize = true){
-    if(initialize){
-        while(!predicate(source.front())){
-            source.popFront();
-        }
-        if(source.back) while(!predicate(source.back())){
-            source.popBack();
-        }
-    }
     this.predicate = predicate;
     this.source = source;
     this.maskAbsentMethods(source);
@@ -14,6 +6,34 @@ hi.FilterSequence = function(predicate, source, initialize = true){
 
 hi.FilterSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.FilterSequence.prototype, {
+    initializeFront: function(){
+        while(!this.predicate(this.source.front())){
+            this.source.popFront();
+        }
+        this.front = function(){
+            return this.source.front();
+        };
+        this.popFront = function(){
+            this.source.popFront();
+            while(!this.source.done() && !this.predicate(this.source.front())){
+                this.source.popFront();
+            }
+        };
+    },
+    initializeBack: function(){
+        while(!this.predicate(this.source.back())){
+            this.source.popBack();
+        }
+        this.back = function(){
+            return this.source.back();
+        }
+        this.popBack = function(){
+            this.source.popBack();
+            while(!this.source.done() && !this.predicate(this.source.back())){
+                this.source.popBack();
+            }
+        };
+    },
     bounded: function(){
         return this.source.bounded();
     },
@@ -23,22 +43,20 @@ Object.assign(hi.FilterSequence.prototype, {
     length: null,
     left: null,
     front: function(){
+        this.initializeFront();
         return this.source.front();
     },
     popFront: function(){
-        this.source.popFront();
-        while(!this.source.done() && !this.predicate(this.source.front())){
-            this.source.popFront();
-        }
+        this.initializeFront();
+        return this.popFront();
     },
     back: function(){
+        this.initializeBack();
         return this.source.back();
     },
     popBack: function(){
-        this.source.popBack();
-        while(!this.source.done() && !this.predicate(this.source.back())){
-            this.source.popBack();
-        }
+        this.initializeBack();
+        return this.popBack();
     },
     index: null,
     slice: null,
