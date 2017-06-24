@@ -1,4 +1,8 @@
-const hi = {
+const hi = function(source){
+    return hi.asSequence(source);
+};
+
+Object.assign(hi, {
     version: "0.1.0",
     
     internal: {},
@@ -44,7 +48,7 @@ const hi = {
             this[alias + "Async"] = this[name + "Async"];
         }
     },
-};
+});
 
 if(typeof window === "undefined"){
     hi.callAsync = function(callback){

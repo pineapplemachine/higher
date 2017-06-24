@@ -32,9 +32,6 @@ hi.asSequence = function(source){
     }
 };
 
-// Convenient alias for same.
-hi.seq = hi.asSequence;
-
 // Get a sequence for enumerating the elements of an array.
 // Optionally accepts an inclusive start index and an exclusive end index.
 // When start and end indexes aren't given, the sequence enumerates the
