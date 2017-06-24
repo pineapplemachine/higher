@@ -61,12 +61,12 @@ hi.Sequence.prototype.collapse = function(limit = -1){
     let stack = [];
     let breaks = [];
     let i = 0;
-    while(source && isSequence(source)){
+    while(source && hi.isSequence(source)){
         if(source.collapseBreak) breaks.push(stack.length);
         stack.push(source);
         source = source.source;
     }
-    if(!isArray(source)){
+    if(!hi.isArray(source)){
         throw (
             "Sequence collapsing is supported only for sequences that are " +
             "based on an array. To acquire other sequences in-memory, see " +
