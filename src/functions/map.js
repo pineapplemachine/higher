@@ -22,7 +22,7 @@ function PluralMapSequence(transform, sources){
 
 NullMapSequence.prototype = Object.create(EmptySequence.prototype);
 
-SingularMapSequence.prototype = Object.create(Sequence.prototype);
+SingularMapSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(SingularMapSequence.prototype, {
     bounded: function(){
         return this.source.bounded();
@@ -69,7 +69,7 @@ Object.assign(SingularMapSequence.prototype, {
     },
 });
 
-PluralMapSequence.prototype = Object.create(Sequence.prototype);
+PluralMapSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(PluralMapSequence.prototype, {
     bounded: function(){
         for(let source of this.sources){

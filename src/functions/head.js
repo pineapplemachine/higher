@@ -6,7 +6,7 @@ function HeadSequence(elements, source, frontIndex = 0){
     this.maskAbsentMethods(source);
 }
 
-HeadSequence.prototype = Object.create(Sequence.prototype);
+HeadSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(HeadSequence.prototype, {
     bounded: () => true,
     done: function(){

@@ -1,29 +1,29 @@
 // Check whether a value is a sequence or can be coerced to a sequence type.
-const validAsSequence = function(value){
-    return isIterable(value) || isObject(value);
+hi.validAsSequence = function(value){
+    return hi.isIterable(value) || hi.isObject(value);
 };
 
-const validAsBoundedSequence = function(value){
+hi.validAsBoundedSequence = function(value){
     return (
-        (isSequence(value) && value.bounded()) ||
-        isArray(value) || isString(value) || isObject(value)
+        (hi.isSequence(value) && value.bounded()) ||
+        hi.isArray(value) || hi.isString(value) || hi.isObject(value)
     );
 };
 
 // Get an array, string, iterable, or object as a sequence.
 // If it receives a sequences as input, returns that sequence.
 // For all other inputs an error is thrown.
-const asSequence = function(source){
-    if(isSequence(source)){
+hi.asSequence = function(source){
+    if(hi.isSequence(source)){
         return source;
-    }else if(isArray(source)){
-        return new ArraySequence(source);
-    }else if(isString(source)){
-        return new StringSequence(source);
-    }else if(isIterable(source)){
-        return new IterableSequence(source);
-    }else if(isObject(source)){
-        return new ObjectSequence(source);
+    }else if(hi.isArray(source)){
+        return new hi.ArraySequence(source);
+    }else if(hi.isString(source)){
+        return new hi.StringSequence(source);
+    }else if(hi.isIterable(source)){
+        return new hi.IterableSequence(source);
+    }else if(hi.isObject(source)){
+        return new hi.ObjectSequence(source);
     }else{
         throw (
             "Value is not valid as a sequence. Only arrays, strings, " +
@@ -32,20 +32,23 @@ const asSequence = function(source){
     }
 };
 
+// Convenient alias for same.
+hi.seq = hi.asSequence;
+
 // Get a sequence for enumerating the elements of an array.
 // Optionally accepts an inclusive start index and an exclusive end index.
 // When start and end indexes aren't given, the sequence enumerates the
 // entire contents of the array.
-function ArraySequence(source, low, high){
+hi.ArraySequence = function(source, low, high){
     this.source = source;
     this.lowIndex = isNaN(low) ? 0 : low;
     this.highIndex = isNaN(high) ? source.length : high;
     this.frontIndex = this.lowIndex;
     this.backIndex = this.highIndex;
-}
+};
 
-ArraySequence.prototype = Object.create(Sequence.prototype);
-Object.assign(ArraySequence.prototype, {
+hi.ArraySequence.prototype = Object.create(hi.Sequence.prototype);
+Object.assign(hi.ArraySequence.prototype, {
     bounded: () => true,
     done: function(){
         return this.frontIndex >= this.backIndex;
@@ -72,7 +75,7 @@ Object.assign(ArraySequence.prototype, {
         return this.source[this.lowIndex + i];
     },
     slice: function(i, j){
-        return new ArraySequence(
+        return new hi.ArraySequence(
             this.source, this.lowIndex + i, this.lowIndex + j
         );
     },
@@ -83,7 +86,7 @@ Object.assign(ArraySequence.prototype, {
         return this.source[i - this.lowIndex];
     },
     copy: function(){
-        let copy = new ArraySequence(this.source, this.lowIndex, this.highIndex);
+        let copy = new hi.ArraySequence(this.source, this.lowIndex, this.highIndex);
         copy.frontIndex = this.frontIndex;
         copy.backIndex = this.backIndex;
         return copy;
@@ -99,16 +102,16 @@ Object.assign(ArraySequence.prototype, {
 // Optionally accepts an inclusive start index and an exclusive end index.
 // When start and end indexes aren't given, the sequence enumerates the
 // entire contents of the string.
-function StringSequence(source, low, high){
+hi.StringSequence = function(source, low, high){
     this.source = source;
     this.lowIndex = isNaN(low) ? 0 : low;
     this.highIndex = isNaN(high) ? source.length : high;
     this.frontIndex = this.lowIndex;
     this.backIndex = this.highIndex;
-}
+};
 
-StringSequence.prototype = Object.create(Sequence.prototype);
-Object.assign(StringSequence.prototype, {
+hi.StringSequence.prototype = Object.create(hi.Sequence.prototype);
+Object.assign(hi.StringSequence.prototype, {
     bounded: () => true,
     done: function(){
         return this.frontIndex >= this.backIndex;
@@ -135,7 +138,7 @@ Object.assign(StringSequence.prototype, {
         return this.source[this.lowIndex + i];
     },
     slice: function(i, j){
-        return new StringSequence(
+        return new hi.StringSequence(
             this.source, this.lowIdex + i, this.lowIndex + j
         );
     },
@@ -146,7 +149,7 @@ Object.assign(StringSequence.prototype, {
         return this.source[i - this.lowIndex];
     },
     copy: function(){
-        let copy = new StringSequence(this.source, this.lowIndex, this.highIndex);
+        let copy = new hi.StringSequence(this.source, this.lowIndex, this.highIndex);
         copy.frontIndex = this.frontIndex;
         copy.backIndex = this.backIndex;
         return copy;
@@ -162,14 +165,14 @@ Object.assign(StringSequence.prototype, {
 // Optionally accepts an array of keys indicating which keys of the object
 // should be enumerated. When not explicitly provided, the sequence enumerates
 // key, value pairs for all of the object's own keys.
-function ObjectSequence(source, keys){
+hi.ObjectSequence = function(source, keys){
     this.source = source;
     this.keys = keys || Object.keys(source);
     this.keyIndex = 0;
-}
+};
 
-ObjectSequence.prototype = Object.create(Sequence.prototype);
-Object.assign(ObjectSequence.prototype, {
+hi.ObjectSequence.prototype = Object.create(hi.Sequence.prototype);
+Object.assign(hi.ObjectSequence.prototype, {
     bounded: () => true,
     done: function(){
         return this.keyIndex >= this.keys.length;
@@ -199,7 +202,7 @@ Object.assign(ObjectSequence.prototype, {
         return this.source[i];
     },
     copy: function(){
-        let copy = new ObjectSequence(this.source, this.keys);
+        let copy = new hi.ObjectSequence(this.source, this.keys);
         copy.keyIndex = this.keyIndex;
         return copy;
     },
@@ -213,13 +216,13 @@ Object.assign(ObjectSequence.prototype, {
 // An iterable is anything with a "next" method returning an object with two
 // attributes, "done" being a boolean indicating when the iterator has been
 // fully consumed and "value" being the current element of the iterator.
-function IterableSequence(source){
+hi.IterableSequence = function(source){
     this.source = source;
     this.item = source.next();
-}
+};
 
-IterableSequence.prototype = Object.create(Sequence.prototype);
-Object.assign(IterableSequence.prototype, {
+hi.IterableSequence.prototype = Object.create(hi.Sequence.prototype);
+Object.assign(hi.IterableSequence.prototype, {
     bounded: () => false,
     done: function(){
         return this.item.done;

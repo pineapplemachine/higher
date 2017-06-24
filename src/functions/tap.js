@@ -8,7 +8,7 @@ function TapSequence(callback, source){
     this.maskAbsentMethods(source);
 }
 
-TapSequence.prototype = Object.create(Sequence.prototype);
+TapSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(TapSequence.prototype, {
     bounded: function(){
         return this.source.bounded();

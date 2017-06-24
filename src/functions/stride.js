@@ -36,7 +36,7 @@ function IndexStrideSequence(strideLength, source){
     this.maskAbsentMethods(source);
 }
 
-PoppingStrideSequence.prototype = Object.create(Sequence.prototype);
+PoppingStrideSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(PoppingStrideSequence.prototype, {
     bounded: function(){
         return this.source.bounded();
@@ -81,7 +81,7 @@ Object.assign(PoppingStrideSequence.prototype, {
     },
 });
 
-IndexStrideSequence.prototype = Object.create(Sequence.prototype);
+IndexStrideSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(IndexStrideSequence.prototype, {
     bounded: () => true,
     done: function(){

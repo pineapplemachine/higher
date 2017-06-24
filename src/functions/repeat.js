@@ -45,7 +45,7 @@ function InfiniteRepeatSequence(source, frontSource = null, backSource = null){
     this.maskAbsentMethods(source);
 }
 
-FiniteRepeatSequence.prototype = Object.create(Sequence.prototype);
+FiniteRepeatSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(FiniteRepeatSequence.prototype, {
     finishedRepetitions: function(){
         return this.frontRepetitions + this.backRepetitions;
@@ -168,7 +168,7 @@ Object.assign(FiniteRepeatSequence.prototype, {
     },
 });
 
-InfiniteRepeatSequence.prototype = Object.create(Sequence.prototype);
+InfiniteRepeatSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(InfiniteRepeatSequence.prototype, {
     bounded: () => false,
     done: () => false,

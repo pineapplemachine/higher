@@ -53,6 +53,8 @@ const expectedDescriptionStringPart = function(expected, singular, plural){
         return `no ${plural}`;
     }else if(expected && !isNaN(expected)){
         return `exactly ${expected} ${+expected === 1 ? singular : plural}`;
+    }else if(hi.isArray(expected)){
+        return `between ${expected[0]} and ${expected[1]} ${plural}`;
     }else if(expected === "*"){
         return `any number of ${plural}`;
     }else if(expected === "+"){
@@ -87,8 +89,8 @@ const expectedDescriptionString = function(expected){
 // Get an English name for an argument type, one of "number", "function",
 // "sequence", or "invalid".
 const getArgumentTypeName = function(argument){
-    if(isFunction(argument)) return "function";
-    else if(validAsSequence(argument)) return "sequence";
+    if(hi.isFunction(argument)) return "function";
+    else if(hi.validAsSequence(argument)) return "sequence";
     else if(!isNaN(argument)) return "number";
     else return "invalid";
 };
@@ -100,6 +102,8 @@ const getExpectedArgumentsSatisfied = function(expected, found){
         return found === 0;
     }else if(!isNaN(expected)){
         return found === +expected;
+    }else if(hi.isArray(expected)){
+        return found >= expected[0] && found <= expected[1];
     }else if(expected === "+"){
         return found >= 1;
     }else if(expected === "?"){
@@ -161,8 +165,8 @@ const countArgumentTypes = function(args){
     let sequences = 0;
     let invalid = 0;
     for(let argument of args){
-        if(isFunction(argument)) functions++;
-        else if(validAsSequence(argument)) sequences++;
+        if(hi.isFunction(argument)) functions++;
+        else if(hi.validAsSequence(argument)) sequences++;
         else if(!isNaN(argument)) numbers++;
         else invalid++;
     }
@@ -183,10 +187,10 @@ const separateArgumentTypes = function(args, allowIterables){
     let sequences = [];
     let invalid = [];
     for(let argument of args){
-        if(isFunction(argument)){
+        if(hi.isFunction(argument)){
             functions.push(argument);
-        }else if(validAsSequence(argument)){
-            sequences.push(allowIterables ? argument : asSequence(argument));
+        }else if(hi.validAsSequence(argument)){
+            sequences.push(allowIterables ? argument : hi.asSequence(argument));
         }else if(!isNaN(argument)){
             numbers.push(+argument);
         }else{

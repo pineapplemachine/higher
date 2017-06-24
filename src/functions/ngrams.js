@@ -8,7 +8,7 @@ function NgramSequence(ngramSize, source, currentNgram = null){
     this.maskAbsentMethods(source);
 }
 
-NgramSequence.prototype = Object.create(Sequence.prototype);
+NgramSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(NgramSequence.prototype, {
     bounded: function(){
         return this.source.bounded();

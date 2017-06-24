@@ -1,4 +1,4 @@
-function FilterSequence(predicate, source, initialize = true){
+hi.FilterSequence = function(predicate, source, initialize = true){
     if(initialize){
         while(!predicate(source.front())){
             source.popFront();
@@ -10,10 +10,10 @@ function FilterSequence(predicate, source, initialize = true){
     this.predicate = predicate;
     this.source = source;
     this.maskAbsentMethods(source);
-}
+};
 
-FilterSequence.prototype = Object.create(Sequence.prototype);
-Object.assign(FilterSequence.prototype, {
+hi.FilterSequence.prototype = Object.create(hi.Sequence.prototype);
+Object.assign(hi.FilterSequence.prototype, {
     bounded: function(){
         return this.source.bounded();
     },
@@ -49,7 +49,7 @@ Object.assign(FilterSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        return new FilterSequence(this.predicate, this.source.copy(), false);
+        return new hi.FilterSequence(this.predicate, this.source.copy(), false);
     },
     reset: function(){
         this.source.reset();
@@ -61,5 +61,5 @@ hi.register("filter", {
     functions: 1,
     sequences: 1,
 }, function(predicate, source){
-    return new FilterSequence(predicate, source)
+    return new hi.FilterSequence(predicate, source)
 });

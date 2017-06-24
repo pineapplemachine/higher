@@ -8,7 +8,7 @@ function ReverseSequence(source){
     }
 }
 
-ReverseSequence.prototype = Object.create(Sequence.prototype);
+ReverseSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(ReverseSequence.prototype, {
     bounded: function(){
         return this.source.bounded;

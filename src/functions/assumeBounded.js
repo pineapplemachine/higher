@@ -3,7 +3,7 @@ function AssumeBoundedSequence(source){
     this.maskAbsentMethods(source);
 }
 
-AssumeBoundedSequence.prototype = Object.create(Sequence.prototype);
+AssumeBoundedSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(AssumeBoundedSequence.prototype, {
     bounded: () => true,
     done: function(){

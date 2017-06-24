@@ -10,7 +10,7 @@ function InfiniteRepeatElementSequence(element){
     this.element = element;
 }
 
-FiniteRepeatElementSequence.prototype = Object.create(Sequence.prototype);
+FiniteRepeatElementSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(FiniteRepeatElementSequence.prototype, {
     seed: function(element){
         this.element = element;
@@ -56,7 +56,7 @@ Object.assign(FiniteRepeatElementSequence.prototype, {
     },
 });
 
-InfiniteRepeatElementSequence.prototype = Object.create(Sequence.prototype);
+InfiniteRepeatElementSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(InfiniteRepeatElementSequence.prototype, {
     seed: function(element){
         this.element = element;

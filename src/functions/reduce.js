@@ -93,7 +93,7 @@ function ReduceSequence(
     }
 }
 
-ReduceSequence.prototype = Object.create(Sequence.prototype);
+ReduceSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(ReduceSequence.prototype, {
     bounded: function(){
         return this.source.bounded();

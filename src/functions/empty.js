@@ -1,7 +1,7 @@
 // A chronically empty sequence.
 function EmptySequence(){}
 
-EmptySequence.prototype = Object.create(Sequence.prototype);
+EmptySequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(EmptySequence.prototype, {
     bounded: () => true,
     done: () => true,
