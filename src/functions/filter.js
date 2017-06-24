@@ -67,7 +67,14 @@ Object.assign(hi.FilterSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        return new hi.FilterSequence(this.predicate, this.source.copy(), false);
+        let copy = new hi.FilterSequence(
+            this.predicate, this.source.copy(), false
+        );
+        copy.front = this.front;
+        copy.popFront = this.popFront;
+        copy.back = this.back;
+        copy.popBack = this.popBack;
+        return copy;
     },
     reset: function(){
         this.source.reset();
