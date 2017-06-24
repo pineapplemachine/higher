@@ -1,4 +1,7 @@
 hi.ReverseSequence = function(source){
+    if(!source.back){
+        throw "Failed to reverse sequence: Sequence must be bidirectional.";
+    }
     this.source = source;
     this.maskAbsentMethods(source);
     // Length property is required to support index and slice operations.
@@ -76,7 +79,12 @@ hi.register("reverse", {
 }, function(source){
     if(source instanceof hi.ReverseSequence){
         return source.source;
-    }else{
+    }else if(source.back){
         return new hi.ReverseSequence(source);
+    }else if(source.bounded()){
+        // For large sequences this can be expensive, but the only way to do it.
+        return new hi.ReverseSequence(new hi.LazyArraySequence(source));
+    }else{
+        throw "Failed to reverse sequence: Can't reverse unidirectional unbounded sequence.";
     }
 });
