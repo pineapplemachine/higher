@@ -1,4 +1,4 @@
-const consume = registerFunction("consume", {
+hi.register("consume", {
     sequences: 1,
     // Don't waste time coercing input iterables to sequences
     allowIterables: true,

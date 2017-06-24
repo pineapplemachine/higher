@@ -218,7 +218,7 @@ Object.assign(InfiniteRepeatSequence.prototype, {
     },
 });
 
-const repeat = registerFunction("repeat", {
+hi.register("repeat", {
     numbers: "?",
     sequences: 1,
 }, function(repetitions, source){

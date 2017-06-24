@@ -1,4 +1,4 @@
-const each = registerFunction("each", {
+hi.register("each", {
     functions: 1,
     sequences: 1,
     // Don't waste time coercing input iterables to sequences

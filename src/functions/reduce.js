@@ -139,7 +139,7 @@ Object.assign(ReduceSequence.prototype, {
     },
 });
 
-const reduce = registerFunction("reduce", {
+hi.register("reduce", {
     functions: 1,
     sequences: 1,
     // Don't waste time coercing input iterables to sequences

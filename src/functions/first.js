@@ -1,7 +1,7 @@
 // Get the first element in a sequence or, if a predicate is passed,
 // get the first element meeting that predicate.
 // Returns undefined if there was no such element.
-const first = registerFunction("first", {
+hi.register("first", {
     functions: "?",
     sequences: 1,
     // Don't waste time coercing input iterables to sequences
@@ -19,9 +19,10 @@ const first = registerFunction("first", {
 
 // Separate async implementation to handle reject callback when there
 // is no first element.
-first.async = registerFunction("firstAsync", {
+hi.register("firstAsync", {
     functions: "?",
     sequences: 1,
+    isAsync: true,
     // Don't waste time coercing input iterables to sequences
     allowIterables: true,
 }, function(predicate, source){

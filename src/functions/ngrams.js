@@ -63,7 +63,7 @@ Object.assign(NgramSequence.prototype, {
     },
 });
 
-const ngrams = registerFunction("ngrams", {
+hi.register("ngrams", {
     numbers: 1,
     sequences: 1,
 }, function(ngramSize, source){
@@ -74,13 +74,13 @@ const ngrams = registerFunction("ngrams", {
     }
 });
 
-const bigrams = registerFunction("bigrams", {
+hi.register("bigrams", {
     sequences: 1,
 }, function(source){
     return new NgramSequence(2, source);
 });
 
-const trigrams = registerFunction("trigrams", {
+hi.register("trigrams", {
     sequences: 1,
 }, function(source){
     return new NgramSequence(3, source);

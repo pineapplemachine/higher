@@ -67,7 +67,7 @@ Object.assign(TapSequence.prototype, {
     },
 });
 
-const tap = registerFunction("tap", {
+hi.register("tap", {
     functions: 1,
     sequences: 1,
 }, function(callback, source){

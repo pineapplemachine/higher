@@ -129,7 +129,7 @@ Object.assign(IndexStrideSequence.prototype, {
     },
 });
 
-const stride = registerFunction("stride", {
+hi.register("stride", {
     numbers: 1,
     sequences: 1,
 }, function(strideLength, source){

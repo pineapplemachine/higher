@@ -149,7 +149,7 @@ Object.assign(PluralMapSequence.prototype, {
     },
 });
 
-const map = registerFunction("map", {
+hi.register("map", {
     functions: 1,
     sequences: "*",
 }, function(transform, sources){

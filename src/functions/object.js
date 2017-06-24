@@ -1,4 +1,4 @@
-const object = registerFunction("object", {
+hi.register("object", {
     numbers: "?",
     sequences: 1,
     // Don't waste time coercing input iterables to sequences

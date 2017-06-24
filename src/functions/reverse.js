@@ -71,7 +71,7 @@ Object.assign(ReverseSequence.prototype, {
     },
 });
 
-const reverse = registerFunction("reverse", {
+hi.register("reverse", {
     sequences: 1,
 }, function(source){
     if(source instanceof ReverseSequence){

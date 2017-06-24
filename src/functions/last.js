@@ -1,7 +1,7 @@
 // Get the last element in a sequence or, if a predicate is passed,
 // get the last element meeting that predicate.
 // Returns undefined if there was no such element.
-const last = registerFunction("last", {
+hi.register("last", {
     functions: "?",
     sequences: 1,
 }, function(predicate, source){
@@ -20,9 +20,10 @@ const last = registerFunction("last", {
 
 // Separate async implementation to handle reject callback when there
 // is no first element.
-last.async = registerFunction("lastAsync", {
+hi.register("lastAsync", {
     functions: "?",
     sequences: 1,
+    isAsync: true,
 }, function(predicate, source){
     return new Promise((resolve, reject) => {
         hi.callAsync(() => {

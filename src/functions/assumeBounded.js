@@ -52,7 +52,7 @@ Object.assign(AssumeBoundedSequence.prototype, {
 // unbounded sequence is in fact bounded.
 // This may be helpful if you're sure a sequence that you want to fully
 // consume will eventually end, even if higher can't tell for itself.
-const assumeBounded = registerFunction("assumeBounded", {
+hi.register("assumeBounded", {
     sequences: 1,
 }, function(source){
     return source.bounded() ? source : new AssumeBoundedSequence(source);

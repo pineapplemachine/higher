@@ -25,6 +25,6 @@ Object.assign(EmptySequence.prototype, {
     },
 });
 
-const empty = registerFunction("empty", {}, function(){
+hi.register("empty", {}, function(){
     return new EmptySequence();
 });

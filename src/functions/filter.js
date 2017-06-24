@@ -57,7 +57,7 @@ Object.assign(FilterSequence.prototype, {
     },
 });
 
-const filter = registerFunction("filter", {
+hi.register("filter", {
     functions: 1,
     sequences: 1,
 }, function(predicate, source){

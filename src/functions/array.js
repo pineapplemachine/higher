@@ -3,7 +3,7 @@
 // elements to output to the array.
 // Will throw an error if the function receives an unbounded sequence and
 // no length limit.
-const array = registerFunction("array", {
+hi.register("array", {
     numbers: "?",
     sequences: 1,
     // Don't waste time coercing input iterables to sequences

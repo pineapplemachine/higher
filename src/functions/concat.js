@@ -108,7 +108,7 @@ Object.assign(ConcatSequence.prototype, {
     },
 });
 
-const concat = registerFunction("concat", {
+hi.register("concat", {
     sequences: "*",
 }, function(sources){
     return new ConcatSequence(sources);

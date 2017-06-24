@@ -1,4 +1,4 @@
-const write = registerFunction("write", {
+hi.register("write", {
     numbers: "?",
     sequences: 2,
     // Don't waste time coercing input iterables to sequences

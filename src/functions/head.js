@@ -50,7 +50,7 @@ Object.assign(HeadSequence.prototype, {
 // Get a sequence for enumerating the first so many elements of the input.
 // The resulting sequence may be shorter than the length specified, but
 // will never be longer.
-const head = registerFunction("head", {
+hi.register("head", {
     numbers: 1,
     sequences: 1,
 }, function(elements, source){
