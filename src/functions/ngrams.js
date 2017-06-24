@@ -22,11 +22,9 @@ Object.assign(NgramSequence.prototype, {
     left: function(){
         return 1 + this.source.left();
     },
+    // Note that modifying the returned array will break the behavior of this
+    // sequence. For a value that's safe to modify, slice() the returned array.
     front: function(){
-        return this.currentNgram.slice();
-    },
-    // Faster than front, but the return value must not be modified.
-    frontImm: function(){
         return this.currentNgram;
     },
     popFront: function(){

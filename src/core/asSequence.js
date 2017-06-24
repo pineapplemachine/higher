@@ -158,39 +158,6 @@ Object.assign(StringSequence.prototype, {
     },
 });
 
-// Get a sequence that enumerates the items of an iterable.
-// An iterable is anything with a "next" method returning an object with two
-// attributes, "done" being a boolean indicating when the iterator has been
-// fully consumed and "value" being the current element of the iterator.
-function IterableSequence(source){
-    this.source = source;
-    this.item = source.next();
-}
-
-IterableSequence.prototype = Object.create(Sequence.prototype);
-Object.assign(IterableSequence.prototype, {
-    bounded: () => false,
-    done: function(){
-        return this.item.done;
-    },
-    length: null,
-    left: null,
-    front: function(){
-        return this.item.value;
-    },
-    popFront: function(){
-        this.item = this.source.next();
-    },
-    back: null,
-    popBack: null,
-    index: null,
-    slice: null,
-    has: null,
-    get: null,
-    copy: null,
-    reset: null,
-});
-
 // Get a sequence that enumerates the key, value pairs of an arbitrary object.
 // Optionally accepts an array of keys indicating which keys of the object
 // should be enumerated. When not explicitly provided, the sequence enumerates
@@ -240,4 +207,37 @@ Object.assign(ObjectSequence.prototype, {
         this.keyIndex = 0;
         return this;
     },
+});
+
+// Get a sequence that enumerates the items of an iterable.
+// An iterable is anything with a "next" method returning an object with two
+// attributes, "done" being a boolean indicating when the iterator has been
+// fully consumed and "value" being the current element of the iterator.
+function IterableSequence(source){
+    this.source = source;
+    this.item = source.next();
+}
+
+IterableSequence.prototype = Object.create(Sequence.prototype);
+Object.assign(IterableSequence.prototype, {
+    bounded: () => false,
+    done: function(){
+        return this.item.done;
+    },
+    length: null,
+    left: null,
+    front: function(){
+        return this.item.value;
+    },
+    popFront: function(){
+        this.item = this.source.next();
+    },
+    back: null,
+    popBack: null,
+    index: null,
+    slice: null,
+    has: null,
+    get: null,
+    copy: null,
+    reset: null,
 });

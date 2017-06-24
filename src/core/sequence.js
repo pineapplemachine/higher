@@ -95,11 +95,8 @@ const getFancyWrapperFunction = function(name, expected, implementation){
 const getAsyncWrapperFunction = function(callback){
     return function(){
         return new Promise((resolve, reject) => {
-            let caller = this;
             let args = arguments;
-            hi.callAsync(function(){
-                resolve(callback(caller, args));
-            });
+            hi.callAsync(() => resolve(callback(this, args)));
         });
     };
 };
@@ -117,7 +114,7 @@ const registerFunction = function(name, expected, func){
     if(expected.async){
         const fasync = getAsyncWrapperFunction(function(caller, args){
             return fancy.apply(caller, args);
-        })
+        });
         fancy.async = fasync;
         registeredFunctions[name + "Async"] = fasync;
         if(prototypeMethod){
