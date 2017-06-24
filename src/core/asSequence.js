@@ -3,6 +3,13 @@ const validAsSequence = function(value){
     return isIterable(value) || isObject(value);
 };
 
+const validAsBoundedSequence = function(value){
+    return (
+        (isSequence(value) && value.bounded()) ||
+        isArray(value) || isString(value) || isObject(value)
+    );
+};
+
 // Get an array, string, iterable, or object as a sequence.
 // If it receives a sequences as input, returns that sequence.
 // For all other inputs an error is thrown.
