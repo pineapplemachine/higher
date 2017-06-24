@@ -50,7 +50,7 @@ Object.assign(hi.ReverseSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        return reverse.raw(this.source.copy());
+        return new hi.ReverseSequence(this.source.copy());
     },
     reset: function(){
         this.source.reset();
