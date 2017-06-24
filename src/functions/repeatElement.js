@@ -14,6 +14,7 @@ hi.FiniteRepeatElementSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.FiniteRepeatElementSequence.prototype, {
     seed: function(element){
         this.element = element;
+        return this;
     },
     bounded: () => true,
     done: function(){
@@ -60,6 +61,7 @@ hi.InfiniteRepeatElementSequence.prototype = Object.create(hi.Sequence.prototype
 Object.assign(hi.InfiniteRepeatElementSequence.prototype, {
     seed: function(element){
         this.element = element;
+        return this;
     },
     bounded: () => false,
     done: () => false,
