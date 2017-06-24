@@ -38,6 +38,9 @@ Object.assign(hi.LazyArraySequence.prototype, {
         return this.done();
     },
     length: function(){
+        if(this.source.length){
+            return this.source.length();
+        }
         if(!this.arraySequence) this.load();
         return this.length();
     },
@@ -62,8 +65,15 @@ Object.assign(hi.LazyArraySequence.prototype, {
         return this.popBack();
     },
     index: function(i){
+        if(this.source.index){
+            return this.source.index(i);
+        }
         if(!this.arraySequence) this.load();
         return this.index(i);
+    },
+    slice: function(i, j){
+        if(!this.arraySequence) this.load();
+        return this.slice(i, j);
     },
     has: function(i){
         if(!this.arraySequence) this.load();
@@ -73,13 +83,12 @@ Object.assign(hi.LazyArraySequence.prototype, {
         if(!this.arraySequence) this.load();
         return this.get(i);
     },
-    slice: function(i, j){
-        if(!this.arraySequence) this.load();
-        return this.slice(i, j);
-    },
     copy: function(){
-        if(this.arraySequence) return this.arraySequence.copy();
-        else return new hi.LazyArraySequence(this.source);
+        if(this.source.copy){
+            return new LazyArraySequence(this.source.copy());
+        }
+        if(!this.arraySequence) this.load();
+        return this.copy();
     },
     reset: function(){
         return this;
