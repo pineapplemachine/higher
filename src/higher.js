@@ -8,38 +8,21 @@ Object.assign(hi, {
     internal: {},
     
     registeredFunctions: [],
+    
     register: function(name, expected, implementation){
-        let register = {
-            name: name,
-            expected: expected,
-            implementation: implementation,
-            fancy: this.internal.wrap.fancy(name, expected, implementation),
-        };
-        this[name] = register.fancy;
-        register.fancy.raw = implementation;
-        if(!hi.args.expectNone(expected.sequences)){
-            prototypeMethod = this.internal.wrap.sequenceMethod(
-                name, expected, implementation
-            );
-            this.Sequence.prototype[name] = prototypeMethod;
-            register.prototypeMethod = prototypeMethod;
+        let wrapped = hi.wrap(expected, implementation);
+        this.registeredFunctions.push(wrapped);
+        this[name] = wrapped.fancy;
+        if(wrapped.method){
+            this.Sequence.prototype[name] = wrapped.method;
         }
-        if(expected.async){
-            const fancyAsync = this.internal.wrap.async(
-                (caller, args) => fancy.apply(caller, args)
-            );
-            this[name + "Async"] = fancyAsync;
-            register.fancyAsync = fancyAsync;
+        if(wrapped.fancyAsync){
+            this[name + "Async"] = wrapped.fancyAsync;
         }
-        if(expected.async && register.prototypeMethod){
-            const protoAsync = this.internal.wrap.async(
-                (caller, args) => prototypeMethod.apply(caller, args)
-            );
-            this.Sequence.prototype[name + "Async"] = protoAsync;
-            register.prototypeMethodAsync = protoAsync;
+        if(wrapped.methodAsync){
+            this.Sequence.prototype[name + "Async"] = wrapped.methodAsync;
         }
-        this.registeredFunctions.push(register);
-        return register.fancy;
+        return wrapped;
     },
     alias: function(name, alias){
         if(name in this){
@@ -62,5 +45,3 @@ if(typeof window === "undefined"){
     };
     window.hi = hi;
 }
-
-export default hi;

@@ -53,6 +53,7 @@ hi.Sequence.prototype.maskAbsentMethods = function(source){
     if(!source.copy) this.copy = null;
     if(!source.reset) this.reset = null;
 };
+// Here be dragons
 hi.Sequence.prototype.collapse = function(limit = -1){
     if(limit < 0 && !this.bounded()){
         throw hi.internal.unboundedError("collapse", "collapse");
@@ -106,6 +107,7 @@ hi.Sequence.prototype.collapse = function(limit = -1){
             }
             i = breaking.collapseBreak(source, i);
             if(next){
+                // TODO: Can this be accomplished more safely?
                 next.source = arraySequence;
                 arraySequence.backIndex = i;
                 if(next.sources) next.sources[0] = arraySequence;

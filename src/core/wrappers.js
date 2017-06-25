@@ -1,5 +1,19 @@
-hi.internal.wrap = {
-    fancy: function(name, expected, implementation){
+hi.wrap = function(expected, implementation){
+    let fancy = hi.wrap.fancy(expected, implementation);
+    let method = hi.wrap.method(expected, implementation);
+    return {
+        expected: expected,
+        raw: implementation,
+        fancy: fancy,
+        method: method,
+        fancyAsync: hi.wrap.fancyAsync(fancy),
+        methodAsync: method ? hi.wrap.methodAsync(method) : null,
+    };
+        
+};
+
+Object.assign(hi.wrap, {
+    fancy: function(expected, implementation){
         const numbers = hi.args.expectCount(expected.numbers);
         const functions = hi.args.expectCount(expected.functions);
         const sequences = hi.args.expectCount(expected.sequences);
@@ -8,54 +22,66 @@ hi.internal.wrap = {
             const counts = hi.args.countSeparated(found);
             if(!hi.args.satisfied(expected, counts)){
                 let error = hi.args.describe.discrepancy(expected, counts);
-                throw `Error calling ${name}: ${error}`;
+                throw `Error calling function: ${error}`;
             }
         };
-        if(numbers + functions + sequences === 1){
+        // Function accepts exactly one argument?
+        let oneArgument = numbers + functions + sequences === 1;
+        // Function accepts arguments of only one type?
+        let oneType = (
+            (numbers + functions === 0) ||
+            (functions + sequences === 0) ||
+            (sequences + numbers === 0)
+        );
+        let fancy = null;
+        if(oneArgument){
             if(sequences === 1 && !expected.allowIterables){
-                return function(){
+                fancy = function(){
                     validate(arguments);
                     return implementation(hi.asSequence(arguments[0]));
                 };
             }else{
-                return function(){
+                fancy = function(){
                     validate(arguments);
                     return implementation(arguments[0]);
                 };
             }
-        }else if(
-            (numbers + functions === 0) ||
-            (functions + sequences === 0) ||
-            (sequences + numbers === 0)
-        ){
+        }else if(oneType){
             if(sequences > 0 && !expected.allowIterables){
-                return function(){
+                fancy = function(){
                     validate(arguments);
                     let sequences = [];
                     for(let arg of arguments) sequences.push(hi.asSequence(arg));
                     return implementation(sequences);
                 };
             }else{
-                return function(){
+                fancy = function(){
                     validate(arguments);
                     return implementation(arguments);
                 };
             }
         }
-        return function(){
+        fancy = fancy || function(){
             return hi.args.validate(
                 expected, arguments, implementation, function(error){
                     throw `Error calling ${name}: ${error}`;
                 }
             );
         };
+        fancy.expected = expected;
+        fancy.raw = implementation;
+        return fancy;
     },
-    sequenceMethod: function(name, expected, implementation){
+    method: function(expected, implementation){
+        if(hi.args.expectNone(expected.sequences)){
+            return null; // Not applicable
+        }
+        let method = null;
         if(hi.args.expectSingular(expected.sequences)){
             const numbers = hi.args.expectCount(expected.numbers);
             const functions = hi.args.expectCount(expected.functions);
             if(numbers === 0 && functions === 0){
-                return function(){
+                method = function(){
                     return implementation(this);
                 };
             }else if(numbers === 0 || functions === 0){
@@ -65,23 +91,23 @@ hi.internal.wrap = {
                     counts.sequences++;
                     if(!hi.args.satisfied(expected, counts)){
                         let error = hi.args.describe.discrepancy(expected, counts);
-                        throw `Error calling ${name}: ${error}`;
+                        throw `Error calling function: ${error}`;
                     }
                 };
                 if(numbers === 1 || functions === 1){
-                    return function(){
+                    method = function(){
                         validate(arguments);
                         return implementation(arguments[0], this);
                     };
                 }else{
-                    return function(){
+                    method = function(){
                         validate(arguments);
                         return implementation(arguments, this);
                     };
                 }
             }
         }
-        return function(){
+        method = method || function(){
             Array.prototype.splice.call(arguments, 0, 0, this)
             return hi.args.validate(
                 expected, arguments, implementation, function(error){
@@ -89,6 +115,15 @@ hi.internal.wrap = {
                 }
             );
         };
+        method.expected = expected;
+        method.raw = implementation;
+        return method;
+    },
+    fancyAsync: function(fancy){
+        return hi.wrap.async((caller, args) => fancy.apply(caller, args));
+    },
+    methodAsync: function(method){
+        return hi.wrap.async((caller, args) => method.apply(caller, args));
     },
     async: function(callback){
         return function(){
@@ -98,4 +133,4 @@ hi.internal.wrap = {
             });
         };
     },
-};
+});
