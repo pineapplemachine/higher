@@ -15,7 +15,7 @@ hi.register("array", {
         return [];
     }else if(!limit){
         if(!source.bounded()){
-            throw sequenceBoundsError("write", "array");
+            throw hi.internal.unboundedError("write", "array");
         }
         let result = [];
         for(let element of source){
