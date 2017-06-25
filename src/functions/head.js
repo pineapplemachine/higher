@@ -26,6 +26,7 @@ Object.assign(hi.HeadSequence.prototype, {
     },
     popFront: function(){
         this.source.popFront();
+        this.frontIndex++;
     },
     back: null,
     popBack: null,
