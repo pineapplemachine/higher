@@ -62,3 +62,5 @@ if(typeof window === "undefined"){
     };
     window.hi = hi;
 }
+
+export default hi;
