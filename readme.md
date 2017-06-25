@@ -92,3 +92,8 @@ Any sequence has, at minimum, all of these attributes. They will either be funct
 `collapse`: Write the contents of the sequence to the array that is at its root.
 `object`: Get a new object from the contents of the sequence, where each element is interpreted as a key, value pair.
 `consume`: Fully consume the sequence. This might be useful if consuming a sequence will have side-effects.
+
+## How to contribute to hi
+
+Before making contributions to higher, please read the [code of conduct](docs/conduct.md) and the [style guide](docs/style.md).
+New features are nice, and fixes are extremely nice. Tests and documentation are amazing, too: higher cannot possibly have enough of them. Please feel especially welcome to help make higher more stable and more accessible to everyone!
