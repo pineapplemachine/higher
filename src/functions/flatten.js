@@ -2,7 +2,7 @@ hi.FlattenDeepSequence = function(source){
     this.source = source;
     this.sourceStack = [source];
     this.currentSource = source;
-}
+};
 
 hi.FlattenDeepSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.FlattenDeepSequence.prototype, {

@@ -6,7 +6,7 @@ hi.NgramSequence = function(ngramSize, source, currentNgram = null){
         this.currentNgram.push(source.nextFront());
     }
     this.maskAbsentMethods(source);
-}
+};
 
 hi.NgramSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.NgramSequence.prototype, {

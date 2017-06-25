@@ -4,7 +4,7 @@ const getStrideLength = function(strideLength){
         "Failed to create stride sequence: Stride length must not be less than one."
     );
     return value;
-}
+};
 
 // Implement stride using repeated popping of elements.
 // Note that initialization potentially changes the state of the source sequence.
@@ -20,7 +20,7 @@ hi.PoppingStrideSequence = function(strideLength, source){
     }else{
         this.back = null;
     }
-}
+};
 
 // Implement stride using indexing.
 // For this to be available, the source must support index and length methods.
@@ -34,7 +34,7 @@ hi.IndexStrideSequence = function(strideLength, source){
     this.backIndex = source.length();
     this.backIndex -= (this.backIndex % strideLength);
     this.maskAbsentMethods(source);
-}
+};
 
 hi.PoppingStrideSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.PoppingStrideSequence.prototype, {
