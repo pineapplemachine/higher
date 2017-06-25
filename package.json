@@ -1,30 +1,30 @@
 {
-  "name": "higher",
-  "version": "0.1.0",
-  "license": "Zlib",
-  "description": "Lazily-evaluated and async higher-order functions in JavaScript.",
-  "homepage": "https://www.github.com/pineapplemachine/higher",
-  "contributors": [
-    {
-      "name": "Sophie Kirschner",
-      "email": "sophiek@pineapplemachine.com"
-    }
-  ],
-  "repository": {
-    "type": "git",
-    "url": "https://www.github.com/pineapplemachine/higher"
-  },
-  "main": "lib/higher.js",
-  "module": "es/higher.js",
-  "scripts": {
-    "build": "nwb build-web-module",
-    "clean": "nwb clean-module",
-    "test": "nwb test",
-    "test:coverage": "nwb test --coverage",
-    "test:watch": "nwb test --server"
-  },
-  "devDependencies": {
-    "nwb": "0.17.x"
-  },
-  "dependencies": {}
+    "name": "higher",
+    "version": "0.1.0",
+    "license": "Zlib",
+    "description": "Lazily-evaluated and async higher-order functions in JavaScript.",
+    "homepage": "https://www.github.com/pineapplemachine/higher",
+    "contributors": [
+        {
+            "name": "Sophie Kirschner",
+            "email": "sophiek@pineapplemachine.com"
+        }
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://www.github.com/pineapplemachine/higher"
+    },
+    "main": "lib/higher.js",
+    "module": "es/higher.js",
+    "scripts": {
+        "build": "nwb build-web-module",
+        "clean": "nwb clean-module",
+        "test": "nwb test",
+        "test:coverage": "nwb test --coverage",
+        "test:watch": "nwb test --server"
+    },
+    "devDependencies": {
+        "nwb": "0.17.x"
+    },
+    "dependencies": {}
 }
