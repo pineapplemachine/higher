@@ -63,6 +63,7 @@ Object.assign(hi.InfiniteRepeatElementSequence.prototype, {
         this.element = element;
         return this;
     },
+    unbounded: () => true,
     bounded: () => false,
     done: () => false,
     length: null,

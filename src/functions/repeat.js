@@ -170,6 +170,7 @@ Object.assign(hi.FiniteRepeatSequence.prototype, {
 
 hi.InfiniteRepeatSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.InfiniteRepeatSequence.prototype, {
+    unbounded: () => true,
     bounded: () => false,
     done: () => false,
     length: null,
@@ -222,6 +223,9 @@ hi.register("repeat", {
     numbers: "?",
     sequences: 1,
 }, function(repetitions, source){
+    if(source.unbounded()){
+        return source;
+    }
     if(!source.copy){
         if(!source.bounded()) throw (
             "Error repeating sequence: Sequence is unbounded and uncopyable."

@@ -38,20 +38,23 @@ hi.Sequence.prototype.nextBack = function(){
     this.popBack();
     return value;
 };
+hi.Sequence.prototype.unbounded = function(){
+    return false;
+};
 hi.Sequence.prototype.maskAbsentMethods = function(source){
     if(!source.back){
         this.back = null;
         this.popBack = null;
         this.nextBack = null;
     }
-    if(!source.length) this.length = null;
-    if(!source.left) this.left = null;
-    if(!source.index) this.index = null;
-    if(!source.slice) this.slice = null;
-    if(!source.has) this.has = null;
-    if(!source.get) this.get = null;
-    if(!source.copy) this.copy = null;
-    if(!source.reset) this.reset = null;
+    if(this.length && !source.length) this.length = null;
+    if(this.left && !source.left) this.left = null;
+    if(this.index && !source.index) this.index = null;
+    if(this.slice && !source.slice) this.slice = null;
+    if(this.has && !source.has) this.has = null;
+    if(this.get && !source.get) this.get = null;
+    if(this.copy && !source.copy) this.copy = null;
+    if(this.reset && !source.reset) this.reset = null;
 };
 // Here be dragons
 hi.Sequence.prototype.collapse = function(limit = -1){
