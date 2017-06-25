@@ -110,6 +110,12 @@ hi.StringSequence = function(source, low, high){
 
 hi.StringSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.StringSequence.prototype, {
+    string: function(){
+        return this.source.slice(this.frontIndex, this.backIndex);
+    },
+    stringAsync: function(){
+        return new Promise((resolve, reject) => resolve(this.string()));
+    },
     bounded: () => true,
     done: function(){
         return this.frontIndex >= this.backIndex;
