@@ -13,6 +13,7 @@ hi.validAsBoundedSequence = function(value){
 // Get an array, string, iterable, or object as a sequence.
 // If it receives a sequences as input, returns that sequence.
 // For all other inputs an error is thrown.
+// TODO: Perhaps strings shouldn't be automatically converted to sequences?
 hi.asSequence = function(source){
     if(hi.isSequence(source)){
         return source;
