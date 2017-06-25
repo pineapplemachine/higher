@@ -32,7 +32,7 @@ Object.assign(SequenceReducer.prototype, {
     // Get the last value in the sequence synchronously.
     // Returns the fallback value if there was no last element.
     last: function(fallback = undefined){
-        if(!validAsBoundedSequence(this.source)){
+        if(!hi.validAsBoundedSequence(this.source)){
             throw "Failed to reduce sequence: Sequence isn't known to be bounded."
         }
         if(this.hasSeed){
