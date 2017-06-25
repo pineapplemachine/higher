@@ -3,6 +3,7 @@
 // elements to output to the array.
 // Will throw an error if the function receives an unbounded sequence and
 // no length limit.
+// When the input is an array, returns a copy of that array.
 hi.register("array", {
     numbers: "?",
     sequences: 1,
@@ -14,6 +15,9 @@ hi.register("array", {
     if(limit <= 0){
         return [];
     }else if(!limit){
+        if(hi.isArray(source)){
+            return source.slice();
+        }
         if(!source.bounded()){
             throw hi.internal.unboundedError("write", "array");
         }
@@ -23,6 +27,9 @@ hi.register("array", {
         }
         return result;
     }else{
+        if(hi.isArray(source)) return source.slice(
+            0, limit < source.length ? limit : source.length
+        );
         let result = [];
         let i = 0;
         for(let element of source){
