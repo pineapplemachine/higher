@@ -24,12 +24,12 @@ Object.assign(hi, {
         }
         return wrapped;
     },
-    alias: function(name, alias){
-        if(name in this){
-            this[alias] = this[name];
+    alias: function(alias, target){
+        if(target in this){
+            this[alias] = this[target];
         }
-        if(name + "Async" in this){
-            this[alias + "Async"] = this[name + "Async"];
+        if(target + "Async" in this){
+            this[alias + "Async"] = this[target + "Async"];
         }
     },
 });
