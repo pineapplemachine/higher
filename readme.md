@@ -4,7 +4,7 @@
 
 Higher is a functional programming library for JavaScript with a focus on providing implementations for various _higher_-order functions, in lazy and async variants where ever possible and applicable. Call it hi for short.
 
-Higher is released under a [zlib/libpng license](https://github.com/pineapplemachine/higher/blob/master/license). In summary, you may do anything you like with this software except misrepresenting its origin.
+Higher is released under a [zlib/libpng license](https://github.com/pineapplemachine/higher/blob/master/license). In summary, you may do anything you like with this software except misrepresent its origin.
 
 _Please be aware that this repo is still under construction!_
 
