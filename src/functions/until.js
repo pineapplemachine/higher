@@ -67,8 +67,8 @@ Object.assign(hi.UntilSequence.prototype, {
         this.source.reset();
         this.included = !this.isInclusive;
         if(!this.source.done()){
-            this.frontValue = source.nextFront();
-            this.satisfied = predicate(this.frontValue);
+            this.frontValue = this.source.nextFront();
+            this.satisfied = this.predicate(this.frontValue);
         }
         return this;
     },

@@ -8,7 +8,7 @@ hi.register("write", {
 }, function(limit, sequences){
     let source = sequences[0];
     let target = sequences[1];
-    if(!isArray(target)){
+    if(!hi.isArray(target)){
         throw "Failed to write sequence because the target isn't an array.";
     }
     let iter = source.next ? source : source[Symbol.iterator]();

@@ -41,7 +41,7 @@ Object.assign(hi.ReverseSequence.prototype, {
         return this.source.index(this.source.length - i - 1);
     },
     slice: function(i, j){
-        return reverse.raw(this.source.slice(
+        return new hi.ReverseSequence(this.source.slice(
             this.source.length - j - 1,
             this.source.length - i - 1
         ));
