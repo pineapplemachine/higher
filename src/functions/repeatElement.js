@@ -20,11 +20,15 @@ Object.assign(hi.FiniteRepeatElementSequence.prototype, {
         this.element = element;
         return this;
     },
-    repeat: function(repetitions = -1){
-        if(repetitions === 0){
-            const sequence = new hi.EmptySequence();
-            sequence.element = this.element;
-            return sequence;
+    repeat: function(repetitions = null){
+        if(repetitions === null || !isFinite(repetitions)){
+            return new hi.InfiniteRepeatElementSequence(this.element);
+        }else if(repetitions <= 0){
+            return new hi.NullRepeatElementSequence(this.element);
+        }else{
+            return new hi.FiniteRepeatElementSequence(
+                this.element, this.repetitions * repetitions
+            );
         }
     },
     reverse: function(){
