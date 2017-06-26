@@ -143,7 +143,7 @@ Object.assign(hi.StringSequence.prototype, {
     },
     slice: function(i, j){
         return new hi.StringSequence(
-            this.source, this.lowIdex + i, this.lowIndex + j
+            this.source, this.lowIndex + i, this.lowIndex + j
         );
     },
     has: function(i){
