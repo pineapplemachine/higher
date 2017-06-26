@@ -64,7 +64,7 @@ Object.assign(hi.wrap, {
         fancy = fancy || function(){
             return hi.args.validate(
                 expected, arguments, implementation, function(error){
-                    throw `Error calling ${name}: ${error}`;
+                    throw `Error calling function: ${error}`;
                 }
             );
         };

@@ -158,8 +158,8 @@ hi.args = {
             }else if(series.length === 2){
                 return `${series[0]} and ${series[1]}`;
             }else{
-                const left = parts.slice(0, parts.length - 1).join(", ");
-                return `${left}, and ${parts[parts.length - 1]}`;
+                const left = series.slice(0, series.length - 1).join(", ");
+                return `${left}, and ${series[series.length - 1]}`;
             }
         },
         expected: function(expected){

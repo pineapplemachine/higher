@@ -2,7 +2,9 @@
     "extends": ["eslint:recommended", "google"],
     "parser": "babel-eslint",
     "globals": {
-        "hi": true
+        "hi": true,
+        "Promise": false,
+        "Symbol": false
     },
     "rules": {
         ////////// Possible Errors //////////
@@ -187,10 +189,13 @@
         "array-bracket-spacing": ["warn", "never"],
         "computed-property-spacing": ["warn", "never"],
         "object-curly-spacing": ["warn", "never"],
-        "keyword-spacing": ["warn", {"before": false, "after": false, "overrides": {
-            "return": {"after": true},
-            "throw": {"after": true},
-            "case": {"after": true}
-        }}]
+        "no-invalid-this": "off",
+        // Friggin useless, can't get this to do anything sensible
+        // "keyword-spacing": ["warn", {"before": false, "after": false, "overrides": {
+        //     "return": {"before": true, "after": true},
+        //     "throw": {"before": true, "after": true},
+        //     "case": {"before": true, "after": true}
+        // }}]
+        "keyword-spacing": "off"
     }
 }

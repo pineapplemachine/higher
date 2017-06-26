@@ -14,10 +14,8 @@ hi.FromSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.FromSequence.prototype, {
     initialize: function(){
         this.initialized = true;
-        while(true){
-            if(this.source.done()){
-                break;
-            }else if(this.predicate(this.source.front())){
+        while(!this.source.done()){
+            if(this.predicate(this.source.front())){
                 if(!this.isInclusive) this.source.popFront();
                 break;
             }else{

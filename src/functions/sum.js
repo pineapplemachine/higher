@@ -57,7 +57,7 @@ hi.register("sumKahan", {
 // Compute a sum of numbers using Shewchuk's summation algorithm.
 // http://stackoverflow.com/a/2704565/3478907
 // http://code.activestate.com/recipes/393090-binary-floating-point-summation-accurate-to-full-p/
-/// https://github.com/python/cpython/blob/master/Modules/mathmodule.c#L1301
+// https://github.com/python/cpython/blob/master/Modules/mathmodule.c#L1301
 // More accurate than either Kahan or linear summation, but slower.
 // You probably don't REALLY need your sums to be this accurate.
 // If any input is NaN, returns the first NaN input.

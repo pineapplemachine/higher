@@ -7,7 +7,7 @@ hi.register("object", {
     async: true,
 }, function(limit, source){
     function pushKeyValuePair(result, element){
-        if(isArray(element)){
+        if(hi.isArray(element)){
             if(element.length){
                 result[element[0]] = element.length > 1 ? element[1] : null;
             }
