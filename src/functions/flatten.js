@@ -1,71 +1,54 @@
-hi.FlattenDeepSequence = function(source){
+hi.FlattenSequence = function(source, frontSource = null){
     this.source = source;
-    this.sourceStack = [source];
-    this.currentSource = source;
+    this.frontSource = frontSource;
 };
 
-hi.FlattenDeepSequence.prototype = Object.create(hi.Sequence.prototype);
-Object.assign(hi.FlattenDeepSequence.prototype, {
-    flattenElement: function(element){
-        return !hi.isString(element) && (
-            hi.isArray(element) ||
-            hi.isIterable(element) ||
-            hi.isSequence(element)
-        );
-    },
-    // Used internally to handle progression to the next element.
-    // Dive into the lowest possible sequence.
-    diveStack: function(){
-        while(!this.currentSource.done()){
-            const front = this.currentSource.front();
-            if(!this.flattenElement(front)){
-                break;
+hi.FlattenSequence.prototype = Object.create(hi.Sequence.prototype);
+Object.assign(hi.FlattenSequence.prototype, {
+    initializeFront: function(){
+        while((!this.frontSource || this.frontSource.done()) && !this.source.done()){
+            let element = this.source.nextFront();
+            if(!hi.validAsSequence(element)){
+                this.frontSource = new hi.OnceSequence(element); break;
             }else{
-                this.currentSource.popFront();
-                const source = hi.asSequence(front);
-                this.sourceStack.push(source);
-                this.currentSource = source;
+                this.frontSource = hi.asSequence(element);
             }
         }
-    },
-    // Used internally to handle progression to the next element.
-    // Resurface from empty sequences (and those containing only empties)
-    bubbleStack: function(){
-        while(this.sourceStack.length > 1 && this.currentSource.done()){
-            this.sourceStack.pop();
-            this.currentSource = this.sourceStack[this.sourceStack.length - 1];
-        }
-        if(!this.currentSource.done()){
-            this.diveStack();
-            if(this.currentSource.done()) this.bubbleStack();
-        }
-    },
-    initialize: function(){
-        this.diveStack();
-        if(this.currentSource.done()) this.bubbleStack();
+        this.done = function(){
+            return this.frontSource.done();
+        };
         this.front = function(){
-            return this.currentSource.front();
+            return this.frontSource.front();
         };
         this.popFront = function(){
-            this.currentSource.popFront();
-            this.diveStack();
-            if(this.currentSource.done()) this.bubbleStack();
+            this.frontSource.popFront();
+            while(this.frontSource.done() && !this.source.done()){
+                let element = this.source.nextFront();
+                if(!hi.validAsSequence(element)){
+                    this.frontSource = new hi.OnceSequence(element); break;
+                }else{
+                    this.frontSource = hi.asSequence(element);
+                }
+            }
         };
     },
     bounded: () => false,
     done: function(){
-        return this.sourceStack[0].done();
+        this.initializeFront();
+        return this.frontSource.done();
     },
     length: null,
     left: null,
     front: function(){
-        this.initialize();
-        return this.currentSource.front();
+        this.initializeFront();
+        return this.frontSource.front();
     },
     popFront: function(){
-        this.initialize();
-        return this.popFront();
+        this.initializeFront();
+        this.popFront();
     },
+    // Can't support many operations because a sub-sequence might not support them.
+    // TODO: Allow user to insist that the sequence should be bidirectional etc?
     back: null,
     popBack: null,
     index: null,
@@ -75,20 +58,8 @@ Object.assign(hi.FlattenDeepSequence.prototype, {
 });
 
 // Flatten a single level deep.
-hi.flatten = function(source){
-    let sequences = [];
-    for(let element of source) sequences.push(hi.asSequence(element));
-    return new hi.ConcatSequence(sequences);
-};
-hi.Sequence.prototype.flatten = function(){
-    return new hi.ConcatSequence(hi.asArray(this));
-};
-
-// Flatten recursively.
-// Flattens arrays, iterables except strings, and sequences.
-hi.register("flattenDeep", {
+hi.register("flatten", {
     sequences: 1,
 }, function(source){
-    return new hi.FlattenDeepSequence(source);
+    return new hi.FlattenSequence(source);
 });
-
