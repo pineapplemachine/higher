@@ -6,8 +6,8 @@ hi.wrap = function(expected, implementation){
         raw: implementation,
         fancy: fancy,
         method: method,
-        fancyAsync: hi.wrap.fancyAsync(fancy),
-        methodAsync: method ? hi.wrap.methodAsync(method) : null,
+        fancyAsync: expected.async ? hi.wrap.fancyAsync(fancy) : null,
+        methodAsync: expected.async && method ? hi.wrap.methodAsync(method) : null,
     };
 };
 
