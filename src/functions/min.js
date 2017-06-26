@@ -8,9 +8,9 @@ hi.register("min", {
     allowIterables: true,
     // Also generate an async version of this function
     async: true,
-}, function(compare, source){
-    const combine = (compare ?
-        (a, b) => (compare(a, b) ? a : b) :
+}, function(order, source){
+    const combine = (order ?
+        (a, b) => (order(a, b) ? a : b) :
         (a, b) => (a < b ? a : b)
     );
     return hi.reduce.raw(combine, source).last();
