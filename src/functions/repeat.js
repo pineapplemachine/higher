@@ -45,6 +45,10 @@ hi.InfiniteRepeatSequence = function(source, frontSource = null, backSource = nu
     this.maskAbsentMethods(source);
 }
 
+hi.NullRepeatSequence = function(source){
+    this.source = source;
+}
+
 hi.FiniteRepeatSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.FiniteRepeatSequence.prototype, {
     finishedRepetitions: function(){
@@ -147,10 +151,8 @@ Object.assign(hi.FiniteRepeatSequence.prototype, {
     },
     collapseBreak: function(target, length){
         if(this.repetitions === 0){
-            target.splice(0);
             return 0;
         }else if(this.repetitions === 1){
-            target.splice(length);
             return length;
         }else{
             let i = 0;
@@ -170,6 +172,7 @@ Object.assign(hi.FiniteRepeatSequence.prototype, {
 
 hi.InfiniteRepeatSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.InfiniteRepeatSequence.prototype, {
+    repetitions: Infinity,
     unbounded: () => true,
     bounded: () => false,
     done: () => false,
@@ -217,24 +220,39 @@ Object.assign(hi.InfiniteRepeatSequence.prototype, {
         this.frontSource = this.source.copy();
         if(this.back) this.backSource = this.source.copy();
     },
+    collapseBreak: function(target, length){
+        // TODO: Can this be fixed?
+        throw "Cannot collapse infinitely repeated sequence.";
+    },
+});
+
+hi.NullRepeatSequence.prototype = Object.create(hi.EmptySequence.prototype);
+Object.assign(hi.NullRepeatSequence.prototype, {
+    repetitions: 0,
+    slice: function(i, j){
+        return new hi.NullRepeatSequence(this.source);
+    },
+    copy: function(){
+        return new hi.NullRepeatSequence(this.source);
+    },
 });
 
 hi.register("repeat", {
     numbers: "?",
     sequences: 1,
 }, function(repetitions, source){
-    if(source.unbounded()){
+    const getCopyableSource = (source) => {
+        if(source.copy) return source;
+        else if(source.bounded()) return new hi.LazyArraySequence(source);
+        else throw "Error repeating sequence: Sequence is unbounded and uncopyable.";
+    };
+    if(repetitions <= 0 && repetitions !== null){
+        return new hi.NullRepeatSequence(source);
+    }else if(source.unbounded()){
         return source;
-    }
-    if(!source.copy){
-        if(!source.bounded()) throw (
-            "Error repeating sequence: Sequence is unbounded and uncopyable."
-        );
-        source = new hi.LazyArraySequence(source);
-    }
-    if(repetitions || repetitions === 0){
-        return new hi.FiniteRepeatSequence(repetitions, source);
+    }else if(repetitions && isFinite(repetitions)){
+        return new hi.FiniteRepeatSequence(repetitions, getCopyableSource(source));
     }else{
-        return new hi.InfiniteRepeatSequence(source);
+        return new hi.InfiniteRepeatSequence(getCopyableSource(source));
     }
 });
