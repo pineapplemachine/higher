@@ -6,6 +6,9 @@ hi.register("string", {
     // Also generate an async version of this function
     async: true,
 }, function(source){
+    if(!hi.validAsBoundedSequence(source)){
+        throw "Failed to create string: Input sequence is not known to be bounded.";
+    }
     let string = "";
     for(const element of source) string += element;
     return string;
