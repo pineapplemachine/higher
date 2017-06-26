@@ -12,8 +12,8 @@ hi.register("last", {
             if(predicate(back)) return back;
             source.popBack();
         }
-    }else{
-        if(!source.done()) return source.back();
+    }else if(!source.done()){
+        return source.back();
     }
     return undefined;
 });
@@ -34,8 +34,8 @@ hi.register("lastAsync", {
                     if(predicate(back)) resolve(back);
                     source.popBack();
                 }
-            }else{
-                if(!source.done()) resolve(source.back());
+            }else if(!source.done()){
+                resolve(source.back());
             }
             reject();
         });
