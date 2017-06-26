@@ -1,6 +1,6 @@
 hi.wrap = function(expected, implementation){
-    let fancy = hi.wrap.fancy(expected, implementation);
-    let method = hi.wrap.method(expected, implementation);
+    const fancy = hi.wrap.fancy(expected, implementation);
+    const method = hi.wrap.method(expected, implementation);
     return {
         expected: expected,
         raw: implementation,
@@ -9,7 +9,6 @@ hi.wrap = function(expected, implementation){
         fancyAsync: hi.wrap.fancyAsync(fancy),
         methodAsync: method ? hi.wrap.methodAsync(method) : null,
     };
-        
 };
 
 Object.assign(hi.wrap, {
@@ -21,14 +20,14 @@ Object.assign(hi.wrap, {
             const found = hi.args.countTypes(args);
             const counts = hi.args.countSeparated(found);
             if(!hi.args.satisfied(expected, counts)){
-                let error = hi.args.describe.discrepancy(expected, counts);
+                const error = hi.args.describe.discrepancy(expected, counts);
                 throw `Error calling function: ${error}`;
             }
         };
         // Function accepts exactly one argument?
-        let oneArgument = numbers + functions + sequences === 1;
+        const oneArgument = numbers + functions + sequences === 1;
         // Function accepts arguments of only one type?
-        let oneType = (
+        const oneType = (
             (numbers + functions === 0) ||
             (functions + sequences === 0) ||
             (sequences + numbers === 0)
@@ -50,8 +49,8 @@ Object.assign(hi.wrap, {
             if(sequences > 0 && !expected.allowIterables){
                 fancy = function(){
                     validate(arguments);
-                    let sequences = [];
-                    for(let arg of arguments) sequences.push(hi.asSequence(arg));
+                    const sequences = [];
+                    for(const arg of arguments) sequences.push(hi.asSequence(arg));
                     return implementation(sequences);
                 };
             }else{
@@ -90,7 +89,7 @@ Object.assign(hi.wrap, {
                     const counts = hi.args.countSeparated(found);
                     counts.sequences++;
                     if(!hi.args.satisfied(expected, counts)){
-                        let error = hi.args.describe.discrepancy(expected, counts);
+                        const error = hi.args.describe.discrepancy(expected, counts);
                         throw `Error calling function: ${error}`;
                     }
                 };
@@ -108,7 +107,7 @@ Object.assign(hi.wrap, {
             }
         }
         method = method || function(){
-            Array.prototype.splice.call(arguments, 0, 0, this)
+            Array.prototype.splice.call(arguments, 0, 0, this);
             return hi.args.validate(
                 expected, arguments, implementation, function(error){
                     throw `Error calling ${name}: ${error}`;
@@ -128,7 +127,7 @@ Object.assign(hi.wrap, {
     async: function(callback){
         return function(){
             return new Promise((resolve, reject) => {
-                let args = arguments;
+                const args = arguments;
                 hi.callAsync(() => resolve(callback(this, args)));
             });
         };

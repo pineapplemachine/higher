@@ -6,7 +6,7 @@ hi.TapSequence = function(callback, source){
     this.cachedFront = false;
     this.cachedBack = false;
     this.maskAbsentMethods(source);
-}
+};
 
 hi.TapSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.TapSequence.prototype, {
@@ -55,7 +55,7 @@ Object.assign(hi.TapSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        let copy = new hi.TapSequence(this.callback, this.source.copy());
+        const copy = new hi.TapSequence(this.callback, this.source.copy());
         copy.frontValue = this.frontValue;
         copy.backValue = this.backValue;
         copy.cachedFront = this.cachedFront;

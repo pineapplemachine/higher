@@ -9,9 +9,9 @@ hi.register("partition", {
     if(!validAsBoundedSequence(source)){
         throw "Failed to partition sequence: Can't partition an unbounded sequence.";
     }
-    let a = [];
-    let b = [];
-    for(let element of source){
+    const a = [];
+    const b = [];
+    for(const element of source){
         if(predicate(element)) a.push(element);
         else b.push(element);
     }

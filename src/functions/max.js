@@ -9,7 +9,7 @@ hi.register("max", {
     // Also generate an async version of this function
     async: true,
 }, function(compare, source){
-    let combine = (compare ?
+    const combine = (compare ?
         (a, b) => (compare(b, a) ? a : b) :
         (a, b) => (b < a ? a : b)
     );

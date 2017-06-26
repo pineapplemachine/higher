@@ -5,7 +5,7 @@ hi.DistinctSequence = function(
     this.history = history || {};
     this.frontValue = initialize && !source.done() ? source.front() : frontValue;
     this.maskAbsentMethods(source);
-}
+};
 
 hi.DistinctSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.DistinctSequence.prototype, {

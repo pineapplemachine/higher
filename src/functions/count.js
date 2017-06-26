@@ -3,19 +3,19 @@ function SequenceCounter(predicate, source){
     this.source = source;
     if(!source.copy) this.copy = null;
     if(!source.reset) this.reset = null;
-};
+}
 
 Object.assign(SequenceCounter.prototype, {
     sum: function(){
         let i = 0;
-        for(let element of this.source){
+        for(const element of this.source){
             i += this.predicate(element) ? 1 : 0;
         }
         return i;
     },
     equals: function(n){
         let i = 0;
-        for(let element of this.source){
+        for(const element of this.source){
             i += this.predicate(element) ? 1 : 0;
             if(i > n) return false;
         }
@@ -23,7 +23,7 @@ Object.assign(SequenceCounter.prototype, {
     },
     lessThan: function(n){
         let i = 0;
-        for(let element of this.source){
+        for(const element of this.source){
             i += this.predicate(element) ? 1 : 0;
             if(i >= n) return false;
         }
@@ -31,7 +31,7 @@ Object.assign(SequenceCounter.prototype, {
     },
     lessThanEqual: function(n){
         let i = 0;
-        for(let element of this.source){
+        for(const element of this.source){
             i += this.predicate(element) ? 1 : 0;
             if(i > n) return false;
         }
@@ -39,7 +39,7 @@ Object.assign(SequenceCounter.prototype, {
     },
     greaterThan: function(n){
         let i = 0;
-        for(let element of this.source){
+        for(const element of this.source){
             i += this.predicate(element) ? 1 : 0;
             if(i > n) return true;
         }
@@ -47,7 +47,7 @@ Object.assign(SequenceCounter.prototype, {
     },
     greaterThanEqual: function(n){
         let i = 0;
-        for(let element of this.source){
+        for(const element of this.source){
             i += this.predicate(element) ? 1 : 0;
             if(i >= n) return true;
         }

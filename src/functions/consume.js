@@ -8,6 +8,6 @@ hi.register("consume", {
     if(isSequence(source)){
         while(!source.done()) source.popFront();
     }else{
-        for(let element of source){}
+        for(const element of source){}
     }
 });

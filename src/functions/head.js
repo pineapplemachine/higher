@@ -4,7 +4,7 @@ hi.HeadSequence = function(elements, source, frontIndex = 0){
     this.source = source;
     this.frontIndex = frontIndex;
     this.maskAbsentMethods(source);
-}
+};
 
 hi.HeadSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.HeadSequence.prototype, {
@@ -13,12 +13,12 @@ Object.assign(hi.HeadSequence.prototype, {
         return this.frontIndex >= this.elements || this.source.done();
     },
     length: function(){
-        let sourceLength = this.source.length();
+        const sourceLength = this.source.length();
         return sourceLength < this.elements ? sourceLength : this.elements;
     },
     left: function(){
-        let sourceLeft = this.source.left();
-        let indexLeft = this.elements - this.frontIndex;
+        const sourceLeft = this.source.left();
+        const indexLeft = this.elements - this.frontIndex;
         return sourceLeft < indexLeft ? sourceLeft : indexLeft;
     },
     front: function(){
@@ -58,7 +58,7 @@ hi.register("head", {
     if(elements < 1){
         return new hi.EmptySequence();
     }else if(source.length && source.slice){
-        let length = source.length();
+        const length = source.length();
         return source.slice(0, length < elements ? length : elements);
     }else{
         return new hi.HeadSequence(elements, source);

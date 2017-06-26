@@ -26,7 +26,7 @@ Object.assign(hi.FilterSequence.prototype, {
         }
         this.back = function(){
             return this.source.back();
-        }
+        };
         this.popBack = function(){
             this.source.popBack();
             while(!this.source.done() && !this.predicate(this.source.back())){
@@ -67,7 +67,7 @@ Object.assign(hi.FilterSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        let copy = new hi.FilterSequence(
+        const copy = new hi.FilterSequence(
             this.predicate, this.source.copy(), false
         );
         copy.front = this.front;
@@ -86,5 +86,5 @@ hi.register("filter", {
     functions: 1,
     sequences: 1,
 }, function(predicate, source){
-    return new hi.FilterSequence(predicate, source)
+    return new hi.FilterSequence(predicate, source);
 });

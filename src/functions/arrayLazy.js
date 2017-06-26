@@ -5,7 +5,7 @@ hi.LazyArraySequence = function(source){
     this.source = source;
     this.originalSource = source;
     this.arraySequence = null;
-}
+};
 
 hi.LazyArraySequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.LazyArraySequence.prototype, {

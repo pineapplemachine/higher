@@ -8,7 +8,7 @@ hi.DropSliceSequence = function(dropLow, dropHigh, source){
     this.dropLow = dropLow < 0 ? 0 : dropLow;
     this.dropHigh = dropHigh;
     if(source.length){
-        let length = source.length();
+        const length = source.length();
         if(this.dropHigh > length) this.dropHigh = length;
     }
     this.source = source;
@@ -17,7 +17,7 @@ hi.DropSliceSequence = function(dropLow, dropHigh, source){
     this.backIndex = 0;
     this.droppedSlice = false;
     this.maskAbsentMethods(source);
-}
+};
 
 hi.DropSliceSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.DropSliceSequence.prototype, {
@@ -74,7 +74,7 @@ Object.assign(hi.DropSliceSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        let copy = new hi.DropSliceSequence(this.strideLength, this.source.copy());
+        const copy = new hi.DropSliceSequence(this.strideLength, this.source.copy());
     },
     reset: function(){
         this.source.reset();
@@ -86,17 +86,17 @@ hi.register("dropSlice", {
     numbers: 2,
     sequences: 1,
 }, function(slice, source){
-    let dropLow = slice[0];
-    let dropHigh = slice[1];
+    const dropLow = slice[0];
+    const dropHigh = slice[1];
     if(dropLow >= dropHigh){
         return source;
     }else if(source.slice && source.length){
-        let length = source.length();
+        const length = source.length();
         if(dropLow <= 0 && dropHigh >= length){
             return new hi.EmptySequence();
         }else{
             return new hi.ConcatSequence([
-                source.slice(0, dropLow), source.slice(dropHigh, length)
+                source.slice(0, dropLow), source.slice(dropHigh, length),
             ]);
         }
     }else if(dropLow <= 0){
@@ -106,7 +106,7 @@ hi.register("dropSlice", {
             return new hi.DropHeadSequence(dropHigh, source);
         }
     }else if(source.length){
-        let length = source.length();
+        const length = source.length();
         if(dropHigh >= length){
             return new hi.DropTailSequence(length - dropLow, source);
         }

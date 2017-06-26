@@ -6,7 +6,7 @@ hi.register("each", {
     // Also generate an async version of this function
     async: true,
 }, function(callback, source){
-    for(let element of source){
+    for(const element of source){
         callback(element);
     }
     return source;

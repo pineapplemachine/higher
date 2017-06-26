@@ -8,11 +8,11 @@ hi.register("tail", {
     if(elements < 1){
         return new hi.EmptySequence();
     }else if(source.length && source.slice){
-        let length = source.length();
-        let slice = length < elements ? length : elements;
+        const length = source.length();
+        const slice = length < elements ? length : elements;
         return source.slice(length - slice, length);
     }else if(source.bounded()){
-        let array = source.array();
+        const array = source.array();
         return array.slice(array.length - elements);
     }else{
         throw "Failed to get sequence tail: Input is unbounded.";

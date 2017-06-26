@@ -7,7 +7,7 @@ hi.DropTailSequence = function(dropElements, source, frontIndex = 0){
     this.frontIndex = frontIndex;
     this.lastIndex = source.length() - dropElements;
     this.maskAbsentMethods(source);
-}
+};
 
 hi.DropTailSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.DropTailSequence.prototype, {
@@ -42,7 +42,7 @@ Object.assign(hi.DropTailSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        let copy = new hi.DropTailSequence(
+        const copy = new hi.DropTailSequence(
             this.dropElements, this.source.copy(), this.frontIndex
         );
     },
@@ -65,7 +65,7 @@ hi.register("dropTail", {
         return new hi.DropTailSequence(dropElements, source);
     }else if(source.bounded()){
         // Sequence must be loaded into memory to perform the operation.
-        let array = hi.array.raw(-1, source);
+        const array = hi.array.raw(-1, source);
         return array.slice(0, array.length() - dropElements);
     }else{
         throw "Failed to drop sequence tail: Input is unbounded.";

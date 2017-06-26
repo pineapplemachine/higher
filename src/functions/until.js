@@ -14,7 +14,7 @@ hi.UntilSequence = function(
         this.satisfied = predicate(this.frontValue);
     }
     this.maskAbsentMethods(source);
-}
+};
 
 hi.UntilSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.UntilSequence.prototype, {

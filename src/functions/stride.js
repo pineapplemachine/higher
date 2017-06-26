@@ -1,5 +1,5 @@
 const getStrideLength = function(strideLength){
-    let value = Math.floor(+strideLength);
+    const value = Math.floor(+strideLength);
     if(value < 1) throw (
         "Failed to create stride sequence: Stride length must not be less than one."
     );
@@ -13,7 +13,7 @@ hi.PoppingStrideSequence = function(strideLength, source){
     this.source = source;
     this.maskAbsentMethods(source);
     if(source.back && source.length){
-        let pop = source.length() % strideLength;
+        const pop = source.length() % strideLength;
         for(let i = 0; i < pop && !source.done(); i++){
             source.popBack();
         }
@@ -73,7 +73,7 @@ Object.assign(hi.PoppingStrideSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        let copy = new hi.StrideSequence(this.strideLength, this.source.copy());
+        const copy = new hi.StrideSequence(this.strideLength, this.source.copy());
     },
     reset: function(){
         this.source.reset();
@@ -118,7 +118,7 @@ Object.assign(hi.IndexStrideSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        let copy = new hi.IndexStrideSequence(this.strideLength, this.source.copy());
+        const copy = new hi.IndexStrideSequence(this.strideLength, this.source.copy());
     },
     reset: function(){
         this.source.reset();

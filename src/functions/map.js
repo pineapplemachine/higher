@@ -1,24 +1,24 @@
 // Map sequence optimized for no input sequences.
 hi.NullMapSequence = function(transform){
     this.transform = transform;
-}
+};
 
 // Map sequence optimized for one input sequence.
 hi.SingularMapSequence = function(transform, source){
     this.source = source;
     this.transform = transform;
     this.maskAbsentMethods(source);
-}
+};
 
 // Map sequence for any number of input sequences.
 hi.PluralMapSequence = function(transform, sources){
     this.sources = sources;
     this.source = sources[0];
     this.transform = transform;
-    for(let source of sources){
+    for(const source of sources){
         this.maskAbsentMethods(source);
     }
-}
+};
 
 hi.NullMapSequence.prototype = Object.create(hi.EmptySequence.prototype);
 
@@ -72,13 +72,13 @@ Object.assign(hi.SingularMapSequence.prototype, {
 hi.PluralMapSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.PluralMapSequence.prototype, {
     bounded: function(){
-        for(let source of this.sources){
+        for(const source of this.sources){
             if(!source.bounded()) return false;
         }
         return true;
     },
     done: function(){
-        for(let source of this.sources){
+        for(const source of this.sources){
             if(source.done()) return true;
         }
         return false;
@@ -98,53 +98,53 @@ Object.assign(hi.PluralMapSequence.prototype, {
         return min;
     },
     front: function(){
-        let elements = [];
-        for(let source of this.sources) elements.push(source.front());
+        const elements = [];
+        for(const source of this.sources) elements.push(source.front());
         return this.transform.apply(this, elements);
     },
     popFront: function(){
-        for(let source of this.sources){
+        for(const source of this.sources){
             source.popFront();
         }
     },
     back: function(){
-        let elements = [];
-        for(let source of this.sources) elements.push(source.back());
+        const elements = [];
+        for(const source of this.sources) elements.push(source.back());
         return this.transform.apply(this, elements);
     },
     popBack: function(){
-        for(let source of this.sources){
+        for(const source of this.sources){
             source.popBack();
         }
     },
     index: function(i){
-        let elements = [];
-        for(let source of this.sources) elements.push(source.index(i));
+        const elements = [];
+        for(const source of this.sources) elements.push(source.index(i));
         return this.transform.apply(this, elements);
     },
     slice: function(i, j){
-        let slices = [];
-        for(let source of this.sources) slices.push(source.slice(i, j));
+        const slices = [];
+        for(const source of this.sources) slices.push(source.slice(i, j));
         return new hi.PluralMapSequence(this.transform, slices);
     },
     has: function(i){
-        for(let source of this.sources){
+        for(const source of this.sources){
             if(!source.has(i)) return false;
         }
         return true;
     },
     get: function(i){
-        let elements = [];
-        for(let source of this.sources) elements.push(source.get(i));
+        const elements = [];
+        for(const source of this.sources) elements.push(source.get(i));
         return this.transform.apply(this, elements);
     },
     copy: function(){
-        let copies = [];
-        for(let source of this.sources) copies.push(source.copy());
+        const copies = [];
+        for(const source of this.sources) copies.push(source.copy());
         return new hi.PluralMapSequence(this.transform, copies);
     },
     reset: function(){
-        for(let source of this.sources) source.reset();
+        for(const source of this.sources) source.reset();
         return this;
     },
 });

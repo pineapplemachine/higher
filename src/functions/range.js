@@ -67,7 +67,7 @@ Object.assign(hi.NumberRangeSequence.prototype, {
         return new hi.NumberRangeSequence(this.start + i, this.start + j);
     },
     copy: function(){
-        let copy = new hi.NumberRangeSequence(this.start, this.end);
+        const copy = new hi.NumberRangeSequence(this.start, this.end);
         copy.frontValue = this.frontValue;
         copy.backValue = this.backValue;
         return copy;
@@ -117,7 +117,7 @@ Object.assign(hi.ForwardNumberRangeSequence.prototype, {
         );
     },
     copy: function(){
-        let copy = new hi.ForwardNumberRangeSequence(
+        const copy = new hi.ForwardNumberRangeSequence(
             this.start, this.end, this.step
         );
         copy.frontValue = this.frontValue;
@@ -169,7 +169,7 @@ Object.assign(hi.BackwardNumberRangeSequence.prototype, {
         );
     },
     copy: function(){
-        let copy = new hi.BackwardNumberRangeSequence(
+        const copy = new hi.BackwardNumberRangeSequence(
             this.start, this.end, this.step
         );
         copy.frontValue = this.frontValue;

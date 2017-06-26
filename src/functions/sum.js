@@ -9,7 +9,7 @@ hi.register("sumLinear", {
     async: true,
 }, function(source){
     let sum = 0;
-    for(let value of source) sum += value;
+    for(const value of source) sum += value;
     return sum;
 });
 
@@ -33,7 +33,7 @@ hi.register("sumKahan", {
     let sum = 0;
     let compensation = 0;
     let overflow = false;
-    for(let value of source){
+    for(const value of source){
         if(isNaN(value)){
             return value;
         }else if(!isFinite(value)){
@@ -77,7 +77,7 @@ hi.register("sumShew", {
     let overflow = 0; // Handles intermediate overflow
     
     const partials = [];
-    for(let value of source){
+    for(const value of source){
         if(isNaN(value)){
             return value;
         }else if(!isFinite(value)){
@@ -85,7 +85,7 @@ hi.register("sumShew", {
         }else if(infSum === 0 && overflow === 0){
             let x = value;
             let i = 0;
-            for(let partial of partials){
+            for(const partial of partials){
                 let y = partial;
                 if(Math.abs(x) < Math.abs(y)){
                     const t = x; x = y; y = t;

@@ -8,7 +8,7 @@ hi.internal.unboundedError = function(action, method, intermediate = false){
         "eventually end, use the sequence's assumeBounded method " +
         "before collapsing it.")
     );
-}
+};
 hi.internal.collapseCopyError = function(prevType, breakingType){
     return (
         "Collapsing the sequence failed because one of the " +
@@ -16,7 +16,7 @@ hi.internal.collapseCopyError = function(prevType, breakingType){
         "not support copying even though it appears before a " +
         `special collapse behavior sequence "${breakingType}".`
     );
-}
+};
 
 hi.Sequence = function(){};
 
@@ -24,17 +24,17 @@ hi.Sequence.prototype[Symbol.iterator] = function(){
     return this;
 };
 hi.Sequence.prototype.next = function(){
-    let done = this.done();
-    let value = done ? undefined : this.nextFront();
+    const done = this.done();
+    const value = done ? undefined : this.nextFront();
     return {value: value, done: done};
 };
 hi.Sequence.prototype.nextFront = function(){
-    let value = this.front();
+    const value = this.front();
     this.popFront();
     return value;
 };
 hi.Sequence.prototype.nextBack = function(){
-    let value = this.back();
+    const value = this.back();
     this.popBack();
     return value;
 };
@@ -62,8 +62,8 @@ hi.Sequence.prototype.collapse = function(limit = -1){
         throw hi.internal.unboundedError("collapse", "collapse");
     }
     let source = this;
-    let stack = [];
-    let breaks = [];
+    const stack = [];
+    const breaks = [];
     let i = 0;
     while(source && hi.isSequence(source)){
         if(source.collapseBreak) breaks.push(stack.length);
@@ -77,14 +77,14 @@ hi.Sequence.prototype.collapse = function(limit = -1){
             "the write, array, and object methods."
         );
     }
-    let arraySequence = stack[stack.length - 1];
+    const arraySequence = stack[stack.length - 1];
     function write(seq, limit, intermediate){
         if(limit < 0 && !seq.bounded()) throw hi.internal.unboundedError(
             "collapse", "collapse", intermediate
         );
         i = 0;
         while(!seq.done()){
-            let value = seq.nextFront();
+            const value = seq.nextFront();
             if(i < source.length) source[i] = value;
             else source.push(value);
             i++;
@@ -94,10 +94,10 @@ hi.Sequence.prototype.collapse = function(limit = -1){
         write(this, limit, false);
     }else{
         for(let j = breaks.length - 1; j >= 0; j--){
-            let breakIndex = breaks[j];
-            let breaking = stack[breakIndex];
-            let prev = stack[breakIndex + 1];
-            let next = stack[breakIndex - 1];
+            const breakIndex = breaks[j];
+            const breaking = stack[breakIndex];
+            const prev = stack[breakIndex + 1];
+            const next = stack[breakIndex - 1];
             if(prev){
                 if(!prev.collapseBreak){
                     if(!prev.copy) throw hi.internal.collapseCopyError(

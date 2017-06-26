@@ -12,11 +12,11 @@ hi.register("any", {
     async: true,
 }, function(predicate, source){
     if(predicate){
-        for(let element of source){
+        for(const element of source){
             if(predicate(element)) return true;
         }
     }else{
-        for(let element of source){
+        for(const element of source){
             if(element) return element;
         }
     }
@@ -33,11 +33,11 @@ hi.register("all", {
     async: true,
 }, function(predicate, source){
     if(predicate){
-        for(let element of source){
+        for(const element of source){
             if(!predicate(element)) return false;
         }
     }else{
-        for(let element of source){
+        for(const element of source){
             if(!element) return false;
         }
     }
@@ -54,11 +54,11 @@ hi.register("none", {
     async: true,
 }, function(predicate, source){
     if(predicate){
-        for(let element of source){
+        for(const element of source){
             if(predicate(element)) return false;
         }
     }else{
-        for(let element of source){
+        for(const element of source){
             if(element) return false;
         }
     }

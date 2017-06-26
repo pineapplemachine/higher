@@ -6,12 +6,12 @@ hi.register("write", {
     // Also generate an async version of this function
     async: true,
 }, function(limit, sequences){
-    let source = sequences[0];
-    let target = sequences[1];
+    const source = sequences[0];
+    const target = sequences[1];
     if(!hi.isArray(target)){
         throw "Failed to write sequence because the target isn't an array.";
     }
-    let iter = source.next ? source : source[Symbol.iterator]();
+    const iter = source.next ? source : source[Symbol.iterator]();
     let i = 0;
     if(limit === 0){
         // Do nothing
@@ -30,7 +30,7 @@ hi.register("write", {
         }
     }else{
         let item = iter.next();
-        let firstLimit = target.length < limit ? target.length : limit;
+        const firstLimit = target.length < limit ? target.length : limit;
         while(!item.done && i < firstLimit){
             target[i++] = item.value;
             item = iter.next();

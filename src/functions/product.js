@@ -8,6 +8,6 @@ hi.register("product", {
     async: true,
 }, function(source){
     let product = 1;
-    for(let value of source) product *= value;
+    for(const value of source) product *= value;
     return product;
 });

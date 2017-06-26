@@ -73,7 +73,7 @@ hi.args = {
             sequences: 0,
             invalid: 0,
         };
-        for(let argument of args){
+        for(const argument of args){
             if(hi.isFunction(argument)) found.functions++;
             else if(hi.validAsSequence(argument)) found.sequences++;
             else if(!isNaN(argument)) found.numbers++;
@@ -92,7 +92,7 @@ hi.args = {
             sequences: [],
             invalid: [],
         };
-        for(let argument of args){
+        for(const argument of args){
             if(hi.isFunction(argument)){
                 found.functions.push(argument);
             }else if(hi.validAsSequence(argument)){
@@ -169,10 +169,10 @@ hi.args = {
             );
             if(expected.functions) parts.push(
                 hi.args.describe.expectedFunctions(expected.functions)
-            )
+            );
             if(expected.sequences) parts.push(
                 hi.args.describe.expectedSequences(expected.sequences)
-            )
+            );
             return hi.args.describe.joinSeries(parts);
         },
         expectedNumbers: function(expected){
@@ -217,7 +217,7 @@ hi.args = {
             );
             if(found.invalid) parts.push(
                 `Found ${found.invalid} ${found.invalid === 1 ? "argument" : "arguments"} ` +
-                `that are invalid because they are neither numbers, functions, or sequences.` 
+                "that are invalid because they are neither numbers, functions, or sequences." 
             );
             return hi.args.describe.joinSeries(parts);
         },

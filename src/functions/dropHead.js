@@ -3,7 +3,7 @@ hi.DropHeadSequence = function(dropElements, source, initialized = false){
     this.source = source;
     this.initialized = initialized;
     this.maskAbsentMethods(source);
-}
+};
 
 hi.DropHeadSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.DropHeadSequence.prototype, {
@@ -46,7 +46,7 @@ Object.assign(hi.DropHeadSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        let copy = new hi.DropHeadSequence(
+        const copy = new hi.DropHeadSequence(
             this.dropElements, this.source.copy(), this.initialized
         );
     },

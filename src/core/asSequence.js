@@ -84,7 +84,7 @@ Object.assign(hi.ArraySequence.prototype, {
         return this.source[i - this.lowIndex];
     },
     copy: function(){
-        let copy = new hi.ArraySequence(this.source, this.lowIndex, this.highIndex);
+        const copy = new hi.ArraySequence(this.source, this.lowIndex, this.highIndex);
         copy.frontIndex = this.frontIndex;
         copy.backIndex = this.backIndex;
         return copy;
@@ -153,7 +153,7 @@ Object.assign(hi.StringSequence.prototype, {
         return this.source[i - this.lowIndex];
     },
     copy: function(){
-        let copy = new hi.StringSequence(this.source, this.lowIndex, this.highIndex);
+        const copy = new hi.StringSequence(this.source, this.lowIndex, this.highIndex);
         copy.frontIndex = this.frontIndex;
         copy.backIndex = this.backIndex;
         return copy;
@@ -188,7 +188,7 @@ Object.assign(hi.ObjectSequence.prototype, {
         return this.keys.length - this.keyIndex;
     },
     front: function(){
-        let key = this.keys[this.keyIndex];
+        const key = this.keys[this.keyIndex];
         return {key: key, value: this.source[key]};
     },
     popFront: function(){
@@ -206,7 +206,7 @@ Object.assign(hi.ObjectSequence.prototype, {
         return this.source[i];
     },
     copy: function(){
-        let copy = new hi.ObjectSequence(this.source, this.keys);
+        const copy = new hi.ObjectSequence(this.source, this.keys);
         copy.keyIndex = this.keyIndex;
         return copy;
     },

@@ -1,11 +1,11 @@
 // Simple abstraction of plural map function.
 hi.zip = function(){
-    let sequences = [];
-    for(let argument of arguments){
+    const sequences = [];
+    for(const argument of arguments){
         sequences.push(hi.asSequence(argument));
     }
-    let transform = function(){
+    const transform = function(){
         return Array.prototype.slice.call(arguments);
     };
     return hi.map.raw(transform, sequences);
-}
+};

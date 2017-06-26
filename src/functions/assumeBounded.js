@@ -1,7 +1,7 @@
 hi.AssumeBoundedSequence = function(source){
     this.source = source;
     this.maskAbsentMethods(source);
-}
+};
 
 hi.AssumeBoundedSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.AssumeBoundedSequence.prototype, {

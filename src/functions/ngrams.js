@@ -36,7 +36,7 @@ Object.assign(hi.NgramSequence.prototype, {
     back: null,
     popBack: null,
     index: function(i){
-        let ngram = [];
+        const ngram = [];
         for(let j = i; j < i + this.ngramSize; j++){
             ngram.push(this.source.index(i));
         }
@@ -49,7 +49,7 @@ Object.assign(hi.NgramSequence.prototype, {
     has: null,
     get: null,
     copy: function(){
-        let copy = new hi.NgramSequence(this.ngramSize, this.source.copy());
+        const copy = new hi.NgramSequence(this.ngramSize, this.source.copy());
         copy.currentNgram = this.currentNgram.slice();
         return copy;
     },

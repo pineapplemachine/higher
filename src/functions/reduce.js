@@ -33,18 +33,18 @@ Object.assign(SequenceReducer.prototype, {
     // Returns the fallback value if there was no last element.
     last: function(fallback = undefined){
         if(!hi.validAsBoundedSequence(this.source)){
-            throw "Failed to reduce sequence: Sequence isn't known to be bounded."
+            throw "Failed to reduce sequence: Sequence isn't known to be bounded.";
         }
         if(this.hasSeed){
             let accumulator = this.seed;
-            for(let element of this.source){
+            for(const element of this.source){
                 accumulator = this.combine(accumulator, element);
             }
             return accumulator;
         }else{
             let first = true;
             let accumulator = fallback;
-            for(let element of this.source){
+            for(const element of this.source){
                 accumulator = first ? element : this.combine(
                     accumulator, element
                 );
@@ -80,7 +80,7 @@ Object.assign(SequenceReducer.prototype, {
 hi.ReduceSequence = function(
     combine, source, seedValue = null, hasSeed = false, initialize = true
 ){
-    let done = source.done();
+    const done = source.done();
     this.combine = combine;
     this.source = source;
     this.accumulator = seedValue;
@@ -91,7 +91,7 @@ hi.ReduceSequence = function(
     if(initialize && !hasSeed && !done){
         this.accumulator = source.nextFront();
     }
-}
+};
 
 hi.ReduceSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.ReduceSequence.prototype, {

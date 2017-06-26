@@ -1,7 +1,7 @@
 hi.OnceSequence = function(element, isDone = false){
     this.element = element;
     this.isDone = isDone;
-}
+};
 
 hi.OnceSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.OnceSequence.prototype, {

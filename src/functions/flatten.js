@@ -7,7 +7,7 @@ hi.FlattenSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.FlattenSequence.prototype, {
     initializeFront: function(){
         while((!this.frontSource || this.frontSource.done()) && !this.source.done()){
-            let element = this.source.nextFront();
+            const element = this.source.nextFront();
             if(!hi.validAsSequence(element)){
                 this.frontSource = new hi.OnceSequence(element); break;
             }else{
@@ -23,7 +23,7 @@ Object.assign(hi.FlattenSequence.prototype, {
         this.popFront = function(){
             this.frontSource.popFront();
             while(this.frontSource.done() && !this.source.done()){
-                let element = this.source.nextFront();
+                const element = this.source.nextFront();
                 if(!hi.validAsSequence(element)){
                     this.frontSource = new hi.OnceSequence(element); break;
                 }else{

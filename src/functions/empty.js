@@ -1,5 +1,5 @@
 // A chronically empty sequence.
-hi.EmptySequence = function(){}
+hi.EmptySequence = function(){};
 
 hi.EmptySequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.EmptySequence.prototype, {

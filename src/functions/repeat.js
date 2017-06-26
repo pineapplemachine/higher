@@ -31,7 +31,7 @@ hi.FiniteRepeatSequence = function(
     }
     // Only needs to break a collapse if it repeats more than once
     if(repetitions <= 1) this.collapseBreak = null;
-}
+};
 
 hi.InfiniteRepeatSequence = function(source, frontSource = null, backSource = null){
     if(!source.copy){
@@ -43,11 +43,11 @@ hi.InfiniteRepeatSequence = function(source, frontSource = null, backSource = nu
         source.back ? source.copy() : null
     );
     this.maskAbsentMethods(source);
-}
+};
 
 hi.NullRepeatSequence = function(source){
     this.source = source;
-}
+};
 
 hi.FiniteRepeatSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.FiniteRepeatSequence.prototype, {
@@ -78,7 +78,7 @@ Object.assign(hi.FiniteRepeatSequence.prototype, {
         this.frontSource.popFront();
         if(this.frontSource.done()){
             this.frontRepetitions++;
-            let finishedRepetitions = this.finishedRepetitions();
+            const finishedRepetitions = this.finishedRepetitions();
             if(this.backSource && finishedRepetitions === this.repetitions - 1){
                 this.frontSource = this.backSource;
             }else if(finishedRepetitions < this.repetitions){
@@ -93,7 +93,7 @@ Object.assign(hi.FiniteRepeatSequence.prototype, {
         this.backSource.popBack();
         if(this.backSource.done()){
             this.backRepetitions++;
-            let finishedRepetitions = this.finishedRepetitions();
+            const finishedRepetitions = this.finishedRepetitions();
             if(finishedRepetitions === this.repetitions - 1){
                 this.backSource = this.frontSource;
             }else if(finishedRepetitions < this.repetitions){
@@ -105,19 +105,19 @@ Object.assign(hi.FiniteRepeatSequence.prototype, {
         return this.source.index(i % this.source.length());
     },
     slice: function(i, j){
-        let length = this.source.length();
-        let lowIndex = i % length;
-        let highIndex = j % length;
+        const length = this.source.length();
+        const lowIndex = i % length;
+        const highIndex = j % length;
         if(j - i < length && highIndex >= lowIndex){
             return this.source.slice(lowIndex, highIndex);
         }else if(lowIndex === 0 && highIndex === 0){
             return new hi.FiniteRepeatSequence((j - i) / length, this.source);   
         }else{
-            let repetitions = Math.ceil(j / length) - Math.floor(i / length);
-            let frontSource = (
+            const repetitions = Math.ceil(j / length) - Math.floor(i / length);
+            const frontSource = (
                 lowIndex === 0 ? this.source : this.source.slice(lowIndex, length)
             );
-            let backSource = (
+            const backSource = (
                 highIndex === 0 ? this.source : this.source.slice(0, highIndex)
             );
             return new hi.FiniteRepeatSequence(
@@ -157,7 +157,7 @@ Object.assign(hi.FiniteRepeatSequence.prototype, {
         }else{
             let i = 0;
             let j = length;
-            let writes = length * (this.repetitions - 1);
+            const writes = length * (this.repetitions - 1);
             while(j < target.length && i < writes){
                 target[j++] = target[i++];
             }
@@ -200,7 +200,7 @@ Object.assign(hi.InfiniteRepeatSequence.prototype, {
     // I'm trying not to feel too bad about this since the relevant code
     // is defined just a few tens of lines above here.
     slice: function(i, j){
-        let repeat = new hi.FiniteRepeatSequence(
+        const repeat = new hi.FiniteRepeatSequence(
             0, this.source, null, null, null, null
         );
         return repeat.slice(i, j);

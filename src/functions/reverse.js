@@ -9,7 +9,7 @@ hi.ReverseSequence = function(source){
         this.index = null;
         this.slice = null;
     }
-}
+};
 
 hi.ReverseSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.ReverseSequence.prototype, {
@@ -64,7 +64,7 @@ Object.assign(hi.ReverseSequence.prototype, {
         let i = 0;
         let j = length;
         while(i < j){
-            let t = target[i];
+            const t = target[i];
             target[i] = target[j - 1];
             target[j - 1] = t;
             i++;

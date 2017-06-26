@@ -8,7 +8,7 @@ hi.FromSequence = function(
     this.isInclusive = isInclusive;
     this.initialized = initialized;
     this.maskAbsentMethods(source);
-}
+};
 
 hi.FromSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.FromSequence.prototype, {
@@ -65,7 +65,7 @@ Object.assign(hi.FromSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        let copy = new hi.FromSequence(
+        const copy = new hi.FromSequence(
             this.predicate, this.source.copy(),
             this.isInclusive, this.initialized
         );

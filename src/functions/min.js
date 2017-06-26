@@ -9,7 +9,7 @@ hi.register("min", {
     // Also generate an async version of this function
     async: true,
 }, function(compare, source){
-    let combine = (compare ?
+    const combine = (compare ?
         (a, b) => (compare(a, b) ? a : b) :
         (a, b) => (a < b ? a : b)
     );

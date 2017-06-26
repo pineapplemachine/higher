@@ -21,8 +21,8 @@ hi.register("array", {
         if(!source.bounded()){
             throw hi.internal.unboundedError("write", "array");
         }
-        let result = [];
-        for(let element of source){
+        const result = [];
+        for(const element of source){
             result.push(element);
         }
         return result;
@@ -30,9 +30,9 @@ hi.register("array", {
         if(hi.isArray(source)) return source.slice(
             0, limit < source.length ? limit : source.length
         );
-        let result = [];
+        const result = [];
         let i = 0;
-        for(let element of source){
+        for(const element of source){
             if(i++ >= limit) break;
             result.push(element);
         }

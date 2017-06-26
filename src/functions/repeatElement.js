@@ -4,15 +4,15 @@ hi.FiniteRepeatElementSequence = function(
     this.repetitions = repetitions;
     this.finishedRepetitions = finishedRepetitions || 0;
     this.element = element;
-}
+};
 
 hi.InfiniteRepeatElementSequence = function(element){
     this.element = element;
-}
+};
 
 hi.NullRepeatElementSequence = function(element){
     this.element = element;
-}
+};
 
 hi.FiniteRepeatElementSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.FiniteRepeatElementSequence.prototype, {
@@ -144,7 +144,7 @@ hi.repeatElement = function(){
         }else if(!isFinite(repetitions)){
             return new hi.InfiniteRepeatElementSequence(element);
         }else{
-            let repetitions = Math.floor(+repetitions);
+            const repetitions = Math.floor(+repetitions);
             return new hi.FiniteRepeatElementSequence(repetitions, element);
         }
     }else{

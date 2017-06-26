@@ -23,15 +23,15 @@ hi.register("object", {
         if(!source.bounded()){
             throw sequenceBoundsError("write", "object");
         }
-        let result = {};
-        for(let element of source){
+        const result = {};
+        for(const element of source){
             pushKeyValuePair(result, element);
         }
         return result;
     }else{
-        let result = {};
+        const result = {};
         let i = 0;
-        for(let element of source){
+        for(const element of source){
             if(i++ >= limit) break;
             pushKeyValuePair(result, element);
         }

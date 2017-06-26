@@ -8,11 +8,11 @@ hi.register("first", {
     allowIterables: true,
 }, function(predicate, source){
     if(predicate){
-        for(let element of source){
+        for(const element of source){
             if(predicate(element)) return element;
         }
     }else{
-        for(let element of source) return element;
+        for(const element of source) return element;
     }
     return undefined;
 });
@@ -29,11 +29,11 @@ hi.register("firstAsync", {
     return new Promise((resolve, reject) => {
         hi.callAsync(() => {
             if(predicate){
-                for(let element of source){
+                for(const element of source){
                     if(predicate(element)) resolve(element);
                 }
             }else{
-                for(let element of source) resolve(element);
+                for(const element of source) resolve(element);
             }
             reject();
         });

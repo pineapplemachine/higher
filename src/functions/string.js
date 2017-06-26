@@ -7,6 +7,6 @@ hi.register("string", {
     async: true,
 }, function(source){
     let string = "";
-    for(let element of source) string += element;
+    for(const element of source) string += element;
     return string;
 });

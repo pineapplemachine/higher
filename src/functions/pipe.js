@@ -7,7 +7,7 @@ hi.pipe = function(rootFunction, ...moreFunctions){
     }else{
         return (...args) => {
             let value = rootFunction(...args);
-            for(let func of moreFunctions){
+            for(const func of moreFunctions){
                 value = func(value);
             }
             return value;
