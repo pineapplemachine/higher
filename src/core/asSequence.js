@@ -10,6 +10,15 @@ hi.validAsBoundedSequence = function(value){
     );
 };
 
+hi.canGetLength = function(source){
+    return hi.isString(source) || "length" in source;
+};
+
+hi.getLength = function(source){
+    if(hi.isFunction(source.length)) return source.length();
+    else return source.length;
+};
+
 // Get an array, string, iterable, or object as a sequence.
 // If it receives a sequences as input, returns that sequence.
 // For all other inputs an error is thrown.
