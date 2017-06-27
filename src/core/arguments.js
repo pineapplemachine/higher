@@ -190,7 +190,11 @@ hi.args = {
             }else if(expected && !isNaN(expected)){
                 return `exactly ${expected} ${+expected === 1 ? singular : plural}`;
             }else if(hi.isArray(expected)){
-                return `between ${expected[0]} and ${expected[1]} ${plural}`;
+                if(expected[1] === "+"){
+                    return `at least ${expected[0]} ${+expected[0] === 1 ? singular : plural}`;
+                }else{
+                    return `between ${expected[0]} and ${expected[1]} ${plural}`;
+                }
             }else if(expected === "*"){
                 return `any number of ${plural}`;
             }else if(expected === "+"){
