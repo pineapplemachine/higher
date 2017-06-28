@@ -11,3 +11,5 @@ hi.register("each", {
     }
     return source;
 });
+
+hi.alias("forEach", "each");
