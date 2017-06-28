@@ -56,6 +56,30 @@ hi.ArraySequence = function(source, low, high){
 
 hi.ArraySequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.ArraySequence.prototype, {
+    array: function(limit){
+        if(limit <= 0){
+            return [];
+        }else if(!limit || limit >= this.source.length){
+            return this.source;
+        }else{
+            return this.source.slice(limit);
+        }
+    },
+    arrayAsync: function(limit){
+        return new Promise((resolve, reject) => resolve(this.array(limit)));
+    },
+    newArray: function(limit){
+        if(limit <= 0){
+            return [];
+        }else if(!limit || limit >= this.source.length){
+            return this.source.slice();
+        }else{
+            return this.source.slice(limit);
+        }
+    },
+    newArrayAsync: function(limit){
+        return new Promise((resolve, reject) => resolve(this.newArray(limit)));
+    },
     bounded: () => true,
     done: function(){
         return this.frontIndex >= this.backIndex;
@@ -120,7 +144,7 @@ hi.StringSequence = function(source, low, high){
 hi.StringSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.StringSequence.prototype, {
     string: function(){
-        return this.source.slice(this.frontIndex, this.backIndex);
+        return this.source;
     },
     stringAsync: function(){
         return new Promise((resolve, reject) => resolve(this.string()));
