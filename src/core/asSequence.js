@@ -59,6 +59,15 @@ Object.assign(hi.ArraySequence.prototype, {
     array: function(limit){
         if(limit <= 0){
             return [];
+        }else if(this.lowIndex !== 0){
+            if(!limit){
+                return this.source.slice(this.lowIndex, this.highIndex);
+            }else{
+                const length = this.source.length - this.lowIndex;
+                return this.source.slice(this.lowIndex, this.lowIndex + (
+                    limit < length ? limit : length
+                ));
+            }
         }else if(!limit || limit >= this.source.length){
             return this.source;
         }else{
@@ -144,7 +153,11 @@ hi.StringSequence = function(source, low, high){
 hi.StringSequence.prototype = Object.create(hi.Sequence.prototype);
 Object.assign(hi.StringSequence.prototype, {
     string: function(){
-        return this.source;
+        if(this.lowIndex === 0 && this.highIndex === this.source.length){
+            return this.source;
+        }else{
+            return this.source.slice(this.lowIndex, this.highIndex);
+        }
     },
     stringAsync: function(){
         return new Promise((resolve, reject) => resolve(this.string()));
