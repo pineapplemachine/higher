@@ -80,5 +80,5 @@ The `recur` function also uses a transformation function that is applied repeate
 An example of a transformation function would be:
 
 ``` js
-const relate = (n) => (n * n); // Square n
+const transform = (n) => (n * n); // Square n
 ```
