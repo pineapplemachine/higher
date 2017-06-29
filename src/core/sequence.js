@@ -132,3 +132,84 @@ hi.Sequence.prototype.collapseAsync = function(limit = -1){
         });
     });
 };
+// Turn a lazy sequence into an array-based one.
+// Used internally by functions when a purely lazy implementation won't work
+// because a sequence doesn't support the necessary operations.
+// Not necessarily intended for external use.
+hi.Sequence.prototype.forceEager = function(){
+    if(!this.bounded()){
+        throw "Failed to consume sequence: Sequence is not known to be bounded.";
+    }
+    this.lazyDone = this.done;
+    this.lazyFront = this.front;
+    this.lazyPopFront = this.popFront;
+    this.initializeEager = function(){
+        const array = [];
+        while(!this.lazyDone()){
+            array.push(this.lazyFront());
+            this.lazyPopFront();
+        }
+        delete this.lazyDone;
+        delete this.lazyFront;
+        delete this.lazyPopFront;
+        this.source = array;
+        this.lowIndex = 0;
+        this.highIndex = this.source.length;
+        this.frontIndex = this.lowIndex;
+        this.backIndex = this.highIndex;
+        this.done = hi.ArraySequence.prototype.done;
+        this.length = hi.ArraySequence.prototype.length;
+        this.left = hi.ArraySequence.prototype.left;
+        this.front = hi.ArraySequence.prototype.front;
+        this.popFront = hi.ArraySequence.prototype.popFront;
+        this.back = hi.ArraySequence.prototype.back;
+        this.popBack = hi.ArraySequence.prototype.popBack;
+        this.index = hi.ArraySequence.prototype.index;
+        this.slice = hi.ArraySequence.prototype.slice;
+        this.has = hi.ArraySequence.prototype.has;
+        this.get = hi.ArraySequence.prototype.get;
+        this.copy = hi.ArraySequence.prototype.copy;
+        this.reset = hi.ArraySequence.prototype.reset;
+    };
+    this.bounded = () => true;
+    if(!this.length) this.length = function(){
+        this.initializeEager();
+        return this.length();
+    };
+    if(!this.left) this.left = function(){
+        this.initializeEager();
+        return this.left();
+    };
+    this.front = function(){
+        this.initializeEager();
+        return this.front();
+    };
+    this.popFront = function(){
+        this.initializeEager();
+        return this.popFront();
+    };
+    this.back = function(){
+        this.initializeEager();
+        return this.back();
+    };
+    this.popBack = function(){
+        this.initializeEager();
+        return this.popBack();
+    };
+    this.index = function(i){
+        this.initializeEager();
+        return this.index(i);
+    };
+    this.slice = function(i, j){
+        this.initializeEager();
+        return this.slice(i, j);
+    };
+    this.copy = function(){
+        this.initializeEager();
+        return this.copy();
+    };
+    this.reset = function(){
+        return this;
+    };
+    return this;
+};

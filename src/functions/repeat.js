@@ -1,21 +1,11 @@
 hi.FiniteRepeatSequence = function(
-    repetitions, source,
-    originalFrontSource = null, originalBackSource = null,
-    frontSource = null, backSource = null
+    repetitions, source, frontSource = undefined, backSource = undefined
 ){
-    if(!source.copy){
-        throw "Error repeating sequence: Only copyable sequences can be repeated.";
-    }
+    // Input sequence must be copyable.
     this.repetitions = repetitions;
     this.source = source;
-    this.originalFrontSource = originalFrontSource || source;
-    this.originalBackSource = originalBackSource || (
-        source.back ? source : null
-    );
-    this.frontSource = frontSource || this.originalFrontSource.copy();
-    this.backSource = backSource || (
-        source.back ? this.originalBackSource.copy() : null
-    );
+    this.frontSource = frontSource;
+    this.backSource = backSource;
     this.frontRepetitions = 0;
     this.backRepetitions = 0;
     this.maskAbsentMethods(source);
@@ -38,10 +28,8 @@ hi.InfiniteRepeatSequence = function(source, frontSource = null, backSource = nu
         throw "Error repeating sequence: Only copyable sequences can be repeated.";
     }
     this.source = source;
-    this.frontSource = frontSource || source.copy();
-    this.backSource = backSource || (
-        source.back ? source.copy() : null
-    );
+    this.frontSource = frontSource;
+    this.backSource = backSource;
     this.maskAbsentMethods(source);
 };
 
@@ -59,8 +47,10 @@ Object.assign(hi.FiniteRepeatSequence.prototype, {
     },
     done: function(){
         return (
-            this.finishedRepetitions() >= this.repetitions &&
-            this.frontSource.done()
+            this.source.done() || (
+                this.finishedRepetitions() >= this.repetitions &&
+                (this.frontSource && this.frontSource.done())
+            )
         );
     },
     length: function(){
@@ -72,32 +62,40 @@ Object.assign(hi.FiniteRepeatSequence.prototype, {
         );
     },
     front: function(){
-        return this.frontSource.front();
+        return this.frontSource ? this.frontSource.front() : this.source.front();
     },
     popFront: function(){
+        if(!this.frontSource){
+            this.frontSource = this.source.copy();
+        }
         this.frontSource.popFront();
         if(this.frontSource.done()){
             this.frontRepetitions++;
             const finishedRepetitions = this.finishedRepetitions();
             if(this.backSource && finishedRepetitions === this.repetitions - 1){
+                if(!this.backSource) this.backSource = this.source.copy();
                 this.frontSource = this.backSource;
             }else if(finishedRepetitions < this.repetitions){
-                this.frontSource = this.originalFrontSource.copy();
+                this.frontSource = this.source.copy();
             }
         }
     },
     back: function(){
-        return this.backSource.back();
+        return this.backSource ? this.backSource.back() : this.source.back();
     },
     popBack: function(){
+        if(!this.backSource){
+            this.backSource = this.source.copy();
+        }
         this.backSource.popBack();
         if(this.backSource.done()){
             this.backRepetitions++;
             const finishedRepetitions = this.finishedRepetitions();
             if(finishedRepetitions === this.repetitions - 1){
+                if(!this.frontSource) this.frontSource = this.source.copy();
                 this.backSource = this.frontSource;
             }else if(finishedRepetitions < this.repetitions){
-                this.backSource = this.originalBackSource.copy();
+                this.backSource = this.source.copy();
             }
         }
     },
@@ -136,16 +134,16 @@ Object.assign(hi.FiniteRepeatSequence.prototype, {
     copy: function(){
         return new hi.FiniteRepeatSequence(
             this.repetitions, this.source,
-            this.originalFrontSource, this.originalBackSource,
-            this.frontSource.copy(), this.backSource.copy()
+            this.frontSource ? this.frontSource.copy() : null,
+            this.backSource ? this.backSource.copy() : null
         );
     },
     reset: function(){
         this.frontRepetitions = 0;
-        this.frontSource = this.originalFrontSource.copy();
+        this.frontSource = null;
         if(this.back){
             this.backRepetitions = 0;
-            this.backSource = this.originalBackSource.copy();
+            this.backSource = null;
         }
         return this;
     },
@@ -179,31 +177,38 @@ Object.assign(hi.InfiniteRepeatSequence.prototype, {
     length: null,
     left: null,
     front: function(){
-        return this.frontSource.front();
+        return this.frontSource ? this.frontSource.front() : this.source.front();
     },
     popFront: function(){
+        if(!this.frontSource){
+            this.frontSource = this.source.copy();
+        }
         this.frontSource.popFront();
-        if(this.frontSource.done()) this.frontSource = this.source.copy();
+        if(this.frontSource.done()){
+            this.frontSource = this.source.copy();
+        }
     },
     back: function(){
-        return this.backSource.back();
+        return this.backSource ? this.backSource.back() : this.source.back();
     },
     popBack: function(){
+        if(!this.backSource){
+            this.backSource = this.source.copy();
+        }
         this.backSource.popBack();
-        if(this.backSource.done()) this.backSource = this.source.copy();
+        if(this.backSource.done()){
+            this.backSource = this.source.copy();
+        }
     },
     index: function(i){
         return this.source.index(i % this.source.length());
     },
-    // Note: This method is a bit dirty as it relies on knowing
+    // This method is a bit dirty as it relies on knowing
     // the implementation details of FiniteRepeatSequence.
     // I'm trying not to feel too bad about this since the relevant code
     // is defined just a few tens of lines above here.
     slice: function(i, j){
-        const repeat = new hi.FiniteRepeatSequence(
-            0, this.source, null, null, null, null
-        );
-        return repeat.slice(i, j);
+        return new hi.FiniteRepeatSequence(0, this.source, null, null).slice(i, j);
     },
     has: function(i){
         return this.source.has(i);
@@ -217,8 +222,8 @@ Object.assign(hi.InfiniteRepeatSequence.prototype, {
         );
     },
     reset: function(){
-        this.frontSource = this.source.copy();
-        if(this.back) this.backSource = this.source.copy();
+        this.frontSource = null;
+        this.backSource = null;
     },
     collapseBreak: function(target, length){
         // TODO: Can this be fixed?
@@ -241,18 +246,18 @@ hi.register("repeat", {
     numbers: "?",
     sequences: 1,
 }, function(repetitions, source){
-    const getCopyableSource = (source) => {
-        if(source.copy) return source;
-        else if(source.bounded()) return new hi.LazyArraySequence(source);
-        else throw "Error repeating sequence: Sequence is unbounded and uncopyable.";
-    };
     if(repetitions <= 0 && repetitions !== null){
         return new hi.NullRepeatSequence(source);
     }else if(source.unbounded()){
         return source;
-    }else if(repetitions && isFinite(repetitions)){
-        return new hi.FiniteRepeatSequence(repetitions, getCopyableSource(source));
+    }
+    if(!source.copy){
+        source.forceEager();
+        console.log(source);
+    }
+    if(repetitions && isFinite(repetitions)){
+        return new hi.FiniteRepeatSequence(repetitions, source);
     }else{
-        return new hi.InfiniteRepeatSequence(getCopyableSource(source));
+        return new hi.InfiniteRepeatSequence(source);
     }
 });
