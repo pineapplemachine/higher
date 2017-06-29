@@ -28,18 +28,40 @@ A lazy sequence is one whose contents are, unlike typical sequences such as arra
 
 ### Ordering function
 
-A ordering function is one accepting exactly two arguments (here named `a` and `b` for the sake of example) which returns a truthy value when `a` precedes `b` and a falsey value otherwise.
+An ordering function is one accepting exactly two arguments (here named `a` and `b` for the sake of example) which returns a negative value when `a` precedes `b`, a positive value when `a` follows `b`, and zero otherwise.
 
-When the ordering function is used to define a sorting algorithm, it indicates which elements should precede which when sorting in ascending order. (A function returning `a < b` would produce a sorted result like `[0, 1, 2, 3]`.)
+An example of an ordering function would be:
 
-When the ordering function is used in finding a minimum or maximum of many elements, the ordering function must be itself equivalient to `a < b`.
-Higher functions which find the maximum element of a sequence must do so by reversing the order of arguments; `b < a` is, of course, complementary to `a > b`.
+``` js
+const order = (a, b) => (a < b ? -1 : (a > b) ? +1 : 0);
+```
 
 ### Predicate function
 
 A predicate function is one accepting any number of arguments, depending on where it's used. (Usually one argument.) It returns a truthy or falsey value describing whether the input matched some condition.
 
 The `filter` higher-order function accepts a predicate. Every element of the input sequence being filtered that satisfies the predicate (i.e. the predicate returns a truthy value) is included in the output sequence whereas elements that don't satisfy the predicate are excluded from the output sequence.
+
+An example of a predicate function would be:
+
+``` js
+const predicate = (n) => (n % 2 === 0); // Is n even?
+```
+
+### Relational Function
+
+A relational function is one accepting exactly two arguments (here named `a` and `b` for the sake of example) which returns a truthy value when `a` precedes `b` and a falsey value otherwise.
+
+When the relational function is used to define a sorting algorithm, it indicates which elements should precede which when sorting in ascending order. (A function returning `a < b` would produce a sorted result like `[0, 1, 2, 3]`.)
+
+When the relational function is used in finding a minimum or maximum of many elements, the relational function must be itself equivalient to `a < b`.
+Higher functions which find the maximum element of a sequence must do so by reversing the order of arguments; `b < a` is, of course, complementary to `a > b`.
+
+An example of a relational function would be:
+
+``` js
+const relate = (a, b) => (a < b);
+```
 
 ### Sequence
 
@@ -54,3 +76,9 @@ A transformation function is one accepting any number of arguments, depending on
 Transformation functions are most commonly used by the `map` higher-order function. The number of arguments expected by its transformation function is the same as the number of sequences that were given as input to the function.
 
 The `recur` function also uses a transformation function that is applied repeatedly to a seed to produce a sequence.
+
+An example of a transformation function would be:
+
+``` js
+const relate = (n) => (n * n); // Square n
+```
