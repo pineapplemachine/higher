@@ -1,15 +1,13 @@
-// Find the first occurrence of a substring as judged by a comparison function.
+// Find the last occurrence of a substring as judged by a comparison function.
 // When no comparison function is given, (a, b) => (a == b) is used as a default.
-hi.register("findFirst", {
+hi.register("findLast", {
     functions: "?",
     sequences: 2,
-    // Don't waste time coercing input iterables to sequences
-    allowIterables: true,
     // Also generate an async version of this function
     async: true,
 }, function(compare, sequences){
     const source = sequences[0];
-    const search = hi.asSequence(sequences[1]);
+    const search = sequences[1];
     const compareFunc = compare || ((a, b) => (a == b));
     // Handle empty or unbounded search subject
     if(search.done() || search.unbounded()){
@@ -25,18 +23,22 @@ hi.register("findFirst", {
             return undefined;
         }
     }
-    // Search sequence absolutely must be copyable
-    if(!search.copy){
+    // Source sequence absolutely must be bidirectional and have known length
+    if(!source.length || !source.back){
+        source.forceEager();
+    }
+    // Search sequence absolutely must be copyable and bidirectional
+    if(!search.copy || !search.back){
         search.forceEager();
     }
-    const searchElement = search.nextFront();
+    const searchElement = search.nextBack();
     // Handle single-element search subject
     if(search.done()){
         let index = 0;
-        for(const element of source){
-            if(compareFunc(element, searchElement)){
+        while(!source.done()){
+            if(compareFunc(source.nextBack(), searchElement)){
                 return new hi.FindSequenceResult(
-                    hi.asSequence(source), index, index + 1
+                    source, index, index + 1
                 );
             }
             index++;
@@ -45,23 +47,20 @@ hi.register("findFirst", {
     }
     // Handle search subject of two or more elements
     const findObject = {
-        threadType: hi.ForwardFindSequenceThread,
+        threadType: hi.BackwardFindSequenceThread,
         stepThreads: hi.stepFindThreads,
         compare: compareFunc,
         source: source,
         search: search,
         searchElement: searchElement,
-        nextSearchElement: search.nextFront(),
+        nextSearchElement: search.nextBack(),
         searchThreads: [],
-        index: 0,
+        index: source.length(),
     };
-    for(const element of source){
-        const result = findObject.stepThreads(element);
-        if(result){
-            result.source = hi.asSequence(source);
-            return result;
-        }
-        findObject.index++;
+    while(!source.done()){
+        const result = findObject.stepThreads(source.nextBack());
+        if(result) return result;
+        findObject.index--;
     }
     return undefined;
 });
