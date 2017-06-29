@@ -34,6 +34,9 @@ Object.assign(hi.FiniteRepeatElementSequence.prototype, {
     reverse: function(){
         return this;
     },
+    shuffle: function(){
+        return this;
+    },
     bounded: () => true,
     done: function(){
         return this.finishedRepetitions >= this.repetitions;
@@ -88,6 +91,9 @@ Object.assign(hi.InfiniteRepeatElementSequence.prototype, {
     reverse: function(){
         return this;
     },
+    shuffle: function(){
+        return this;
+    },
     bounded: () => false,
     done: () => false,
     length: null,
@@ -119,6 +125,9 @@ Object.assign(hi.InfiniteRepeatElementSequence.prototype, {
 hi.NullRepeatElementSequence.prototype = Object.create(hi.EmptySequence.prototype);
 Object.assign(hi.NullRepeatElementSequence.prototype, {
     repetitions: 0,
+    shuffle: function(){
+        return this;
+    },
     seed: function(element){
         this.element = element;
         return this;

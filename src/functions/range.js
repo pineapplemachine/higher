@@ -7,7 +7,7 @@ hi.NumberRangeSequence = function(start, end){
 };
 
 // Result of calling range with a step of greater than 0.
-hi.ForwardNumberRangeSequence = function(start, end, step = 1){
+hi.ForwardNumberRangeSequence = function(start, end, step){
     if(step <= 0){
         throw "Failed to create range: Step must be greater than zero.";
     }
@@ -19,7 +19,7 @@ hi.ForwardNumberRangeSequence = function(start, end, step = 1){
 };
 
 // Result of calling range with a step of less than 0.
-hi.BackwardNumberRangeSequence = function(start, end, step = -1){
+hi.BackwardNumberRangeSequence = function(start, end, step){
     if(step >= 0){
         throw "Failed to create range: Step must be less than zero.";
     }
