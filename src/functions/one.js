@@ -1,10 +1,10 @@
-hi.OnceSequence = function(element, isDone = false){
+hi.OneSequence = function(element, isDone = false){
     this.element = element;
     this.isDone = isDone;
 };
 
-hi.OnceSequence.prototype = Object.create(hi.Sequence.prototype);
-Object.assign(hi.OnceSequence.prototype, {
+hi.OneSequence.prototype = Object.create(hi.Sequence.prototype);
+Object.assign(hi.OneSequence.prototype, {
     seed: function(element){
         this.element = element;
         return this;
@@ -48,10 +48,10 @@ Object.assign(hi.OnceSequence.prototype, {
     has: (i) => false,
     get: (i) => undefined,
     slice: function(i, j){
-        return new hi.OnceSequence(this.element, i >= j);
+        return new hi.OneSequence(this.element, i >= j);
     },
     copy: function(){
-        return new hi.OnceSequence(this.element, this.isDone);
+        return new hi.OneSequence(this.element, this.isDone);
     },
     reset: function(){
         this.isDone = false;
@@ -59,6 +59,6 @@ Object.assign(hi.OnceSequence.prototype, {
     },
 });
 
-hi.once = function(element){
-    return new hi.OnceSequence(element);
+hi.one = function(element){
+    return new hi.OneSequence(element);
 };
