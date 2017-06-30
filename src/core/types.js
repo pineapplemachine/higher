@@ -1,40 +1,82 @@
 // True when the input is undefined.
+/**
+ * Checks if the input is undefined.
+ * @param {*} The value to check
+ * @returns {Boolean} Whether or not the `value` is `undefined`.
+ */
 hi.isUndefined = function(value){
-    return typeof(value) === "undefined";
+    return typeof (value) === "undefined";
 };
-// True when the input is a number.
+
+/**
+ * Checks if the `value` is a valid `Number` instance.
+ * @param {*} value The value to check
+ * @returns {Boolean} Whether or not the `value` is a `Number`.
+ */
 hi.isNumber = function(value){
     return !isNaN(value);
 };
-// True when the input is a string.
-hi.isString = function(value){
+
+/**
+ * Checks whether or not the `value` is a `String`.
+ * @param {*} value The value to check
+ * @returns {Boolean} Whether or not the `value` is a string.
+ */
+function isString(value){
     return value instanceof String || typeof value === "string";
-};
-// True when the input is an array.
-hi.isArray = function(value){
+}
+
+/**
+ * Checks whether or not the `value` is an array.
+ * @param {*} value The value to check
+ * @returns {Boolean} Whether or not the `value` is an array.
+ */
+function isArray(value){
     return value instanceof Array;
-};
-// True when the input is an object.
-hi.isObject = function(value){
+}
+
+/**
+ * Checks whether or not the `value` is an `Object`.
+ * @param {*} value The value to check
+ * @returns {Boolean} Whether or not the `value` is an object.
+ */
+function isObject(value){
     return Object.prototype.toString.call(value) === "[object Object]";
-};
-// True when the input is callable.
-hi.isFunction = function(value){
+}
+
+/**
+ * Checks if `value` is a function/callable.
+ * @param {*} value The value to check
+ * @returns {Boolean} Whether or not the `value` is a function.
+ */
+function isFunction(value){
     return value instanceof Function;
-};
-// True when the input is an iterable.
-hi.isIterable = function(value){
-    return hi.isFunction(value[Symbol.iterator]);
-};
-// True when the input is a sequence.
-hi.isSequence = function(value){
-    return hi.isIterable(value) && (
-        hi.isFunction(value.front) &&
-        hi.isFunction(value.popFront) &&
-        hi.isFunction(value.nextFront) &&
-        hi.isFunction(value.consume) &&
-        hi.isFunction(value.done) &&
-        hi.isFunction(value.array) &&
-        hi.isFunction(value.object)
+}
+
+/**
+ * Checks if `value` is an `Iterable`.
+ * @param {*} value The value to check
+ * @returns {Boolean} Whether or not the `value` is an iterable.
+ */
+function isIterable(value){
+    return isFunction(value[Symbol.iterator]);
+}
+
+/**
+ * Checks to see if the input `value` is a `sequence`.
+ * @param {*} value The value to check
+ * @returns {Boolean} Whether or not the `value` is a `sequence`.
+ */
+function isSequence(value){
+    return isIterable(value) && (
+        isFunction(value.front) &&
+        isFunction(value.popFront) &&
+        isFunction(value.nextFront) &&
+        isFunction(value.consume) &&
+        isFunction(value.done) &&
+        isFunction(value.array) &&
+        isFunction(value.object)
     );
-};
+}
+
+export default {isNumber, isString, isArray, isObject, isFunction, isIterable, isSequence};
