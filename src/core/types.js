@@ -4,7 +4,7 @@
  * @param {*} The value to check
  * @returns {Boolean} Whether or not the `value` is `undefined`.
  */
-hi.isUndefined = function(value){
+function isUndefined(value){
     return typeof (value) === "undefined";
 };
 
@@ -13,9 +13,9 @@ hi.isUndefined = function(value){
  * @param {*} value The value to check
  * @returns {Boolean} Whether or not the `value` is a `Number`.
  */
-hi.isNumber = function(value){
+function isNumber(value){
     return !isNaN(value);
-};
+}
 
 /**
  * Checks whether or not the `value` is a `String`.
@@ -79,4 +79,8 @@ function isSequence(value){
     );
 }
 
+<<<<<<< HEAD
 export {isNumber, isString, isArray, isObject, isFunction, isIterable, isSequence};
+=======
+export default {isNumber, isString, isArray, isObject, isFunction, isIterable, isSequence};
+>>>>>>> Coverted core/types.js to ES6
