@@ -1,7 +1,8 @@
-import {isSequence} from "./core/types";
+import wrap from "./core/wrappers";
+import {asSequence} from "./core/asSequence";
 
 const hi = function(source){
-    return hi.asSequence(source);
+    return asSequence(source);
 };
 
 Object.assign(hi, {
@@ -12,7 +13,7 @@ Object.assign(hi, {
     registeredFunctions: [],
 
     register: function(name, expected, implementation){
-        const wrapped = hi.wrap(expected, implementation);
+        const wrapped = wrap(expected, implementation);
         this.registeredFunctions.push(wrapped);
         this[name] = wrapped.fancy;
         if(wrapped.method){

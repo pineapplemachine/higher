@@ -1,19 +1,22 @@
-// Important term definition: "Argument expectation token".
-// An argument expectation token is a value that tells the arguments handler
-// how many arguments of some type to expect. Tokens are associated with a
-// type - either numbers, functions, or sequences - and they provide information
-// like "there should be exactly one of these" or "there should be none of
-// these" or even "there may be any number of these".
-// The possible tokens are:
-// Any falsey value - No arguments of this type are expected.
-// Any number - The exact number of arguments of this type that are expected.
-// An array - The first element is a minimum number of arguments of this
-// type and the second element is a maximum number of arguments.
-// "?" - One or zero arguments of this type are expected.
-// "+" - One or more arguments of this type are expected.
-// "*" - Any number of arguments of this type are allowed.
+import {isFunction} from "./types";
 
-hi.args = {
+/**
+ * Important term definition: "Argument expectation token".
+ * An argument expectation token is a value that tells the arguments handler
+ * how many arguments of some type to expect. Tokens are associated with a
+ * type - either numbers, functions, or sequences - and they provide information
+ * like "there should be exactly one of these" or "there should be none of
+ * these" or even "there may be any number of these".
+ * The possible tokens are:
+ * Any falsey value - No arguments of this type are expected.
+ * Any number - The exact number of arguments of this type that are expected.
+ * An array - The first element is a minimum number of arguments of this
+ * type and the second element is a maximum number of arguments.
+ * "?" - One or zero arguments of this type are expected.
+ * "+" - One or more arguments of this type are expected.
+ * "*" - Any number of arguments of this type are allowed.
+ */
+const args = {
     expectSingular: function(expected){
         return expected === 1 || expected === "?";
     },
@@ -21,60 +24,60 @@ hi.args = {
         return !expected;
     },
     expectPlural: function(expected){
-        return expected && !hi.args.expectSingularArgument(expected);
+        return expected && !args.expectSingularArgument(expected);
     },
     // Returns 0 when no arguments of a type are expected.
     // Returns 1 when a singular or null argument is expected.
     // Returns 2 when an array of arguments of a type is expected.
     expectCount: function(expected){
-        if(hi.args.expectNone(expected)) return 0; // None
-        else if(hi.args.expectSingular(expected)) return 1; // Singular
+        if(args.expectNone(expected)) return 0; // None
+        else if(args.expectSingular(expected)) return 1; // Singular
         else return 2; // Plural
     },
-    
+
     asExpected: function(expected, values){
-        return hi.args.expectSingular(expected) ? values[0] : values;
+        return args.expectSingular(expected) ? values[0] : values;
     },
     allAsExpected: function(expected, found){
         return {
-            numbers: hi.args.asExpected(expected.numbers, found.numbers),
-            functions: hi.args.asExpected(expected.functions, found.functions),
-            sequences: hi.args.asExpected(expected.sequences, found.sequences),
+            numbers: args.asExpected(expected.numbers, found.numbers),
+            functions: args.asExpected(expected.functions, found.functions),
+            sequences: args.asExpected(expected.sequences, found.sequences),
         };
     },
     withExpected: function(callback, expected, found){
-        const args = [];
-        if(expected.numbers) args.push(
-            hi.args.asExpected(expected.numbers, found.numbers)
+        const callbackArgs = [];
+        if(expected.numbers) callbackArgs.push(
+            args.asExpected(expected.numbers, found.numbers)
         );
-        if(expected.functions) args.push(
-            hi.args.asExpected(expected.functions, found.functions)
+        if(expected.functions) callbackArgs.push(
+            args.asExpected(expected.functions, found.functions)
         );
-        if(expected.sequences) args.push(
-            hi.args.asExpected(expected.sequences, found.sequences)
+        if(expected.sequences) callbackArgs.push(
+            args.asExpected(expected.sequences, found.sequences)
         );
-        return callback.apply(this, args);
+        return callback.apply(this, callbackArgs);
     },
-    validate: function(expected, args, callback, error){
-        const found = hi.args.separateTypes(args, expected.allowIterables);
-        const counts = hi.args.countSeparated(found);
-        if(!hi.args.satisfied(expected, counts)){
-            return error(hi.args.describe.discrepancy(expected, counts));
+    validate: function(expected, argz, callback, error){
+        const found = args.separateTypes(argz, expected.allowIterables);
+        const counts = args.countSeparated(found);
+        if(!args.satisfied(expected, counts)){
+            return error(args.describe.discrepancy(expected, counts));
         }else{
-            return hi.args.withExpected(callback, expected, found);
+            return args.withExpected(callback, expected, found);
         }
     },
-    
+
     // Count the occurrences of different argument types.
-    countTypes: function(args){
+    countTypes: function(argz){
         const found = {
             numbers: 0,
             functions: 0,
             sequences: 0,
             invalid: 0,
         };
-        for(const argument of args){
-            if(hi.isFunction(argument)) found.functions++;
+        for(const argument of argz){
+            if(isFunction(argument)) found.functions++;
             else if(hi.validAsSequence(argument)) found.sequences++;
             else if(!isNaN(argument)) found.numbers++;
             else found.invalid++;
@@ -85,7 +88,7 @@ hi.args = {
     // The allowIterables argument determines whether incoming iterables are
     // allowed to enter the returned list as-is, or if they must first be
     // coerced to sequence types.
-    separateTypes: function(args, allowIterables = false){
+    separateTypes: function(argz, allowIterables = false){
         const found = {
             numbers: [],
             functions: [],
@@ -93,7 +96,7 @@ hi.args = {
             invalid: [],
         };
         for(const argument of args){
-            if(hi.isFunction(argument)){
+            if(isFunction(argument)){
                 found.functions.push(argument);
             }else if(hi.validAsSequence(argument)){
                 found.sequences.push(
@@ -115,7 +118,7 @@ hi.args = {
             invalid: found.invalid.length,
         };
     },
-    
+
     // Determine whether a number of found arguments satisfies the expectation.
     // The expected argument should be an expectation token and found should be
     // a number of found arguments of a given type.
@@ -138,16 +141,16 @@ hi.args = {
     },
     satisfied: function(expected, found){
         const satisfied = {
-            numbers: hi.args.typeSatisfied(expected.numbers, found.numbers),
-            functions: hi.args.typeSatisfied(expected.functions, found.functions),
-            sequences: hi.args.typeSatisfied(expected.sequences, found.sequences),
+            numbers: args.typeSatisfied(expected.numbers, found.numbers),
+            functions: args.typeSatisfied(expected.functions, found.functions),
+            sequences: args.typeSatisfied(expected.sequences, found.sequences),
         };
         satisfied.all = (
             satisfied.numbers && satisfied.functions && satisfied.sequences
         );
         return satisfied;
     },
-    
+
     describe: {
         // Join a series of strings with "and"s and commas.
         joinSeries: function(series){
@@ -165,24 +168,24 @@ hi.args = {
         expected: function(expected){
             const parts = [];
             if(expected.numbers) parts.push(
-                hi.args.describe.expectedNumbers(expected.numbers)
+                args.describe.expectedNumbers(expected.numbers)
             );
             if(expected.functions) parts.push(
-                hi.args.describe.expectedFunctions(expected.functions)
+                args.describe.expectedFunctions(expected.functions)
             );
             if(expected.sequences) parts.push(
-                hi.args.describe.expectedSequences(expected.sequences)
+                args.describe.expectedSequences(expected.sequences)
             );
-            return hi.args.describe.joinSeries(parts);
+            return args.describe.joinSeries(parts);
         },
         expectedNumbers: function(expected){
-            return hi.args.describe.expectedType(expected, "number", "numbers");
+            return args.describe.expectedType(expected, "number", "numbers");
         },
         expectedFunctions: function(expected){
-            return hi.args.describe.expectedType(expected, "function", "functions");
+            return args.describe.expectedType(expected, "function", "functions");
         },
         expectedSequences: function(expected){
-            return hi.args.describe.expectedType(expected, "sequence", "sequences");
+            return args.describe.expectedType(expected, "sequence", "sequences");
         },
         expectedType: function(expected, singular, plural){
             if(!expected){
@@ -207,23 +210,23 @@ hi.args = {
         },
         discrepancy: function(expected, found){
             const parts = [];
-            if(!hi.args.typeSatisfied(expected.numbers, found.numbers)) parts.push(
-                `Expected ${hi.args.describe.expectedNumbers(expected.numbers)} ` +
-                `but found ${hi.args.foundCount(found.numbers)}.`
+            if(!args.typeSatisfied(expected.numbers, found.numbers)) parts.push(
+                `Expected ${args.describe.expectedNumbers(expected.numbers)} ` +
+                `but found ${args.foundCount(found.numbers)}.`
             );
-            if(!hi.args.typeSatisfied(expected.functions, found.functions)) parts.push(
-                `Expected ${hi.args.describe.expectedFunctions(expected.functions)} ` +
-                `but found ${hi.args.foundCount(found.functions)}.`
+            if(!args.typeSatisfied(expected.functions, found.functions)) parts.push(
+                `Expected ${args.describe.expectedFunctions(expected.functions)} ` +
+                `but found ${args.foundCount(found.functions)}.`
             );
-            if(!hi.args.typeSatisfied(expected.sequences, found.sequences)) parts.push(
-                `Expected ${hi.args.describe.expectedSequences(expected.sequences)} ` +
-                `but found ${hi.args.foundCount(found.sequences)}.`
+            if(!args.typeSatisfied(expected.sequences, found.sequences)) parts.push(
+                `Expected ${args.describe.expectedSequences(expected.sequences)} ` +
+                `but found ${args.foundCount(found.sequences)}.`
             );
             if(found.invalid) parts.push(
                 `Found ${found.invalid} ${found.invalid === 1 ? "argument" : "arguments"} ` +
-                "that are invalid because they are neither numbers, functions, or sequences." 
+                "that are invalid because they are neither numbers, functions, or sequences."
             );
-            return hi.args.describe.joinSeries(parts);
+            return args.describe.joinSeries(parts);
         },
         foundCount: function(found){
             return `${found ? found : "none"}`;
@@ -231,3 +234,4 @@ hi.args = {
     },
 };
 
+export default args;
