@@ -4,7 +4,11 @@ hi.SequencePadder = function(source){
 
 Object.assign(hi.SequencePadder.prototype, {
     left: function(length, element){
-        if(!this.source.bounded()) return this.source;
+        if(this.source.unbounded()){
+            return this.source;
+        }else if(!this.source.bounded()){
+            throw "Failed to pad sequence: Input must be known bounded or unbounded.";
+        }
         if(!this.source.length) this.source.forceEager();
         const sourceLength = this.source.length();
         if(sourceLength >= length){
