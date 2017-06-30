@@ -1,16 +1,18 @@
+import {isSequence} from "./core/types";
+
 const hi = function(source){
     return hi.asSequence(source);
 };
 
 Object.assign(hi, {
     version: "0.1.0",
-    
+
     internal: {},
-    
+
     registeredFunctions: [],
-    
+
     register: function(name, expected, implementation){
-        let wrapped = hi.wrap(expected, implementation);
+        const wrapped = hi.wrap(expected, implementation);
         this.registeredFunctions.push(wrapped);
         this[name] = wrapped.fancy;
         if(wrapped.method){
@@ -45,3 +47,5 @@ if(typeof window === "undefined"){
     };
     window.hi = hi;
 }
+
+export default hi;
