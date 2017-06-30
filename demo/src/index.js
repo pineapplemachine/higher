@@ -3,6 +3,7 @@ import {render} from "react-dom";
 import styled from "styled-components";
 
 import higher from "../../src/higher";
+import {isFunction} from "../../src/core/types";
 
 const UIWrapper = styled.div`
     display: flex;
@@ -36,6 +37,12 @@ class Demo extends Component{
     constructor(props){
         super(props);
         console.log(higher);
+
+        const testFn = () => {
+            return true;
+        };
+        console.log("isFunction truthy: " + isFunction(testFn));
+        console.log("isFunction falsy: " + isFunction("fail"));
     }
 
     render(){

@@ -79,4 +79,4 @@ function isSequence(value){
     );
 }
 
-export default {isNumber, isString, isArray, isObject, isFunction, isIterable, isSequence};
+export {isNumber, isString, isArray, isObject, isFunction, isIterable, isSequence};
