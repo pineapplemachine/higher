@@ -1,26 +1,28 @@
+import {isSequence} from "./core/types";
+
 const hi = function(source){
     return hi.asSequence(source);
 };
 
 Object.assign(hi, {
     version: "0.1.0",
-    
+
     Promise: Promise,
-    
+
     internal: {},
-    
+
     registeredFunctions: [],
-    
+
     defaultComparisonFunction: (a, b) => (a === b),
     defaultOrderingFunction: (a, b) => (a < b ? -1 : (a > b) ? +1 : 0),
     defaultPredicateFunction: (a) => (a),
     defaultRelationalFunction: (a, b) => (a < b),
     defaultTransformationFunction: (a) => (a),
-    
+
     defaultLimitLength: 1000,
-    
+
     register: function(name, expected, implementation){
-        let wrapped = hi.wrap(expected, implementation);
+        const wrapped = hi.wrap(expected, implementation);
         this.registeredFunctions.push(wrapped);
         this[name] = wrapped.fancy;
         if(wrapped.method){
@@ -62,3 +64,5 @@ if(typeof window === "undefined"){
     };
     window.hi = hi;
 }
+
+export default hi;
