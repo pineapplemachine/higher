@@ -28,8 +28,15 @@ Object.assign(hi, {
         if(target in this){
             this[alias] = this[target];
         }
-        if(target + "Async" in this){
-            this[alias + "Async"] = this[target + "Async"];
+        if(target in hi.Sequence.prototype){
+            hi.Sequence.prototype[alias] = hi.Sequence.prototype[target];
+        }
+        const async = target + "Async";
+        if(async + "Async" in this){
+            this[alias + "Async"] = this[async];
+        }
+        if(async in hi.Sequence.prototype){
+            hi.Sequence.prototype[alias + "Async"] = hi.Sequence.prototype[async];
         }
     },
 });
