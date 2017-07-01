@@ -10,7 +10,7 @@ hi.register("findFirst", {
 }, function(compare, sequences){
     const source = sequences[0];
     const search = hi.asSequence(sequences[1]);
-    const compareFunc = compare || ((a, b) => (a == b));
+    const compareFunc = compare || ((a, b) => (a === b));
     // Handle empty or unbounded search subject
     if(search.done() || search.unbounded()){
         return undefined;

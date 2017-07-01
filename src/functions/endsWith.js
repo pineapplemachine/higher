@@ -16,7 +16,7 @@ hi.register("endsWith", {
     // If either input isn't bidirectional, it needs to be fully in memory.
     if(!source.back) source.forceEager();
     if(!search.back) search.forceEager();
-    const compareFunc = compare || ((a, b) => (a == b));
+    const compareFunc = compare || ((a, b) => (a === b));
     while(!search.done()){
         if(source.done() || !compareFunc(source.nextBack(), search.nextBack())){
             return false;

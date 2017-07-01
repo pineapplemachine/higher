@@ -6,6 +6,10 @@ Because who can remember what all these terms mean?
 
 A comparison function is one accepting exactly two arguments (here named `a` and `b` for the sake of example) which returns a truthy value when `a` is equivalent to `b` and a falsey value otherwise.
 
+``` js
+const compare = (a, b) => (a === b);
+```
+
 ### Higher-Order Function
 
 [Higher-order functions](https://en.wikipedia.org/wiki/Higher-order_function) are defined as those functions which accept at least one function as their output, or which output another function. Many of the functions that higher provides are higher-order functions.

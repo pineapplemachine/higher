@@ -16,7 +16,7 @@ hi.register("startsWith", {
         if(hi.getLength(source) < hi.getLength(search)) return false;
     }
     const sequence = hi.asSequence(source);
-    const compareFunc = compare || ((a, b) => (a == b));
+    const compareFunc = compare || ((a, b) => (a === b));
     for(const element of search){
         if(sequence.done() || !compareFunc(sequence.nextFront(), element)){
             return false;
