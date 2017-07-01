@@ -126,7 +126,7 @@ Object.assign(hi.wrap, {
     },
     async: function(callback){
         return function(){
-            return new Promise((resolve, reject) => {
+            return new hi.Promise((resolve, reject) => {
                 const args = arguments;
                 hi.callAsync(() => resolve(callback(this, args)));
             });

@@ -25,7 +25,7 @@ hi.register("lastAsync", {
     sequences: 1,
     isAsync: true,
 }, function(predicate, source){
-    return new Promise((resolve, reject) => {
+    return new hi.Promise((resolve, reject) => {
         hi.callAsync(() => {
             if(predicate){
                 let back = null;

@@ -26,7 +26,7 @@ hi.register("firstAsync", {
     // Don't waste time coercing input iterables to sequences
     allowIterables: true,
 }, function(predicate, source){
-    return new Promise((resolve, reject) => {
+    return new hi.Promise((resolve, reject) => {
         hi.callAsync(() => {
             if(predicate){
                 for(const element of source){

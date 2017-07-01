@@ -126,7 +126,7 @@ hi.Sequence.prototype.collapse = function(limit = -1){
     return source;
 };
 hi.Sequence.prototype.collapseAsync = function(limit = -1){
-    return new Promise((resolve, reject) => {
+    return new hi.Promise((resolve, reject) => {
         hi.callAsync(function(){
             resolve(this.collapse(limit));
         });

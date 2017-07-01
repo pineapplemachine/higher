@@ -71,7 +71,7 @@ Object.assign(SequenceReducer.prototype, {
     seq: SequenceReducer.prototype.sequence,
     // Get the last value in the sequence asynchronously.
     lastAsync: function(fallback = undefined){
-        return new Promise((resolve, reject) => {
+        return new hi.Promise((resolve, reject) => {
             hi.callAsync(() => resolve(this.last(fallback)));
         });
     },

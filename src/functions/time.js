@@ -15,7 +15,7 @@ hi.time = function(call, ...args){
 // Asynchronously determine the amount of time in milliseconds it takes to
 // evaluate a function.
 hi.timeAsync = function(call, ...args){
-    return new Promise((resolve, reject) => {
+    return new hi.Promise((resolve, reject) => {
         hi.callAsync(() => resolve(hi.time(call, ...args)));
     });
 };

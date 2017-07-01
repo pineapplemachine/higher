@@ -5,6 +5,8 @@ const hi = function(source){
 Object.assign(hi, {
     version: "0.1.0",
     
+    Promise: Promise,
+    
     internal: {},
     
     registeredFunctions: [],

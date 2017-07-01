@@ -10,7 +10,7 @@ hi.containsElement = function(source, element){
 };
 
 hi.containsElementAsync = function(source, element){
-    return new Promise((resolve, reject) => {
+    return new hi.Promise((resolve, reject) => {
         resolve(hi.contains(source, element));
     });
 };

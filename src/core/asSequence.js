@@ -76,7 +76,7 @@ Object.assign(hi.ArraySequence.prototype, {
         }
     },
     arrayAsync: function(limit){
-        return new Promise((resolve, reject) => resolve(this.array(limit)));
+        return new hi.Promise((resolve, reject) => resolve(this.array(limit)));
     },
     newArray: function(limit){
         if(limit <= 0){
@@ -88,7 +88,7 @@ Object.assign(hi.ArraySequence.prototype, {
         }
     },
     newArrayAsync: function(limit){
-        return new Promise((resolve, reject) => resolve(this.newArray(limit)));
+        return new hi.Promise((resolve, reject) => resolve(this.newArray(limit)));
     },
     bounded: () => true,
     done: function(){
@@ -162,7 +162,7 @@ Object.assign(hi.StringSequence.prototype, {
         }
     },
     stringAsync: function(){
-        return new Promise((resolve, reject) => resolve(this.string()));
+        return new hi.Promise((resolve, reject) => resolve(this.string()));
     },
     bounded: () => true,
     done: function(){
