@@ -37,6 +37,7 @@ hi.IndexStrideSequence = function(strideLength, source){
 };
 
 hi.PoppingStrideSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.PoppingStrideSequence.prototype.constructor = hi.PoppingStrideSequence;
 Object.assign(hi.PoppingStrideSequence.prototype, {
     bounded: function(){
         return this.source.bounded();
@@ -82,6 +83,7 @@ Object.assign(hi.PoppingStrideSequence.prototype, {
 });
 
 hi.IndexStrideSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.IndexStrideSequence.prototype.constructor = hi.IndexStrideSequence;
 Object.assign(hi.IndexStrideSequence.prototype, {
     bounded: () => true,
     done: function(){

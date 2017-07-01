@@ -17,6 +17,7 @@ hi.UntilSequence = function(
 };
 
 hi.UntilSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.UntilSequence.prototype.constructor = hi.UntilSequence;
 Object.assign(hi.UntilSequence.prototype, {
     inclusive: function(){
         this.isInclusive = true;

@@ -20,6 +20,7 @@ hi.DropSliceSequence = function(dropLow, dropHigh, source){
 };
 
 hi.DropSliceSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.DropSliceSequence.prototype.constructor = hi.DropSliceSequence;
 Object.assign(hi.DropSliceSequence.prototype, {
     bounded: function(){
         return this.source.bounded();

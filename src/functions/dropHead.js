@@ -6,6 +6,7 @@ hi.DropHeadSequence = function(dropElements, source, initialized = false){
 };
 
 hi.DropHeadSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.DropHeadSequence.prototype.constructor = hi.DropHeadSequence;
 Object.assign(hi.DropHeadSequence.prototype, {
     initialize: function(){
         this.initialized = true;

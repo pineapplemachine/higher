@@ -15,6 +15,7 @@ hi.EnumerateSequence = function(
 };
 
 hi.EnumerateSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.EnumerateSequence.prototype.constructor = hi.EnumerateSequence;
 Object.assign(hi.EnumerateSequence.prototype, {
     bounded: function(){
         return this.source.bounded();

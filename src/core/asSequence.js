@@ -55,6 +55,7 @@ hi.ArraySequence = function(source, low, high){
 };
 
 hi.ArraySequence.prototype = Object.create(hi.Sequence.prototype);
+hi.ArraySequence.prototype.constructor = hi.ArraySequence;
 Object.assign(hi.ArraySequence.prototype, {
     array: function(limit){
         if(limit <= 0){
@@ -151,6 +152,7 @@ hi.StringSequence = function(source, low, high){
 };
 
 hi.StringSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.StringSequence.prototype.constructor = hi.StringSequence;
 Object.assign(hi.StringSequence.prototype, {
     string: function(){
         if(this.lowIndex === 0 && this.highIndex === this.source.length){
@@ -222,6 +224,7 @@ hi.ObjectSequence = function(source, keys){
 };
 
 hi.ObjectSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.ObjectSequence.prototype.constructor = hi.ObjectSequence;
 Object.assign(hi.ObjectSequence.prototype, {
     bounded: () => true,
     done: function(){
@@ -272,6 +275,7 @@ hi.IterableSequence = function(source){
 };
 
 hi.IterableSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.IterableSequence.prototype.constructor = hi.IterableSequence;
 Object.assign(hi.IterableSequence.prototype, {
     bounded: () => false,
     done: function(){

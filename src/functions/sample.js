@@ -14,6 +14,7 @@ hi.DistinctRandomIndexSequence = function(
 };
 
 hi.DistinctRandomIndexSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.DistinctRandomIndexSequence.prototype.constructor = hi.DistinctRandomIndexSequence;
 Object.assign(hi.DistinctRandomIndexSequence.prototype, {
     bounded: () => true,
     done: function(){
@@ -100,6 +101,7 @@ hi.SampleSequence = function(samples, random, source, indexes = undefined){
 };
 
 hi.SampleSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.SampleSequence.prototype.constructor = hi.SampleSequence;
 Object.assign(hi.SampleSequence.prototype, {
     bounded: () => true,
     done: function(){

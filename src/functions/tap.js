@@ -9,6 +9,7 @@ hi.TapSequence = function(callback, source){
 };
 
 hi.TapSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.TapSequence.prototype.constructor = hi.TapSequence;
 Object.assign(hi.TapSequence.prototype, {
     bounded: function(){
         return this.source.bounded();

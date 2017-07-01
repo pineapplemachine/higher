@@ -16,6 +16,7 @@ hi.ConcatSequence = function(sources){
 };
 
 hi.ConcatSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.ConcatSequence.prototype.constructor = hi.ConcatSequence;
 Object.assign(hi.ConcatSequence.prototype, {
     bounded: function(){
         for(const source of this.sources){

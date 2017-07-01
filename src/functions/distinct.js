@@ -8,6 +8,7 @@ hi.DistinctSequence = function(
 };
 
 hi.DistinctSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.DistinctSequence.prototype.constructor = hi.DistinctSequence;
 Object.assign(hi.DistinctSequence.prototype, {
     bounded: function(){
         return this.source.bounded();

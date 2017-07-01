@@ -94,6 +94,7 @@ hi.ReduceSequence = function(
 };
 
 hi.ReduceSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.ReduceSequence.prototype.constructor = hi.ReduceSequence;
 Object.assign(hi.ReduceSequence.prototype, {
     bounded: function(){
         return this.source.bounded();

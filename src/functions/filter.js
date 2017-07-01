@@ -5,6 +5,7 @@ hi.FilterSequence = function(predicate, source, initialize = true){
 };
 
 hi.FilterSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.FilterSequence.prototype.constructor = hi.FilterSequence;
 Object.assign(hi.FilterSequence.prototype, {
     initializeFront: function(){
         while(!this.predicate(this.source.front())){

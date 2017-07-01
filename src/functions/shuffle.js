@@ -23,6 +23,7 @@ hi.ShuffleSequence = function(
 };
 
 hi.ShuffleSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.ShuffleSequence.prototype.constructor = hi.ShuffleSequence;
 Object.assign(hi.ShuffleSequence.prototype, {
     initialize: function(){
         this.shuffledSource = [];

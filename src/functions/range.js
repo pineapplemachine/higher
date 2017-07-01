@@ -31,6 +31,7 @@ hi.BackwardNumberRangeSequence = function(start, end, step){
 };
 
 hi.NumberRangeSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.NumberRangeSequence.prototype.constructor = hi.NumberRangeSequence;
 Object.assign(hi.NumberRangeSequence.prototype, {
     step: 1,
     reverse: function(){
@@ -80,6 +81,7 @@ Object.assign(hi.NumberRangeSequence.prototype, {
 });
 
 hi.ForwardNumberRangeSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.ForwardNumberRangeSequence.prototype.constructor = hi.ForwardNumberRangeSequence;
 Object.assign(hi.ForwardNumberRangeSequence.prototype, {
     reverse: function(){
         return new hi.BackwardNumberRangeSequence(
@@ -132,6 +134,7 @@ Object.assign(hi.ForwardNumberRangeSequence.prototype, {
 });
 
 hi.BackwardNumberRangeSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.BackwardNumberRangeSequence.prototype.constructor = hi.BackwardNumberRangeSequence;
 Object.assign(hi.BackwardNumberRangeSequence.prototype, {
     reverse: function(){
         return new hi.ForwardNumberRangeSequence(

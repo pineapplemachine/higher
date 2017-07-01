@@ -4,6 +4,7 @@ hi.FlattenSequence = function(source, frontSource = null){
 };
 
 hi.FlattenSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.FlattenSequence.prototype.constructor = hi.FlattenSequence;
 Object.assign(hi.FlattenSequence.prototype, {
     initializeFront: function(){
         while((!this.frontSource || this.frontSource.done()) && !this.source.done()){

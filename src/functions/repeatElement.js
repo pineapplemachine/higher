@@ -15,6 +15,7 @@ hi.NullRepeatElementSequence = function(element){
 };
 
 hi.FiniteRepeatElementSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.FiniteRepeatElementSequence.prototype.constructor = hi.FiniteRepeatElementSequence;
 Object.assign(hi.FiniteRepeatElementSequence.prototype, {
     seed: function(element){
         this.element = element;
@@ -62,11 +63,11 @@ Object.assign(hi.FiniteRepeatElementSequence.prototype, {
     index: function(i){
         return this.element;
     },
-    has: (i) => false,
-    get: (i) => undefined,
     slice: function(i, j){
         return new hi.FiniteRepeatElementSequence(this.element, j - i);
     },
+    has: null,
+    get: null,
     copy: function(){
         return new hi.FiniteRepeatElementSequence(
             this.element, this.repetitions, this.finishedRepetitions
@@ -79,6 +80,7 @@ Object.assign(hi.FiniteRepeatElementSequence.prototype, {
 });
 
 hi.InfiniteRepeatElementSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.InfiniteRepeatElementSequence.prototype.constructor = hi.InfiniteRepeatElementSequence;
 Object.assign(hi.InfiniteRepeatElementSequence.prototype, {
     repetitions: Infinity,
     seed: function(element){
@@ -109,8 +111,8 @@ Object.assign(hi.InfiniteRepeatElementSequence.prototype, {
     index: function(i){
         return this.element;
     },
-    has: (i) => false,
-    get: (i) => undefined,
+    has: null,
+    get: null,
     slice: function(i, j){
         return new hi.FiniteRepeatElementSequence(this.element, j - i);
     },
@@ -123,6 +125,7 @@ Object.assign(hi.InfiniteRepeatElementSequence.prototype, {
 });
 
 hi.NullRepeatElementSequence.prototype = Object.create(hi.EmptySequence.prototype);
+hi.NullRepeatElementSequence.prototype.constructor = hi.NullRepeatElementSequence;
 Object.assign(hi.NullRepeatElementSequence.prototype, {
     repetitions: 0,
     shuffle: function(){

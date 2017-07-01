@@ -41,6 +41,7 @@ hi.PadLeftSequence = function(
 };
 
 hi.PadLeftSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.PadLeftSequence.prototype.constructor = hi.PadLeftSequence;
 Object.assign(hi.PadLeftSequence.prototype, {
     bounded: function(){
         return this.source.bounded();

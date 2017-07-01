@@ -10,6 +10,7 @@ hi.DropTailSequence = function(dropElements, source, frontIndex = 0){
 };
 
 hi.DropTailSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.DropTailSequence.prototype.constructor = hi.DropTailSequence;
 Object.assign(hi.DropTailSequence.prototype, {
     bounded: function(){
         return this.source.bounded();

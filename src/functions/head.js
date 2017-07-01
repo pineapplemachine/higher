@@ -7,6 +7,7 @@ hi.HeadSequence = function(elements, source, frontIndex = 0){
 };
 
 hi.HeadSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.HeadSequence.prototype.constructor = hi.HeadSequence;
 Object.assign(hi.HeadSequence.prototype, {
     bounded: () => true,
     done: function(){

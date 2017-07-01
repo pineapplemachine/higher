@@ -4,6 +4,7 @@ hi.AssumeBoundedSequence = function(source){
 };
 
 hi.AssumeBoundedSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.AssumeBoundedSequence.prototype.constructor = hi.AssumeBoundedSequence;
 Object.assign(hi.AssumeBoundedSequence.prototype, {
     bounded: () => true,
     done: function(){

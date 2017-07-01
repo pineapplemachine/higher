@@ -6,6 +6,7 @@ hi.RecurSequence = function(transform, seedValue = null, frontValue = null){
 };
 
 hi.RecurSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.RecurSequence.prototype.constructor = hi.RecurSequence;
 Object.assign(hi.RecurSequence.prototype, {
     // Call this to set the initial value of the generator.
     // Necessarily resets the state of the sequence.

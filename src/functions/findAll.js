@@ -176,6 +176,7 @@ hi.stepFindThreads = function(element){
 };
 
 hi.ForwardFindSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.ForwardFindSequence.prototype.constructor = hi.ForwardFindSequence;
 Object.assign(hi.ForwardFindSequence.prototype, {
     threadType: hi.ForwardFindSequenceThread,
     stepThreads: hi.stepFindThreads,
@@ -296,6 +297,7 @@ Object.assign(hi.ForwardFindSequence.prototype, {
 });
 
 hi.BackwardFindSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.BackwardFindSequence.prototype.constructor = hi.BackwardFindSequence;
 Object.assign(hi.BackwardFindSequence.prototype, {
     threadType: hi.BackwardFindSequenceThread,
     stepThreads: hi.stepFindThreads,

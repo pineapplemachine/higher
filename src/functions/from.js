@@ -11,6 +11,7 @@ hi.FromSequence = function(
 };
 
 hi.FromSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.FromSequence.prototype.constructor = hi.FromSequence;
 Object.assign(hi.FromSequence.prototype, {
     initialize: function(){
         this.initialized = true;

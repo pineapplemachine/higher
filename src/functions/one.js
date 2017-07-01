@@ -4,6 +4,7 @@ hi.OneSequence = function(element, isDone = false){
 };
 
 hi.OneSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.OneSequence.prototype.constructor = hi.OneSequence;
 Object.assign(hi.OneSequence.prototype, {
     seed: function(element){
         this.element = element;

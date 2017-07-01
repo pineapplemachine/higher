@@ -5,6 +5,7 @@ hi.FlattenDeepSequence = function(source){
 };
 
 hi.FlattenDeepSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.FlattenDeepSequence.prototype.constructor = hi.FlattenDeepSequence;
 Object.assign(hi.FlattenDeepSequence.prototype, {
     // True when an element is a sequence which should be flattened.
     flattenElement: function(element){

@@ -12,6 +12,7 @@ hi.ReverseSequence = function(source){
 };
 
 hi.ReverseSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.ReverseSequence.prototype.constructor = hi.ReverseSequence;
 Object.assign(hi.ReverseSequence.prototype, {
     bounded: function(){
         return this.source.bounded();

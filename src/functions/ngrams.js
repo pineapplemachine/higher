@@ -9,6 +9,7 @@ hi.NgramSequence = function(ngramSize, source, currentNgram = null){
 };
 
 hi.NgramSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.NgramSequence.prototype.constructor = hi.NgramSequence;
 Object.assign(hi.NgramSequence.prototype, {
     bounded: function(){
         return this.source.bounded();
@@ -67,7 +68,7 @@ hi.register("ngrams", {
     numbers: 1,
     sequences: 1,
 }, function(ngramSize, source){
-    if(+ngramSize < 1){
+    if(ngramSize < 1){
         return new hi.EmptySequence();
     }else{
         return new hi.NgramSequence(ngramSize, source);

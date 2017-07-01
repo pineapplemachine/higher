@@ -38,6 +38,7 @@ hi.NullRepeatSequence = function(source){
 };
 
 hi.FiniteRepeatSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.FiniteRepeatSequence.prototype.constructor = hi.FiniteRepeatSequence;
 Object.assign(hi.FiniteRepeatSequence.prototype, {
     finishedRepetitions: function(){
         return this.frontRepetitions + this.backRepetitions;
@@ -169,6 +170,7 @@ Object.assign(hi.FiniteRepeatSequence.prototype, {
 });
 
 hi.InfiniteRepeatSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.InfiniteRepeatSequence.prototype.constructor = hi.InfiniteRepeatSequence;
 Object.assign(hi.InfiniteRepeatSequence.prototype, {
     repetitions: Infinity,
     unbounded: () => true,
@@ -232,6 +234,7 @@ Object.assign(hi.InfiniteRepeatSequence.prototype, {
 });
 
 hi.NullRepeatSequence.prototype = Object.create(hi.EmptySequence.prototype);
+hi.NullRepeatSequence.prototype.constructor = hi.NullRepeatSequence;
 Object.assign(hi.NullRepeatSequence.prototype, {
     repetitions: 0,
     slice: function(i, j){

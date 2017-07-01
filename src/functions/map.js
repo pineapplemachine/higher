@@ -21,8 +21,10 @@ hi.PluralMapSequence = function(transform, sources){
 };
 
 hi.NullMapSequence.prototype = Object.create(hi.EmptySequence.prototype);
+hi.NullMapSequence.prototype.constructor = hi.NullMapSequence;
 
 hi.SingularMapSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.SingularMapSequence.prototype.constructor = hi.SingularMapSequence;
 Object.assign(hi.SingularMapSequence.prototype, {
     bounded: function(){
         return this.source.bounded();
@@ -70,6 +72,7 @@ Object.assign(hi.SingularMapSequence.prototype, {
 });
 
 hi.PluralMapSequence.prototype = Object.create(hi.Sequence.prototype);
+hi.PluralMapSequence.prototype.constructor = hi.PluralMapSequence;
 Object.assign(hi.PluralMapSequence.prototype, {
     bounded: function(){
         for(const source of this.sources){
