@@ -1,9 +1,6 @@
-<<<<<<< HEAD
 import wrap from "./core/wrappers";
+import Sequence from "./core/sequence";
 import {asSequence} from "./core/asSequence";
-=======
-import {isSequence} from "./core/types";
->>>>>>> Resolved merge conflicts
 
 const hi = function(source){
     return asSequence(source);
