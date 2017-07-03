@@ -1,4 +1,5 @@
-import {isFunction} from "./types";
+import {asSequence, validAsSequence} from "./asSequence";
+import {isArray, isFunction} from "./types";
 
 /**
  * Important term definition: "Argument expectation token".
@@ -78,7 +79,7 @@ const args = {
         };
         for(const argument of argz){
             if(isFunction(argument)) found.functions++;
-            else if(hi.validAsSequence(argument)) found.sequences++;
+            else if(validAsSequence(argument)) found.sequences++;
             else if(!isNaN(argument)) found.numbers++;
             else found.invalid++;
         }
@@ -95,12 +96,12 @@ const args = {
             sequences: [],
             invalid: [],
         };
-        for(const argument of args){
+        for(const argument of argz){
             if(isFunction(argument)){
                 found.functions.push(argument);
-            }else if(hi.validAsSequence(argument)){
+            }else if(validAsSequence(argument)){
                 found.sequences.push(
-                    allowIterables ? argument : hi.asSequence(argument)
+                    allowIterables ? argument : asSequence(argument)
                 );
             }else if(!isNaN(argument)){
                 found.numbers.push(argument);
@@ -127,7 +128,7 @@ const args = {
             return found === 0;
         }else if(!isNaN(expected)){
             return found === +expected;
-        }else if(hi.isArray(expected)){
+        }else if(isArray(expected)){
             return found >= expected[0] && found <= expected[1];
         }else if(expected === "+"){
             return found >= 1;
@@ -192,7 +193,7 @@ const args = {
                 return `no ${plural}`;
             }else if(expected && !isNaN(expected)){
                 return `exactly ${expected} ${+expected === 1 ? singular : plural}`;
-            }else if(hi.isArray(expected)){
+            }else if(isArray(expected)){
                 if(expected[1] === "+"){
                     return `at least ${expected[0]} ${+expected[0] === 1 ? singular : plural}`;
                 }else{
