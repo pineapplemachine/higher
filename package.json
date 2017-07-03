@@ -20,16 +20,20 @@
     },
     "dependencies": {},
     "devDependencies": {
-        "nwb": "0.17.x",
-        "eslint": "4.1.0",
         "babel-eslint": "7.2.2",
-        "eslint-config-google": "0.8.0"
+        "eslint": "4.1.0",
+        "eslint-config-google": "0.8.0",
+        "nwb": "0.17.x",
+        "react": "^15.6.1",
+        "react-dom": "^15.6.1",
+        "styled-components": "^2.1.0"
     },
     "main": "lib/higher.js",
     "module": "es/higher.js",
     "scripts": {
         "build": "nwb build-web-module",
-        "clean": "nwb clean-module",
+        "clean": "nwb clean-module && nwb clean-demo",
+        "start": "nwb serve-react-demo",
         "test": "nwb test",
         "test:coverage": "nwb test --coverage",
         "test:watch": "nwb test --server"
