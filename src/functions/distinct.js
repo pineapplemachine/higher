@@ -1,4 +1,6 @@
-hi.DistinctSequence = function(
+import Sequence from "../core/sequence";
+
+const DistinctSequence = function(
     source, history = null, frontValue = null, initialize = true
 ){
     this.source = source;
@@ -7,9 +9,9 @@ hi.DistinctSequence = function(
     this.maskAbsentMethods(source);
 };
 
-hi.DistinctSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.DistinctSequence.prototype.constructor = hi.DistinctSequence;
-Object.assign(hi.DistinctSequence.prototype, {
+DistinctSequence.prototype = Object.create(Sequence.prototype);
+DistinctSequence.prototype.constructor = DistinctSequence;
+Object.assign(DistinctSequence.prototype, {
     bounded: function(){
         return this.source.bounded();
     },
@@ -40,7 +42,7 @@ Object.assign(hi.DistinctSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        return new hi.DistinctSequence(
+        return new DistinctSequence(
             this.source.copy(), Object.assign({}, this.history),
             this.frontValue, false
         );
@@ -52,8 +54,14 @@ Object.assign(hi.DistinctSequence.prototype, {
     },
 });
 
-hi.register("distinct", {
-    sequences: 1,
-}, function(source){
-    return new hi.DistinctSequence(source);
-});
+export {DistinctSequence};
+
+export default {
+    name: "distinct",
+    expected: {
+        sequences: 1,
+    },
+    function(source){
+        return new DistinctSequence(source);
+    },
+};

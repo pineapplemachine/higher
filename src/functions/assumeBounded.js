@@ -1,11 +1,13 @@
-hi.AssumeBoundedSequence = function(source){
+import Sequence from "../core/sequence";
+
+const AssumeBoundedSequence = function(source){
     this.source = source;
     this.maskAbsentMethods(source);
 };
 
-hi.AssumeBoundedSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.AssumeBoundedSequence.prototype.constructor = hi.AssumeBoundedSequence;
-Object.assign(hi.AssumeBoundedSequence.prototype, {
+AssumeBoundedSequence.prototype = Object.create(Sequence.prototype);
+AssumeBoundedSequence.prototype.constructor = AssumeBoundedSequence;
+Object.assign(AssumeBoundedSequence.prototype, {
     bounded: () => true,
     unbounded: () => false,
     done: function(){
@@ -33,10 +35,10 @@ Object.assign(hi.AssumeBoundedSequence.prototype, {
         return this.source.index(i);
     },
     slice: function(i, j){
-        return new hi.AssumeBoundedSequence(this.source.slice(i, j));
+        return new AssumeBoundedSequence(this.source.slice(i, j));
     },
     copy: function(){
-        return new hi.AssumeBoundedSequence(this.source.copy());
+        return new AssumeBoundedSequence(this.source.copy());
     },
     has: function(i){
         return this.source.has(i);
@@ -50,12 +52,18 @@ Object.assign(hi.AssumeBoundedSequence.prototype, {
     },
 });
 
-// An AssumeBoundedSequence can be used to assure higher that a potentially
-// unbounded sequence is in fact bounded.
-// This may be helpful if you're sure a sequence that you want to fully
-// consume will eventually end, even if higher can't tell for itself.
-hi.register("assumeBounded", {
-    sequences: 1,
-}, function(source){
-    return source.bounded() ? source : new hi.AssumeBoundedSequence(source);
-});
+/**
+ * An AssumeBoundedSequence can be used to assure higher that a potentially
+ * unbounded sequence is in fact bounded.
+ * This may be helpful if you're sure a sequence that you want to fully
+ * consume will eventually end, even if higher can't tell for itself.
+ */
+export default {
+    name: "assumeBounded",
+    expected: {
+        sequences: 1,
+    },
+    implementation: function(source){
+        return source.bounded() ? source : new hi.AssumeBoundedSequence(source);
+    },
+};

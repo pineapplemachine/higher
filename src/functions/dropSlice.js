@@ -1,4 +1,10 @@
-hi.DropSliceSequence = function(dropLow, dropHigh, source){
+import Sequence from "../core/sequence";
+import {ConcatSequence} from "./concat";
+import {DropHeadSequence} from "./dropHead";
+import {DropTailSequence} from "./dropTail";
+import {EmptySequence} from "./empty";
+
+const DropSliceSequence = function(dropLow, dropHigh, source){
     if(dropLow === 0){
         throw "Error creating drop slice sequence: Use dropHead instead.";
     }
@@ -19,9 +25,9 @@ hi.DropSliceSequence = function(dropLow, dropHigh, source){
     this.maskAbsentMethods(source);
 };
 
-hi.DropSliceSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.DropSliceSequence.prototype.constructor = hi.DropSliceSequence;
-Object.assign(hi.DropSliceSequence.prototype, {
+DropSliceSequence.prototype = Object.create(Sequence.prototype);
+DropSliceSequence.prototype.constructor = DropSliceSequence;
+Object.assign(DropSliceSequence.prototype, {
     bounded: function(){
         return this.source.bounded();
     },
@@ -78,7 +84,7 @@ Object.assign(hi.DropSliceSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        const copy = new hi.DropSliceSequence(this.strideLength, this.source.copy());
+        const copy = new DropSliceSequence(this.strideLength, this.source.copy());
     },
     reset: function(){
         this.source.reset();
@@ -86,36 +92,42 @@ Object.assign(hi.DropSliceSequence.prototype, {
     },
 });
 
-hi.register("dropSlice", {
-    numbers: 2,
-    sequences: 1,
-}, function(slice, source){
-    const dropLow = slice[0];
-    const dropHigh = slice[1];
-    if(dropLow >= dropHigh){
-        return source;
-    }else if(source.slice && source.length){
-        const length = source.length();
-        if(dropLow <= 0 && dropHigh >= length){
-            return new hi.EmptySequence();
-        }else{
-            return new hi.ConcatSequence([
-                source.slice(0, dropLow), source.slice(dropHigh, length),
-            ]);
+export {DropSliceSequence};
+
+export default {
+    name: "dropSlice",
+    expected: {
+        numbers: 2,
+        sequences: 1,
+    },
+    implementation: function(slice, source){
+        const dropLow = slice[0];
+        const dropHigh = slice[1];
+        if(dropLow >= dropHigh){
+            return source;
+        }else if(source.slice && source.length){
+            const length = source.length();
+            if(dropLow <= 0 && dropHigh >= length){
+                return new EmptySequence();
+            }else{
+                return new ConcatSequence([
+                    source.slice(0, dropLow), source.slice(dropHigh, length),
+                ]);
+            }
+        }else if(dropLow <= 0){
+            if(source.length && dropHigh >= source.length()){
+                return new EmptySequence();
+            }else{
+                return new DropHeadSequence(dropHigh, source);
+            }
+        }else if(source.length){
+            const length = source.length();
+            if(dropHigh >= length){
+                return new DropTailSequence(length - dropLow, source);
+            }
         }
-    }else if(dropLow <= 0){
-        if(source.length && dropHigh >= source.length()){
-            return new hi.EmptySequence();
-        }else{
-            return new hi.DropHeadSequence(dropHigh, source);
-        }
-    }else if(source.length){
-        const length = source.length();
-        if(dropHigh >= length){
-            return new hi.DropTailSequence(length - dropLow, source);
-        }
-    }
-    return new hi.DropSliceSequence(
-        dropLow, dropHigh, source
-    );
-});
+        return new DropSliceSequence(
+            dropLow, dropHigh, source
+        );
+    },
+};

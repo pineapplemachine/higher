@@ -1,4 +1,6 @@
-hi.ConcatSequence = function(sources){
+import Sequence from "../core/sequence";
+
+const ConcatSequence = function(sources){
     this.sources = sources;
     this.source = sources[0];
     this.frontSourceIndex = 0;
@@ -15,9 +17,9 @@ hi.ConcatSequence = function(sources){
     }
 };
 
-hi.ConcatSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.ConcatSequence.prototype.constructor = hi.ConcatSequence;
-Object.assign(hi.ConcatSequence.prototype, {
+ConcatSequence.prototype = Object.create(Sequence.prototype);
+ConcatSequence.prototype.constructor = ConcatSequence;
+Object.assign(ConcatSequence.prototype, {
     bounded: function(){
         for(const source of this.sources){
             if(!source.bounded()) return false;
@@ -98,12 +100,12 @@ Object.assign(hi.ConcatSequence.prototype, {
             }
             offset = nextOffset;
         }
-        return new hi.ConcatSequence(sliceSources);
+        return new ConcatSequence(sliceSources);
     },
     copy: function(){
         const copies = [];
         for(const source of this.sources) copies.push(source.copy());
-        const copy = new hi.ConcatSequence(this.transform, copies);
+        const copy = new ConcatSequence(this.transform, copies);
         copy.frontSourceIndex = this.frontSourceIndex;
         copy.backSourceIndex = this.backSourceIndex;
     },
@@ -115,8 +117,15 @@ Object.assign(hi.ConcatSequence.prototype, {
     },
 });
 
-hi.register("concat", {
-    sequences: "*",
-}, function(sources){
-    return new hi.ConcatSequence(sources);
-});
+// named export for pulling in the ConcatSequence only
+export {ConcatSequence};
+
+export default {
+    name: "concat",
+    expected: {
+        sequences: "*",
+    },
+    implementation: function(sources){
+        return new ConcatSequence(sources);
+    },
+};

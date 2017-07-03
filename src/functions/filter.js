@@ -1,12 +1,14 @@
-hi.FilterSequence = function(predicate, source, initialize = true){
+import Sequence from "../core/sequence";
+
+const FilterSequence = function(predicate, source, initialize = true){
     this.predicate = predicate;
     this.source = source;
     this.maskAbsentMethods(source);
 };
 
-hi.FilterSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.FilterSequence.prototype.constructor = hi.FilterSequence;
-Object.assign(hi.FilterSequence.prototype, {
+FilterSequence.prototype = Object.create(Sequence.prototype);
+FilterSequence.prototype.constructor = FilterSequence;
+Object.assign(FilterSequence.prototype, {
     initializeFront: function(){
         while(!this.predicate(this.source.front())){
             this.source.popFront();
@@ -71,7 +73,7 @@ Object.assign(hi.FilterSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        const copy = new hi.FilterSequence(
+        const copy = new FilterSequence(
             this.predicate, this.source.copy(), false
         );
         copy.front = this.front;
@@ -86,9 +88,15 @@ Object.assign(hi.FilterSequence.prototype, {
     },
 });
 
-hi.register("filter", {
-    functions: 1,
-    sequences: 1,
-}, function(predicate, source){
-    return new hi.FilterSequence(predicate, source);
-});
+export {FilterSequence};
+
+export default {
+    name: "filter",
+    expected: {
+        functions: 1,
+        sequences: 1,
+    },
+    implementation: function(predicate, source){
+        return new FilterSequence(predicate, source);
+    },
+};

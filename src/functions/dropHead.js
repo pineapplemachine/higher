@@ -1,13 +1,15 @@
-hi.DropHeadSequence = function(dropElements, source, initialized = false){
+import Sequence from "../core/sequence";
+
+const DropHeadSequence = function(dropElements, source, initialized = false){
     this.dropElements = dropElements;
     this.source = source;
     this.initialized = initialized;
     this.maskAbsentMethods(source);
 };
 
-hi.DropHeadSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.DropHeadSequence.prototype.constructor = hi.DropHeadSequence;
-Object.assign(hi.DropHeadSequence.prototype, {
+DropHeadSequence.prototype = Object.create(Sequence.prototype);
+DropHeadSequence.prototype.constructor = DropHeadSequence;
+Object.assign(DropHeadSequence.prototype, {
     initialize: function(){
         this.initialized = true;
         for(let i = 0; i < this.dropElements && !this.source.done(); i++){
@@ -50,7 +52,7 @@ Object.assign(hi.DropHeadSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        const copy = new hi.DropHeadSequence(
+        const copy = new DropHeadSequence(
             this.dropElements, this.source.copy(), this.initialized
         );
     },
@@ -61,15 +63,21 @@ Object.assign(hi.DropHeadSequence.prototype, {
     },
 });
 
-hi.register("dropHead", {
-    numbers: 1,
-    sequences: 1,
-}, function(dropElements, source){
-    if(dropElements <= 0){
-        return source;
-    }else if(source.slice && source.length){
-        return source.slice(dropElements, source.length());
-    }else{
-        return new hi.DropHeadSequence(dropElements, source);
-    }
-});
+export {DropHeadSequence};
+
+export default {
+    name: "dropHead",
+    expected: {
+        numbers: 1,
+        sequences: 1,
+    },
+    function(dropElements, source){
+        if(dropElements <= 0){
+            return source;
+        }else if(source.slice && source.length){
+            return source.slice(dropElements, source.length());
+        }else{
+            return new DropHeadSequence(dropElements, source);
+        }
+    },
+};
