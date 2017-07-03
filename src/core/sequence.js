@@ -1,47 +1,29 @@
-hi.internal.unboundedError = function(action, method, intermediate = false){
-    return (
-        `Failed to ${action} the sequence because to do so would require ` +
-        "fully consuming an unbounded sequence" +
-        (intermediate ? " in an intermediate step." : ". Try passing " +
-        `a length limit to the "${method}" call to only store the ` +
-        "first so many elements or, if you're sure the sequence will " +
-        "eventually end, use the sequence's assumeBounded method " +
-        "before collapsing it.")
-    );
-};
-hi.internal.collapseCopyError = function(prevType, breakingType){
-    return (
-        "Collapsing the sequence failed because one of the " +
-        `intermediate sequences of type "${prevType}" does ` +
-        "not support copying even though it appears before a " +
-        `special collapse behavior sequence "${breakingType}".`
-    );
-};
+import {unboundedError, collapseCopyError} from "./internal/errors";
 
-hi.Sequence = function(){};
+const Sequence = function(){};
 
-hi.Sequence.prototype[Symbol.iterator] = function(){
+Sequence.prototype[Symbol.iterator] = function(){
     return this;
 };
-hi.Sequence.prototype.next = function(){
+Sequence.prototype.next = function(){
     const done = this.done();
     const value = done ? undefined : this.nextFront();
     return {value: value, done: done};
 };
-hi.Sequence.prototype.nextFront = function(){
+Sequence.prototype.nextFront = function(){
     const value = this.front();
     this.popFront();
     return value;
 };
-hi.Sequence.prototype.nextBack = function(){
+Sequence.prototype.nextBack = function(){
     const value = this.back();
     this.popBack();
     return value;
 };
-hi.Sequence.prototype.unbounded = function(){
+Sequence.prototype.unbounded = function(){
     return false;
 };
-hi.Sequence.prototype.maskAbsentMethods = function(source){
+Sequence.prototype.maskAbsentMethods = function(source){
     if(!source.back){
         this.back = null;
         this.popBack = null;
@@ -57,9 +39,9 @@ hi.Sequence.prototype.maskAbsentMethods = function(source){
     if(this.reset && !source.reset) this.reset = null;
 };
 // Here be dragons
-hi.Sequence.prototype.collapse = function(limit = -1){
+Sequence.prototype.collapse = function(limit = -1){
     if(limit < 0 && !this.bounded()){
-        throw hi.internal.unboundedError("collapse", "collapse");
+        throw unboundedError("collapse", "collapse");
     }
     let source = this;
     const stack = [];
@@ -79,7 +61,7 @@ hi.Sequence.prototype.collapse = function(limit = -1){
     }
     const arraySequence = stack[stack.length - 1];
     function write(seq, limit, intermediate){
-        if(limit < 0 && !seq.bounded()) throw hi.internal.unboundedError(
+        if(limit < 0 && !seq.bounded()) throw unboundedError(
             "collapse", "collapse", intermediate
         );
         i = 0;
@@ -100,7 +82,7 @@ hi.Sequence.prototype.collapse = function(limit = -1){
             const next = stack[breakIndex - 1];
             if(prev){
                 if(!prev.collapseBreak){
-                    if(!prev.copy) throw hi.internal.collapseCopyError(
+                    if(!prev.copy) throw collapseCopyError(
                         prev.type, breaking.type
                     );
                     write(prev.copy(), -1, true);
@@ -125,18 +107,21 @@ hi.Sequence.prototype.collapse = function(limit = -1){
     }
     return source;
 };
-hi.Sequence.prototype.collapseAsync = function(limit = -1){
+Sequence.prototype.collapseAsync = function(limit = -1){
     return new hi.Promise((resolve, reject) => {
         hi.callAsync(function(){
             resolve(this.collapse(limit));
         });
     });
 };
-// Turn a lazy sequence into an array-based one.
-// Used internally by functions when a purely lazy implementation won't work
-// because a sequence doesn't support the necessary operations.
-// Not necessarily intended for external use.
-hi.Sequence.prototype.forceEager = function(){
+
+/**
+ * Turn a lazy sequence into an array-based one.
+ * Used internally by functions when a purely lazy implementation won't work
+ * because a sequence doesn't support the necessary operations.
+ * Not necessarily intended for external use.
+ */
+Sequence.prototype.forceEager = function(){
     if(!this.bounded()){
         throw "Failed to consume sequence: Sequence is not known to be bounded.";
     }
@@ -213,3 +198,5 @@ hi.Sequence.prototype.forceEager = function(){
     };
     return this;
 };
+
+export default Sequence;

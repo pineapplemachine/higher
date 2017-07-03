@@ -1,8 +1,11 @@
+import {isArray} from "../core/types";
+import {unboundedError} from "../core/internal/errors";
+
 // Base implementation for array and newArray functions.
 const asArray = function(limit, source){
     if(!limit){
         if(!source.bounded()){
-            throw hi.internal.unboundedError("write", "array");
+            throw unboundedError("write", "array");
         }
         const result = [];
         for(const element of source){
@@ -21,7 +24,7 @@ const asArray = function(limit, source){
         }
         return result;
     }
-}
+};
 
 // Produce a fully in-memory array from the contents of a sequence.
 // Optionally accepts a numeric argument indicating the maximum number of
@@ -40,7 +43,7 @@ hi.register("array", {
 }, function(limit, source){
     if(limit <= 0){
         return [];
-    }else if(hi.isArray(source)){
+    }else if(isArray(source)){
         return (!limit || limit >= source.length ?
             source : source.slice(limit)
         );
@@ -63,7 +66,7 @@ hi.register("newArray", {
 }, function(limit, source){
     if(limit <= 0){
         return [];
-    }else if(hi.isArray(source)){
+    }else if(isArray(source)){
         return (!limit || limit >= source.length ?
             source.slice() : source.slice(limit)
         );
