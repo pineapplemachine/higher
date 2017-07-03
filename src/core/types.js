@@ -6,7 +6,7 @@
  */
 function isUndefined(value){
     return typeof (value) === "undefined";
-};
+}
 
 /**
  * Checks if the `value` is a valid `Number` instance.
@@ -79,8 +79,4 @@ function isSequence(value){
     );
 }
 
-<<<<<<< HEAD
 export {isNumber, isString, isArray, isObject, isFunction, isIterable, isSequence};
-=======
-export default {isNumber, isString, isArray, isObject, isFunction, isIterable, isSequence};
->>>>>>> Coverted core/types.js to ES6
