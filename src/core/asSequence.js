@@ -70,7 +70,7 @@ function ArraySequence(source, low, high){
 
 ArraySequence.prototype = Object.create(Sequence.prototype);
 ArraySequence.prototype.constructor = ArraySequence;
-Object.assign(hi.ArraySequence.prototype, {
+Object.assign(ArraySequence.prototype, {
     array: function(limit){
         if(limit <= 0){
             return [];
@@ -172,7 +172,7 @@ function StringSequence(source, low, high){
 
 StringSequence.prototype = Object.create(Sequence.prototype);
 StringSequence.prototype.constructor = StringSequence;
-Object.assign(hi.StringSequence.prototype, {
+Object.assign(StringSequence.prototype, {
     string: function(){
         if(this.lowIndex === 0 && this.highIndex === this.source.length){
             return this.source;
