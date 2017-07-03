@@ -36,13 +36,13 @@ function asSequence(source){
     if(isSequence(source)){
         return source;
     }else if(isArray(source)){
-        return new hi.ArraySequence(source);
+        return new ArraySequence(source);
     }else if(isString(source)){
-        return new hi.StringSequence(source);
+        return new StringSequence(source);
     }else if(isIterable(source)){
-        return new hi.IterableSequence(source);
+        return new IterableSequence(source);
     }else if(isObject(source)){
-        return new hi.ObjectSequence(source);
+        return new ObjectSequence(source);
     }else{
         throw (
             "Value is not valid as a sequence. Only arrays, strings, " +
@@ -248,7 +248,7 @@ function ObjectSequence(source, keys){
 
 ObjectSequence.prototype = Object.create(Sequence.prototype);
 ObjectSequence.prototype.constructor = ObjectSequence;
-Object.assign(hi.ObjectSequence.prototype, {
+Object.assign(ObjectSequence.prototype, {
     bounded: () => true,
     done: function(){
         return this.keyIndex >= this.keys.length;
@@ -302,7 +302,7 @@ function IterableSequence(source){
 
 IterableSequence.prototype = Object.create(Sequence.prototype);
 IterableSequence.prototype.constructor = IterableSequence;
-Object.assign(hi.IterableSequence.prototype, {
+Object.assign(IterableSequence.prototype, {
     bounded: () => false,
     done: function(){
         return this.item.done;

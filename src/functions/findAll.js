@@ -193,9 +193,9 @@ const stepFindThreads = function(element){
 
 ForwardFindSequence.prototype = Object.create(Sequence.prototype);
 ForwardFindSequence.prototype.constructor = ForwardFindSequence;
-Object.assign(hi.ForwardFindSequence.prototype, {
-    threadType: hi.ForwardFindSequenceThread,
-    stepThreads: hi.stepFindThreads,
+Object.assign(ForwardFindSequence.prototype, {
+    threadType: ForwardFindSequenceThread,
+    stepThreads: stepFindThreads,
     reverse: function(){
         return new BackwardFindSequence(
             this.compare, this.source, this.search
@@ -315,8 +315,8 @@ Object.assign(hi.ForwardFindSequence.prototype, {
 BackwardFindSequence.prototype = Object.create(Sequence.prototype);
 BackwardFindSequence.prototype.constructor = BackwardFindSequence;
 Object.assign(BackwardFindSequence.prototype, {
-    threadType: hi.BackwardFindSequenceThread,
-    stepThreads: hi.stepFindThreads,
+    threadType: BackwardFindSequenceThread,
+    stepThreads: stepFindThreads,
     reverse: function(){
         return new ForwardFindSequence(
             this.compare, this.source, this.search
