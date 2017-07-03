@@ -1,4 +1,7 @@
-hi.FiniteRepeatSequence = function(
+import Sequence from "../core/sequence";
+import {EmptySequence} from "./empty";
+
+const FiniteRepeatSequence = function(
     repetitions, source, frontSource = undefined, backSource = undefined
 ){
     // Input sequence must be copyable.
@@ -23,7 +26,7 @@ hi.FiniteRepeatSequence = function(
     if(repetitions <= 1) this.collapseBreak = null;
 };
 
-hi.InfiniteRepeatSequence = function(source, frontSource = null, backSource = null){
+const InfiniteRepeatSequence = function(source, frontSource = null, backSource = null){
     if(!source.copy){
         throw "Error repeating sequence: Only copyable sequences can be repeated.";
     }
@@ -33,13 +36,13 @@ hi.InfiniteRepeatSequence = function(source, frontSource = null, backSource = nu
     this.maskAbsentMethods(source);
 };
 
-hi.NullRepeatSequence = function(source){
+const NullRepeatSequence = function(source){
     this.source = source;
 };
 
-hi.FiniteRepeatSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.FiniteRepeatSequence.prototype.constructor = hi.FiniteRepeatSequence;
-Object.assign(hi.FiniteRepeatSequence.prototype, {
+FiniteRepeatSequence.prototype = Object.create(Sequence.prototype);
+FiniteRepeatSequence.prototype.constructor = FiniteRepeatSequence;
+Object.assign(FiniteRepeatSequence.prototype, {
     finishedRepetitions: function(){
         return this.frontRepetitions + this.backRepetitions;
     },
@@ -110,7 +113,7 @@ Object.assign(hi.FiniteRepeatSequence.prototype, {
         if(j - i < length && highIndex >= lowIndex){
             return this.source.slice(lowIndex, highIndex);
         }else if(lowIndex === 0 && highIndex === 0){
-            return new hi.FiniteRepeatSequence((j - i) / length, this.source);   
+            return new FiniteRepeatSequence((j - i) / length, this.source);
         }else{
             const repetitions = Math.ceil(j / length) - Math.floor(i / length);
             const frontSource = (
@@ -119,7 +122,7 @@ Object.assign(hi.FiniteRepeatSequence.prototype, {
             const backSource = (
                 highIndex === 0 ? this.source : this.source.slice(0, highIndex)
             );
-            return new hi.FiniteRepeatSequence(
+            return new FiniteRepeatSequence(
                 repetitions, this.source,
                 this.source, this.source,
                 frontSource, backSource
@@ -133,7 +136,7 @@ Object.assign(hi.FiniteRepeatSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        return new hi.FiniteRepeatSequence(
+        return new FiniteRepeatSequence(
             this.repetitions, this.source,
             this.frontSource ? this.frontSource.copy() : null,
             this.backSource ? this.backSource.copy() : null
@@ -169,9 +172,9 @@ Object.assign(hi.FiniteRepeatSequence.prototype, {
     },
 });
 
-hi.InfiniteRepeatSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.InfiniteRepeatSequence.prototype.constructor = hi.InfiniteRepeatSequence;
-Object.assign(hi.InfiniteRepeatSequence.prototype, {
+InfiniteRepeatSequence.prototype = Object.create(Sequence.prototype);
+InfiniteRepeatSequence.prototype.constructor = InfiniteRepeatSequence;
+Object.assign(InfiniteRepeatSequence.prototype, {
     repetitions: Infinity,
     unbounded: () => true,
     bounded: () => false,
@@ -210,7 +213,7 @@ Object.assign(hi.InfiniteRepeatSequence.prototype, {
     // I'm trying not to feel too bad about this since the relevant code
     // is defined just a few tens of lines above here.
     slice: function(i, j){
-        return new hi.FiniteRepeatSequence(0, this.source, null, null).slice(i, j);
+        return new FiniteRepeatSequence(0, this.source, null, null).slice(i, j);
     },
     has: function(i){
         return this.source.has(i);
@@ -219,7 +222,7 @@ Object.assign(hi.InfiniteRepeatSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        return new hi.InfniteRepeatSequence(
+        return new InfiniteRepeatSequence(
             this.source, this.frontSource, this.backSource
         );
     },
@@ -233,34 +236,40 @@ Object.assign(hi.InfiniteRepeatSequence.prototype, {
     },
 });
 
-hi.NullRepeatSequence.prototype = Object.create(hi.EmptySequence.prototype);
-hi.NullRepeatSequence.prototype.constructor = hi.NullRepeatSequence;
-Object.assign(hi.NullRepeatSequence.prototype, {
+NullRepeatSequence.prototype = Object.create(EmptySequence.prototype);
+NullRepeatSequence.prototype.constructor = NullRepeatSequence;
+Object.assign(NullRepeatSequence.prototype, {
     repetitions: 0,
     slice: function(i, j){
-        return new hi.NullRepeatSequence(this.source);
+        return new NullRepeatSequence(this.source);
     },
     copy: function(){
-        return new hi.NullRepeatSequence(this.source);
+        return new NullRepeatSequence(this.source);
     },
 });
 
-hi.register("repeat", {
-    numbers: "?",
-    sequences: 1,
-}, function(repetitions, source){
-    if(repetitions <= 0 && repetitions !== null){
-        return new hi.NullRepeatSequence(source);
-    }else if(source.unbounded()){
-        return source;
-    }
-    if(!source.copy){
-        source.forceEager();
-        console.log(source);
-    }
-    if(repetitions && isFinite(repetitions)){
-        return new hi.FiniteRepeatSequence(repetitions, source);
-    }else{
-        return new hi.InfiniteRepeatSequence(source);
-    }
-});
+export {FiniteRepeatSequence, InfiniteRepeatSequence, NullRepeatSequence};
+
+export default {
+    name: "repeat",
+    expected: {
+        numbers: "?",
+        sequences: 1,
+    },
+    function(repetitions, source){
+        if(repetitions <= 0 && repetitions !== null){
+            return new NullRepeatSequence(source);
+        }else if(source.unbounded()){
+            return source;
+        }
+        if(!source.copy){
+            source.forceEager();
+            console.log(source);
+        }
+        if(repetitions && isFinite(repetitions)){
+            return new FiniteRepeatSequence(repetitions, source);
+        }else{
+            return new InfiniteRepeatSequence(source);
+        }
+    },
+};

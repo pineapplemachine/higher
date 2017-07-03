@@ -1,11 +1,14 @@
-// A chronically empty sequence.
-hi.EmptySequence = function(){};
+import Sequence from "../core/sequence";
+// import {NullRepeatSequence} from "./repeat";
 
-hi.EmptySequence.prototype = Object.create(hi.Sequence.prototype);
-hi.EmptySequence.prototype.constructor = hi.EmptySequence;
-Object.assign(hi.EmptySequence.prototype, {
+// A chronically empty sequence.
+const EmptySequence = function(){};
+
+EmptySequence.prototype = Object.create(Sequence.prototype);
+EmptySequence.prototype.constructor = EmptySequence;
+Object.assign(EmptySequence.prototype, {
     repeat: function(repetitions){
-        const sequence = new hi.NullRepeatSequence(this);
+        const sequence = new NullRepeatSequence(this);
         sequence.repetitions = repetitions;
         return sequence;
     },
@@ -34,6 +37,12 @@ Object.assign(hi.EmptySequence.prototype, {
     },
 });
 
-hi.register("empty", {}, function(){
-    return new hi.EmptySequence();
-});
+export {EmptySequence};
+
+export default {
+    name: "empty",
+    expected: {},
+    implementation: function(){
+        return new EmptySequence();
+    },
+};

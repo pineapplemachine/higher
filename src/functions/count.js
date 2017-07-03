@@ -1,9 +1,9 @@
-function SequenceCounter(predicate, source){
+const SequenceCounter = function(predicate, source){
     this.predicate = predicate;
     this.source = source;
     if(!source.copy) this.copy = null;
     if(!source.reset) this.reset = null;
-}
+};
 
 Object.assign(SequenceCounter.prototype, {
     sum: function(){
@@ -94,11 +94,17 @@ Object.assign(SequenceCounter.prototype, {
     },
 });
 
-hi.register("count", {
-    functions: 1,
-    sequences: 1,
-    // Don't waste time coercing input iterables to sequences
-    allowIterables: true,
-}, function(predicate, source){
-    return new SequenceCounter(predicate, source);
-});
+export {SequenceCounter};
+
+export default {
+    name: "count",
+    expected: {
+        functions: 1,
+        sequences: 1,
+        // Don't waste time coercing input iterables to sequences
+        allowIterables: true,
+    },
+    function(predicate, source){
+        return new SequenceCounter(predicate, source);
+    },
+};

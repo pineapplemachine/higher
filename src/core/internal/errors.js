@@ -1,3 +1,9 @@
+/**
+ * An error message for explaining why the sequence is unbounded.
+ * @param {*} action
+ * @param {*} method
+ * @param {*} intermediate
+ */
 function unboundedError(action, method, intermediate = false){
     return (
         `Failed to ${action} the sequence because to do so would require ` +
@@ -10,6 +16,11 @@ function unboundedError(action, method, intermediate = false){
     );
 }
 
+/**
+ * An error message explaining why collapsing a sequence has failed.
+ * @param {*} prevType
+ * @param {*} breakingType
+ */
 function collapseCopyError(prevType, breakingType){
     return (
         "Collapsing the sequence failed because one of the " +
