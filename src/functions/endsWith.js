@@ -16,20 +16,12 @@ export default {
         const search = sources[1];
         if(source.length && search.length){
         // Can't end with a sequence longer than the sequence itself.
-        if(source.length() < search.length()) return false;
-    }
-    // If either input isn't bidirectional, it needs to be fully in memory.
-    if(!source.back) source.forceEager();
-    if(!search.back) search.forceEager();
-    const compareFunc = compare || ((a, b) => (a === b));
-    while(!search.done()){
-        if(source.done() || !compareFunc(source.nextBack(), search.nextBack())){
-            return false;
+            if(source.length() < search.length()) return false;
         }
         // If either input isn't bidirectional, it needs to be fully in memory.
         if(!source.back) source.forceEager();
         if(!search.back) search.forceEager();
-        const compareFunc = compare || ((a, b) => (a == b));
+        const compareFunc = compare || ((a, b) => (a === b));
         while(!search.done()){
             if(source.done() || !compareFunc(source.nextBack(), search.nextBack())){
                 return false;
