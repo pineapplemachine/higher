@@ -5,14 +5,13 @@ hi.EmptySequence.prototype = Object.create(hi.Sequence.prototype);
 hi.EmptySequence.prototype.constructor = hi.EmptySequence;
 Object.assign(hi.EmptySequence.prototype, {
     repeat: function(repetitions){
-        const sequence = new hi.NullRepeatSequence(this);
-        sequence.repetitions = repetitions;
-        return sequence;
+        return this;
     },
     reverse: function(){
         return this;
     },
     bounded: () => true,
+    unbounded: () => false,
     done: () => true,
     length: () => 0,
     left: () => 0,
