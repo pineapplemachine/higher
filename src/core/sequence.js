@@ -38,8 +38,9 @@ hi.Sequence.prototype.nextBack = function(){
     this.popBack();
     return value;
 };
+// TODO: Make this part of normal sequence spec just like bounded
 hi.Sequence.prototype.unbounded = function(){
-    return false;
+    return this.source ? this.source.unbounded() : false;
 };
 hi.Sequence.prototype.maskAbsentMethods = function(source){
     if(!source.back){
@@ -111,6 +112,8 @@ hi.Sequence.prototype.collapse = function(limit = -1){
             i = breaking.collapseBreak(source, i);
             if(next){
                 // TODO: Can this be accomplished more safely?
+                // Idea: Reset method should accept an optional source,
+                // if it's passed then the sequence uses it as the new basis
                 next.source = arraySequence;
                 arraySequence.backIndex = i;
                 if(next.sources) next.sources[0] = arraySequence;
