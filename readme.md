@@ -70,30 +70,13 @@ A sequence, being defined as an object whose prototype chain ends with `hi.Seque
 
 - `popFront`: Progresses to the next element in the sequence. Its behavior is also undefined if `sequence.done()` is truthy.
 
-Any sequence has, at minimum, all of these attributes. They will either be functions or null; a null value indicates that the operation isn't supported:
-
-`bounded`: Get whether the sequence is known to have a definite end.
-`done`: Get whether the sequence has been fully consumed.
-`length`: Get the total number of items in the sequence.
-`left`: Get the number of elements left in the sequence before it's fully consumed.
-`front`: Get the front element of the sequence.
-`popFront`: Progress to the next element at the front of the sequence.
-`nextFront`: Get the front element, and also progress to the next one.
-`back`: Get the back element of the sequence.
-`popBack`: Go to the prior element at the back of the sequence.
-`nextBack`: Get the back element and progress to the prior one.
-`next`: Get an object with `value` and `done` attributes; `value` is the same as a call to `nextFront` and `done` the same as a following call to `done`. (This makes the sequence an iterator.)
-`index`: Get the element at an index.
-`slice`: Get a sequence that will enumerate the elements from an inclusive low until an exclusive high index.
-`copy`: Get a sequence that is a copy of this one; changing the state of either the original or the copy won't affect the state of the other.
-`reset`: Rewind the sequence back to the state it was in when it was first created.
-`array`: Get a new array from the contents of the sequence.
-`write`: Write the contents of the sequence to an existing array. (But not an array that the sequence was created using.)
-`collapse`: Write the contents of the sequence to the array that is at its root.
-`object`: Get a new object from the contents of the sequence, where each element is interpreted as a key, value pair.
-`consume`: Fully consume the sequence. This might be useful if consuming a sequence will have side-effects.
-
 ## How to contribute to hi
 
 Before making contributions to higher, please read the [code of conduct](docs/conduct.md) and the [style guide](docs/style.md).
 New features are nice, and fixes are extremely nice. Tests and documentation are amazing, too: higher cannot possibly have enough of them. Please feel especially welcome to help make higher more stable and more accessible to everyone!
+
+## Further reading
+
+- [The Glossary](docs/glossary.md), which defines some of the more technical or jargony terms used in higher's documentation.
+
+- [The Rulebook](docs/rulebook.md), which explains the rules you should follow when using higher in order to have the best experience and write the most stable code possible, as well as the rules that higher follows.
