@@ -1,5 +1,5 @@
-const assertMessage = (message, condition) => (hi.isFunction(message) ?
-    message(condition) : (message || "Assertion error")
+const assertMessage = (message, value) => (hi.isFunction(message) ?
+    message(value) : (message || "Assertion error")
 );
 
 hi.AssertError = function(message, value = undefined){
@@ -22,6 +22,13 @@ hi.assertNot = function(condition, message = undefined){
         assertMessage(message, condition), condition
     );
     return condition;
+};
+
+hi.assertUndefined = function(value, message = undefined){
+    if(!hi.isUndefined(value)) throw new hi.AssertError(
+        assertMessage(message, value), value
+    );
+    return value;
 };
 
 hi.assertEqual = function(...values){
