@@ -1,4 +1,3 @@
-// True when the input is undefined.
 /**
  * Checks if the input is undefined.
  * @param {*} The value to check
@@ -79,4 +78,4 @@ function isSequence(value){
     );
 }
 
-export {isNumber, isString, isArray, isObject, isFunction, isIterable, isSequence};
+export {isUndefined, isNumber, isString, isArray, isObject, isFunction, isIterable, isSequence};

@@ -1,5 +1,4 @@
 import Sequence from "../core/sequence";
-// import {NullRepeatSequence} from "./repeat";
 
 // A chronically empty sequence.
 const EmptySequence = function(){};
