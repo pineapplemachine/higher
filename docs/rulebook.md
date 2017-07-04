@@ -26,6 +26,10 @@ filtered.popFront();
 const reversed = filtered.reverse(); // Unsafe!
 ```
 
+If you want to create a sequence based on another excepting some elements of the front or back, it is not safe to pop those elements yourself and then to create that sequence. Instead, higher provides functions like `dropHead`, `dropTail`, `from`, and `until` for accomplishing this safely.
+
+TODO: Include links to further reading on these functions
+
 ### Consuming completed sequences
 
 It is unsafe to call `sequence.front()`, `sequence.popFront()`, `sequence.nextFront()`, `sequence.back()`, `sequence.popBack()`, `sequence.nextBack()`, or `sequence.next()` on any sequence for which `sequence.done()` returns a truthy value.
