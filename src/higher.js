@@ -71,6 +71,8 @@ const hi = function(source){
 
 // TODO: Verify if we need to really set these here since non are registered
 hi.Sequence = Sequence;
+hi.containsElement = containsElement.containsElement;
+hi.containsElementAsync = containsElement.containsElementAsync;
 hi.once = once;
 hi.one = one;
 hi.partial = partial;
