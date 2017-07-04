@@ -1,10 +1,11 @@
-// Get the last element in a sequence or, if a predicate is passed,
-// get the last element meeting that predicate.
-// Returns undefined if there was no such element.
-hi.register("last", {
-    functions: "?",
-    sequences: 1,
-}, function(predicate, source){
+/**
+ * Get the last element in a sequence or, if a predicate is passed,
+ * get the last element meeting that predicate.
+ * Returns undefined if there was no such element.
+ * @param {*} predicate
+ * @param {*} source
+ */
+const last = (predicate, source) => {
     if(predicate){
         let back = null;
         while(!source.done()){
@@ -16,28 +17,15 @@ hi.register("last", {
         return source.back();
     }
     return undefined;
-});
+};
 
-// Separate async implementation to handle reject callback when there
-// is no first element.
-hi.register("lastAsync", {
-    functions: "?",
-    sequences: 1,
-    isAsync: true,
-}, function(predicate, source){
-    return new hi.Promise((resolve, reject) => {
-        hi.callAsync(() => {
-            if(predicate){
-                let back = null;
-                while(!source.done()){
-                    back = source.back();
-                    if(predicate(back)) resolve(back);
-                    source.popBack();
-                }
-            }else if(!source.done()){
-                resolve(source.back());
-            }
-            reject();
-        });
-    });
-});
+export const registration = {
+    name: "last",
+    expected: {
+        functions: "?",
+        sequences: 1,
+    },
+    implementation: last,
+};
+
+export default last;

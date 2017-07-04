@@ -1,26 +1,27 @@
-// Find the first occurrence of a substring as judged by a comparison function.
-// When no comparison function is given, (a, b) => (a == b) is used as a default.
-hi.register("findFirst", {
-    functions: "?",
-    sequences: 2,
-    // Don't waste time coercing input iterables to sequences
-    allowIterables: true,
-    // Also generate an async version of this function
-    async: true,
-}, function(compare, sequences){
+import {asSequence, canGetLength, getLength} from "../core/asSequence";
+import {FindSequenceResult, ForwardFindSequenceThread, stepFindThreads} from "./findAll";
+import equals from "./equals";
+
+/**
+ * Find the first occurrence of a substring as judged by a comparison function.
+ * When no comparison function is given, (a, b) => (a == b) is used as a default.
+ * @param {*} compare
+ * @param {*} sequences
+ */
+const findFirst = (compare, sequences) => {
     const source = sequences[0];
-    const search = hi.asSequence(sequences[1]);
+    const search = asSequence(sequences[1]);
     const compareFunc = compare || ((a, b) => (a === b));
     // Handle empty or unbounded search subject
     if(search.done() || search.unbounded()){
         return undefined;
     }
     // Handle case where search length is known to be at least source length
-    if(search.length && hi.canGetLength(source)){
+    if(search.length && canGetLength(source)){
         const searchLength = search.length();
-        const sourceLength = hi.getLength(source);
-        if(searchLength === sourceLength && hi.equals.raw(compareFunc, [search, source])){
-            return new hi.FindSequenceResult(hi.asSequence(source), 0, sourceLength);
+        const sourceLength = getLength(source);
+        if(searchLength === sourceLength && equals.raw(compareFunc, [search, source])){
+            return new FindSequenceResult(asSequence(source), 0, sourceLength);
         }else if(searchLength > sourceLength){
             return undefined;
         }
@@ -35,8 +36,8 @@ hi.register("findFirst", {
         let index = 0;
         for(const element of source){
             if(compareFunc(element, searchElement)){
-                return new hi.FindSequenceResult(
-                    hi.asSequence(source), index, index + 1
+                return new FindSequenceResult(
+                    asSequence(source), index, index + 1
                 );
             }
             index++;
@@ -45,8 +46,8 @@ hi.register("findFirst", {
     }
     // Handle search subject of two or more elements
     const findObject = {
-        threadType: hi.ForwardFindSequenceThread,
-        stepThreads: hi.stepFindThreads,
+        threadType: ForwardFindSequenceThread,
+        stepThreads: stepFindThreads,
         compare: compareFunc,
         source: source,
         search: search,
@@ -58,15 +59,31 @@ hi.register("findFirst", {
     for(const element of source){
         const result = findObject.stepThreads(element);
         if(result){
-            result.source = hi.asSequence(source);
+            result.source = asSequence(source);
             return result;
         }
         findObject.index++;
     }
     return undefined;
-});
+};
 
-// Finding the first instance of a substring is overwhelmingly the most
-// common use case for substring searching, so alias "find" to "findFirst"
-// for maximum user convenience and minimum user confusion.
-hi.alias("find", "findFirst");
+export const registration = {
+    name: "findFirst",
+
+    // Finding the first instance of a substring is overwhelmingly the most
+    // common use case for substring searching, so alias "find" to "findFirst"
+    // for maximum user convenience and minimum user confusion.
+    aliases: ["find"],
+
+    expected: {
+        functions: "?",
+        sequences: 2,
+        // Don't waste time coercing input iterables to sequences
+        allowIterables: true,
+        // Also generate an async version of this function
+        async: true,
+    },
+    implementation: findFirst,
+};
+
+export default findFirst;

@@ -1,5 +1,5 @@
 import Sequence from "../core/sequence";
-import {array} from "./array";
+import array from "./array";
 
 const DropTailSequence = function(dropElements, source, frontIndex = 0){
     if(!source.length){
@@ -57,28 +57,36 @@ Object.assign(DropTailSequence.prototype, {
     },
 });
 
+/**
+ *
+ * @param {*} dropElements
+ * @param {*} source
+ */
+const dropTail = (dropElements, source) => {
+    if(dropElements <= 0){
+        return source;
+    }else if(source.slice && source.length){
+        return source.slice(0, source.length() - dropElements);
+    }else if(source.length){
+        return new DropTailSequence(dropElements, source);
+    }else if(source.bounded()){
+        // Sequence must be loaded into memory to perform the operation.
+        const a = array.raw(-1, source);
+        return a.slice(0, array.length() - dropElements);
+    }else{
+        throw "Failed to drop sequence tail: Input is unbounded.";
+    }
+};
+
 export {DropTailSequence};
 
-export default {
+export const registration = {
     name: "dropTail",
     expected: {
         numbers: 1,
         sequences: 1,
     },
-    function(dropElements, source){
-        
-        if(dropElements <= 0){
-            return source;
-        }else if(source.slice && source.length){
-            return source.slice(0, source.length() - dropElements);
-        }else if(source.length){
-            return new DropTailSequence(dropElements, source);
-        }else if(source.bounded()){
-            // Sequence must be loaded into memory to perform the operation.
-            const array = hi.array.raw(-1, source);
-            return array.slice(0, array.length() - dropElements);
-        }else{
-            throw "Failed to drop sequence tail: Input is unbounded.";
-        }
-    },
+    implementation: dropTail,
 };
+
+export default dropTail;

@@ -1,18 +1,22 @@
-hi.FlattenDeepSequence = function(source){
+import Sequence from "../core/sequence";
+import {asSequence, validAsSequence} from "../core/asSequence";
+import {isArray, isIterable, isSequence, isString} from "../core/types";
+
+const FlattenDeepSequence = function(source){
     this.source = source;
     this.sourceStack = [source];
     this.frontSource = source;
 };
 
-hi.FlattenDeepSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.FlattenDeepSequence.prototype.constructor = hi.FlattenDeepSequence;
-Object.assign(hi.FlattenDeepSequence.prototype, {
+FlattenDeepSequence.prototype = Object.create(Sequence.prototype);
+FlattenDeepSequence.prototype.constructor = FlattenDeepSequence;
+Object.assign(FlattenDeepSequence.prototype, {
     // True when an element is a sequence which should be flattened.
     flattenElement: function(element){
-        return !hi.isString(element) && (
-            hi.isArray(element) ||
-            hi.isIterable(element) ||
-            hi.isSequence(element)
+        return !isString(element) && (
+            isArray(element) ||
+            isIterable(element) ||
+            isSequence(element)
         );
     },
     // Used internally to handle progression to the next element.
@@ -24,7 +28,7 @@ Object.assign(hi.FlattenDeepSequence.prototype, {
                 break;
             }else{
                 this.frontSource.popFront();
-                const source = hi.asSequence(front);
+                const source = asSequence(front);
                 this.sourceStack.push(source);
                 this.frontSource = source;
             }
@@ -78,10 +82,21 @@ Object.assign(hi.FlattenDeepSequence.prototype, {
     reset: null,
 });
 
-// Flatten recursively.
-// Flattens arrays, iterables except strings, and sequences.
-hi.register("flattenDeep", {
-    sequences: 1,
-}, function(source){
-    return new hi.FlattenDeepSequence(source);
-});
+/**
+ * Flatten recursively.
+ * Flattens arrays, iterables except strings, and sequences.
+ * @param {*} source
+ */
+const flattenDeep = (source) => {
+    return new FlattenDeepSequence(source);
+};
+
+export const registration = {
+    name: "flattenDeep",
+    expected: {
+        sequences: 1,
+    },
+    implementation: flattenDeep,
+};
+
+export default flattenDeep;

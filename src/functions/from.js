@@ -1,6 +1,8 @@
+import Sequence from "../core/sequence";
+
 // Enumerate those elements of an input sequence starting from the first
 // element matching a predicate.
-hi.FromSequence = function(
+const FromSequence = function(
     predicate, source, isInclusive = true, initialized = false
 ){
     this.predicate = predicate;
@@ -10,9 +12,9 @@ hi.FromSequence = function(
     this.maskAbsentMethods(source);
 };
 
-hi.FromSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.FromSequence.prototype.constructor = hi.FromSequence;
-Object.assign(hi.FromSequence.prototype, {
+FromSequence.prototype = Object.create(Sequence.prototype);
+FromSequence.prototype.constructor = FromSequence;
+Object.assign(FromSequence.prototype, {
     initialize: function(){
         this.initialized = true;
         while(!this.source.done()){
@@ -66,7 +68,7 @@ Object.assign(hi.FromSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        const copy = new hi.FromSequence(
+        const copy = new FromSequence(
             this.predicate, this.source.copy(),
             this.isInclusive, this.initialized
         );
@@ -86,9 +88,17 @@ Object.assign(hi.FromSequence.prototype, {
     },
 });
 
-hi.register("from", {
-    functions: 1,
-    sequences: 1,
-}, function(predicate, source){
-    return new hi.FromSequence(predicate, source);
-});
+const fromFn = (predicate, source) => {
+    return new FromSequence(predicate, source);
+};
+
+export const registration = {
+    name: "from",
+    expected: {
+        functions: 1,
+        sequences: 1,
+    },
+    implementation: fromFn,
+};
+
+export default fromFn;

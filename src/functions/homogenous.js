@@ -1,11 +1,9 @@
-hi.register("homogenous", {
-    functions: "?",
-    sequences: 1,
-    // Don't waste time coercing input iterables to sequences
-    allowIterables: true,
-    // Also generate an async version of this function
-    async: true,
-}, function(compare, source){
+/**
+ *
+ * @param {*} compare
+ * @param {*} source
+ */
+const homogenous = (compare, source) => {
     const compareFunc = compare || ((a, b) => (a === b));
     let first = true;
     let firstElement = null;
@@ -18,4 +16,19 @@ hi.register("homogenous", {
         }
     }
     return true;
-});
+};
+
+export const registration = {
+    name: "homogenous",
+    expected: {
+        functions: "?",
+        sequences: 1,
+        // Don't waste time coercing input iterables to sequences
+        allowIterables: true,
+        // Also generate an async version of this function
+        async: true,
+    },
+    implementation: homogenous,
+};
+
+export default homogenous;

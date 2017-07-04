@@ -85,15 +85,19 @@ Object.assign(FilterSequence.prototype, {
     },
 });
 
+const filter = (predicate, source) => {
+    return new FilterSequence(predicate, source);
+};
+
 export {FilterSequence};
 
-export default {
+export const registration = {
     name: "filter",
     expected: {
         functions: 1,
         sequences: 1,
     },
-    implementation: function(predicate, source){
-        return new FilterSequence(predicate, source);
-    },
+    implementation: filter,
 };
+
+export default filter;

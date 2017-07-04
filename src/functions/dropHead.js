@@ -60,21 +60,25 @@ Object.assign(DropHeadSequence.prototype, {
     },
 });
 
+const dropHead = (dropElements, source) => {
+    if(dropElements <= 0){
+        return source;
+    }else if(source.slice && source.length){
+        return source.slice(dropElements, source.length());
+    }else{
+        return new DropHeadSequence(dropElements, source);
+    }
+};
+
 export {DropHeadSequence};
 
-export default {
+export const registration = {
     name: "dropHead",
     expected: {
         numbers: 1,
         sequences: 1,
     },
-    function(dropElements, source){
-        if(dropElements <= 0){
-            return source;
-        }else if(source.slice && source.length){
-            return source.slice(dropElements, source.length());
-        }else{
-            return new DropHeadSequence(dropElements, source);
-        }
-    },
+    implementation: dropHead,
 };
+
+export default dropHead;

@@ -1,11 +1,12 @@
-hi.register("object", {
-    numbers: "?",
-    sequences: 1,
-    // Don't waste time coercing input iterables to sequences
-    allowIterables: true,
-    // Also generate an async version of this function
-    async: true,
-}, function(limit, source){
+import {sequenceBoundsError} from "../core/internal/errors";
+import {isObject} from "../core/types";
+
+/**
+ *
+ * @param {*} limit
+ * @param {*} source
+ */
+const object = (limit, source) => {
     function pushKeyValuePair(result, element){
         if(hi.isArray(element)){
             if(element.length){
@@ -37,4 +38,19 @@ hi.register("object", {
         }
         return result;
     }
-});
+};
+
+export const registration = {
+    name: "object",
+    expected: {
+        numbers: "?",
+        sequences: 1,
+        // Don't waste time coercing input iterables to sequences
+        allowIterables: true,
+        // Also generate an async version of this function
+        async: true,
+    },
+    implementation: object,
+};
+
+export default object;

@@ -1,11 +1,6 @@
-hi.register("write", {
-    numbers: "?",
-    sequences: 2,
-    // Don't waste time coercing input iterables to sequences
-    allowIterables: true,
-    // Also generate an async version of this function
-    async: true,
-}, function(limit, sequences){
+// import {sequenceBoundsError} from "../core/internal/errors"; TODO: Missing dependency?
+
+const write = (limit, sequences) => {
     const source = sequences[0];
     const target = sequences[1];
     if(!hi.isArray(target)){
@@ -42,4 +37,19 @@ hi.register("write", {
         }
     }
     return target;
-});
+};
+
+export const registration = {
+    name: "write",
+    expected: {
+        numbers: "?",
+        sequences: 2,
+        // Don't waste time coercing input iterables to sequences
+        allowIterables: true,
+        // Also generate an async version of this function
+        async: true,
+    },
+    implementation: write,
+};
+
+export default write;

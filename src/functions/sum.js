@@ -1,35 +1,48 @@
-// Perform a linear summation of values in a sequence.
-// Suitable for integers and low-accuracy floating point sums.
-// Returns 0 for empty inputs.
-hi.register("sumLinear", {
-    sequences: 1,
-    // Don't waste time coercing input iterables to sequences
-    allowIterables: true,
-    // Also generate an async version of this function
-    async: true,
-}, function(source){
+/**
+ * Perform a linear summation of values in a sequence.
+ * Suitable for integers and low-accuracy floating point sums.
+ * Returns 0 for empty inputs.
+ * @param {*} source
+ */
+const sumLinear = (source) => {
     let sum = 0;
     for(const value of source) sum += value;
     return sum;
-});
+};
 
-// Compute a sum of numbers using the Kahan summation algorithm.
-// https://en.wikipedia.org/wiki/Kahan_summation_algorithm
-// More accurate than linear summation, but slower.
-// Less accurate than Shewchuk's summation algorithm, but faster.
-// If any input is NaN, returns the first NaN input.
-// If any input is +inf and no inputs are -inf, returns +inf.
-// If any input is -inf and no inputs are +inf, returns -inf.
-// If any input is +inf and any input is -inf, returns NaN.
-// In case of intermediate positive overflow, returns +inf.
-// In case of intermediate negative overflow, returns -inf.
-hi.register("sumKahan", {
-    sequences: 1,
-    // Don't waste time coercing input iterables to sequences
-    allowIterables: true,
-    // Also generate an async version of this function
-    async: true,
-}, function(source){
+export const registrationSumLinear = {
+    name: "sumLinear",
+
+    // For users who really can't be bothered to know how the different
+    // summation functions are differentiated, stick to the principle of least
+    // astonishment: Most users are acquainted with linear summation, perhaps
+    // less so with Kahan and Shewchuk algorithms.
+    aliases: ["sum"],
+
+    expected: {
+        sequences: 1,
+        // Don't waste time coercing input iterables to sequences
+        allowIterables: true,
+        // Also generate an async version of this function
+        async: true,
+    },
+    implementation: sumLinear,
+};
+
+/**
+ * Compute a sum of numbers using the Kahan summation algorithm.
+ * https://en.wikipedia.org/wiki/Kahan_summation_algorithm
+ * More accurate than linear summation, but slower.
+ * Less accurate than Shewchuk's summation algorithm, but faster.
+ * If any input is NaN, returns the first NaN input.
+ * If any input is +inf and no inputs are -inf, returns +inf.
+ * If any input is -inf and no inputs are +inf, returns -inf.
+ * If any input is +inf and any input is -inf, returns NaN.
+ * In case of intermediate positive overflow, returns +inf.
+ * In case of intermediate negative overflow, returns -inf.
+ * @param {*} source
+ */
+const sumKahan = (source) => {
     let sum = 0;
     let compensation = 0;
     let overflow = false;
@@ -52,30 +65,39 @@ hi.register("sumKahan", {
         }
     }
     return sum;
-});
+};
 
-// Compute a sum of numbers using Shewchuk's summation algorithm.
-// http://stackoverflow.com/a/2704565/3478907
-// http://code.activestate.com/recipes/393090-binary-floating-point-summation-accurate-to-full-p/
-// https://github.com/python/cpython/blob/master/Modules/mathmodule.c#L1301
-// More accurate than either Kahan or linear summation, but slower.
-// You probably don't REALLY need your sums to be this accurate.
-// If any input is NaN, returns the first NaN input.
-// If any input is +inf and no inputs are -inf, returns +inf.
-// If any input is -inf and no inputs are +inf, returns -inf.
-// If any input is +inf and any input is -inf, returns NaN.
-// In case of intermediate positive overflow, returns +inf.
-// In case of intermediate negative overflow, returns -inf.
-hi.register("sumShew", {
-    sequences: 1,
-    // Don't waste time coercing input iterables to sequences
-    allowIterables: true,
-    // Also generate an async version of this function
-    async: true,
-}, function(source){
+export const registrationSumKahan = {
+    name: "sumKahan",
+    expected: {
+        sequences: 1,
+        // Don't waste time coercing input iterables to sequences
+        allowIterables: true,
+        // Also generate an async version of this function
+        async: true,
+    },
+    implementation: sumKahan,
+};
+
+/**
+ * Compute a sum of numbers using Shewchuk's summation algorithm.
+ * http://stackoverflow.com/a/2704565/3478907
+ * http://code.activestate.com/recipes/393090-binary-floating-point-summation-accurate-to-full-p/
+ * https://github.com/python/cpython/blob/master/Modules/mathmodule.c#L1301
+ * More accurate than either Kahan or linear summation, but slower.
+ * You probably don't REALLY need your sums to be this accurate.
+ * If any input is NaN, returns the first NaN input.
+ * If any input is +inf and no inputs are -inf, returns +inf.
+ * If any input is -inf and no inputs are +inf, returns -inf.
+ * If any input is +inf and any input is -inf, returns NaN.
+ * In case of intermediate positive overflow, returns +inf.
+ * In case of intermediate negative overflow, returns -inf.
+ * @param {*} source
+ */
+const sumShew = (source) => {
     let infSum = 0; // Handles infinite inputs
     let overflow = 0; // Handles intermediate overflow
-    
+
     const partials = [];
     for(const value of source){
         if(isNaN(value)){
@@ -97,17 +119,17 @@ hi.register("sumShew", {
                 x = high;
             }
             partials.splice(i);
-            
+
             if(x !== 0){
                 if(!isFinite(x)) overflow = x;
                 else partials.push(x);
             }
         }
     }
-    
+
     if(infSum !== 0) return infSum;
     else if(overflow !== 0) return overflow;
-    
+
     let high = 0;
     if(partials.length !== 0){
         let low;
@@ -130,12 +152,20 @@ hi.register("sumShew", {
             if(y === yr) high = x;
         }
     }
-    
-    return high;
-});
 
-// For users who really can't be bothered to know how the different
-// summation functions are differentiated, stick to the principle of least
-// astonishment: Most users are acquainted with linear summation, perhaps
-// less so with Kahan and Shewchuk algorithms.
-hi.alias("sum", "sumLinear");
+    return high;
+};
+
+export const registrationSumShew = {
+    name: "sumShew",
+    expected: {
+        sequences: 1,
+        // Don't waste time coercing input iterables to sequences
+        allowIterables: true,
+        // Also generate an async version of this function
+        async: true,
+    },
+    implementation: sumShew,
+};
+
+export default {sumLinear, sumKahan, sumShew};

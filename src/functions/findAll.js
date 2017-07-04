@@ -433,29 +433,36 @@ Object.assign(BackwardFindSequence.prototype, {
     },
 });
 
+/**
+ * Find all occurrences of a substring as judged by a comparison function.
+ * When no comparison function is given, (a, b) => (a == b) is used as a default.
+ * @param {*} compare
+ * @param {*} sequences
+ */
+const findAll = (compare, sequences) => {
+    const source = sequences[0];
+    const search = sequences[1];
+    return new ForwardFindSequence(
+        compare || ((a, b) => a == b), source, search
+    );
+};
+
 export {
     FindSequenceResult,
     ForwardFindSequence,
     ForwardFindSequenceThread,
     BackwardFindSequence,
     BackwardFindSequenceThread,
+    stepFindThreads,
 };
 
-/**
- * Find all occurrences of a substring as judged by a comparison function.
- * When no comparison function is given, (a, b) => (a == b) is used as a default.
- */
-export default {
+export const registration = {
     name: "findAll",
     expected: {
         functions: "?",
         sequences: 2,
     },
-    implementation: function(compare, sequences){
-        const source = sequences[0];
-        const search = sequences[1];
-        return new ForwardFindSequence(
-            compare || ((a, b) => a == b), source, search
-        );
-    },
+    implementation: findAll,
 };
+
+export default findAll;

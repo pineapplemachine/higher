@@ -27,22 +27,19 @@ const asArray = function(limit, source){
 };
 
 /**
- * Produce a fully in-memory array from the contents of a sequence.
- * Optionally accepts a numeric argument indicating the maximum number of
- * elements to output to the array.
- * Will throw an error if the function receives an unbounded sequence and
- * no length limit.
- * When the input is an array and the limit is either not set or is the
- * at least the length of that array, the array itself is returned.
+ * This function is guaranteed to return a different object from the one
+ * passed to it. This might be important if the output will later be modified,
+ * and the input could potentially be already an array that must not be modified.
+ * When the input is an array, returns a copy of that array.
  * @param {*} limit
  * @param {*} source
  */
-const array = (limit, source) => {
+const newArray = (limit, source)=> {
     if(limit <= 0){
         return [];
     }else if(isArray(source)){
         return (!limit || limit >= source.length ?
-            source : source.slice(limit)
+            source.slice() : source.slice(limit)
         );
     }else{
         return asArray(limit, source);
@@ -50,7 +47,7 @@ const array = (limit, source) => {
 };
 
 export const registration = {
-    name: "array",
+    name: "newArray",
     expected: {
         numbers: "?",
         sequences: 1,
@@ -59,7 +56,7 @@ export const registration = {
         // Also generate an async version of this function
         async: true,
     },
-    implementation: array,
+    implementation: newArray,
 };
 
-export default array;
+export default newArray;

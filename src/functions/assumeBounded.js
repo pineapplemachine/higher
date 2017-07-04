@@ -57,12 +57,16 @@ Object.assign(AssumeBoundedSequence.prototype, {
  * This may be helpful if you're sure a sequence that you want to fully
  * consume will eventually end, even if higher can't tell for itself.
  */
-export default {
+const assumeBounded = (source) => {
+    return source.bounded() ? source : new AssumeBoundedSequence(source);
+};
+
+export const registration = {
     name: "assumeBounded",
     expected: {
         sequences: 1,
     },
-    implementation: function(source){
-        return source.bounded() ? source : new hi.AssumeBoundedSequence(source);
-    },
+    implementation: assumeBounded,
 };
+
+export default assumeBounded;

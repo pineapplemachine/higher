@@ -1,36 +1,7 @@
-hi.SequencePadder = function(source){
-    this.source = source;
-};
+import Sequence from "../core/sequence";
+import {FiniteRepeatElementSequence} from "./repeatElement";
 
-Object.assign(hi.SequencePadder.prototype, {
-    left: function(length, element){
-        if(this.source.unbounded()){
-            return this.source;
-        }else if(!this.source.bounded()){
-            throw "Failed to pad sequence: Input must be known bounded or unbounded.";
-        }
-        if(!this.source.length) this.source.forceEager();
-        const sourceLength = this.source.length();
-        if(sourceLength >= length){
-            return this.source;
-        }else{
-            return this.leftCount(length - sourceLength, element);
-        }
-    },
-    leftCount: function(count, element){
-        return count <= 0 ? source : new hi.PadLeftSequence(
-            this.source, element, count
-        );
-    },
-    right: function(length, element){
-        // TODO
-    },
-    rightCount: function(count, element){
-        // TODO
-    },
-});
-
-hi.PadLeftSequence = function(
+const PadLeftSequence = function(
     source, padElement, leftCount, leftPadded = undefined
 ){
     this.source = source;
@@ -40,9 +11,9 @@ hi.PadLeftSequence = function(
     this.maskAbsentMethods(source);
 };
 
-hi.PadLeftSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.PadLeftSequence.prototype.constructor = hi.PadLeftSequence;
-Object.assign(hi.PadLeftSequence.prototype, {
+PadLeftSequence.prototype = Object.create(Sequence.prototype);
+PadLeftSequence.prototype.constructor = PadLeftSequence;
+Object.assign(PadLeftSequence.prototype, {
     bounded: function(){
         return this.source.bounded();
     },
@@ -83,11 +54,11 @@ Object.assign(hi.PadLeftSequence.prototype, {
     },
     slice: function(i, j){
         if(j < this.leftCount){
-            return new hi.FiniteRepeatElementSequence(j - i, this.padElement);
+            return new FiniteRepeatElementSequence(j - i, this.padElement);
         }else if(i >= this.leftCount){
             return this.source.slice(i - this.leftCount, j - this.leftCount);
         }else{
-            return new hi.PadLeftSequence(
+            return new PadLeftSequence(
                 this.source.slice(0, j - this.leftCount),
                 this.padElement, this.leftCount - i
             );
@@ -100,7 +71,7 @@ Object.assign(hi.PadLeftSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        return new hi.PadLeftSequence(
+        return new PadLeftSequence(
             this.source.copy(), this.padElement,
             this.leftCount, this.leftPadded
         );
@@ -112,8 +83,52 @@ Object.assign(hi.PadLeftSequence.prototype, {
     },
 });
 
-hi.register("pad", {
-    sequences: 1,
-}, function(source){
-    return new hi.SequencePadder(source);
+const SequencePadder = function(source){
+    this.source = source;
+};
+
+Object.assign(SequencePadder.prototype, {
+    left: function(length, element){
+        if(this.source.unbounded()){
+            return this.source;
+        }else if(!this.source.bounded()){
+            throw "Failed to pad sequence: Input must be known bounded or unbounded.";
+        }
+        if(!this.source.length) this.source.forceEager();
+        const sourceLength = this.source.length();
+        if(sourceLength >= length){
+            return this.source;
+        }else{
+            return this.leftCount(length - sourceLength, element);
+        }
+    },
+    leftCount: function(count, element){
+        return count <= 0 ? source : new PadLeftSequence(
+            this.source, element, count
+        );
+    },
+    right: function(length, element){
+        // TODO
+    },
+    rightCount: function(count, element){
+        // TODO
+    },
 });
+
+/**
+ *
+ * @param {*} source
+ */
+const pad = (source) => {
+    return new SequencePadder(source);
+};
+
+export const registration = {
+    name: "pad",
+    expected: {
+        sequences: 1,
+    },
+    implementation: pad,
+};
+
+export default pad;

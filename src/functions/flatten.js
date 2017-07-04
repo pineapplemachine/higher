@@ -1,15 +1,18 @@
-hi.FlattenSequence = function(source, frontSource = null){
+import Sequence from "../core/sequence";
+import {asSequence, validAsSequence} from "../core/asSequence";
+
+const FlattenSequence = function(source, frontSource = null){
     this.source = source;
     this.frontSource = frontSource;
 };
 
-hi.FlattenSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.FlattenSequence.prototype.constructor = hi.FlattenSequence;
-Object.assign(hi.FlattenSequence.prototype, {
+FlattenSequence.prototype = Object.create(Sequence.prototype);
+FlattenSequence.prototype.constructor = FlattenSequence;
+Object.assign(FlattenSequence.prototype, {
     initializeFront: function(){
         while((!this.frontSource || this.frontSource.done()) && !this.source.done()){
             const element = this.source.nextFront();
-            if(!hi.validAsSequence(element)){
+            if(!validAsSequence(element)){
                 this.frontSource = new hi.OnceSequence(element); break;
             }else{
                 this.frontSource = hi.asSequence(element);
@@ -25,10 +28,10 @@ Object.assign(hi.FlattenSequence.prototype, {
             this.frontSource.popFront();
             while(this.frontSource.done() && !this.source.done()){
                 const element = this.source.nextFront();
-                if(!hi.validAsSequence(element)){
+                if(!validAsSequence(element)){
                     this.frontSource = new hi.OnceSequence(element); break;
                 }else{
-                    this.frontSource = hi.asSequence(element);
+                    this.frontSource = asSequence(element);
                 }
             }
         };
@@ -58,9 +61,20 @@ Object.assign(hi.FlattenSequence.prototype, {
     reset: null,
 });
 
-// Flatten a single level deep.
-hi.register("flatten", {
-    sequences: 1,
-}, function(source){
-    return new hi.FlattenSequence(source);
-});
+/**
+ * Flatten a single level deep.
+ * @param {*} source
+ */
+const flatten = (source) => {
+    return new FlattenSequence(source);
+};
+
+export const registration = {
+    name: "flatten",
+    expected: {
+
+    },
+    implementation: flatten,
+};
+
+export default flatten;
