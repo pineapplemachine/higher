@@ -17,6 +17,9 @@ Object.assign(hi.DropHeadSequence.prototype, {
     bounded: function(){
         return this.source.bounded();
     },
+    unbounded: function(){
+        return this.source.unbounded();
+    },
     done: function(){
         if(!this.initialized) this.initialize();
         return this.source.done();

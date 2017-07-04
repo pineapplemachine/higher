@@ -15,6 +15,9 @@ Object.assign(hi.DropTailSequence.prototype, {
     bounded: function(){
         return this.source.bounded();
     },
+    unbounded: function(){
+        return this.source.unbounded();
+    },
     done: function(){
         return this.frontIndex >= this.lastIndex;
     },
