@@ -72,17 +72,21 @@ Object.assign(EnumerateSequence.prototype, {
     },
 });
 
+const enumerate = (numbers, source) =>{
+    const start = numbers[0] || 0;
+    const step = numbers.length > 1 ? numbers[1] : 1;
+    return new EnumerateSequence(source, start, step);
+};
+
 export {EnumerateSequence};
 
-export default {
+export const registration = {
     name: "enumerate",
     expected: {
         numbers: [0, 2],
         sequences: 1,
     },
-    implementation: function(numbers, source){
-        const start = numbers[0] || 0;
-        const step = numbers.length > 1 ? numbers[1] : 1;
-        return new EnumerateSequence(source, start, step);
-    },
+    implementation: enumerate,
 };
+
+export default enumerate;

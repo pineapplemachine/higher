@@ -36,12 +36,16 @@ Object.assign(EmptySequence.prototype, {
     },
 });
 
+const empty = () => {
+    return new EmptySequence();
+};
+
 export {EmptySequence};
 
-export default {
+export const registration = {
     name: "empty",
     expected: {},
-    implementation: function(){
-        return new EmptySequence();
-    },
+    implementation: empty,
 };
+
+export default empty;

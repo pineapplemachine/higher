@@ -1,5 +1,7 @@
+import Sequence from "../core/sequence";
+
 // Generate a partially-applied function.
-hi.partial = function(target, leftArgs, rightArgs){
+const partial = function(target, leftArgs, rightArgs){
     return (...callArgs) => {
         const useArgs = callArgs;
         if(leftArgs) useArgs.unshift(...leftArgs);
@@ -10,7 +12,7 @@ hi.partial = function(target, leftArgs, rightArgs){
 
 // Generate a partially-applied function.
 // The sequence the method is called for will be the left-most argument.
-hi.Sequence.prototype.partial = function(target, leftArgs, rightArgs){
+Sequence.prototype.partial = function(target, leftArgs, rightArgs){
     return (...callArgs) => {
         const useArgs = callArgs;
         if(leftArgs) useArgs.unshift(...leftArgs);
@@ -18,3 +20,5 @@ hi.Sequence.prototype.partial = function(target, leftArgs, rightArgs){
         return target(this, ...useArgs);
     };
 };
+
+export default partial;

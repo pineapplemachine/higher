@@ -1,4 +1,7 @@
-hi.NgramSequence = function(ngramSize, source, currentNgram = null){
+import Sequence from "../core/sequence";
+import {EmptySequence} from "./empty";
+
+const NgramSequence = function(ngramSize, source, currentNgram = null){
     this.ngramSize = Math.floor(+ngramSize);
     this.source = source;
     this.currentNgram = currentNgram || [];
@@ -8,9 +11,9 @@ hi.NgramSequence = function(ngramSize, source, currentNgram = null){
     this.maskAbsentMethods(source);
 };
 
-hi.NgramSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.NgramSequence.prototype.constructor = hi.NgramSequence;
-Object.assign(hi.NgramSequence.prototype, {
+NgramSequence.prototype = Object.create(Sequence.prototype);
+NgramSequence.prototype.constructor = NgramSequence;
+Object.assign(NgramSequence.prototype, {
     bounded: function(){
         return this.source.bounded();
     },
@@ -43,14 +46,14 @@ Object.assign(hi.NgramSequence.prototype, {
         }
     },
     slice: function(i, j){
-        return new hi.NgramSequence(
+        return new NgramSequence(
             this.ngramSize, this.source.slice(i, j + this.ngramSize)
         );
     },
     has: null,
     get: null,
     copy: function(){
-        const copy = new hi.NgramSequence(this.ngramSize, this.source.copy());
+        const copy = new NgramSequence(this.ngramSize, this.source.copy());
         copy.currentNgram = this.currentNgram.slice();
         return copy;
     },
@@ -64,25 +67,58 @@ Object.assign(hi.NgramSequence.prototype, {
     },
 });
 
-hi.register("ngrams", {
-    numbers: 1,
-    sequences: 1,
-}, function(ngramSize, source){
+/**
+ *
+ * @param {*} ngramSize
+ * @param {*} source
+ */
+const ngrams = (ngramSize, source) => {
     if(ngramSize < 1){
-        return new hi.EmptySequence();
+        return new EmptySequence();
     }else{
-        return new hi.NgramSequence(ngramSize, source);
+        return new NgramSequence(ngramSize, source);
     }
-});
+};
 
-hi.register("bigrams", {
-    sequences: 1,
-}, function(source){
-    return new hi.NgramSequence(2, source);
-});
+export const registrationNgrams = {
+    name: "ngrams",
+    expected: {
+        numbers: 1,
+        sequences: 1,
+    },
+    implementation: ngrams,
+};
 
-hi.register("trigrams", {
-    sequences: 1,
-}, function(source){
-    return new hi.NgramSequence(3, source);
-});
+/**
+ *
+ * @param {*} source
+ */
+const bigrams = (source) => {
+    return new NgramSequence(2, source);
+};
+
+export const registrationBigrams = {
+    name: "bigrams",
+    expected: {
+        sequences: 1,
+    },
+    implementation: bigrams,
+};
+
+/**
+ *
+ * @param {*} source
+ */
+const trigrams = (source) => {
+    return new NgramSequence(3, source);
+};
+
+export const registrationTrigrams = {
+    name: "trigrams",
+    expected: {
+        sequences: 1,
+    },
+    implementation: trigrams,
+};
+
+export default {ngrams, bigrams, trigrams};

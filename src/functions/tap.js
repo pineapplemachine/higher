@@ -1,4 +1,6 @@
-hi.TapSequence = function(callback, source){
+import Sequence from "../core/sequence";
+
+const TapSequence = function(callback, source){
     this.callback = callback;
     this.source = source;
     this.frontValue = null;
@@ -8,9 +10,9 @@ hi.TapSequence = function(callback, source){
     this.maskAbsentMethods(source);
 };
 
-hi.TapSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.TapSequence.prototype.constructor = hi.TapSequence;
-Object.assign(hi.TapSequence.prototype, {
+TapSequence.prototype = Object.create(Sequence.prototype);
+TapSequence.prototype.constructor = TapSequence;
+Object.assign(TapSequence.prototype, {
     bounded: function(){
         return this.source.bounded();
     },
@@ -47,7 +49,7 @@ Object.assign(hi.TapSequence.prototype, {
         return this.source.index(i);
     },
     slice: function(i, j){
-        return new hi.TapSequence(this.callback, this.source.slice(i, j));
+        return new TapSequence(this.callback, this.source.slice(i, j));
     },
     has: function(i){
         return this.source.has(i);
@@ -56,7 +58,7 @@ Object.assign(hi.TapSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        const copy = new hi.TapSequence(this.callback, this.source.copy());
+        const copy = new TapSequence(this.callback, this.source.copy());
         copy.frontValue = this.frontValue;
         copy.backValue = this.backValue;
         copy.cachedFront = this.cachedFront;
@@ -68,9 +70,22 @@ Object.assign(hi.TapSequence.prototype, {
     },
 });
 
-hi.register("tap", {
-    functions: 1,
-    sequences: 1,
-}, function(callback, source){
-    return new hi.TapSequence(callback, source);
-});
+/**
+ *
+ * @param {*} callback
+ * @param {*} source
+ */
+const tap = (callback, source) => {
+    return new TapSequence(callback, source);
+};
+
+export const registration = {
+    name: "tap",
+    expected: {
+        functions: 1,
+        sequences: 1,
+    },
+    implementation: tap,
+};
+
+export default tap;

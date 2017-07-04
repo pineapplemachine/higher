@@ -1,4 +1,6 @@
-hi.ReverseSequence = function(source){
+import Sequence from "../core/sequence";
+
+const ReverseSequence = function(source){
     if(!source.back){
         throw "Failed to reverse sequence: Sequence must be bidirectional.";
     }
@@ -11,9 +13,9 @@ hi.ReverseSequence = function(source){
     }
 };
 
-hi.ReverseSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.ReverseSequence.prototype.constructor = hi.ReverseSequence;
-Object.assign(hi.ReverseSequence.prototype, {
+ReverseSequence.prototype = Object.create(Sequence.prototype);
+ReverseSequence.prototype.constructor = ReverseSequence;
+Object.assign(ReverseSequence.prototype, {
     bounded: function(){
         return this.source.bounded();
     },
@@ -42,7 +44,7 @@ Object.assign(hi.ReverseSequence.prototype, {
         return this.source.index(this.source.length - i - 1);
     },
     slice: function(i, j){
-        return new hi.ReverseSequence(this.source.slice(
+        return new ReverseSequence(this.source.slice(
             this.source.length - j - 1,
             this.source.length - i - 1
         ));
@@ -54,7 +56,7 @@ Object.assign(hi.ReverseSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        return new hi.ReverseSequence(this.source.copy());
+        return new ReverseSequence(this.source.copy());
     },
     reset: function(){
         this.source.reset();
@@ -75,17 +77,27 @@ Object.assign(hi.ReverseSequence.prototype, {
     },
 });
 
-hi.register("reverse", {
-    sequences: 1,
-}, function(source){
+/**
+ *
+ * @param {*} source
+ */
+const reverse = (source) => {
     if(source instanceof hi.ReverseSequence){
         return source.source;
     }else if(source.back){
-        return new hi.ReverseSequence(source);
+        return new ReverseSequence(source);
     }else if(source.bounded()){
         // For large sequences this can be expensive, but the only way to do it.
-        return new hi.ReverseSequence(new hi.LazyArraySequence(source));
+        return new ReverseSequence(new hi.LazyArraySequence(source));
     }else{
         throw "Failed to reverse sequence: Can't reverse unidirectional unbounded sequence.";
     }
-});
+};
+
+export const registration = {
+    name: "reverse",
+    expected: {sequences: 1},
+    implementation: reverse,
+};
+
+export default reverse;

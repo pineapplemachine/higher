@@ -94,9 +94,13 @@ Object.assign(SequenceCounter.prototype, {
     },
 });
 
+const count = (predicate, source) => {
+    return new SequenceCounter(predicate, source);
+};
+
 export {SequenceCounter};
 
-export default {
+export const registration = {
     name: "count",
     expected: {
         functions: 1,
@@ -104,7 +108,7 @@ export default {
         // Don't waste time coercing input iterables to sequences
         allowIterables: true,
     },
-    function(predicate, source){
-        return new SequenceCounter(predicate, source);
-    },
+    implementation: count,
 };
+
+export default count;

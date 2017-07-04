@@ -1,7 +1,10 @@
-// Call the encapsulated function only once, with any arguments.
-// Successive calls return the value which the first call produced without
-// calling the function again.
-hi.once = function(call){
+/**
+ * Call the encapsulated function only once, with any arguments.
+ * Successive calls return the value which the first call produced without
+ * calling the function again.
+ * @param {*} call
+ */
+const once = (call) => {
     let called = false;
     let result;
     return (...args) => {
@@ -10,5 +13,7 @@ hi.once = function(call){
             called = true;
         }
         return result;
-    }
+    };
 };
+
+export default once;

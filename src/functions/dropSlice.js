@@ -92,42 +92,46 @@ Object.assign(DropSliceSequence.prototype, {
     },
 });
 
+const dropSlice = (slice, source)=> {
+    const dropLow = slice[0];
+    const dropHigh = slice[1];
+    if(dropLow >= dropHigh){
+        return source;
+    }else if(source.slice && source.length){
+        const length = source.length();
+        if(dropLow <= 0 && dropHigh >= length){
+            return new EmptySequence();
+        }else{
+            return new ConcatSequence([
+                source.slice(0, dropLow), source.slice(dropHigh, length),
+            ]);
+        }
+    }else if(dropLow <= 0){
+        if(source.length && dropHigh >= source.length()){
+            return new EmptySequence();
+        }else{
+            return new DropHeadSequence(dropHigh, source);
+        }
+    }else if(source.length){
+        const length = source.length();
+        if(dropHigh >= length){
+            return new DropTailSequence(length - dropLow, source);
+        }
+    }
+    return new DropSliceSequence(
+        dropLow, dropHigh, source
+    );
+};
+
 export {DropSliceSequence};
 
-export default {
+export const registration = {
     name: "dropSlice",
     expected: {
         numbers: 2,
         sequences: 1,
     },
-    implementation: function(slice, source){
-        const dropLow = slice[0];
-        const dropHigh = slice[1];
-        if(dropLow >= dropHigh){
-            return source;
-        }else if(source.slice && source.length){
-            const length = source.length();
-            if(dropLow <= 0 && dropHigh >= length){
-                return new EmptySequence();
-            }else{
-                return new ConcatSequence([
-                    source.slice(0, dropLow), source.slice(dropHigh, length),
-                ]);
-            }
-        }else if(dropLow <= 0){
-            if(source.length && dropHigh >= source.length()){
-                return new EmptySequence();
-            }else{
-                return new DropHeadSequence(dropHigh, source);
-            }
-        }else if(source.length){
-            const length = source.length();
-            if(dropHigh >= length){
-                return new DropTailSequence(length - dropLow, source);
-            }
-        }
-        return new DropSliceSequence(
-            dropLow, dropHigh, source
-        );
-    },
+    implementation: dropSlice,
 };
+
+export default dropSlice;

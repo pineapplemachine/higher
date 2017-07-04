@@ -1,6 +1,14 @@
 import {isSequence} from "../core/types";
 
-export default {
+const consume = (source) => {
+    if(isSequence(source)){
+        while(!source.done()) source.popFront();
+    }else{
+        for(const element of source){}
+    }
+};
+
+export const registration = {
     name: "consume",
     expected: {
         sequences: 1,
@@ -9,11 +17,7 @@ export default {
         // Also generate an async version of this function
         async: true,
     },
-    implementation: function(source){
-        if(isSequence(source)){
-            while(!source.done()) source.popFront();
-        }else{
-            for(const element of source){}
-        }
-    },
+    implementation: consume,
 };
+
+export default consume;

@@ -1,14 +1,17 @@
+import Sequence from "../core/sequence";
+import {EmptySequence} from "./empty";
+
 // Fallback implementation of first function for when slicing is unavailable.
-hi.HeadSequence = function(elements, source, frontIndex = 0){
+const HeadSequence = function(elements, source, frontIndex = 0){
     this.elements = elements;
     this.source = source;
     this.frontIndex = frontIndex;
     this.maskAbsentMethods(source);
 };
 
-hi.HeadSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.HeadSequence.prototype.constructor = hi.HeadSequence;
-Object.assign(hi.HeadSequence.prototype, {
+HeadSequence.prototype = Object.create(Sequence.prototype);
+HeadSequence.prototype.constructor = HeadSequence;
+Object.assign(HeadSequence.prototype, {
     bounded: () => true,
     done: function(){
         return this.frontIndex >= this.elements || this.source.done();
@@ -38,7 +41,7 @@ Object.assign(hi.HeadSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        return new hi.HeadSequence(
+        return new HeadSequence(
             this.elements, this.source.copy(), this.frontIndex
         );
     },
@@ -49,19 +52,33 @@ Object.assign(hi.HeadSequence.prototype, {
     },
 });
 
-// Get a sequence for enumerating the first so many elements of the input.
-// The resulting sequence may be shorter than the length specified, but
-// will never be longer.
-hi.register("head", {
-    numbers: 1,
-    sequences: 1,
-}, function(elements, source){
+/**
+ * Get a sequence for enumerating the first so many elements of the input.
+ * The resulting sequence may be shorter than the length specified, but
+ * will never be longer.
+ * @param {*} elements
+ * @param {*} source
+ */
+const head = (elements, source) => {
     if(elements < 1){
-        return new hi.EmptySequence();
+        return new EmptySequence();
     }else if(source.length && source.slice){
         const length = source.length();
         return source.slice(0, length < elements ? length : elements);
     }else{
-        return new hi.HeadSequence(elements, source);
+        return new HeadSequence(elements, source);
     }
-});
+};
+
+export const registration = {
+    name: "head",
+    expected: {
+        numbers: 1,
+        sequences: 1,
+    },
+    implementation: head,
+};
+
+export {HeadSequence};
+
+export default head;

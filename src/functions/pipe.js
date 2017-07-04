@@ -1,7 +1,13 @@
-// Returns a function which, when called the left-most function passed at
-// creation is evaluated, then that result is passed to the next function,
-// that result passed to the next, etc, until a final value is acquired.
-hi.pipe = function(rootFunction, ...moreFunctions){
+//
+
+/**
+ * Returns a function which, when called the left-most function passed at
+ * creation is evaluated, then that result is passed to the next function,
+ * that result passed to the next, etc, until a final value is acquired.
+ * @param {*} rootFunction
+ * @param {*} moreFunctions
+ */
+const pipe = function(rootFunction, ...moreFunctions){
     if(!moreFunctions.length){
         return rootFunction;
     }else{
@@ -14,3 +20,5 @@ hi.pipe = function(rootFunction, ...moreFunctions){
         };
     }
 };
+
+export default pipe;

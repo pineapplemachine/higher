@@ -1,11 +1,18 @@
-// Simple abstraction of plural map function.
-hi.zip = function(){
+import {asSequence} from "../core/asSequence";
+import map from "./map";
+
+/**
+ * Simple abstraction of plural map function.
+ */
+const zip = () => {
     const sequences = [];
     for(const argument of arguments){
-        sequences.push(hi.asSequence(argument));
+        sequences.push(asSequence(argument));
     }
     const transform = function(){
         return Array.prototype.slice.call(arguments);
     };
-    return hi.map.raw(transform, sequences);
+    return map(transform, sequences);
 };
+
+export default zip;

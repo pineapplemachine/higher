@@ -54,14 +54,18 @@ Object.assign(DistinctSequence.prototype, {
     },
 });
 
+const distinct = (source) => {
+    return new DistinctSequence(source);
+};
+
 export {DistinctSequence};
 
-export default {
+export const registration = {
     name: "distinct",
     expected: {
         sequences: 1,
     },
-    function(source){
-        return new DistinctSequence(source);
-    },
+    implementation: distinct,
 };
+
+export default distinct;

@@ -1,13 +1,16 @@
+import Sequence from "../core/sequence";
+import {isFunction} from "../core/types";
+
 // Result of calling range with a step of greater than 0.
-hi.RecurSequence = function(transform, seedValue = null, frontValue = null){
+const RecurSequence = function(transform, seedValue = null, frontValue = null){
     this.transform = transform;
     this.seedValue = seedValue;
     this.frontValue = frontValue;
 };
 
-hi.RecurSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.RecurSequence.prototype.constructor = hi.RecurSequence;
-Object.assign(hi.RecurSequence.prototype, {
+RecurSequence.prototype = Object.create(Sequence.prototype);
+RecurSequence.prototype.constructor = RecurSequence;
+Object.assign(RecurSequence.prototype, {
     // Call this to set the initial value of the generator.
     // Necessarily resets the state of the sequence.
     seed: function(value){
@@ -31,7 +34,7 @@ Object.assign(hi.RecurSequence.prototype, {
     index: null,
     slice: null,
     copy: function(){
-        return new hi.RecurSequence(
+        return new RecurSequence(
             this.transform, this.seedValue, this.frontValue
         );
     },
@@ -41,17 +44,23 @@ Object.assign(hi.RecurSequence.prototype, {
     },
 });
 
-// Create a sequence enumerating numbers in a linear range.
-// When one number is passed, it is an exclusive upper bound.
-// When two numbers are passed, they are the inclusive lower and exclusive
-// higher bounds, respectively.
-// When three numbers are passed they are the lower and higher bounds and
-// the step from one value to the next, respectively.
-// The step is 1 by default but fractical, negative, and zero values are
-// also accepted.
-hi.recur = function(transform){
-    if(!hi.isFunction(transform)) throw (
+
+/**
+ * Create a sequence enumerating numbers in a linear range.
+ * When one number is passed, it is an exclusive upper bound.
+ * When two numbers are passed, they are the inclusive lower and exclusive
+ * higher bounds, respectively.
+ * When three numbers are passed they are the lower and higher bounds and
+ * the step from one value to the next, respectively.
+ * The step is 1 by default but fractical, negative, and zero values are
+ * also accepted.
+ * @param {*} transform
+ */
+const recur = (transform) => {
+    if(!isFunction(transform)) throw (
         "Failed to create recur sequence: Input must be a function."
     );
-    return new hi.RecurSequence(transform);
+    return new RecurSequence(transform);
 };
+
+export default recur;

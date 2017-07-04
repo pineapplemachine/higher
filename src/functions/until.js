@@ -1,4 +1,6 @@
-hi.UntilSequence = function(
+import Sequence from "../core/sequence";
+
+const UntilSequence = function(
     predicate, source, isInclusive = false, included = true,
     satisfied = false, frontValue = null, initialize = true
 ){
@@ -16,9 +18,9 @@ hi.UntilSequence = function(
     this.maskAbsentMethods(source);
 };
 
-hi.UntilSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.UntilSequence.prototype.constructor = hi.UntilSequence;
-Object.assign(hi.UntilSequence.prototype, {
+UntilSequence.prototype = Object.create(Sequence.prototype);
+UntilSequence.prototype.constructor = UntilSequence;
+Object.assign(UntilSequence.prototype, {
     inclusive: function(){
         this.isInclusive = true;
         this.included = false;
@@ -59,7 +61,7 @@ Object.assign(hi.UntilSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        return new hi.UntilSequence(
+        return new UntilSequence(
             this.predicate, this.source.copy(), this.isInclusive,
             this.included, this.satisfied, this.frontValue, false
         );
@@ -75,9 +77,22 @@ Object.assign(hi.UntilSequence.prototype, {
     },
 });
 
-hi.register("until", {
-    functions: 1,
-    sequences: 1,
-}, function(predicate, source){
-    return new hi.UntilSequence(predicate, source);
-});
+/**
+ *
+ * @param {*} predicate
+ * @param {*} source
+ */
+const until = (predicate, source) => {
+    return new UntilSequence(predicate, source);
+};
+
+export const registration = {
+    name: "until",
+    expected: {
+        functions: 1,
+        sequences: 1,
+    },
+    implementation: until,
+};
+
+export default until;

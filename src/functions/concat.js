@@ -117,15 +117,19 @@ Object.assign(ConcatSequence.prototype, {
     },
 });
 
+const concat = (sources) => {
+    return new ConcatSequence(sources);
+};
+
 // named export for pulling in the ConcatSequence only
 export {ConcatSequence};
 
-export default {
+export const registration = {
     name: "concat",
     expected: {
         sequences: "*",
     },
-    implementation: function(sources){
-        return new ConcatSequence(sources);
-    },
+    implementation: concat,
 };
+
+export default concat;

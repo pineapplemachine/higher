@@ -1,11 +1,14 @@
-hi.OneSequence = function(element, isDone = false){
+import Sequence from "../core/sequence";
+import {FiniteRepeatElementSequence, InfiniteRepeatElementSequence} from "./repeatElement";
+
+const OneSequence = function(element, isDone = false){
     this.element = element;
     this.isDone = isDone;
 };
 
-hi.OneSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.OneSequence.prototype.constructor = hi.OneSequence;
-Object.assign(hi.OneSequence.prototype, {
+OneSequence.prototype = Object.create(Sequence.prototype);
+OneSequence.prototype.constructor = OneSequence;
+Object.assign(OneSequence.prototype, {
     seed: function(element){
         this.element = element;
         return this;
@@ -13,11 +16,11 @@ Object.assign(hi.OneSequence.prototype, {
     // Optimized implementations of some common operations
     repeat: function(repetitions = -1){
         if(repetitions === 0){
-            return new hi.EmptyElementSequence(this.element);
+            return new EmptyElementSequence(this.element);
         }else if(repetitions < 0){
-            return new hi.InfiniteRepeatElementSequence(this.element);
+            return new InfiniteRepeatElementSequence(this.element);
         }else{
-            return new hi.FiniteRepeatElementSequence(repetitions, this.element);
+            return new FiniteRepeatElementSequence(repetitions, this.element);
         }
     },
     reverse: function(){
@@ -49,10 +52,10 @@ Object.assign(hi.OneSequence.prototype, {
     has: (i) => false,
     get: (i) => undefined,
     slice: function(i, j){
-        return new hi.OneSequence(this.element, i >= j);
+        return new OneSequence(this.element, i >= j);
     },
     copy: function(){
-        return new hi.OneSequence(this.element, this.isDone);
+        return new OneSequence(this.element, this.isDone);
     },
     reset: function(){
         this.isDone = false;
@@ -60,6 +63,8 @@ Object.assign(hi.OneSequence.prototype, {
     },
 });
 
-hi.one = function(element){
-    return new hi.OneSequence(element);
+const one = function(element){
+    return new OneSequence(element);
 };
+
+export default one;

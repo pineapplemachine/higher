@@ -3,7 +3,6 @@ import {render} from "react-dom";
 import styled from "styled-components";
 
 import higher from "../../src/higher";
-import {isFunction} from "../../src/core/types";
 
 const UIWrapper = styled.div`
     display: flex;
@@ -36,13 +35,12 @@ const Description = styled.p`
 class Demo extends Component{
     constructor(props){
         super(props);
-        console.log(higher);
 
-        const testFn = () => {
-            return true;
-        };
-        console.log("isFunction truthy: " + isFunction(testFn));
-        console.log("isFunction falsy: " + isFunction("fail"));
+        const collatz = (n) => hi.recur((n) => n % 2 ? n * 3 + 1 : n / 2).seed(n).until((n) => n <= 1).inclusive().assumeBounded();
+        console.log(collatz(19).array());
+
+        const fib = () => hi.recur((i) => [i[1], i[0] + i[1] || 1]).seed([0, 0]).map((i) => i[1]);
+        console.log(fib().head(10).array());
     }
 
     render(){
