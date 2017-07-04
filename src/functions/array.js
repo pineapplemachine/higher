@@ -13,7 +13,7 @@ const asArray = function(limit, source){
         }
         return result;
     }else{
-        if(hi.isArray(source)) return source.slice(
+        if(isArray(source)) return source.slice(
             0, limit < source.length ? limit : source.length
         );
         const result = [];

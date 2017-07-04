@@ -1,4 +1,6 @@
 import {unboundedError, collapseCopyError} from "./internal/errors";
+import {isArray, isSequence} from "./types";
+import {ArraySequence} from "./asSequence";
 
 const Sequence = function(){};
 
@@ -48,12 +50,12 @@ Sequence.prototype.collapse = function(limit = -1){
     const stack = [];
     const breaks = [];
     let i = 0;
-    while(source && hi.isSequence(source)){
+    while(source && isSequence(source)){
         if(source.collapseBreak) breaks.push(stack.length);
         stack.push(source);
         source = source.source;
     }
-    if(!hi.isArray(source)){
+    if(!isArray(source)){
         throw (
             "Sequence collapsing is supported only for sequences that are " +
             "based on an array. To acquire other sequences in-memory, see " +
@@ -145,19 +147,19 @@ Sequence.prototype.forceEager = function(){
         this.highIndex = this.source.length;
         this.frontIndex = this.lowIndex;
         this.backIndex = this.highIndex;
-        this.done = hi.ArraySequence.prototype.done;
-        this.length = hi.ArraySequence.prototype.length;
-        this.left = hi.ArraySequence.prototype.left;
-        this.front = hi.ArraySequence.prototype.front;
-        this.popFront = hi.ArraySequence.prototype.popFront;
-        this.back = hi.ArraySequence.prototype.back;
-        this.popBack = hi.ArraySequence.prototype.popBack;
-        this.index = hi.ArraySequence.prototype.index;
-        this.slice = hi.ArraySequence.prototype.slice;
-        this.has = hi.ArraySequence.prototype.has;
-        this.get = hi.ArraySequence.prototype.get;
-        this.copy = hi.ArraySequence.prototype.copy;
-        this.reset = hi.ArraySequence.prototype.reset;
+        this.done = ArraySequence.prototype.done;
+        this.length = ArraySequence.prototype.length;
+        this.left = ArraySequence.prototype.left;
+        this.front = ArraySequence.prototype.front;
+        this.popFront = ArraySequence.prototype.popFront;
+        this.back = ArraySequence.prototype.back;
+        this.popBack = ArraySequence.prototype.popBack;
+        this.index = ArraySequence.prototype.index;
+        this.slice = ArraySequence.prototype.slice;
+        this.has = ArraySequence.prototype.has;
+        this.get = ArraySequence.prototype.get;
+        this.copy = ArraySequence.prototype.copy;
+        this.reset = ArraySequence.prototype.reset;
     };
     this.bounded = () => true;
     if(!this.length) this.length = function(){

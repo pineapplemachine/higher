@@ -82,7 +82,7 @@ Object.assign(ReverseSequence.prototype, {
  * @param {*} source
  */
 const reverse = (source) => {
-    if(source instanceof hi.ReverseSequence){
+    if(source instanceof ReverseSequence){
         return source.source;
     }else if(source.back){
         return new ReverseSequence(source);

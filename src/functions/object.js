@@ -1,5 +1,5 @@
 import {sequenceBoundsError} from "../core/internal/errors";
-import {isObject} from "../core/types";
+import {isArray, isObject} from "../core/types";
 
 /**
  *
@@ -8,7 +8,7 @@ import {isObject} from "../core/types";
  */
 const object = (limit, source) => {
     function pushKeyValuePair(result, element){
-        if(hi.isArray(element)){
+        if(isArray(element)){
             if(element.length){
                 result[element[0]] = element.length > 1 ? element[1] : null;
             }

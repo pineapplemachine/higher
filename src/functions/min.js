@@ -1,3 +1,5 @@
+import reduce from "./reduce";
+
 /**
  * Get the minimum value in a sequence as judged by a comparison function.
  * If no comparison function is provided, then (a, b) => (a < b) is used.
@@ -10,7 +12,7 @@ const min = (relate, source) => {
         (a, b) => (relate(a, b) ? a : b) :
         (a, b) => (a < b ? a : b)
     );
-    return hi.reduce.raw(combine, source).last();
+    return reduce(combine, source).last();
 };
 
 export const registration = {

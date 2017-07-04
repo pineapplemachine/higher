@@ -18,14 +18,14 @@ const time = function(call, ...args){
 // evaluate a function.
 const timeAsync = function(call, ...args){
     return new hi.Promise((resolve, reject) => {
-        hi.callAsync(() => resolve(hi.time(call, ...args)));
+        hi.callAsync(() => resolve(time(call, ...args)));
     });
 };
 
 // Get the amount of time in milliseconds it takes to consume a sequence.
 // Calls the sequence's first method once per element.
 Sequence.prototype.time = function(){
-    return hi.time(() => {
+    return time(() => {
         while(!this.done()) this.nextFront();
     });
 };
@@ -33,7 +33,7 @@ Sequence.prototype.time = function(){
 // Asynchronously get the amount of time in milliseconds it takes to consume
 // a sequence. Calls the sequence's first method once per element.
 Sequence.prototype.timeAsync = function(){
-    return hi.timeAsync(() => {
+    return timeAsync(() => {
         while(!this.done()) this.nextFront();
     });
 };

@@ -5,7 +5,7 @@ import {validAsBoundedSequence} from "../core/asSequence";
  * @param {*} source
  */
 const string = (source) => {
-    if(!hi.validAsBoundedSequence(source)){
+    if(!validAsBoundedSequence(source)){
         throw "Failed to create string: Input sequence is not known to be bounded.";
     }
     let str = "";

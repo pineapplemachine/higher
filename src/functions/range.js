@@ -217,15 +217,15 @@ NullStepRangeSequence.prototype = Object.create(
  */
 const range = (numbers) => {
     if(numbers.length === 1){
-        return new hi.NumberRangeSequence(0, numbers[0]);
+        return new NumberRangeSequence(0, numbers[0]);
     }else if(numbers.length === 2 || numbers[2] === 1){
-        return new hi.NumberRangeSequence(numbers[0], numbers[1]);
+        return new NumberRangeSequence(numbers[0], numbers[1]);
     }else if(numbers[2] > 0){
-        return new hi.ForwardNumberRangeSequence(numbers[0], numbers[1], numbers[2]);
+        return new ForwardNumberRangeSequence(numbers[0], numbers[1], numbers[2]);
     }else if(numbers[2] < 0){
-        return new hi.BackwardNumberRangeSequence(numbers[0], numbers[1], numbers[2]);
+        return new BackwardNumberRangeSequence(numbers[0], numbers[1], numbers[2]);
     }else{
-        return new hi.NullStepRangeSequence(numbers[0], numbers[1]);
+        return new NullStepRangeSequence(numbers[0], numbers[1]);
     }
 };
 
