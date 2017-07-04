@@ -1,3 +1,5 @@
+import {asSequence} from "../core/asSequence";
+
 /**
  * Get the lexicographic ordering of two sequences.
  * Returns +1 when the first input follows the second.
@@ -8,7 +10,7 @@
  */
 const lexOrder = (order, sequences) => {
     const orderFunc = order || ((a, b) => (a < b ? -1 : (a > b) ? +1 : 0));
-    const a = hi.asSequence(sequences[0]);
+    const a = asSequence(sequences[0]);
     const b = sequences[1];
     for(const element of b){
         if(a.done()) return -1;

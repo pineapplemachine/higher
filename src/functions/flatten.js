@@ -1,5 +1,6 @@
 import Sequence from "../core/sequence";
 import {asSequence, validAsSequence} from "../core/asSequence";
+// import {OnceSequence} from "./once"; TODO: Missing dependency?
 
 const FlattenSequence = function(source, frontSource = null){
     this.source = source;
@@ -13,9 +14,9 @@ Object.assign(FlattenSequence.prototype, {
         while((!this.frontSource || this.frontSource.done()) && !this.source.done()){
             const element = this.source.nextFront();
             if(!validAsSequence(element)){
-                this.frontSource = new hi.OnceSequence(element); break;
+                this.frontSource = new OnceSequence(element); break;
             }else{
-                this.frontSource = hi.asSequence(element);
+                this.frontSource = asSequence(element);
             }
         }
         this.done = function(){
@@ -29,7 +30,7 @@ Object.assign(FlattenSequence.prototype, {
             while(this.frontSource.done() && !this.source.done()){
                 const element = this.source.nextFront();
                 if(!validAsSequence(element)){
-                    this.frontSource = new hi.OnceSequence(element); break;
+                    this.frontSource = new OnceSequence(element); break;
                 }else{
                     this.frontSource = asSequence(element);
                 }

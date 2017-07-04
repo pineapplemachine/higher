@@ -1,9 +1,10 @@
+import {isArray} from "../core/types";
 // import {sequenceBoundsError} from "../core/internal/errors"; TODO: Missing dependency?
 
 const write = (limit, sequences) => {
     const source = sequences[0];
     const target = sequences[1];
-    if(!hi.isArray(target)){
+    if(!isArray(target)){
         throw "Failed to write sequence because the target isn't an array.";
     }
     const iter = source.next ? source : source[Symbol.iterator]();
