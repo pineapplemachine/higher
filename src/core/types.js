@@ -1,3 +1,7 @@
+// True when the input is undefined.
+hi.isUndefined = function(value){
+    return typeof(value) === "undefined";
+};
 // True when the input is a number.
 hi.isNumber = function(value){
     return !isNaN(value);
