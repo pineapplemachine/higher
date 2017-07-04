@@ -17,6 +17,8 @@ Object.assign(hi, {
     defaultRelationalFunction: (a, b) => (a < b),
     defaultTransformationFunction: (a) => (a),
     
+    defaultLimitLength: 1000,
+    
     register: function(name, expected, implementation){
         let wrapped = hi.wrap(expected, implementation);
         this.registeredFunctions.push(wrapped);
