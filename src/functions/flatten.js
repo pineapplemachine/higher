@@ -1,6 +1,5 @@
 import Sequence from "../core/sequence";
 import {asSequence, validAsSequence} from "../core/asSequence";
-// import {OnceSequence} from "./once"; TODO: Missing dependency?
 
 const ForwardFlattenSequence = function(source, frontSource = null){
     this.source = source;

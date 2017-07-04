@@ -1,5 +1,4 @@
 import {isArray} from "../core/types";
-// import {sequenceBoundsError} from "../core/internal/errors"; TODO: Missing dependency?
 
 const write = (limit, sequences) => {
     const source = sequences[0];
