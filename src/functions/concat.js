@@ -24,6 +24,12 @@ Object.assign(hi.ConcatSequence.prototype, {
         }
         return true;
     },
+    unbounded: function(){
+        for(const source of this.sources){
+            if(source.unbounded()) return true;
+        }
+        return true;
+    },
     done: function(){
         return this.frontSourceIndex > this.backSourceIndex || (
             this.frontSourceIndex === this.backSourceIndex - 1 &&
