@@ -10,7 +10,7 @@ hi.register("lexOrder", {
     // Also generate an async version of this function
     async: true,
 }, function(order, sequences){
-    const orderFunc = order || ((a, b) => (a < b ? -1 : (a > b) ? +1 : 0));
+    const orderFunc = order || hi.defaultOrderingFunction;
     const a = hi.asSequence(sequences[0]);
     const b = sequences[1];
     for(const element of b){

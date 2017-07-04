@@ -6,7 +6,7 @@ hi.register("homogenous", {
     // Also generate an async version of this function
     async: true,
 }, function(compare, source){
-    const compareFunc = compare || ((a, b) => (a === b));
+    const compareFunc = compare || hi.defaultComparisonFunction;
     let first = true;
     let firstElement = null;
     for(const element of source){

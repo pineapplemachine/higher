@@ -1,6 +1,6 @@
 // Determine equality of one or more sequences given a comparison function.
 // When only one sequence is given as input, the output is always true.
-// When no comparison function is given, (a, b) => (a == b) is used as a default.
+// When no comparison function is given, (a, b) => (a === b) is used as a default.
 hi.register("endsWith", {
     functions: "?",
     sequences: 2,
@@ -16,7 +16,7 @@ hi.register("endsWith", {
     // If either input isn't bidirectional, it needs to be fully in memory.
     if(!source.back) source.forceEager();
     if(!search.back) search.forceEager();
-    const compareFunc = compare || ((a, b) => (a === b));
+    const compareFunc = compare || hi.defaultComparisonFunction;
     while(!search.done()){
         if(source.done() || !compareFunc(source.nextBack(), search.nextBack())){
             return false;

@@ -426,6 +426,6 @@ hi.register("findAll", {
     const source = sequences[0];
     const search = sequences[1];
     return new hi.ForwardFindSequence(
-        compare || ((a, b) => a == b), source, search
+        compare || ((a, b) => a === b), source, search
     );
 });

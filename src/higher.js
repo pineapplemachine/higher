@@ -11,6 +11,12 @@ Object.assign(hi, {
     
     registeredFunctions: [],
     
+    defaultComparisonFunction: (a, b) => (a === b),
+    defaultOrderingFunction: (a, b) => (a < b ? -1 : (a > b) ? +1 : 0),
+    defaultPredicateFunction: (a) => (a),
+    defaultRelationalFunction: (a, b) => (a < b),
+    defaultTransformationFunction: (a) => (a),
+    
     register: function(name, expected, implementation){
         let wrapped = hi.wrap(expected, implementation);
         this.registeredFunctions.push(wrapped);

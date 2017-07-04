@@ -9,7 +9,7 @@ hi.register("equals", {
     // Also generate an async version of this function
     async: true,
 }, function(compare, sources){
-    const compareFunc = compare || ((a, b) => (a === b));
+    const compareFunc = compare || hi.defaultComparisonFunction;
     if(sources.length <= 1){
         return true;
     }else if(sources.length === 2){

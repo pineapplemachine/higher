@@ -8,7 +8,7 @@ hi.register("findLast", {
 }, function(compare, sequences){
     const source = sequences[0];
     const search = sequences[1];
-    const compareFunc = compare || ((a, b) => (a === b));
+    const compareFunc = compare || hi.defaultComparisonFunction;
     // Handle empty or unbounded search subject
     if(search.done() || search.unbounded()){
         return undefined;
