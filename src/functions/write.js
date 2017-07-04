@@ -17,7 +17,7 @@ hi.register("write", {
         // Do nothing
     }else if(!limit){
         if(!source.bounded()){
-            throw sequenceBoundsError("write", "write");
+            throw hi.internal.unboundedError("write", "write");
         }
         let item = iter.next();
         while(!item.done && i < target.length){

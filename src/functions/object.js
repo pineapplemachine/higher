@@ -21,7 +21,7 @@ hi.register("object", {
         return {};
     }else if(!limit){
         if(!source.bounded()){
-            throw sequenceBoundsError("write", "object");
+            throw hi.internal.unboundedError("write", "object");
         }
         const result = {};
         for(const element of source){
