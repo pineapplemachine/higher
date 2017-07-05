@@ -1,9 +1,9 @@
-import args from "./arguments";
+import {args} from "./arguments";
 import {asSequence, validAsSequence} from "./asSequence";
 import {Sequence} from "./sequence";
 import {isFunction, isIterable} from "./types";
 
-const expecting = {
+export const expecting = {
     anything: (value) => value,
     number: (value) => {
         if(isNaN(value)){
@@ -35,7 +35,7 @@ const expecting = {
     },
 };
 
-const wrap = function(info){
+export const wrap = function(info){
     const fancy = wrap.fancy(info.arguments, info.implementation);
     fancy.names = fancy.names || [fancy.name];
     fancy.arguments = info.arguments;
@@ -57,6 +57,8 @@ Object.assign(wrap, {
     fancy: function(info){
         if(info.arguments.none){
             return info.implementation;
+        }else if(info.arguments.one){
+            return wrap.fancyOne(info);
         }else if(info.arguments.ordered){
             return wrap.fancyOrdered(info);
         }else if(info.arguments.unordered){
@@ -64,6 +66,17 @@ Object.assign(wrap, {
         }else{
             // TODO: More descriptive error message
             throw "Function has no arguments information.";
+        }
+    },
+    fancyOne: function(info){
+        const implementation = info.implementation;
+        const validate = info.one;
+        if(info.one === expecting.anything){
+            return implementation;
+        }else{
+            return (arg) => {
+                return implementation(validate(arg));
+            };
         }
     },
     fancyOrdered: function(info){
@@ -139,12 +152,27 @@ Object.assign(wrap, {
     method: function(info, implementation){
         if(info.arguments.none){
             return null; // Not applicable
+        }else if(info.arguments.one){
+            return wrap.methodOne(info);
         }else if(info.arguments.ordered){
             return wrap.methodOrdered(info);
         }else if(info.arguments.unordered){
             return wrap.methodUnordered(info);
         }else{
             throw "Function has no arguments information.";
+        }
+    },
+    methodOne: function(info){
+        if(!(
+            info.ordered[0] === expected.iterable ||
+            info.ordered[0] === expected.sequence ||
+            info.ordered[0] === expected.anything
+        )){
+            return null;
+        }
+        const implementation = info.implementation;
+        return function(){
+            return implementation(this);
         }
     },
     methodOrdered: function(info){
@@ -157,7 +185,7 @@ Object.assign(wrap, {
             return null;
         }
         const implementation = info.implementation;
-        return (...callArgs) => {
+        return function(...callArgs){
             const argsCount = Math.min(
                 callArgs.length, info.arguments.ordered.length - 1
             );
@@ -228,7 +256,5 @@ Object.assign(wrap, {
         };
     },
 });
-
-export {expecting};
 
 export default wrap;

@@ -2,7 +2,7 @@ import {unboundedError, collapseCopyError} from "./internal/errors";
 import {isArray, isSequence} from "./types";
 import {ArraySequence} from "./asSequence";
 
-const Sequence = function(){};
+export const Sequence = function(){};
 
 // Accepts a fancy function wrapper object returned by the wrap function.
 // Attaches methods to the sequence prototype for method chaining.
@@ -138,12 +138,10 @@ Sequence.prototype.collapseAsync = function(limit = -1){
     });
 };
 
-/**
- * Turn a lazy sequence into an array-based one.
- * Used internally by functions when a purely lazy implementation won't work
- * because a sequence doesn't support the necessary operations.
- * Not necessarily intended for external use.
- */
+// Turn a lazy sequence into an array-based one.
+// Used internally by functions when a purely lazy implementation won't work
+// because a sequence doesn't support the necessary operations.
+// Not necessarily intended for external use.
 Sequence.prototype.forceEager = function(){
     if(!this.bounded()){
         throw "Failed to consume sequence: Sequence is not known to be bounded.";
