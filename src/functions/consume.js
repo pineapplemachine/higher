@@ -1,23 +1,20 @@
 import {isSequence} from "../core/types";
+import {expecting, wrap} from "../core/wrap";
 
-const consume = (source) => {
-    if(isSequence(source)){
-        while(!source.done()) source.popFront();
-    }else{
-        for(const element of source){}
-    }
-};
-
-export const registration = {
+export const consume = wrap({
     name: "consume",
-    expected: {
-        sequences: 1,
-        // Don't waste time coercing input iterables to sequences
-        allowIterables: true,
-        // Also generate an async version of this function
-        async: true,
+    attachSequence: true,
+    async: true,
+    arguments: {
+        one: expecting.iterable
     },
-    implementation: consume,
-};
+    implementation: (source) => {
+        if(isSequence(source)){
+            while(!source.done()) source.popFront();
+        }else{
+            for(const element of source){}
+        }
+    },
+});
 
 export default consume;

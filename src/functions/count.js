@@ -1,4 +1,4 @@
-const SequenceCounter = function(predicate, source){
+expost const SequenceCounter = function(predicate, source){
     this.predicate = predicate;
     this.source = source;
     if(!source.copy) this.copy = null;
@@ -94,21 +94,20 @@ Object.assign(SequenceCounter.prototype, {
     },
 });
 
-const count = (predicate, source) => {
-    return new SequenceCounter(predicate, source);
-};
-
-export {SequenceCounter};
-
-export const registration = {
+export const count = wrap({
     name: "count",
-    expected: {
-        functions: 1,
-        sequences: 1,
-        // Don't waste time coercing input iterables to sequences
-        allowIterables: true,
+    attachSequence: true,
+    async: false,
+    arguments: {
+        unordered: {
+            functions: 1,
+            sequences: 1,
+            allowIterables: true
+        }
     },
-    implementation: count,
-};
+    implementation: (predicate, source) => {
+        return new SequenceCounter(predicate, source);
+    },
+});
 
 export default count;

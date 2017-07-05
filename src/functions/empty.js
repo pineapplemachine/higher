@@ -1,7 +1,8 @@
-import Sequence from "../core/sequence";
+import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
 
 // A chronically empty sequence.
-const EmptySequence = function(){};
+export const EmptySequence = function(){};
 
 EmptySequence.prototype = Object.create(Sequence.prototype);
 EmptySequence.prototype.constructor = EmptySequence;
@@ -35,16 +36,16 @@ Object.assign(EmptySequence.prototype, {
     },
 });
 
-const empty = () => {
-    return new EmptySequence();
-};
-
-export {EmptySequence};
-
-export const registration = {
+export const empty = wrap({
     name: "empty",
-    expected: {},
-    implementation: empty,
-};
+    attachSequence: false,
+    async: false,
+    arguments: {
+        none: true
+    },
+    implementation: () => {
+        return new EmptySequence();
+    },
+});
 
 export default empty;

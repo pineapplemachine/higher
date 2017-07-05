@@ -1,7 +1,7 @@
-import Sequence from "../core/sequence";
-import array from "./array";
+import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
 
-const DropTailSequence = function(dropElements, source, frontIndex = 0){
+export const DropTailSequence = function(dropElements, source, frontIndex = 0){
     if(!source.length){
         throw "Error dropping tail: Input sequence must have known length.";
     }
@@ -60,36 +60,30 @@ Object.assign(DropTailSequence.prototype, {
     },
 });
 
-/**
- *
- * @param {*} dropElements
- * @param {*} source
- */
-const dropTail = (dropElements, source) => {
-    if(dropElements <= 0){
-        return source;
-    }else if(source.slice && source.length){
-        return source.slice(0, source.length() - dropElements);
-    }else if(source.length){
-        return new DropTailSequence(dropElements, source);
-    }else if(source.bounded()){
-        // Sequence must be loaded into memory to perform the operation.
-        const a = array.raw(-1, source);
-        return a.slice(0, array.length() - dropElements);
-    }else{
-        throw "Failed to drop sequence tail: Input is unbounded.";
-    }
-};
-
-export {DropTailSequence};
-
-export const registration = {
+export const dropTail = wrap({
     name: "dropTail",
-    expected: {
-        numbers: 1,
-        sequences: 1,
+    attachSequence: true,
+    async: false,
+    arguments: {
+        unordered: {
+            numbers: 1,
+            sequences: 1
+        }
     },
-    implementation: dropTail,
-};
+    implementation: (dropElements, source) => {
+        if(dropElements <= 0){
+            return source;
+        }else if(source.slice && source.length){
+            return source.slice(0, source.length() - dropElements);
+        }else if(source.length){
+            return new DropTailSequence(dropElements, source);
+        }else if(source.bounded()){
+            source.forceEager();
+            return source.slice(0, source.length() - dropElements);
+        }else{
+            throw "Failed to drop sequence tail: Input is not known to be bounded.";
+        }
+    },
+});
 
 export default dropTail;

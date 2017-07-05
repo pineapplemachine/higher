@@ -1,6 +1,7 @@
-import Sequence from "../core/sequence";
+import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
 
-const ConcatSequence = function(sources){
+export const ConcatSequence = function(sources){
     this.sources = sources;
     this.source = sources[0];
     this.frontSourceIndex = 0;
@@ -117,19 +118,18 @@ Object.assign(ConcatSequence.prototype, {
     },
 });
 
-const concat = (sources) => {
-    return new ConcatSequence(sources);
-};
-
-// named export for pulling in the ConcatSequence only
-export {ConcatSequence};
-
-export const registration = {
+export const concat = wrap({
     name: "concat",
-    expected: {
-        sequences: "*",
+    attachSequence: true,
+    async: false,
+    arguments: {
+        unordered: {
+            sequences: "*"
+        }
     },
-    implementation: concat,
-};
+    implementation: (sources) => {
+        return new ConcatSequence(sources);
+    },
+});
 
 export default concat;
