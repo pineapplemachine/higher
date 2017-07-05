@@ -26,7 +26,7 @@ const asArray = function(limit, source){
     }
 };
 
-const array = wrap({
+export const array = wrap({
     name: "array",
     attachSequence: true,
     async: true,
@@ -50,7 +50,7 @@ const array = wrap({
     },
 });
 
-const newArray = wrap({
+export const newArray = wrap({
     name: "newArray",
     attachSequence: true,
     async: true,
@@ -73,7 +73,5 @@ const newArray = wrap({
         }
     },
 });
-
-export {newArray};
 
 export default array;
