@@ -1,6 +1,7 @@
-import Sequence from "../core/sequence";
+import {Sequence} from "../core/sequence";
+import {expecting, wrap} from "../core/wrap";
 
-const AssumeBoundedSequence = function(source){
+export const AssumeBoundedSequence = function(source){
     this.source = source;
     this.maskAbsentMethods(source);
 };
@@ -52,22 +53,20 @@ Object.assign(AssumeBoundedSequence.prototype, {
     },
 });
 
-/**
- * An AssumeBoundedSequence can be used to assure higher that a potentially
- * unbounded sequence is in fact bounded.
- * This may be helpful if you're sure a sequence that you want to fully
- * consume will eventually end, even if higher can't tell for itself.
- */
-const assumeBounded = (source) => {
-    return source.bounded() ? source : new AssumeBoundedSequence(source);
-};
-
-export const registration = {
-    name: "assumeBounded",
-    expected: {
-        sequences: 1,
+// An AssumeBoundedSequence can be used to assure higher that a potentially
+// unbounded sequence is in fact bounded.
+// This may be helpful if you're sure a sequence that you want to fully
+// consume will eventually end, even if higher can't tell for itself.
+export const assumeBounded = wrap({
+    name: "assumeBounded":
+    attachSequence: true,
+    async: false,
+    arguments: {
+        one: expecting.sequence
     },
-    implementation: assumeBounded,
-};
+    implementation: () => {
+        return source.bounded() ? source : new AssumeBoundedSequence(source);
+    },
+});
 
 export default assumeBounded;
