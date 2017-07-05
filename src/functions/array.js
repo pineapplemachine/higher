@@ -1,5 +1,6 @@
 import {isArray} from "../core/types";
 import {unboundedError} from "../core/internal/errors";
+import {expecting, wrap} from "../core/wrap";
 
 // Base implementation for array and newArray functions.
 const asArray = function(limit, source){
