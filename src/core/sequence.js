@@ -4,6 +4,24 @@ import {ArraySequence} from "./asSequence";
 
 const Sequence = function(){};
 
+// Accepts a fancy function wrapper object returned by the wrap function.
+// Attaches methods to the sequence prototype for method chaining.
+Sequence.attach = function(fancy){
+    if(fancy.method){
+        if(fancy.method.async){
+            for(const name of fancy.names){
+                Sequence.prototype[name] = fancy.method;
+                Sequence.prototype[name + "Async"] = fancy.method.async;
+            }
+        }else{
+            for(const name of fancy.names){
+                Sequence.prototype[name] = fancy.method;
+            }
+        }
+    }
+    return fancy;
+};
+
 Sequence.prototype[Symbol.iterator] = function(){
     return this;
 };
