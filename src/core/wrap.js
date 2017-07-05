@@ -1,5 +1,6 @@
 import args from "./arguments";
 import {asSequence, validAsSequence} from "./asSequence";
+import {Sequence} from "./sequence";
 import {isFunction, isIterable} from "./types";
 
 const expecting = {
@@ -45,6 +46,9 @@ const wrap = function(info){
         if(fancy.method){
             fancy.method.async = wrap.methodAsync(fancy.method);
         }
+    }
+    if(info.attachSequence){
+        Sequence.attach(fancy);
     }
     return fancy;
 };

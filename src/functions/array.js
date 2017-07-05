@@ -26,40 +26,54 @@ const asArray = function(limit, source){
     }
 };
 
-/**
- * Produce a fully in-memory array from the contents of a sequence.
- * Optionally accepts a numeric argument indicating the maximum number of
- * elements to output to the array.
- * Will throw an error if the function receives an unbounded sequence and
- * no length limit.
- * When the input is an array and the limit is either not set or is the
- * at least the length of that array, the array itself is returned.
- * @param {*} limit
- * @param {*} source
- */
-const array = (limit, source) => {
-    if(limit <= 0){
-        return [];
-    }else if(isArray(source)){
-        return (!limit || limit >= source.length ?
-            source : source.slice(limit)
-        );
-    }else{
-        return asArray(limit, source);
-    }
-};
-
-export const registration = {
+const array = wrap({
     name: "array",
-    expected: {
-        numbers: "?",
-        sequences: 1,
-        // Don't waste time coercing input iterables to sequences
-        allowIterables: true,
-        // Also generate an async version of this function
-        async: true,
+    attachSequence: true,
+    async: true,
+    arguments: {
+        unordered: {
+            allowIterables: true
+            numbers: "?",
+            sequences: 1,
+        }
     },
-    implementation: array,
-};
+    implementation: (limit, source) => {
+        if(limit <= 0){
+            return [];
+        }else if(isArray(source)){
+            return (!limit || limit >= source.length ?
+                source : source.slice(limit)
+            );
+        }else{
+            return asArray(limit, source);
+        }
+    },
+});
+
+const newArray = wrap({
+    name: "newArray",
+    attachSequence: true,
+    async: true,
+    arguments: {
+        unordered: {
+            allowIterables: true
+            numbers: "?",
+            sequences: 1,
+        }
+    },
+    implementation: (limit, source) => {
+        if(limit <= 0){
+            return [];
+        }else if(isArray(source)){
+            return (!limit || limit >= source.length ?
+                source.slice() : source.slice(limit)
+            );
+        }else{
+            return asArray(limit, source);
+        }
+    },
+});
+
+export {newArray};
 
 export default array;
