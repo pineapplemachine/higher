@@ -95,6 +95,9 @@ export const filter = wrap({
     name: "filter",
     attachSequence: true,
     async: false,
+    sequences: [
+        FilterSequence
+    ],
     arguments: {
         unordered: {
             functions: 1,

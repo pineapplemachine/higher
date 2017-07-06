@@ -7,6 +7,8 @@ import {isFunction, isIterable} from "./types";
 export const wrap = function(info){
     const fancy = wrap.fancy(info);
     fancy.names = fancy.names || [fancy.name];
+    fancy.sequences = info.sequences;
+    fancy.errors = info.errors;
     fancy.arguments = info.arguments;
     fancy.implementation = info.implementation;
     fancy.method = wrap.method(info);

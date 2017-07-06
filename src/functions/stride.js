@@ -142,6 +142,10 @@ export const stride = wrap({
     name: "stride",
     attachSequence: true,
     async: false,
+    sequences: [
+        PoppingStrideSequence,
+        IndexStrideSequence
+    ],
     arguments: {
         unordered: {
             numbers: 1,

@@ -51,6 +51,9 @@ export const recur = wrap({
     name: "recur",
     attachSequence: false,
     async: false,
+    sequences: [
+        RecurSequence
+    ],
     arguments: {
         one: wrap.expecting.function
     },

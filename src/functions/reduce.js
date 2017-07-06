@@ -117,6 +117,9 @@ export const reduce = wrap({
     names: ["reduce", "fold"],
     attachSequence: true,
     async: false,
+    sequences: [
+        ReduceSequence
+    ],
     arguments: {
         unordered: {
             functions: 1,

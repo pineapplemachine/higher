@@ -3,11 +3,6 @@ import {wrap} from "../core/wrap";
 
 import {EmptySequence} from "./empty";
 
-// Map sequence optimized for no input sequences.
-export const NullMapSequence = function(transform){
-    this.transform = transform;
-};
-
 // Map sequence optimized for one input sequence.
 export const SingularMapSequence = function(transform, source){
     this.source = source;
@@ -25,14 +20,14 @@ export const PluralMapSequence = function(transform, sources){
     }
 };
 
-NullMapSequence.prototype = Object.create(EmptySequence.prototype);
-NullMapSequence.prototype.constructor = NullMapSequence;
-
 SingularMapSequence.prototype = Object.create(Sequence.prototype);
 SingularMapSequence.prototype.constructor = SingularMapSequence;
 Object.assign(SingularMapSequence.prototype, {
     bounded: function(){
         return this.source.bounded();
+    },
+    unbounded: function(){
+        return this.source.unbounded();
     },
     done: function(){
         return this.source.done();
@@ -82,6 +77,12 @@ Object.assign(PluralMapSequence.prototype, {
     bounded: function(){
         for(const source of this.sources){
             if(!source.bounded()) return false;
+        }
+        return true;
+    },
+    unbounded: function(){
+        for(const source of this.sources){
+            if(!source.unbounded()) return false;
         }
         return true;
     },
@@ -161,6 +162,10 @@ export const map = wrap({
     name: "map",
     attachSequence: true,
     async: false,
+    sequences: [
+        SingularMapSequence,
+        PluralMapSequence
+    ],
     arguments: {
         unordered: {
             functions: 1,
@@ -172,7 +177,7 @@ export const map = wrap({
             // Most common use case
             return new SingularMapSequence(transform, sources[0]);
         }else if(sources.length === 0){
-            return new NullMapSequence(transform);
+            return new EmptySequence();
         }else{
             return new PluralMapSequence(transform, sources);
         }

@@ -225,6 +225,10 @@ export const pad = wrap({
     name: "pad",
     attachSequence: true,
     async: false,
+    sequences: [
+        PadLeftSequence,
+        PadRightSequence
+    ],
     arguments: {
         one: wrap.expecting.sequence
     },

@@ -122,6 +122,9 @@ export const concat = wrap({
     name: "concat",
     attachSequence: true,
     async: false,
+    sequences: [
+        ConcatSequence
+    ],
     arguments: {
         unordered: {
             sequences: "*"

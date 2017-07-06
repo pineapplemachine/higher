@@ -438,6 +438,10 @@ export const findAll = wrap({
     name: "findAll",
     attachSequence: true,
     async: false,
+    sequences: [
+        ForwardFindSequence,
+        BackwardFindSequence
+    ],
     arguments: {
         unordered: {
             functions: "?",

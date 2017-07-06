@@ -77,6 +77,9 @@ export const tap = wrap({
     name: "tap",
     attachSequence: true,
     async: false,
+    sequences: [
+        TapSequence
+    ],
     arguments: {
         unordered: {
             functions: 1,

@@ -82,6 +82,9 @@ export const until = wrap({
     name: "until",
     attachSequence: true,
     async: false,
+    sequences: [
+        UntilSequence
+    ],
     arguments: {
         unordered: {
             functions: 1,

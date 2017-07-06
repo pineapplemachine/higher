@@ -68,6 +68,9 @@ export const dropHead = wrap({
     name: "dropHead",
     attachSequence: true,
     async: false,
+    sequences: [
+        DropHeadSequence
+    ],
     arguments: {
         unordered: {
             numbers: 1,

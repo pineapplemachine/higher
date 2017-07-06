@@ -191,6 +191,10 @@ export const join = wrap({
     name: "join",
     attachSequence: true,
     async: false,
+    sequences: [
+        ForwardJoinSequence,
+        BackwardJoinSequence
+    ],
     arguments: {
         ordered: [wrap.expecting.sequence, wrap.expecting.sequence]
     },

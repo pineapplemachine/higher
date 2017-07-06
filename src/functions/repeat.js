@@ -238,6 +238,10 @@ export const repeat = wrap({
     name: "repeat",
     attachSequence: true,
     async: false,
+    sequences: [
+        FiniteRepeatSequence,
+        InfiniteRepeatSequence
+    ],
     arguments: {
         unordered: {
             numbers: "?",

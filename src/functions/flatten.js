@@ -109,6 +109,10 @@ export const flatten = wrap({
     name: "flatten",
     attachSequence: true,
     async: false,
+    sequences: [
+        ForwardFlattenSequence,
+        BackwardFlattenSequence
+    ],
     arguments: {
         one: wrap.expecting.sequence
     },

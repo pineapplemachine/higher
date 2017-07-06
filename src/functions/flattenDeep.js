@@ -9,6 +9,7 @@ export const FlattenDeepSequence = function(source){
     this.frontSource = source;
 };
 
+// TODO: Also write a backwards version of this sequence
 FlattenDeepSequence.prototype = Object.create(Sequence.prototype);
 FlattenDeepSequence.prototype.constructor = FlattenDeepSequence;
 Object.assign(FlattenDeepSequence.prototype, {
@@ -89,6 +90,9 @@ export const flattenDeep = wrap({
     name: "flattenDeep",
     attachSequence: true,
     async: false,
+    sequences: [
+        FlattenDeepSequence
+    ],
     arguments: {
         one: wrap.expecting.sequence
     },

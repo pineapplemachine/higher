@@ -184,6 +184,10 @@ export const split = wrap({
     name: "split",
     attachSequence: true,
     async: false,
+    sequences: [
+        ForwardSplitSequence,
+        BackwardSplitSequence
+    ],
     arguments: {
         unordered: {
             functions: "?",

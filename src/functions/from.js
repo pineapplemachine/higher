@@ -93,6 +93,9 @@ export const from = wrap({
     name: "from",
     attachSequence: true,
     async: false,
+    sequences: [
+        FromSequence
+    ],
     arguments: {
         unordered: {
             functions: 1,

@@ -64,6 +64,9 @@ export const dropTail = wrap({
     name: "dropTail",
     attachSequence: true,
     async: false,
+    sequences: [
+        DropTailSequence
+    ],
     arguments: {
         unordered: {
             numbers: 1,

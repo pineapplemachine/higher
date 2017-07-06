@@ -83,6 +83,9 @@ export const reverse = wrap({
     name: "reverse",
     attachSequence: true,
     async: false,
+    sequences: [
+        ReverseSequence
+    ],
     arguments: {
         one: wrap.expecting.sequence
     },

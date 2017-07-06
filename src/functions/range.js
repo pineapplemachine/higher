@@ -204,6 +204,11 @@ export const range = wrap({
     name: "range",
     attachSequence: false,
     async: false,
+    sequences: [
+        NumberRangeSequence,
+        ForwardNumberRangeSequence,
+        BackwardNumberRangeSequence
+    ],
     arguments: {
         unordered: {
             numbers: [1, 3]

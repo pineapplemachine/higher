@@ -154,6 +154,9 @@ export const shuffle = wrap({
     name: "shuffle",
     attachSequence: true,
     async: false,
+    sequences: [
+        ShuffleSequence
+    ],
     expected: {
         functions: "?",
         sequences: 1

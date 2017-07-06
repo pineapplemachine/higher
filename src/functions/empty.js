@@ -43,6 +43,9 @@ export const empty = wrap({
     arguments: {
         none: true
     },
+    sequences: [
+        EmptySequence
+    ],
     implementation: () => {
         return new EmptySequence();
     },

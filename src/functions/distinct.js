@@ -59,6 +59,9 @@ export const distinct = wrap({
     name: "distinct",
     attachSequence: true,
     async: false,
+    sequences: [
+        DistinctSequence
+    ],
     arguments: {
         one: wrap.expecting.sequence
     },

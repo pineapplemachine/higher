@@ -73,6 +73,9 @@ export const ngrams = wrap({
     name: "ngrams",
     attachSequence: true,
     async: false,
+    sequences: [
+        NgramSequence
+    ],
     arguments: {
         unordered: {
             numbers: 1,
@@ -85,30 +88,6 @@ export const ngrams = wrap({
         }else{
             return new NgramSequence(ngramSize, source);
         }
-    },
-});
-
-export const bigrams = wrap({
-    name: "bigrams",
-    attachSequence: true,
-    async: false,
-    arguments: {
-        one: wrap.expecting.sequence
-    },
-    implementation: (source) => {
-        return new NgramSequence(2, source);
-    },
-});
-
-export const trigrams = wrap({
-    name: "trigrams",
-    attachSequence: true,
-    async: false,
-    arguments: {
-        one: wrap.expecting.sequence
-    },
-    implementation: (source) => {
-        return new NgramSequence(3, source);
     },
 });
 

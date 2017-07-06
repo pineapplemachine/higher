@@ -137,6 +137,10 @@ export const repeatElement = wrap({
     name: "repeatElement",
     attachSequence: false,
     async: false,
+    sequences: [
+        FiniteRepeatElementSequence,
+        InfiniteRepeatElementSequence
+    ],
     arguments: {
         ordered: [wrap.expecting.anything, wrap.expecting.number]
     },

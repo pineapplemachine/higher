@@ -78,6 +78,9 @@ export const enumerate = wrap({
     name: "enumerate",
     attachSequence: true,
     async: false,
+    sequences: [
+        EnumerateSequence
+    ],
     arguments: {
         unordered: {
             numbers: [0, 2],

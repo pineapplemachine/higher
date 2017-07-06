@@ -68,6 +68,9 @@ export const one = wrap({
     name: "one",
     attachSequence: false,
     async: false,
+    sequences: [
+        OneElementSequence
+    ],
     arguments: {
         one: wrap.expecting.anything
     },

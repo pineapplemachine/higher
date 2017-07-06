@@ -3,7 +3,7 @@ import {unboundedError} from "../core/internal/errors";
 import {wrap} from "../core/wrap";
 
 // Base implementation for array and newArray functions.
-const asArray = function(limit, source){
+export const asArray = function(limit, source){
     if(!limit){
         if(!source.bounded()){
             throw unboundedError("write", "array");

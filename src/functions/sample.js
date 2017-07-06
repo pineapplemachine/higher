@@ -139,6 +139,10 @@ export const sample = wrap({
     name: "sample",
     attachSequence: true,
     async: false,
+    sequences: [
+        SampleSequence,
+        DistinctRandomIndexSequence
+    ],
     arguments: {
         unordered: {
             numbers: "?",
