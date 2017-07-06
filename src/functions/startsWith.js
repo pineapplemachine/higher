@@ -1,5 +1,5 @@
-import {wrap} from "../core/wrap";
 import {asSequence, canGetLength, getLength} from "../core/asSequence";
+import {wrap} from "../core/wrap";
 
 // Determine equality of one or more sequences given a comparison function.
 // When only one sequence is given as input, the output is always true.

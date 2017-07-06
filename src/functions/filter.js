@@ -1,6 +1,7 @@
-import Sequence from "../core/sequence";
+import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
 
-const FilterSequence = function(predicate, source, initialize = true){
+export const FilterSequence = function(predicate, source, initialize = true){
     this.predicate = predicate;
     this.source = source;
     this.maskAbsentMethods(source);
@@ -88,19 +89,21 @@ Object.assign(FilterSequence.prototype, {
     },
 });
 
-const filter = (predicate, source) => {
-    return new FilterSequence(predicate, source);
-};
-
-export {FilterSequence};
-
-export const registration = {
+// Produce a new sequence enumerating only those elements of an input sequence
+// which satisfy a predicate function.
+export const filter = wrap({
     name: "filter",
-    expected: {
-        functions: 1,
-        sequences: 1,
+    attachSequence: true,
+    async: false,
+    arguments: {
+        unordered: {
+            functions: 1,
+            sequences: 1
+        }
     },
-    implementation: filter,
-};
+    implementation: (predicate, source) => {
+        return new FilterSequence(predicate, source);
+    },
+});
 
 export default filter;
