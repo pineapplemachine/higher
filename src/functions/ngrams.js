@@ -1,7 +1,9 @@
-import Sequence from "../core/sequence";
-import {EmptySequence} from "./empty";
+import {Sequence} from "../core/sequence";
+import {expecting, wrap} from "../core/wrap";
 
-const NgramSequence = function(ngramSize, source, currentNgram = null){
+import {InfiniteRepeatElementSequence} from "./repeatElement";
+
+export const NgramSequence = function(ngramSize, source, currentNgram = null){
     this.ngramSize = Math.floor(+ngramSize);
     this.source = source;
     this.currentNgram = currentNgram || [];
@@ -67,58 +69,47 @@ Object.assign(NgramSequence.prototype, {
     },
 });
 
-/**
- *
- * @param {*} ngramSize
- * @param {*} source
- */
-const ngrams = (ngramSize, source) => {
-    if(ngramSize < 1){
-        return new EmptySequence();
-    }else{
-        return new NgramSequence(ngramSize, source);
-    }
-};
-
-export const registrationNgrams = {
+export const ngrams = wrap({
     name: "ngrams",
-    expected: {
-        numbers: 1,
-        sequences: 1,
+    attachSequence: true,
+    async: false,
+    arguments: {
+        unordered: {
+            numbers: 1,
+            sequences: 1
+        }
     },
-    implementation: ngrams,
-};
+    implementation: (ngramSize, source) => {
+        if(ngramSize < 1){
+            return new InfiniteRepeatElementSequence([]);
+        }else{
+            return new NgramSequence(ngramSize, source);
+        }
+    },
+});
 
-/**
- *
- * @param {*} source
- */
-const bigrams = (source) => {
-    return new NgramSequence(2, source);
-};
-
-export const registrationBigrams = {
+export const bigrams = wrap({
     name: "bigrams",
-    expected: {
-        sequences: 1,
+    attachSequence: true,
+    async: false,
+    arguments: {
+        one: expecting.sequence
     },
-    implementation: bigrams,
-};
+    implementation: (source) => {
+        return new NgramSequence(2, source);
+    },
+});
 
-/**
- *
- * @param {*} source
- */
-const trigrams = (source) => {
-    return new NgramSequence(3, source);
-};
-
-export const registrationTrigrams = {
+export const trigrams = wrap({
     name: "trigrams",
-    expected: {
-        sequences: 1,
+    attachSequence: true,
+    async: false,
+    arguments: {
+        one: expecting.sequence
     },
-    implementation: trigrams,
-};
+    implementation: (source) => {
+        return new NgramSequence(3, source);
+    },
+});
 
-export default {ngrams, bigrams, trigrams};
+export default ngrams;

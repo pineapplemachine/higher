@@ -1,7 +1,8 @@
-import Sequence from "../core/sequence";
+import {Sequence} from "../core/sequence";
 import {FiniteRepeatElementSequence} from "./repeatElement";
+import {expecting, wrap} from "../core/wrap";
 
-const PadLeftSequence = function(
+export const PadLeftSequence = function(
     source, padElement, padTotal, padCount = undefined
 ){
     this.source = source;
@@ -11,7 +12,7 @@ const PadLeftSequence = function(
     this.maskAbsentMethods(source);
 };
 
-const PadRightSequence = function(
+export const PadRightSequence = function(
     source, padElement, padTotal, padCount = undefined
 ){
     this.source = source;
@@ -168,7 +169,7 @@ Object.assign(PadRightSequence.prototype, {
     },
 });
 
-const SequencePadder = function(source){
+export const SequencePadder = function(source){
     this.source = source;
 };
 
@@ -181,12 +182,13 @@ Object.assign(SequencePadder.prototype, {
         }
         if(!this.source.length) this.source.forceEager();
         const sourceLength = this.source.length();
-        if(sourceLength >= length){
+        const targetLength = +length;
+        if(sourceLength >= targetLength){
             return this.source;
         }else if(sourceLength === 0){
-            return new FiniteRepeatElementSequence(length, element);
+            return new FiniteRepeatElementSequence(targetLength, element);
         }else{
-            return this.leftCount(length - sourceLength, element);
+            return this.leftCount(targetLength - sourceLength, element);
         }
     },
     leftCount: function(count, element){
@@ -202,12 +204,13 @@ Object.assign(SequencePadder.prototype, {
         }
         if(!this.source.length) this.source.forceEager();
         const sourceLength = this.source.length();
-        if(sourceLength >= length){
+        const targetLength = +length;
+        if(sourceLength >= targetLength){
             return this.source;
         }else if(sourceLength === 0){
-            return new FiniteRepeatElementSequence(length, element);
+            return new FiniteRepeatElementSequence(targetLength, element);
         }else{
-            return this.rightCount(length - sourceLength, element);
+            return this.rightCount(targetLength - sourceLength, element);
         }
     },
     rightCount: function(count, element){
@@ -217,20 +220,16 @@ Object.assign(SequencePadder.prototype, {
     },
 });
 
-/**
- *
- * @param {*} source
- */
-const pad = (source) => {
-    return new SequencePadder(source);
-};
-
-export const registration = {
+export const pad = wrap({
     name: "pad",
-    expected: {
-        sequences: 1,
+    attachSequence: true,
+    async: false,
+    arguments: {
+        one: expecting.sequence
     },
-    implementation: pad,
-};
+    implementation: (source) => {
+        return new SequencePadder(source);
+    },
+});
 
 export default pad;
