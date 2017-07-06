@@ -7,7 +7,7 @@ export const time = wrap({
     arguments: {
         ordered: [expecting.function] // + ...args
     },
-    implementation: (performance ?
+    implementation: (typeof performance === "undefined" ?
         (call, ...args) => {
             const start = performance.now();
             call(...args);

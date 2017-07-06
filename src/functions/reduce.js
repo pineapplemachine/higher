@@ -1,4 +1,5 @@
 import {asSequence, validAsBoundedSequence} from "../core/asSequence";
+import {callAsync} from "../core/callAsync";
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
@@ -48,7 +49,7 @@ Object.assign(ReduceSequence.prototype, {
     },
     lastAsync: function(fallback = undefined){
         return new hi.Promise((resolve, reject) => {
-            hi.callAsync(() => resolve(this.last(fallback)));
+            callAsync(() => resolve(this.last(fallback)));
         });
     },
     seed: function(value){

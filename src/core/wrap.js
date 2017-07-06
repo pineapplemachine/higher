@@ -1,5 +1,6 @@
 import {args} from "./arguments";
 import {asSequence, validAsSequence} from "./asSequence";
+import {callAsync} from "./callAsync";
 import {Sequence} from "./sequence";
 import {isFunction, isIterable} from "./types";
 
@@ -252,7 +253,7 @@ Object.assign(wrap, {
     async: function(callback){
         return function(...callArgs){
             return new hi.Promise((resolve, reject) => {
-                hi.callAsync(() => resolve(callback(this, callArgs)));
+                callAsync(() => resolve(callback(this, callArgs)));
             });
         };
     },
