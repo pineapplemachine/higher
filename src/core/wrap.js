@@ -36,11 +36,12 @@ export const expecting = {
 };
 
 export const wrap = function(info){
-    const fancy = wrap.fancy(info.arguments, info.implementation);
+    const fancy = wrap.fancy(info);
     fancy.names = fancy.names || [fancy.name];
     fancy.arguments = info.arguments;
     fancy.implementation = info.implementation;
-    fancy.method = wrap.method(info.arguments, info.implementation);
+    fancy.method = wrap.method(info);
+    fancy.method.implementation = info.methodImplementation;
     if(info.async){
         fancy.async = wrap.fancyAsync(fancy);
         if(fancy.method){
@@ -170,7 +171,7 @@ Object.assign(wrap, {
         )){
             return null;
         }
-        const implementation = info.implementation;
+        const implementation = info.implementation || info.methodImplementation;
         return function(){
             return implementation(this);
         }
@@ -184,7 +185,7 @@ Object.assign(wrap, {
             // Not applicable as a method in this case
             return null;
         }
-        const implementation = info.implementation;
+        const implementation = info.implementation || info.methodImplementation;
         return function(...callArgs){
             const argsCount = Math.min(
                 callArgs.length, info.arguments.ordered.length - 1
@@ -196,7 +197,7 @@ Object.assign(wrap, {
         };
     },
     methodUnordered: function(info){
-        const implementation = info.implementation;
+        const implementation = info.implementation || info.methodImplementation;
         const expected = info.arguments.unordered;
         if(args.expectNone(expected.sequences)){
             return null;
