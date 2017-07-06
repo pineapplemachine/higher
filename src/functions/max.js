@@ -1,31 +1,32 @@
-import reduce from "./reduce";
+import {wrap} from "../core/wrap";
 
-/**
- * Get the maximum value in a sequence as judged by a comparison function.
- * If no comparison function is provided, then (a, b) => (a < b) is used.
- * @param {*} relate
- * @param {*} source
- * @returns `undefined` when the input sequence was empty.
- */
-const max = (relate, source) => {
-    const combine = (relate ?
-        (a, b) => (relate(b, a) ? a : b) :
-        (a, b) => (b < a ? a : b)
-    );
-    return reduce(combine, source).last();
-};
-
-export const registration = {
+// Get the maximum value in a sequence as judged by a relational function.
+// If no relational function is provided, then (a, b) => (a < b) is used.
+export const max = wrap({
     name: "max",
-    expected: {
-        functions: 1,
-        sequences: 1,
-        // Don't waste time coercing input iterables to sequences
-        allowIterables: true,
-        // Also generate an async version of this function
-        async: true,
+    attachSequence: true,
+    async: true,
+    arguments: {
+        unordered: {
+            functions: 1,
+            sequences: 1,
+            allowIterables: true
+        }
     },
-    implementation: max,
-};
+    implementation: (relate, source) => {
+        const relateFunc = relate || hi.defaultRelationalFunction;
+        let max = undefined;
+        let first = true;
+        for(const element of source){
+            if(first){
+                max = element;
+                first = false;
+            }else if(relateFunc(max, element)){
+                max = element;
+            }
+        }
+        return max;
+    },
+});
 
 export default max;

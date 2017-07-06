@@ -1,31 +1,32 @@
-import reduce from "./reduce";
+import {wrap} from "../core/wrap";
 
-/**
- * Get the minimum value in a sequence as judged by a comparison function.
- * If no comparison function is provided, then (a, b) => (a < b) is used.
- * @param {*} relate
- * @param {*} source
- * @returns `undefined` when the input sequence was empty.
- */
-const min = (relate, source) => {
-    const combine = (relate ?
-        (a, b) => (relate(a, b) ? a : b) :
-        (a, b) => (a < b ? a : b)
-    );
-    return reduce(combine, source).last();
-};
-
-export const registration = {
+// Get the minimum value in a sequence as judged by a relational function.
+// If no relational function is provided, then (a, b) => (a < b) is used.
+export const min = wrap({
     name: "min",
-    expected: {
-        functions: 1,
-        sequences: 1,
-        // Don't waste time coercing input iterables to sequences
-        allowIterables: true,
-        // Also generate an async version of this function
-        async: true,
+    attachSequence: true,
+    async: true,
+    arguments: {
+        unordered: {
+            functions: 1,
+            sequences: 1,
+            allowIterables: true
+        }
     },
-    implementation: min,
-};
+    implementation: (relate, source) => {
+        const relateFunc = relate || hi.defaultRelationalFunction;
+        let min = undefined;
+        let first = true;
+        for(const element of source){
+            if(first){
+                min = element;
+                first = false;
+            }else if(relateFunc(element, min)){
+                min = element;
+            }
+        }
+        return min;
+    },
+});
 
 export default min;
