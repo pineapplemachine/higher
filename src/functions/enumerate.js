@@ -1,4 +1,5 @@
 import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
 
 export const EnumerateSequence = function(
     source, start = 0, step = 1,

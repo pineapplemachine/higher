@@ -1,12 +1,26 @@
-// Get a head sequence if the input is not known to be bounded, otherwise
-// return that sequence.
-hi.register("limit", {
-    numbers: "?",
-    sequences: 1,
-}, function(length, source){
-    if(source.bounded()){
-        return source;
-    }else{
-        return source.head(isNaN(length) ? hi.defaultLimitLength : length);
-    }
+import {wrap} from "../core/wrap";
+
+import {HeadSequence} from "./head";
+
+export const limit = wrap({
+    name: "limit",
+    attachSequence: true,
+    async: false,
+    arguments: {
+        unordered: {
+            numbers: 1,
+            sequences: 1
+        }
+    },
+    implementation: (length, source) => {
+        if(source.bounded()){
+            return source;
+        }else{
+            return new HeadSequence(
+                isNaN(length) ? hi.defaultLimitLength : length, source
+            );
+        }
+    },
 });
+
+export default limit;
