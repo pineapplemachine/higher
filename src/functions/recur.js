@@ -1,8 +1,9 @@
-import Sequence from "../core/sequence";
-import {isFunction} from "../core/types";
+import {Sequence} from "../core/sequence";
+import {expecting, wrap} from "../core/wrap";
 
-// Result of calling range with a step of greater than 0.
-const RecurSequence = function(transform, seedValue = null, frontValue = null){
+export const RecurSequence = function(
+    transform, seedValue = null, frontValue = null
+){
     this.transform = transform;
     this.seedValue = seedValue;
     this.frontValue = frontValue;
@@ -44,23 +45,18 @@ Object.assign(RecurSequence.prototype, {
     },
 });
 
-
-/**
- * Create a sequence enumerating numbers in a linear range.
- * When one number is passed, it is an exclusive upper bound.
- * When two numbers are passed, they are the inclusive lower and exclusive
- * higher bounds, respectively.
- * When three numbers are passed they are the lower and higher bounds and
- * the step from one value to the next, respectively.
- * The step is 1 by default but fractical, negative, and zero values are
- * also accepted.
- * @param {*} transform
- */
-const recur = (transform) => {
-    if(!isFunction(transform)) throw (
-        "Failed to create recur sequence: Input must be a function."
-    );
-    return new RecurSequence(transform);
-};
+// Produce a sequence via repeated application of a transformation function
+// to some seed value.
+export const recur = wrap({
+    name: "recur",
+    attachSequence: false,
+    async: false,
+    arguments: {
+        one: expecting.function
+    },
+    implementation: (transform) => {
+        return new RecurSequence(transform);
+    },
+});
 
 export default recur;

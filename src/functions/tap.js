@@ -1,6 +1,7 @@
-import Sequence from "../core/sequence";
+import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
 
-const TapSequence = function(callback, source){
+export const TapSequence = function(callback, source){
     this.callback = callback;
     this.source = source;
     this.frontValue = null;
@@ -70,22 +71,21 @@ Object.assign(TapSequence.prototype, {
     },
 });
 
-/**
- *
- * @param {*} callback
- * @param {*} source
- */
-const tap = (callback, source) => {
-    return new TapSequence(callback, source);
-};
-
-export const registration = {
+// Like each, except the callbacks are invoked as the sequence is consumed,
+// as opposed to the sequence being consumed immediately.
+export const tap = wrap({
     name: "tap",
-    expected: {
-        functions: 1,
-        sequences: 1,
+    attachSequence: true,
+    async: false,
+    arguments: {
+        unordered: {
+            functions: 1,
+            sequences: 1
+        }
     },
-    implementation: tap,
-};
+    implementation: (callback, source) => {
+        return new TapSequence(callback, source);
+    },
+});
 
 export default tap;

@@ -1,9 +1,11 @@
-import Sequence from "../core/sequence";
+import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
+
 import {ArraySequence} from "../core/asSequence";
 
 // https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_.22inside-out.22_algorithm
 
-const ShuffleSequence = function(
+export const ShuffleSequence = function(
     random, source, shuffledSource = undefined,
     lowIndex = undefined, highIndex = undefined,
     frontIndex = undefined, backIndex = undefined
@@ -141,30 +143,24 @@ Object.assign(ShuffleSequence.prototype, {
     },
 });
 
-/**
- * Shuffle the elements of an input, generating a new sequence containing
- * the same elements but in a randomly-determined order.
- * The random function must return a new random number that is at least 0 and
- * less than 1 on each call.
- * The produced sequence has the same interface as any other, but note that
- * the first time many of its properties are accessed (e.g. front, back)
- * the source sequence must be immediately entirely consumed.
- * @param {*} random
- * @param {*} source
- */
-const shuffle = (random, source) => {
-    return new ShuffleSequence(random || Math.random, source);
-};
-
-export const registration = {
+// Shuffle the elements of an input, generating a new sequence containing
+// the same elements but in a randomly-determined order.
+// The random function must return a new random number that is at least 0 and
+// less than 1 on each call.
+// The produced sequence has the same interface as any other, but note that
+// the first time many of its properties are accessed (e.g. front, back)
+// the source sequence must be immediately entirely consumed.
+export const shuffle = wrap({
     name: "shuffle",
+    attachSequence: true,
+    async: false,
     expected: {
         functions: "?",
-        sequences: 1,
+        sequences: 1
     },
-    implementation: shuffle,
-};
-
-export {ShuffleSequence};
+    implementation: (random, source) => {
+        return new ShuffleSequence(random || Math.random, source);
+    },
+});
 
 export default shuffle;

@@ -1,18 +1,23 @@
 import {asSequence} from "../core/asSequence";
-import map from "./map";
+import {wrap} from "../core/wrap";
 
-/**
- * Simple abstraction of plural map function.
- */
-const zip = () => {
-    const sequences = [];
-    for(const argument of arguments){
-        sequences.push(asSequence(argument));
-    }
-    const transform = function(){
-        return Array.prototype.slice.call(arguments);
-    };
-    return map(transform, sequences);
-};
+import {map} from "./map";
+
+export const zipTransform = (...args) => (args);
+
+// Simple abstraction of plural map function.
+export const zip = wrap({
+    name: "zip",
+    attachSequence: true,
+    async: false,
+    arguments: {
+        unordered: {
+            sequences: "*"
+        }
+    },
+    implementation: (sources) => {
+        return map.implementation(zipTransform, sources);
+    },
+});
 
 export default zip;

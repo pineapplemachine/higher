@@ -1,34 +1,31 @@
-/**
- *
- * @param {*} compare
- * @param {*} source
- */
-const homogenous = (compare, source) => {
-    const compareFunc = compare || hi.defaultComparisonFunction;
-    let first = true;
-    let firstElement = null;
-    for(const element of source){
-        if(first){
-            firstElement = element;
-            first = false;
-        }else if(!compareFunc(element, firstElement)){
-            return false;
-        }
-    }
-    return true;
-};
+import {constants} from "../core/constants";
+import {wrap} from "../core/wrap";
 
-export const registration = {
+export const homogenous = wrap({
     name: "homogenous",
-    expected: {
-        functions: "?",
-        sequences: 1,
-        // Don't waste time coercing input iterables to sequences
-        allowIterables: true,
-        // Also generate an async version of this function
-        async: true,
+    attachSequence: true,
+    async: true,
+    arguments: {
+        unordered: {
+            functions: 1,
+            sequences: 1,
+            allowIterables: true
+        }
     },
-    implementation: homogenous,
-};
+    implementation: (compare, source) => {
+        const compareFunc = compare || constants.defaults.comparisonFunction;
+        let first = true;
+        let firstElement = null;
+        for(const element of source){
+            if(first){
+                firstElement = element;
+                first = false;
+            }else if(!compareFunc(element, firstElement)){
+                return false;
+            }
+        }
+        return true;
+    },
+});
 
 export default homogenous;

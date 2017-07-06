@@ -1,7 +1,9 @@
-import Sequence from "../core/sequence";
+import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
+
 import {EmptySequence} from "./empty";
 
-const FiniteRepeatSequence = function(
+export const FiniteRepeatSequence = function(
     repetitions, source, frontSource = undefined, backSource = undefined
 ){
     // Input sequence must be copyable.
@@ -26,7 +28,7 @@ const FiniteRepeatSequence = function(
     if(repetitions <= 1) this.collapseBreak = null;
 };
 
-const InfiniteRepeatSequence = function(source, frontSource = null, backSource = null){
+export const InfiniteRepeatSequence = function(source, frontSource = null, backSource = null){
     if(!source.copy){
         throw "Error repeating sequence: Only copyable sequences can be repeated.";
     }
@@ -34,10 +36,6 @@ const InfiniteRepeatSequence = function(source, frontSource = null, backSource =
     this.frontSource = frontSource;
     this.backSource = backSource;
     this.maskAbsentMethods(source);
-};
-
-const NullRepeatSequence = function(source){
-    this.source = source;
 };
 
 FiniteRepeatSequence.prototype = Object.create(Sequence.prototype);
@@ -236,40 +234,28 @@ Object.assign(InfiniteRepeatSequence.prototype, {
     },
 });
 
-NullRepeatSequence.prototype = Object.create(EmptySequence.prototype);
-NullRepeatSequence.prototype.constructor = NullRepeatSequence;
-Object.assign(NullRepeatSequence.prototype, {
-    repetitions: 0,
-    slice: function(i, j){
-        return new NullRepeatSequence(this.source);
-    },
-    copy: function(){
-        return new NullRepeatSequence(this.source);
-    },
-});
-
-export {FiniteRepeatSequence, InfiniteRepeatSequence, NullRepeatSequence};
-
-export default {
+export const repeat = wrap({
     name: "repeat",
-    expected: {
-        numbers: "?",
-        sequences: 1,
+    attachSequence: true,
+    async: false,
+    arguments: {
+        unordered: {
+            numbers: "?",
+            sequences: 1
+        }
     },
-    function(repetitions, source){
+    implementation: (repetitions, source) => {
         if(repetitions <= 0 && repetitions !== null){
-            return new NullRepeatSequence(source);
+            return new EmptySequence();
         }else if(source.unbounded()){
             return source;
         }
-        if(!source.copy){
-            source.forceEager();
-            console.log(source);
-        }
+        // Source sequence must be copyable to be repeatable.
+        if(!source.copy) source.forceEager();
         if(repetitions && isFinite(repetitions)){
             return new FiniteRepeatSequence(repetitions, source);
         }else{
             return new InfiniteRepeatSequence(source);
         }
     },
-};
+});

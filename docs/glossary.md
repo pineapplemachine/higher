@@ -2,6 +2,16 @@
 
 Because who can remember what all these terms mean?
 
+### Combination function
+
+A combination function is one accepting exactly two argments and reducing them
+to one return value.
+The `reduce` higher-order function accepts a combination function; it combines an initial two elements and then combines each element with the combination preceding it. This functionality could be used, for example, to accumulate a sum of the values in a sequence. (Though for that particular case you probably ought to use one of higher's own summation functions.)
+
+``` js
+const combine = (a, b) => (a + b);
+```
+
 ### Comparison function
 
 A comparison function is one accepting exactly two arguments (here named `a` and `b` for the sake of example) which returns a truthy value when `a` is equivalent to `b` and a falsey value otherwise.
