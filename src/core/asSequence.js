@@ -1,38 +1,31 @@
-import {isArray, isFunction, isIterable, isObject, isSequence, isString} from "./types";
-import Sequence from "./sequence";
+import {isArray, isFunction, isIterable, isObject, isString} from "./types";
+import {isSequence, Sequence} from "./sequence";
 
-/**
- * Check whether a value is a sequence or can be coerced to a sequence type.
- * @param {*} value
- */
-function validAsSequence(value){
+// Check whether a value is a sequence or can be coerced to a sequence type.
+export const validAsSequence = (value) => {
     return isIterable(value) || isObject(value);
 }
 
-function validAsBoundedSequence(value){
+export const validAsBoundedSequence = (value) => {
     return (
         (isSequence(value) && value.bounded()) ||
         isArray(value) || isString(value) || isObject(value)
     );
 }
 
-function canGetLength(source){
+export const canGetLength = (source) => {
     return isString(source) || "length" in source;
 }
 
-function getLength(source){
+export const getLength = (source) => {
     if(isFunction(source.length)) return source.length();
     else return source.length;
 }
 
-/**
- * Get an array, string, iterable, or object as a sequence.
- * If it receives a sequences as input, returns that sequence.
- * For all other inputs an error is thrown.
- * TODO: Perhaps strings shouldn't be automatically converted to sequences?
- * @param {*} source
- */
-function asSequence(source){
+// Get an array, string, iterable, or object as a sequence.
+// If it receives a sequences as input, returns that sequence.
+// For all other inputs an error is thrown.
+export const asSequence = (source) => {
     if(isSequence(source)){
         return source;
     }else if(isArray(source)){
@@ -51,16 +44,11 @@ function asSequence(source){
     }
 }
 
-/**
- * Get a sequence for enumerating the elements of an array.
- * Optionally accepts an inclusive start index and an exclusive end index.
- * When start and end indexes aren't given, the sequence enumerates the
- * entire contents of the array.
- * @param {*} source
- * @param {*} low
- * @param {*} high
- */
-function ArraySequence(source, low, high){
+// Get a sequence for enumerating the elements of an array.
+// Optionally accepts an inclusive start index and an exclusive end index.
+// When start and end indexes aren't given, the sequence enumerates the
+// entire contents of the array.
+export const ArraySequence = function(source, low, high){
     this.source = source;
     this.lowIndex = isNaN(low) ? 0 : low;
     this.highIndex = isNaN(high) ? source.length : high;
@@ -153,16 +141,11 @@ Object.assign(ArraySequence.prototype, {
     },
 });
 
-/**
- * Get a sequence for enumerating the characters in a string.
- * Optionally accepts an inclusive start index and an exclusive end index.
- * When start and end indexes aren't given, the sequence enumerates the
- * entire contents of the string.
- * @param {*} source
- * @param {*} low
- * @param {*} high
- */
-function StringSequence(source, low, high){
+// Get a sequence for enumerating the characters in a string.
+// Optionally accepts an inclusive start index and an exclusive end index.
+// When start and end indexes aren't given, the sequence enumerates the
+// entire contents of the string.
+export const StringSequence = function(source, low, high){
     this.source = source;
     this.lowIndex = isNaN(low) ? 0 : low;
     this.highIndex = isNaN(high) ? source.length : high;
@@ -232,15 +215,11 @@ Object.assign(StringSequence.prototype, {
     },
 });
 
-/**
- * Get a sequence that enumerates the key, value pairs of an arbitrary object.
- * Optionally accepts an array of keys indicating which keys of the object
- * should be enumerated. When not explicitly provided, the sequence enumerates
- * key, value pairs for all of the object's own keys.
- * @param {*} source
- * @param {*} keys
- */
-function ObjectSequence(source, keys){
+// Get a sequence that enumerates the key, value pairs of an arbitrary object.
+// Optionally accepts an array of keys indicating which keys of the object
+// should be enumerated. When not explicitly provided, the sequence enumerates
+// key, value pairs for all of the object's own keys.
+export const ObjectSequence = function(source, keys){
     this.source = source;
     this.keys = keys || Object.keys(source);
     this.keyIndex = 0;
@@ -288,14 +267,11 @@ Object.assign(ObjectSequence.prototype, {
     },
 });
 
-/**
- * Get a sequence that enumerates the items of an iterable.
- * An iterable is anything with a "next" method returning an object with two
- * attributes, "done" being a boolean indicating when the iterator has been
- * fully consumed and "value" being the current element of the iterator.
- * @param {*} source
- */
-function IterableSequence(source){
+// Get a sequence that enumerates the items of an iterable.
+// An iterable is anything with a "next" method returning an object with two
+// attributes, "done" being a boolean indicating when the iterator has been
+// fully consumed and "value" being the current element of the iterator.
+export const IterableSequence = function(source){
     this.source = source;
     this.item = source.next();
 }
@@ -325,14 +301,4 @@ Object.assign(IterableSequence.prototype, {
     reset: null,
 });
 
-export {
-    validAsSequence,
-    validAsBoundedSequence,
-    canGetLength,
-    getLength,
-    asSequence,
-    ArraySequence,
-    StringSequence,
-    ObjectSequence,
-    IterableSequence,
-};
+export default asSequence;

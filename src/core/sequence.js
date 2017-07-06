@@ -1,8 +1,12 @@
 import {unboundedError, collapseCopyError} from "./internal/errors";
-import {isArray, isSequence} from "./types";
+import {isArray} from "./types";
 import {ArraySequence} from "./asSequence";
 
 export const Sequence = function(){};
+
+export const isSequence = (value) => {
+    return value instanceof Sequence;
+};
 
 // Accepts a fancy function wrapper object returned by the wrap function.
 // Attaches methods to the sequence prototype for method chaining.
