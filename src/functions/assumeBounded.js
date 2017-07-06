@@ -67,7 +67,7 @@ export const assumeBounded = wrap({
     arguments: {
         one: wrap.expecting.sequence
     },
-    implementation: () => {
+    implementation: (source) => {
         return source.bounded() ? source : new AssumeBoundedSequence(source);
     },
 });

@@ -1,4 +1,5 @@
 import {callAsync} from "./callAsync";
+import {constants} from "./constants";
 import {unboundedError, collapseCopyError} from "./errors";
 import {isArray} from "./types";
 import {ArraySequence} from "./asSequence";
@@ -132,7 +133,7 @@ Sequence.prototype.collapse = function(limit = -1){
     return source;
 };
 Sequence.prototype.collapseAsync = function(limit = -1){
-    return new hi.Promise((resolve, reject) => {
+    return new constants.Promise((resolve, reject) => {
         callAsync(function(){
             resolve(this.collapse(limit));
         });

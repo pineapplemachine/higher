@@ -1,18 +1,21 @@
 import {args} from "./arguments";
 import {asSequence, validAsSequence} from "./asSequence";
 import {callAsync} from "./callAsync";
+import {constants} from "./constants";
 import {Sequence} from "./sequence";
 import {isFunction, isIterable} from "./types";
 
 export const wrap = function(info){
     const fancy = wrap.fancy(info);
-    fancy.names = fancy.names || [fancy.name];
+    fancy.names = info.names || [info.name];
     fancy.sequences = info.sequences;
     fancy.errors = info.errors;
-    fancy.arguments = info['arguments']; // TODO: Possibly rename this attribute
+    fancy.args = info.arguments;
     fancy.implementation = info.implementation;
     fancy.method = wrap.method(info);
-    fancy.method.implementation = info.methodImplementation || info.implementation;
+    if(fancy.method){
+        fancy.method.implementation = info.methodImplementation || info.implementation;
+    }
     if(info.async){
         fancy.async = wrap.fancyAsync(fancy);
         if(fancy.method){
@@ -73,7 +76,7 @@ Object.assign(wrap, {
     },
     fancyOne: function(info){
         const implementation = info.implementation;
-        const validate = info.one;
+        const validate = info.arguments.one;
         if(info.one === wrap.expecting.anything){
             return implementation;
         }else{
@@ -167,9 +170,9 @@ Object.assign(wrap, {
     },
     methodOne: function(info){
         if(!(
-            info.ordered[0] === expected.iterable ||
-            info.ordered[0] === expected.sequence ||
-            info.ordered[0] === expected.anything
+            info.arguments.one === wrap.expecting.iterable ||
+            info.arguments.one === wrap.expecting.sequence ||
+            info.arguments.one === wrap.expecting.anything
         )){
             return null;
         }
@@ -180,9 +183,9 @@ Object.assign(wrap, {
     },
     methodOrdered: function(info){
         if(!(
-            info.ordered[0] === expected.iterable ||
-            info.ordered[0] === expected.sequence ||
-            info.ordered[0] === expected.anything
+            info.arguments.ordered[0] === wrap.expecting.iterable ||
+            info.arguments.ordered[0] === wrap.expecting.sequence ||
+            info.arguments.ordered[0] === wrap.expecting.anything
         )){
             // Not applicable as a method in this case
             return null;
@@ -223,19 +226,19 @@ Object.assign(wrap, {
                     }
                 };
                 if(numbers === 1 || functions === 1){
-                    return (...callArgs) => {
+                    return function(...callArgs){
                         validate(callArgs);
                         return implementation(callArgs[0], this);
                     };
                 }else{
-                    return (...callArgs) => {
+                    return function(...callArgs){
                         validate(callArgs);
                         return implementation(callArgs, this);
                     };
                 }
             }
         }else{
-            return (...callArgs) => {
+            return function(...callArgs){
                 Array.prototype.splice.call(callArgs, 0, 0, this);
                 return args.validate(
                     expected, callArgs, implementation, function(error){
@@ -253,7 +256,7 @@ Object.assign(wrap, {
     },
     async: function(callback){
         return function(...callArgs){
-            return new hi.Promise((resolve, reject) => {
+            return new constants.Promise((resolve, reject) => {
                 callAsync(() => resolve(callback(this, callArgs)));
             });
         };

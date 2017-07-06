@@ -22,12 +22,10 @@ Object.assign(hi, {
                 }
             }
             if(fancy.sequences) for(const sequence of fancy.sequences){
-                // TODO: Will these names be correct?
-                this.sequence[sequence.constructor.name] = sequence;
+                this.sequence[sequence.name] = sequence;
             }
             if(fancy.errors) for(const error of fancy.errors){
-                // TODO: Will these names be correct?
-                this.error[error.constructor.name] = error;
+                this.error[error.name] = error;
             }
         }
         return fancyFunctions[0];
@@ -49,7 +47,7 @@ import {
     ArraySequence, StringSequence, ObjectSequence, IterableSequence
 } from "./core/asSequence";
 
-hi.arguments = args;
+hi.args = args;
 hi.callAsync = callAsync;
 hi.constants = constants;
 hi.isSequence = isSequence;

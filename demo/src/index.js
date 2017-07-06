@@ -2,7 +2,7 @@ import React, {Component} from "react";
 import {render} from "react-dom";
 import styled from "styled-components";
 
-import higher from "../../src/higher";
+import hi from "../../src/higher";
 
 const UIWrapper = styled.div`
     display: flex;
@@ -35,6 +35,8 @@ const Description = styled.p`
 class Demo extends Component{
     constructor(props){
         super(props);
+        
+        window.hi = hi;
 
         const collatz = (n) => hi.recur((n) => n % 2 ? n * 3 + 1 : n / 2).seed(n).until((n) => n <= 1).inclusive().assumeBounded();
         console.log(collatz(19).array());

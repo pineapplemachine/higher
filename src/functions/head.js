@@ -64,7 +64,7 @@ export const head = wrap({
     sequences: [
         HeadSequence
     ],
-    expected: {
+    arguments: {
         unordered: {
             numbers: 1,
             sequences: 1

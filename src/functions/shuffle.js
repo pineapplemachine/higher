@@ -157,9 +157,11 @@ export const shuffle = wrap({
     sequences: [
         ShuffleSequence
     ],
-    expected: {
-        functions: "?",
-        sequences: 1
+    arguments: {
+        unordered: {
+            functions: "?",
+            sequences: 1
+        }
     },
     implementation: (random, source) => {
         return new ShuffleSequence(random || Math.random, source);

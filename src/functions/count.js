@@ -1,4 +1,5 @@
 import {callAsync} from "../core/callAsync";
+import {constants} from "../core/constants";
 import {wrap} from "../core/wrap";
 
 export const SequenceCounter = function(predicate, source){
@@ -67,32 +68,32 @@ Object.assign(SequenceCounter.prototype, {
 });
 Object.assign(SequenceCounter.prototype, {
     sumAsync: function(){
-        return new hi.Promise((resolve, reject) => {
+        return new constants.Promise((resolve, reject) => {
             callAsync(() => resolve(this.sum()));
         });
     },
     equalsAsync: function(n){
-        return new hi.Promise((resolve, reject) => {
+        return new constants.Promise((resolve, reject) => {
             callAsync(() => resolve(this.equals(n)));
         });
     },
     lessThanAsync: function(n){
-        return new hi.Promise((resolve, reject) => {
+        return new constants.Promise((resolve, reject) => {
             callAsync(() => resolve(this.lessThan(n)));
         });
     },
     lessThanEqualAsync: function(n){
-        return new hi.Promise((resolve, reject) => {
+        return new constants.Promise((resolve, reject) => {
             callAsync(() => resolve(this.lessThanEqual(n)));
         });
     },
     greaterThanAsync: function(n){
-        return new hi.Promise((resolve, reject) => {
+        return new constants.Promise((resolve, reject) => {
             callAsync(() => resolve(this.greaterThan(n)));
         });
     },
     greaterThanEqualAsync: function(n){
-        return new hi.Promise((resolve, reject) => {
+        return new constants.Promise((resolve, reject) => {
             callAsync(() => resolve(this.greaterThanEqual(n)));
         });
     },
