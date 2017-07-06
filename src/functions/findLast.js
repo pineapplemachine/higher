@@ -1,5 +1,6 @@
-import {asSequence, canGetLength, getLength} from "../core/asSequence";
+import {asSequence} from "../core/asSequence";
 import {constants} from "../core/constants";
+import {canGetLength, getLength} from "../core/length";
 import {wrap} from "../core/wrap";
 
 import {FindSequenceResult, BackwardFindSequenceThread, stepFindThreads} from "./findAll";

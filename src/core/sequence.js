@@ -1,5 +1,5 @@
 import {callAsync} from "./callAsync";
-import {unboundedError, collapseCopyError} from "./internal/errors";
+import {unboundedError, collapseCopyError} from "./errors";
 import {isArray} from "./types";
 import {ArraySequence} from "./asSequence";
 

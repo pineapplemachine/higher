@@ -9,9 +9,9 @@ export const newArray = wrap({
     async: true,
     arguments: {
         unordered: {
-            allowIterables: true
             numbers: "?",
             sequences: 1,
+            allowIterables: true
         }
     },
     implementation: (limit, source) => {

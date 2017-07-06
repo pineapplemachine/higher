@@ -2,6 +2,8 @@ export const hi = (source) => {
     return hi.asSequence(source);
 }
 
+export default hi;
+
 Object.assign(hi, {
     version: "0.1.0",
     
@@ -35,7 +37,7 @@ Object.assign(hi, {
 // Core modules
 import {args} from "./core/arguments";
 import {callAsync} from "./core/callAsync";
-import {constants} from "../core/constants";
+import {constants} from "./core/constants";
 // import {canGetLength, getLength} from "../core/length"; // Not exposed
 import {isSequence, Sequence} from "./core/sequence";
 import {wrap} from "./core/wrap";
@@ -72,7 +74,7 @@ hi.sequence.IterableSequence = IterableSequence;
 // Assertions
 import {
     AssertError, assert, assertNot, assertUndefined, assertEqual
-} from "./functions/benchmark";
+} from "./functions/assert";
 hi.error.AssertError = AssertError;
 hi.assert = assert;
 hi.assertNot = assertNot;

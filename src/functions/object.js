@@ -1,4 +1,4 @@
-import {sequenceBoundsError} from "../core/internal/errors";
+import {sequenceBoundsError} from "../core/errors";
 import {isArray, isObject} from "../core/types";
 import {wrap} from "../core/wrap";
 

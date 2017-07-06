@@ -1,5 +1,5 @@
 import {isArray} from "../core/types";
-import {unboundedError} from "../core/internal/errors";
+import {unboundedError} from "../core/errors";
 import {wrap} from "../core/wrap";
 
 // Base implementation for array and newArray functions.
@@ -33,9 +33,9 @@ export const array = wrap({
     async: true,
     arguments: {
         unordered: {
-            allowIterables: true
             numbers: "?",
             sequences: 1,
+            allowIterables: true
         }
     },
     implementation: (limit, source) => {
@@ -44,30 +44,6 @@ export const array = wrap({
         }else if(isArray(source)){
             return (!limit || limit >= source.length ?
                 source : source.slice(limit)
-            );
-        }else{
-            return asArray(limit, source);
-        }
-    },
-});
-
-export const newArray = wrap({
-    name: "newArray",
-    attachSequence: true,
-    async: true,
-    arguments: {
-        unordered: {
-            allowIterables: true
-            numbers: "?",
-            sequences: 1,
-        }
-    },
-    implementation: (limit, source) => {
-        if(limit <= 0){
-            return [];
-        }else if(isArray(source)){
-            return (!limit || limit >= source.length ?
-                source.slice() : source.slice(limit)
             );
         }else{
             return asArray(limit, source);

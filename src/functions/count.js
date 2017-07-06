@@ -1,7 +1,7 @@
 import {callAsync} from "../core/callAsync";
 import {wrap} from "../core/wrap";
 
-expost const SequenceCounter = function(predicate, source){
+export const SequenceCounter = function(predicate, source){
     this.predicate = predicate;
     this.source = source;
     if(!source.copy) this.copy = null;

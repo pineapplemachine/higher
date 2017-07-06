@@ -1,5 +1,5 @@
 export const isUndefined = (value) => {
-    return typeof (value) === "undefined";
+    return value === undefined;
 };
 
 export const isNumber = (value) => {

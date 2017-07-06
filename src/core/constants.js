@@ -1,8 +1,8 @@
 export const constants = {
     Promise: Promise,
     
-    isBrowser: typeof window !== "undefined";
-    isNode: typeof window === "undefined";
+    isBrowser: typeof window !== "undefined",
+    isNode: typeof window === "undefined",
     
     defaults: {
         comparisonFunction: (a, b) => (a === b),

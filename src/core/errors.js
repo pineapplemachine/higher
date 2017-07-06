@@ -1,3 +1,5 @@
+// TODO: These need to be error types, not functions returning strings
+
 // An error message for explaining that an input must be known to be bounded.
 export const unboundedError = (action, method, intermediate = false) => {
     return (

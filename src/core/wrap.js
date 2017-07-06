@@ -9,7 +9,7 @@ export const wrap = function(info){
     fancy.names = fancy.names || [fancy.name];
     fancy.sequences = info.sequences;
     fancy.errors = info.errors;
-    fancy.arguments = info.arguments;
+    fancy.arguments = info['arguments']; // TODO: Possibly rename this attribute
     fancy.implementation = info.implementation;
     fancy.method = wrap.method(info);
     fancy.method.implementation = info.methodImplementation || info.implementation;
@@ -89,7 +89,7 @@ Object.assign(wrap, {
                 callArgs.length, info.arguments.ordered.length
             );
             for(let i = 0; i < argsCount; i++){
-                callArgs[i] = (info.arguments.ordered[i](callArgs[i]);
+                callArgs[i] = info.arguments.ordered[i](callArgs[i]);
             }
             return implementation(...callArgs);
         };
@@ -193,7 +193,7 @@ Object.assign(wrap, {
                 callArgs.length, info.arguments.ordered.length - 1
             );
             for(let i = 0; i < argsCount; i++){
-                callArgs[i] = (info.arguments.ordered[i + 1](callArgs[i]);
+                callArgs[i] = info.arguments.ordered[i + 1](callArgs[i]);
             }
             return implementation(this, ...callArgs);
         };

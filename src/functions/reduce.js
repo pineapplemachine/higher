@@ -104,11 +104,10 @@ Object.assign(ReduceSequence.prototype, {
         this.source.reset();
         if(this.hasSeed){
             this.accumulator = this.seedValue;
-        }else{
+        }else if(!this.source.done()){
             // TODO: Assign in an initialization function
             this.accumulator = this.source.nextFront();
         }
-        else if(!this.source.done()) this.accumulator = this.source.nextFront();
         return this;
     },
 });

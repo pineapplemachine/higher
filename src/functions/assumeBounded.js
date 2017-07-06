@@ -58,9 +58,12 @@ Object.assign(AssumeBoundedSequence.prototype, {
 // This may be helpful if you're sure a sequence that you want to fully
 // consume will eventually end, even if higher can't tell for itself.
 export const assumeBounded = wrap({
-    name: "assumeBounded":
+    name: "assumeBounded",
     attachSequence: true,
     async: false,
+    sequences: [
+        AssumeBoundedSequence
+    ],
     arguments: {
         one: wrap.expecting.sequence
     },

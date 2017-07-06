@@ -107,4 +107,5 @@ export const from = wrap({
     },
 });
 
-export default from;
+const fromFn = from; // Workaround for syntax error
+export default fromFn;
