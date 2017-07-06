@@ -1,12 +1,13 @@
-import Sequence from "../core/sequence";
+import {Sequence} from "../core/sequence";
 import {asSequence, validAsSequence} from "../core/asSequence";
+import {expecting, wrap} from "../core/wrap";
 
-const ForwardFlattenSequence = function(source, frontSource = null){
+export const ForwardFlattenSequence = function(source, frontSource = null){
     this.source = source;
     this.frontSource = frontSource;
 };
 
-const BackwardFlattenSequence = function(source, frontSource = null){
+export const BackwardFlattenSequence = function(source, frontSource = null){
     this.source = source;
     this.frontSource = frontSource;
 };
@@ -103,20 +104,17 @@ Object.assign(BackwardFlattenSequence.prototype, {
     reset: null,
 });
 
-/**
- * Flatten a single level deep.
- * @param {*} source
- */
-const flatten = (source) => {
-    return new ForwardFlattenSequence(source);
-};
-
-export const registration = {
+// Flatten a single level deep.
+export const flatten = wrap({
     name: "flatten",
-    expected: {
-        sequences: 1,
+    attachSequence: true,
+    async: false,
+    arguments: {
+        one: expecting.sequence
     },
-    implementation: flatten,
-};
+    imlementation: (source) => {
+        return new ForwardFlattenSequence(source);
+    },
+});
 
 export default flatten;

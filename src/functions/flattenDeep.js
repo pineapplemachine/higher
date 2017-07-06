@@ -1,8 +1,9 @@
-import Sequence from "../core/sequence";
+import {Sequence} from "../core/sequence";
 import {asSequence, validAsSequence} from "../core/asSequence";
 import {isArray, isIterable, isSequence, isString} from "../core/types";
+import {expecting, wrap} from "../core/wrap";
 
-const FlattenDeepSequence = function(source){
+export const FlattenDeepSequence = function(source){
     this.source = source;
     this.sourceStack = [source];
     this.frontSource = source;
@@ -82,21 +83,18 @@ Object.assign(FlattenDeepSequence.prototype, {
     reset: null,
 });
 
-/**
- * Flatten recursively.
- * Flattens arrays, iterables except strings, and sequences.
- * @param {*} source
- */
-const flattenDeep = (source) => {
-    return new FlattenDeepSequence(source);
-};
-
-export const registration = {
+// Flatten recursively.
+// Flattens arrays, iterables except strings, and sequences.
+export const flattenDeep = wrap({
     name: "flattenDeep",
-    expected: {
-        sequences: 1,
+    attachSequence: true,
+    async: false,
+    arguments: {
+        one: expecting.sequence
     },
-    implementation: flattenDeep,
-};
+    implementation: (source) => {
+        return new FlattenDeepSequence(source);
+    },
+});
 
 export default flattenDeep;
