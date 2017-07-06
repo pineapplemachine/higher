@@ -1,5 +1,5 @@
 import {Sequence} from "../core/sequence";
-import {expecting, wrap} from "../core/wrap";
+import {wrap} from "../core/wrap";
 
 export const ReverseSequence = function(source){
     if(!source.back){
@@ -84,7 +84,7 @@ export const reverse = wrap({
     attachSequence: true,
     async: false,
     arguments: {
-        one: expecting.sequence
+        one: wrap.expecting.sequence
     },
     implementation: (source) => {
         if(source instanceof ReverseSequence){

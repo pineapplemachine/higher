@@ -1,4 +1,4 @@
-import {expecting, wrap} from "../core/wrap";
+import {wrap} from "../core/wrap";
 
 // Compute a sum of numbers using Shewchuk's summation algorithm.
 // http://stackoverflow.com/a/2704565/3478907
@@ -18,7 +18,7 @@ export const sumShew = wrap({
     attachSequence: true,
     async: true,
     arguments: {
-        one: expecting.iterable
+        one: wrap.expecting.iterable
     },
     implementation: (source) => {
         let infSum = 0; // Handles infinite inputs

@@ -1,7 +1,7 @@
 import {isSequence, Sequence} from "../core/sequence";
 import {asSequence, validAsSequence} from "../core/asSequence";
 import {isArray, isIterable, isString} from "../core/types";
-import {expecting, wrap} from "../core/wrap";
+import {wrap} from "../core/wrap";
 
 export const FlattenDeepSequence = function(source){
     this.source = source;
@@ -90,7 +90,7 @@ export const flattenDeep = wrap({
     attachSequence: true,
     async: false,
     arguments: {
-        one: expecting.sequence
+        one: wrap.expecting.sequence
     },
     implementation: (source) => {
         return new FlattenDeepSequence(source);

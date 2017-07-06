@@ -1,6 +1,6 @@
 import {Sequence} from "../core/sequence";
 import {isArray} from "../core/types";
-import {expecting, wrap} from "../core/wrap";
+import {wrap} from "../core/wrap";
 
 const expectingArrayOrFalsey = (value) => {
     if(value && !isArray(value)){
@@ -17,7 +17,7 @@ export const partial = wrap({
     async: false,
     arguments: {
         ordered: [
-            expecting.function, expectingArrayOrFalsey, expectingArrayOrFalsey
+            wrap.expecting.function, expectingArrayOrFalsey, expectingArrayOrFalsey
         ],
     },
     implementation: (target, leftArgs, rightArgs) => {

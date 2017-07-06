@@ -13,14 +13,10 @@ export const isSequence = (value) => {
 // Attaches methods to the sequence prototype for method chaining.
 Sequence.attach = function(fancy){
     if(fancy.method){
-        if(fancy.method.async){
-            for(const name of fancy.names){
-                Sequence.prototype[name] = fancy.method;
+        for(const name of fancy.names){
+            Sequence.prototype[name] = fancy.method;
+            if(fancy.method.async){
                 Sequence.prototype[name + "Async"] = fancy.method.async;
-            }
-        }else{
-            for(const name of fancy.names){
-                Sequence.prototype[name] = fancy.method;
             }
         }
     }

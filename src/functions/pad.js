@@ -1,6 +1,6 @@
 import {Sequence} from "../core/sequence";
 import {FiniteRepeatElementSequence} from "./repeatElement";
-import {expecting, wrap} from "../core/wrap";
+import {wrap} from "../core/wrap";
 
 export const PadLeftSequence = function(
     source, padElement, padTotal, padCount = undefined
@@ -226,7 +226,7 @@ export const pad = wrap({
     attachSequence: true,
     async: false,
     arguments: {
-        one: expecting.sequence
+        one: wrap.expecting.sequence
     },
     implementation: (source) => {
         return new SequencePadder(source);

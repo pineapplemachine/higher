@@ -1,11 +1,11 @@
-import {expecting, wrap} from "../core/wrap";
+import {wrap} from "../core/wrap";
 
 export const time = wrap({
     name: "time",
     attachSequence: false,
     async: true,
     arguments: {
-        ordered: [expecting.function] // + ...args
+        ordered: [wrap.expecting.function] // + ...args
     },
     implementation: (typeof performance === "undefined" ?
         (call, ...args) => {

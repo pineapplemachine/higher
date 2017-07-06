@@ -1,12 +1,12 @@
 import {validAsBoundedSequence} from "../core/asSequence";
-import {expecting, wrap} from "../core/wrap";
+import {wrap} from "../core/wrap";
 
 export const string = wrap({
     name: "string",
     attachSequence: true,
     async: true,
     arguments: {
-        one: expecting.iterable
+        one: wrap.expecting.iterable
     },
     implementation: (source) => {
         if(!validAsBoundedSequence(source)){

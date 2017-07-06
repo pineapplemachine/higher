@@ -1,4 +1,4 @@
-import {expecting, wrap} from "../core/wrap";
+import {wrap} from "../core/wrap";
 
 // Perform a linear summation of values in a sequence.
 // Suitable for integers and low-accuracy floating point sums.
@@ -12,7 +12,7 @@ export const sumLinear = wrap({
     attachSequence: true,
     async: true,
     arguments: {
-        one: expecting.iterable
+        one: wrap.expecting.iterable
     },
     implementation: (source) => {
         let sum = 0;

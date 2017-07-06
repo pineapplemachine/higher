@@ -1,4 +1,4 @@
-import {expecting, wrap} from "../core/wrap";
+import {wrap} from "../core/wrap";
 
 // Check if a sequence contains an element. Uses the comparison function
 // (a, b) => (a === b). When a different comparison function is needed,
@@ -8,7 +8,7 @@ export const containsElement = wrap({
     attachSequence: true,
     async: true,
     arguments: {
-        ordered: [expecting.iterable, expecting.anything]
+        ordered: [wrap.expecting.iterable, wrap.expecting.anything]
     },
     implementation: (source, element) => {
         for(const sourceElement of source){

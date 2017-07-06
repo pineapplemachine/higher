@@ -1,5 +1,5 @@
 import {Sequence} from "../core/sequence";
-import {expecting, wrap} from "../core/wrap";
+import {wrap} from "../core/wrap";
 
 import {InfiniteRepeatElementSequence} from "./repeatElement";
 
@@ -93,7 +93,7 @@ export const bigrams = wrap({
     attachSequence: true,
     async: false,
     arguments: {
-        one: expecting.sequence
+        one: wrap.expecting.sequence
     },
     implementation: (source) => {
         return new NgramSequence(2, source);
@@ -105,7 +105,7 @@ export const trigrams = wrap({
     attachSequence: true,
     async: false,
     arguments: {
-        one: expecting.sequence
+        one: wrap.expecting.sequence
     },
     implementation: (source) => {
         return new NgramSequence(3, source);

@@ -1,5 +1,5 @@
 import {Sequence} from "../core/sequence";
-import {expecting, wrap} from "../core/wrap";
+import {wrap} from "../core/wrap";
 
 export const RecurSequence = function(
     transform, seedValue = null, frontValue = null
@@ -52,7 +52,7 @@ export const recur = wrap({
     attachSequence: false,
     async: false,
     arguments: {
-        one: expecting.function
+        one: wrap.expecting.function
     },
     implementation: (transform) => {
         return new RecurSequence(transform);

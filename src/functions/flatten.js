@@ -1,6 +1,6 @@
 import {Sequence} from "../core/sequence";
 import {asSequence, validAsSequence} from "../core/asSequence";
-import {expecting, wrap} from "../core/wrap";
+import {wrap} from "../core/wrap";
 
 export const ForwardFlattenSequence = function(source, frontSource = null){
     this.source = source;
@@ -110,7 +110,7 @@ export const flatten = wrap({
     attachSequence: true,
     async: false,
     arguments: {
-        one: expecting.sequence
+        one: wrap.expecting.sequence
     },
     imlementation: (source) => {
         return new ForwardFlattenSequence(source);

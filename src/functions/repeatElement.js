@@ -138,7 +138,7 @@ export const repeatElement = wrap({
     attachSequence: false,
     async: false,
     arguments: {
-        ordered: [expecting.anything, expecting.number]
+        ordered: [wrap.expecting.anything, wrap.expecting.number]
     },
     implementation: (...args) => {
         const element = args[0];

@@ -1,5 +1,5 @@
 import {Sequence} from "../core/sequence";
-import {expecting, wrap} from "../core/wrap";
+import {wrap} from "../core/wrap";
 
 export const AssumeBoundedSequence = function(source){
     this.source = source;
@@ -62,7 +62,7 @@ export const assumeBounded = wrap({
     attachSequence: true,
     async: false,
     arguments: {
-        one: expecting.sequence
+        one: wrap.expecting.sequence
     },
     implementation: () => {
         return source.bounded() ? source : new AssumeBoundedSequence(source);

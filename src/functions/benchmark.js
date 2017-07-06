@@ -1,4 +1,4 @@
-import {expecting, wrap} from "../core/wrap";
+import {wrap} from "../core/wrap";
 
 import {time} from "./time";
 
@@ -9,7 +9,7 @@ export const benchmark = wrap({
     attachSequence: false,
     async: true,
     arguments: {
-        ordered: [expecting.number, expecting.function] // + ...args
+        ordered: [wrap.expecting.number, wrap.expecting.function] // + ...args
     },
     implementation: (count, call, ...args) => {
         return time(() => {

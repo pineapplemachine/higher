@@ -1,4 +1,4 @@
-import {expecting, wrap} from "../core/wrap";
+import {wrap} from "../core/wrap";
 
 // Call the encapsulated function only once, with any arguments.
 // Successive calls return the value which the first call produced without
@@ -8,7 +8,7 @@ export const once = wrap({
     attachSequence: false,
     async: false,
     arguments: {
-        one: expecting.function
+        one: wrap.expecting.function
     },
     implementation:  (call) => {
         let called = false;

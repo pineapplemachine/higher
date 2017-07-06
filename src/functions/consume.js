@@ -1,12 +1,12 @@
 import {isSequence} from "../core/sequence";
-import {expecting, wrap} from "../core/wrap";
+import {wrap} from "../core/wrap";
 
 export const consume = wrap({
     name: "consume",
     attachSequence: true,
     async: true,
     arguments: {
-        one: expecting.iterable
+        one: wrap.expecting.iterable
     },
     implementation: (source) => {
         if(isSequence(source)){

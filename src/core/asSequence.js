@@ -1,26 +1,17 @@
-import {isArray, isFunction, isIterable, isObject, isString} from "./types";
+import {isArray, isIterable, isObject, isString} from "./types";
 import {isSequence, Sequence} from "./sequence";
 
 // Check whether a value is a sequence or can be coerced to a sequence type.
 export const validAsSequence = (value) => {
     return isIterable(value) || isObject(value);
-}
+};
 
 export const validAsBoundedSequence = (value) => {
     return (
         (isSequence(value) && value.bounded()) ||
         isArray(value) || isString(value) || isObject(value)
     );
-}
-
-export const canGetLength = (source) => {
-    return isString(source) || "length" in source;
-}
-
-export const getLength = (source) => {
-    if(isFunction(source.length)) return source.length();
-    else return source.length;
-}
+};
 
 // Get an array, string, iterable, or object as a sequence.
 // If it receives a sequences as input, returns that sequence.
@@ -42,7 +33,7 @@ export const asSequence = (source) => {
             "iterables, and objects can be made into sequences."
         );
     }
-}
+};
 
 // Get a sequence for enumerating the elements of an array.
 // Optionally accepts an inclusive start index and an exclusive end index.
@@ -54,7 +45,7 @@ export const ArraySequence = function(source, low, high){
     this.highIndex = isNaN(high) ? source.length : high;
     this.frontIndex = this.lowIndex;
     this.backIndex = this.highIndex;
-}
+};
 
 ArraySequence.prototype = Object.create(Sequence.prototype);
 ArraySequence.prototype.constructor = ArraySequence;
@@ -151,7 +142,7 @@ export const StringSequence = function(source, low, high){
     this.highIndex = isNaN(high) ? source.length : high;
     this.frontIndex = this.lowIndex;
     this.backIndex = this.highIndex;
-}
+};
 
 StringSequence.prototype = Object.create(Sequence.prototype);
 StringSequence.prototype.constructor = StringSequence;
@@ -223,7 +214,7 @@ export const ObjectSequence = function(source, keys){
     this.source = source;
     this.keys = keys || Object.keys(source);
     this.keyIndex = 0;
-}
+};
 
 ObjectSequence.prototype = Object.create(Sequence.prototype);
 ObjectSequence.prototype.constructor = ObjectSequence;
@@ -274,7 +265,7 @@ Object.assign(ObjectSequence.prototype, {
 export const IterableSequence = function(source){
     this.source = source;
     this.item = source.next();
-}
+};
 
 IterableSequence.prototype = Object.create(Sequence.prototype);
 IterableSequence.prototype.constructor = IterableSequence;

@@ -1,6 +1,6 @@
 import {Sequence} from "../core/sequence";
 import {FiniteRepeatElementSequence, InfiniteRepeatElementSequence} from "./repeatElement";
-import {expecting, wrap} from "../core/wrap";
+import {wrap} from "../core/wrap";
 
 export const OneElementSequence = function(element, isDone = false){
     this.element = element;
@@ -69,7 +69,7 @@ export const one = wrap({
     attachSequence: false,
     async: false,
     arguments: {
-        one: expecting.anything
+        one: wrap.expecting.anything
     },
     implementation: (element) => {
         return new OneElementSequence(element);

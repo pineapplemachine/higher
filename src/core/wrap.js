@@ -4,38 +4,6 @@ import {callAsync} from "./callAsync";
 import {Sequence} from "./sequence";
 import {isFunction, isIterable} from "./types";
 
-export const expecting = {
-    anything: (value) => value,
-    number: (value) => {
-        if(isNaN(value)){
-            throw "Expecting a number."; // TODO: Better error messages
-        }else{
-            return +value;
-        }
-    },
-    function: (value) => {
-        if(!isFunction(value)){
-            throw "Expecting a function.";
-        }else{
-            return value;
-        }
-    },
-    iterable: (value) => {
-        if(!isIterable(value)){
-            throw "Expecting an iterable.";
-        }else{
-            return value;
-        }
-    },
-    sequence: (value) => {
-        if(!validAsSequence(value)){
-            throw "Expecting a sequence.";
-        }else{
-            return asSequence(value);
-        }
-    },
-};
-
 export const wrap = function(info){
     const fancy = wrap.fancy(info);
     fancy.names = fancy.names || [fancy.name];
@@ -56,6 +24,37 @@ export const wrap = function(info){
 };
 
 Object.assign(wrap, {
+    expecting: {
+        anything: (value) => value,
+        number: (value) => {
+            if(isNaN(value)){
+                throw "Expecting a number."; // TODO: Better error messages
+            }else{
+                return +value;
+            }
+        },
+        function: (value) => {
+            if(!isFunction(value)){
+                throw "Expecting a function.";
+            }else{
+                return value;
+            }
+        },
+        iterable: (value) => {
+            if(!isIterable(value)){
+                throw "Expecting an iterable.";
+            }else{
+                return value;
+            }
+        },
+        sequence: (value) => {
+            if(!validAsSequence(value)){
+                throw "Expecting a sequence.";
+            }else{
+                return asSequence(value);
+            }
+        },
+    },
     fancy: function(info){
         if(info.arguments.none){
             return info.implementation;
@@ -73,7 +72,7 @@ Object.assign(wrap, {
     fancyOne: function(info){
         const implementation = info.implementation;
         const validate = info.one;
-        if(info.one === expecting.anything){
+        if(info.one === wrap.expecting.anything){
             return implementation;
         }else{
             return (arg) => {

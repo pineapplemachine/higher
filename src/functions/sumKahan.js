@@ -1,4 +1,4 @@
-import {expecting, wrap} from "../core/wrap";
+import {wrap} from "../core/wrap";
 
 // Compute a sum of numbers using the Kahan summation algorithm.
 // https://en.wikipedia.org/wiki/Kahan_summation_algorithm
@@ -15,7 +15,7 @@ export const sumKahan = wrap({
     attachSequence: true,
     async: true,
     arguments: {
-        one: expecting.iterable
+        one: wrap.expecting.iterable
     },
     implementation: (source) => {
         let sum = 0;

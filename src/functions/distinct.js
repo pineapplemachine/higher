@@ -1,5 +1,5 @@
 import {Sequence} from "../core/sequence";
-import {expecting, wrap} from "../core/wrap";
+import {wrap} from "../core/wrap";
 
 export const DistinctSequence = function(
     source, history = null, frontValue = null, initialize = true
@@ -60,7 +60,7 @@ export const distinct = wrap({
     attachSequence: true,
     async: false,
     arguments: {
-        one: expecting.sequence
+        one: wrap.expecting.sequence
     },
     imlementation: (source) => {
         return new DistinctSequence(source);

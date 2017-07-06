@@ -1,4 +1,4 @@
-import {expecting, wrap} from "../core/wrap";
+import {wrap} from "../core/wrap";
 
 // Get the product of the numbers in a sequence.
 // Returns 1 when the input was empty.
@@ -7,7 +7,7 @@ export const product = wrap({
     attachSequence: true,
     async: true,
     arguments: {
-        one: expecting.iterable
+        one: wrap.expecting.iterable
     },
     implementation: (source) => {
         let product = 1;

@@ -1,5 +1,5 @@
 import {Sequence} from "../core/sequence";
-import {expecting, wrap} from "../core/wrap";
+import {wrap} from "../core/wrap";
 
 export const ForwardJoinSequence = function(
     source, delimiter, frontSource = undefined,
@@ -192,7 +192,7 @@ export const join = wrap({
     attachSequence: true,
     async: false,
     arguments: {
-        ordered: [expecting.sequence, expecting.sequence]
+        ordered: [wrap.expecting.sequence, wrap.expecting.sequence]
     },
     implementation: (source, delimiter) => {
         // Delimiter must be copyable.
