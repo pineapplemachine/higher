@@ -1,8 +1,9 @@
-import Sequence from "../core/sequence";
+import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
 
 // Enumerate those elements of an input sequence starting from the first
 // element matching a predicate.
-const FromSequence = function(
+export const FromSequence = function(
     predicate, source, isInclusive = true, initialized = false
 ){
     this.predicate = predicate;
@@ -88,17 +89,19 @@ Object.assign(FromSequence.prototype, {
     },
 });
 
-const fromFn = (predicate, source) => {
-    return new FromSequence(predicate, source);
-};
-
-export const registration = {
+export const from = wrap({
     name: "from",
-    expected: {
-        functions: 1,
-        sequences: 1,
+    attachSequence: true,
+    async: false,
+    arguments: {
+        unordered: {
+            functions: 1,
+            sequences: 1
+        }
     },
-    implementation: fromFn,
-};
+    implementation: (predicate, source) => {
+        return new FromSequence(predicate, source);
+    },
+});
 
-export default fromFn;
+export default from;
