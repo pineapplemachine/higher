@@ -1,4 +1,5 @@
 import {asSequence, canGetLength, getLength} from "../core/asSequence";
+import {constants} from "../core/constants";
 import {wrap} from "../core/wrap";
 
 import {FindSequenceResult, ForwardFindSequenceThread, stepFindThreads} from "./findAll";
@@ -22,7 +23,7 @@ export const findFirst = wrap({
     implementation: (compare, sequences) => {
         const source = sequences[0];
         const search = asSequence(sequences[1]);
-        const compareFunc = compare || hi.defaultComparisonFunction;
+        const compareFunc = compare || constants.defaults.comparisonFunction;
         // Handle empty or unbounded search subject
         if(search.done() || search.unbounded()){
             return undefined;

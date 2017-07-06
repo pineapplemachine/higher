@@ -173,6 +173,7 @@ export const SequencePadder = function(source){
     this.source = source;
 };
 
+SequencePadder.prototype.constructor = SequencePadder;
 Object.assign(SequencePadder.prototype, {
     left: function(length, element){
         if(this.source.unbounded()){

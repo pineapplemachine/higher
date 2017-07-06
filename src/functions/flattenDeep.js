@@ -1,6 +1,6 @@
-import {Sequence} from "../core/sequence";
+import {isSequence, Sequence} from "../core/sequence";
 import {asSequence, validAsSequence} from "../core/asSequence";
-import {isArray, isIterable, isSequence, isString} from "../core/types";
+import {isArray, isIterable, isString} from "../core/types";
 import {expecting, wrap} from "../core/wrap";
 
 export const FlattenDeepSequence = function(source){

@@ -1,4 +1,5 @@
 import {asSequence} from "../core/asSequence";
+import {constants} from "../core/constants";
 import {wrap} from "../core/wrap";
 
 // Get the lexicographic ordering of two sequences.
@@ -17,7 +18,7 @@ export const lexOrder = wrap({
         }
     },
     implementation: (order, sequences) => {
-        const orderFunc = order || hi.defaultOrderingFunction;
+        const orderFunc = order || constants.defaults.orderingFunction;
         const a = asSequence(sequences[0]);
         const b = sequences[1];
         for(const element of b){

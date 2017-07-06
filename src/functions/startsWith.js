@@ -1,4 +1,5 @@
 import {asSequence, canGetLength, getLength} from "../core/asSequence";
+import {constants} from "../core/constants";
 import {wrap} from "../core/wrap";
 
 // Determine equality of one or more sequences given a comparison function.
@@ -22,7 +23,7 @@ export const startsWith = wrap({
             if(getLength(source) < getLength(search)) return false;
         }
         const sequence = asSequence(source);
-        const compareFunc = compare || hi.defaultComparisonFunction;
+        const compareFunc = compare || constants.defaults.comparisonFunction;
         for(const element of search){
             if(sequence.done() || !compareFunc(sequence.nextFront(), element)){
                 return false;

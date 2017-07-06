@@ -1,4 +1,5 @@
 import {asSequence} from "../core/asSequence";
+import {constants} from "../core/constants";
 import {wrap} from "../core/wrap";
 
 export const equals = wrap({
@@ -13,7 +14,7 @@ export const equals = wrap({
         }
     },
     implementation: (compare, sources) => {
-        const compareFunc = compare || hi.defaultComparisonFunction;
+        const compareFunc = compare || constants.defaults.comparisonFunction;
         if(sources.length <= 1){
             return true;
         }else if(sources.length === 2){

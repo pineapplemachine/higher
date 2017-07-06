@@ -1,3 +1,4 @@
+import {constants} from "../core/constants";
 import {wrap} from "../core/wrap";
 
 // Get the minimum value in a sequence as judged by a relational function.
@@ -14,7 +15,7 @@ export const min = wrap({
         }
     },
     implementation: (relate, source) => {
-        const relateFunc = relate || hi.defaultRelationalFunction;
+        const relateFunc = relate || constants.defaults.relationalFunction;
         let min = undefined;
         let first = true;
         for(const element of source){

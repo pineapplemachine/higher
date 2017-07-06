@@ -1,4 +1,4 @@
-import {isSequence} from "../core/types";
+import {isSequence} from "../core/sequence";
 import {expecting, wrap} from "../core/wrap";
 
 export const consume = wrap({

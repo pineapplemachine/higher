@@ -1,3 +1,4 @@
+import {constants} from "../core/constants";
 import {wrap} from "../core/wrap";
 
 import {HeadSequence} from "./head";
@@ -17,7 +18,7 @@ export const limit = wrap({
             return source;
         }else{
             return new HeadSequence(
-                isNaN(length) ? hi.defaultLimitLength : length, source
+                isNaN(length) ? constants.defaults.limitLength : length, source
             );
         }
     },

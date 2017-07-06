@@ -16,6 +16,7 @@ export const FindSequenceResult = function(source, low, high){
 };
 
 // TODO: Maybe this should just be a sequence somehow?
+FindSequenceResult.prototype.constructor = FindSequenceResult;
 Object.assign(FindSequenceResult.prototype, {
     slice: function(){
         return this.source.slice(this.low, this.high);
@@ -55,6 +56,7 @@ export const BackwardFindSequenceThread = function(
     this.alive = alive;
 };
 
+ForwardFindSequenceThread.prototype.constructor = ForwardFindSequenceThread;
 Object.assign(ForwardFindSequenceThread.prototype, {
     consume: function(element){
         if(this.compare(element, this.searchElement)){
@@ -84,6 +86,7 @@ Object.assign(ForwardFindSequenceThread.prototype, {
     },
 });
 
+BackwardFindSequenceThread.prototype.constructor = BackwardFindSequenceThread;
 Object.assign(BackwardFindSequenceThread.prototype, {
     consume: function(element){
         if(this.compare(element, this.searchElement)){

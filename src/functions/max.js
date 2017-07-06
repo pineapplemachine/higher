@@ -1,3 +1,4 @@
+import {constants} from "../core/constants";
 import {wrap} from "../core/wrap";
 
 // Get the maximum value in a sequence as judged by a relational function.
@@ -14,7 +15,7 @@ export const max = wrap({
         }
     },
     implementation: (relate, source) => {
-        const relateFunc = relate || hi.defaultRelationalFunction;
+        const relateFunc = relate || constants.defaults.relationalFunction;
         let max = undefined;
         let first = true;
         for(const element of source){

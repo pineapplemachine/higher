@@ -5,6 +5,7 @@ expost const SequenceCounter = function(predicate, source){
     if(!source.reset) this.reset = null;
 };
 
+SequenceCounter.prototype.constructor = SequenceCounter;
 Object.assign(SequenceCounter.prototype, {
     sum: function(){
         let i = 0;
