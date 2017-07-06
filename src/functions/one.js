@@ -1,14 +1,15 @@
-import Sequence from "../core/sequence";
+import {Sequence} from "../core/sequence";
 import {FiniteRepeatElementSequence, InfiniteRepeatElementSequence} from "./repeatElement";
+import {wrap} from "../core/wrap";
 
-const OneSequence = function(element, isDone = false){
+export const OneElementSequence = function(element, isDone = false){
     this.element = element;
     this.isDone = isDone;
 };
 
-OneSequence.prototype = Object.create(Sequence.prototype);
-OneSequence.prototype.constructor = OneSequence;
-Object.assign(OneSequence.prototype, {
+OneElementSequence.prototype = Object.create(Sequence.prototype);
+OneElementSequence.prototype.constructor = OneElementSequence;
+Object.assign(OneElementSequence.prototype, {
     seed: function(element){
         this.element = element;
         return this;
@@ -52,10 +53,10 @@ Object.assign(OneSequence.prototype, {
     has: (i) => false,
     get: (i) => undefined,
     slice: function(i, j){
-        return new OneSequence(this.element, i >= j);
+        return new OneElementSequence(this.element, i >= j);
     },
     copy: function(){
-        return new OneSequence(this.element, this.isDone);
+        return new OneElementSequence(this.element, this.isDone);
     },
     reset: function(){
         this.isDone = false;
@@ -63,8 +64,19 @@ Object.assign(OneSequence.prototype, {
     },
 });
 
-const one = function(element){
-    return new OneSequence(element);
-};
+export const one = wrap({
+    name: "one",
+    attachSequence: false,
+    async: false,
+    sequences: [
+        OneElementSequence
+    ],
+    arguments: {
+        one: wrap.expecting.anything
+    },
+    implementation: (element) => {
+        return new OneElementSequence(element);
+    },
+});
 
 export default one;

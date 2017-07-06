@@ -1,36 +1,33 @@
 import {asSequence} from "../core/asSequence";
+import {constants} from "../core/constants";
+import {wrap} from "../core/wrap";
 
-/**
- * Get the lexicographic ordering of two sequences.
- * Returns +1 when the first input follows the second.
- * Returns 0 when the inputs are equal.
- * Returns -1 when the first input precedes the second.
- * @param {*} order
- * @param {*} sequences
- */
-const lexOrder = (order, sequences) => {
-    const orderFunc = order || hi.defaultOrderingFunction;
-    const a = asSequence(sequences[0]);
-    const b = sequences[1];
-    for(const element of b){
-        if(a.done()) return -1;
-        const cmp = orderFunc(a.nextFront(), element);
-        if(cmp != 0) return cmp;
-    }
-    return a.done() ? 0 : 1;
-};
-
-export const registration = {
+// Get the lexicographic ordering of two sequences.
+// Returns +1 when the first input follows the second.
+// Returns 0 when the inputs are equal.
+// Returns -1 when the first input precedes the second.
+export const lexOrder = wrap({
     name: "lexOrder",
-    expected: {
-        functions: "?",
-        sequences: 2,
-        // Don't waste time coercing input iterables to sequences
-        allowIterables: true,
-        // Also generate an async version of this function
-        async: true,
+    attachSequence: true,
+    async: true,
+    arguments: {
+        unordered: {
+            functions: "?",
+            sequences: 2,
+            allowIterables: true
+        }
     },
-    implementation: lexOrder,
-};
+    implementation: (order, sequences) => {
+        const orderFunc = order || constants.defaults.orderingFunction;
+        const a = asSequence(sequences[0]);
+        const b = sequences[1];
+        for(const element of b){
+            if(a.done()) return -1;
+            const cmp = orderFunc(a.nextFront(), element);
+            if(cmp != 0) return cmp;
+        }
+        return a.done() ? 0 : 1;
+    }
+});
 
 export default lexOrder;

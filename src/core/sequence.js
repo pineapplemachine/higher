@@ -1,8 +1,28 @@
-import {unboundedError, collapseCopyError} from "./internal/errors";
-import {isArray, isSequence} from "./types";
+import {callAsync} from "./callAsync";
+import {constants} from "./constants";
+import {unboundedError, collapseCopyError} from "./errors";
+import {isArray} from "./types";
 import {ArraySequence} from "./asSequence";
 
-const Sequence = function(){};
+export const Sequence = function(){};
+
+export const isSequence = (value) => {
+    return value instanceof Sequence;
+};
+
+// Accepts a fancy function wrapper object returned by the wrap function.
+// Attaches methods to the sequence prototype for method chaining.
+Sequence.attach = function(fancy){
+    if(fancy.method){
+        for(const name of fancy.names){
+            Sequence.prototype[name] = fancy.method;
+            if(fancy.method.async){
+                Sequence.prototype[name + "Async"] = fancy.method.async;
+            }
+        }
+    }
+    return fancy;
+};
 
 Sequence.prototype[Symbol.iterator] = function(){
     return this;
@@ -113,19 +133,17 @@ Sequence.prototype.collapse = function(limit = -1){
     return source;
 };
 Sequence.prototype.collapseAsync = function(limit = -1){
-    return new hi.Promise((resolve, reject) => {
-        hi.callAsync(function(){
+    return new constants.Promise((resolve, reject) => {
+        callAsync(function(){
             resolve(this.collapse(limit));
         });
     });
 };
 
-/**
- * Turn a lazy sequence into an array-based one.
- * Used internally by functions when a purely lazy implementation won't work
- * because a sequence doesn't support the necessary operations.
- * Not necessarily intended for external use.
- */
+// Turn a lazy sequence into an array-based one.
+// Used internally by functions when a purely lazy implementation won't work
+// because a sequence doesn't support the necessary operations.
+// Not necessarily intended for external use.
 Sequence.prototype.forceEager = function(){
     if(!this.bounded()){
         throw "Failed to consume sequence: Sequence is not known to be bounded.";

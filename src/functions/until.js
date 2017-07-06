@@ -1,6 +1,7 @@
-import Sequence from "../core/sequence";
+import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
 
-const UntilSequence = function(
+export const UntilSequence = function(
     predicate, source, isInclusive = false, included = true,
     satisfied = false, frontValue = null, initialize = true
 ){
@@ -77,22 +78,22 @@ Object.assign(UntilSequence.prototype, {
     },
 });
 
-/**
- *
- * @param {*} predicate
- * @param {*} source
- */
-const until = (predicate, source) => {
-    return new UntilSequence(predicate, source);
-};
-
-export const registration = {
+export const until = wrap({
     name: "until",
-    expected: {
-        functions: 1,
-        sequences: 1,
+    attachSequence: true,
+    async: false,
+    sequences: [
+        UntilSequence
+    ],
+    arguments: {
+        unordered: {
+            functions: 1,
+            sequences: 1
+        }
     },
-    implementation: until,
-};
+    implementation: (predicate, source) => {
+        return new UntilSequence(predicate, source);
+    },
+});
 
 export default until;

@@ -1,20 +1,17 @@
-import Sequence from "../core/sequence";
+import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
+
 import {EmptySequence} from "./empty";
 
-// Map sequence optimized for no input sequences.
-const NullMapSequence = function(transform){
-    this.transform = transform;
-};
-
 // Map sequence optimized for one input sequence.
-const SingularMapSequence = function(transform, source){
+export const SingularMapSequence = function(transform, source){
     this.source = source;
     this.transform = transform;
     this.maskAbsentMethods(source);
 };
 
 // Map sequence for any number of input sequences.
-const PluralMapSequence = function(transform, sources){
+export const PluralMapSequence = function(transform, sources){
     this.sources = sources;
     this.source = sources[0];
     this.transform = transform;
@@ -23,14 +20,14 @@ const PluralMapSequence = function(transform, sources){
     }
 };
 
-NullMapSequence.prototype = Object.create(EmptySequence.prototype);
-NullMapSequence.prototype.constructor = NullMapSequence;
-
 SingularMapSequence.prototype = Object.create(Sequence.prototype);
 SingularMapSequence.prototype.constructor = SingularMapSequence;
 Object.assign(SingularMapSequence.prototype, {
     bounded: function(){
         return this.source.bounded();
+    },
+    unbounded: function(){
+        return this.source.unbounded();
     },
     done: function(){
         return this.source.done();
@@ -80,6 +77,12 @@ Object.assign(PluralMapSequence.prototype, {
     bounded: function(){
         for(const source of this.sources){
             if(!source.bounded()) return false;
+        }
+        return true;
+    },
+    unbounded: function(){
+        for(const source of this.sources){
+            if(!source.unbounded()) return false;
         }
         return true;
     },
@@ -155,23 +158,30 @@ Object.assign(PluralMapSequence.prototype, {
     },
 });
 
-const map = (transform, sources) => {
-    if(sources.length === 1){
-        return new SingularMapSequence(transform, sources[0]);
-    }else if(sources.length === 0){
-        return new NullMapSequence(transform);
-    }else{
-        return new PluralMapSequence(transform, sources);
-    }
-};
-
-export const registration = {
+export const map = wrap({
     name: "map",
-    expected: {
-        functions: 1,
-        sequences: "*",
+    attachSequence: true,
+    async: false,
+    sequences: [
+        SingularMapSequence,
+        PluralMapSequence
+    ],
+    arguments: {
+        unordered: {
+            functions: 1,
+            sequences: "*"
+        }
     },
-    implementation: map,
-};
+    implementation: (transform, sources) => {
+        if(sources.length === 1){
+            // Most common use case
+            return new SingularMapSequence(transform, sources[0]);
+        }else if(sources.length === 0){
+            return new EmptySequence();
+        }else{
+            return new PluralMapSequence(transform, sources);
+        }
+    },
+});
 
 export default map;

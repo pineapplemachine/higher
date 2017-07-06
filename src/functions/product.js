@@ -1,24 +1,19 @@
-/**
- * Get the product of the numbers in a sequence.
- * @param {*} source
- * @returns 1 when the input is empty.
- */
-const product = (source) => {
-    let prod = 1;
-    for(const value of source) prod *= value;
-    return prod;
-};
+import {wrap} from "../core/wrap";
 
-export const registration = {
+// Get the product of the numbers in a sequence.
+// Returns 1 when the input was empty.
+export const product = wrap({
     name: "product",
-    expected: {
-        sequences: 1,
-        // Don't waste time coercing input iterables to sequences
-        allowIterables: true,
-        // Also generate an async version of this function
-        async: true,
+    attachSequence: true,
+    async: true,
+    arguments: {
+        one: wrap.expecting.iterable
     },
-    implementation: product,
-};
+    implementation: (source) => {
+        let product = 1;
+        for(const value of source) product *= value;
+        return product;
+    },
+});
 
 export default product;

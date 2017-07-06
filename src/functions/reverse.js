@@ -1,6 +1,7 @@
-import Sequence from "../core/sequence";
+import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
 
-const ReverseSequence = function(source){
+export const ReverseSequence = function(source){
     if(!source.back){
         throw "Failed to reverse sequence: Sequence must be bidirectional.";
     }
@@ -77,27 +78,29 @@ Object.assign(ReverseSequence.prototype, {
     },
 });
 
-/**
- *
- * @param {*} source
- */
-const reverse = (source) => {
-    if(source instanceof ReverseSequence){
-        return source.source;
-    }else if(source.back){
-        return new ReverseSequence(source);
-    }else if(source.bounded()){
-        // For large sequences this can be expensive, but the only way to do it.
-        return new ReverseSequence(new hi.LazyArraySequence(source));
-    }else{
-        throw "Failed to reverse sequence: Can't reverse unidirectional unbounded sequence.";
-    }
-};
-
-export const registration = {
+// Enumerate the contents of a bidirectional input sequence in reverse order.
+export const reverse = wrap({
     name: "reverse",
-    expected: {sequences: 1},
-    implementation: reverse,
-};
+    attachSequence: true,
+    async: false,
+    sequences: [
+        ReverseSequence
+    ],
+    arguments: {
+        one: wrap.expecting.sequence
+    },
+    implementation: (source) => {
+        if(source instanceof ReverseSequence){
+            return source.source;
+        }else if(source.back){
+            return new ReverseSequence(source);
+        }else if(source.bounded()){
+            source.forceEager();
+            return new ReverseSequence(source);
+        }else{
+            throw "Failed to reverse sequence: Can't reverse unidirectional unbounded sequence.";
+        }
+    },
+});
 
 export default reverse;

@@ -1,4 +1,7 @@
-import Sequence from "../core/sequence";
+import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
+
+import {InfiniteRepeatElementSequence} from "./repeatElement";
 
 const getStrideLength = function(strideLength){
     const value = Math.floor(+strideLength);
@@ -8,13 +11,10 @@ const getStrideLength = function(strideLength){
     return value;
 };
 
-/**
- * Implement stride using repeated popping of elements.
- * Note that initialization potentially changes the state of the source sequence.
- * @param {*} strideLength
- * @param {*} source
- */
-const PoppingStrideSequence = function(strideLength, source){
+// Implement stride using repeated popping of elements.
+// Note that initialization potentially changes the state of the source sequence.
+// TODO: Fix initialization changing the source
+export const PoppingStrideSequence = function(strideLength, source){
     this.strideLength = getStrideLength(strideLength);
     this.source = source;
     this.maskAbsentMethods(source);
@@ -28,15 +28,12 @@ const PoppingStrideSequence = function(strideLength, source){
     }
 };
 
-/**
- * Implement stride using indexing.
- * For this to be available, the source must support index and length methods.
- * @param {*} strideLength
- * @param {*} source
- */
-const IndexStrideSequence = function(strideLength, source){
-    if(!source.bounded()){
-        throw "Failed to create stride sequence: Source must be bounded.";
+// Implement stride using indexing.
+// For this to be available, the source must support index and length methods.
+export const IndexStrideSequence = function(strideLength, source){
+    if(!source.index || !source.length || !source.bounded()){
+        // TODO: More descriptive error
+        throw "Failed to create stride sequence.";
     }
     this.strideLength = getStrideLength(strideLength);
     this.source = source;
@@ -141,28 +138,31 @@ Object.assign(IndexStrideSequence.prototype, {
     },
 });
 
-/**
- *
- * @param {*} strideLength
- * @param {*} source
- */
-const stride = (strideLength, source) => {
-    if(strideLength === 1){
-        return source;
-    }else if(source.index && source.length && source.bounded()){
-        return new IndexStrideSequence(strideLength, source);
-    }else{
-        return new PoppingStrideSequence(strideLength, source);
-    }
-};
-
-export const registration = {
+export const stride = wrap({
     name: "stride",
-    expected: {
-        numbers: 1,
-        sequences: 1,
+    attachSequence: true,
+    async: false,
+    sequences: [
+        PoppingStrideSequence,
+        IndexStrideSequence
+    ],
+    arguments: {
+        unordered: {
+            numbers: 1,
+            sequences: 1
+        }
     },
-    implementation: stride,
-};
+    implementation: (strideLength, source) => {
+        if(strideLength <= 0){
+            return new InfiniteRepeatElementSequence(source.front());
+        }else if(strideLength === 1){
+            return source;
+        }else if(source.index && source.length && source.bounded()){
+            return new IndexStrideSequence(strideLength, source);
+        }else{
+            return new PoppingStrideSequence(strideLength, source);
+        }
+    },
+});
 
 export default stride;

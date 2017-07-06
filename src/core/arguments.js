@@ -1,23 +1,21 @@
 import {asSequence, validAsSequence} from "./asSequence";
 import {isArray, isFunction} from "./types";
 
-/**
- * Important term definition: "Argument expectation token".
- * An argument expectation token is a value that tells the arguments handler
- * how many arguments of some type to expect. Tokens are associated with a
- * type - either numbers, functions, or sequences - and they provide information
- * like "there should be exactly one of these" or "there should be none of
- * these" or even "there may be any number of these".
- * The possible tokens are:
- * Any falsey value - No arguments of this type are expected.
- * Any number - The exact number of arguments of this type that are expected.
- * An array - The first element is a minimum number of arguments of this
- * type and the second element is a maximum number of arguments.
- * "?" - One or zero arguments of this type are expected.
- * "+" - One or more arguments of this type are expected.
- * "*" - Any number of arguments of this type are allowed.
- */
-const args = {
+// Important term definition: "Argument expectation token".
+// An argument expectation token is a value that tells the arguments handler
+// how many arguments of some type to expect. Tokens are associated with a
+// type - either numbers, functions, or sequences - and they provide information
+// like "there should be exactly one of these" or "there should be none of
+// these" or even "there may be any number of these".
+// The possible tokens are:
+// Any falsey value - No arguments of this type are expected.
+// Any number - The exact number of arguments of this type that are expected.
+// An array - The first element is a minimum number of arguments of this
+// type and the second element is a maximum number of arguments.
+// "?" - One or zero arguments of this type are expected.
+// "+" - One or more arguments of this type are expected.
+// "*" - Any number of arguments of this type are allowed.
+export const args = {
     expectSingular: function(expected){
         return expected === 1 || expected === "?";
     },

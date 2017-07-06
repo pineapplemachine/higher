@@ -1,10 +1,7 @@
-/**
- * An error message for explaining why the sequence is unbounded.
- * @param {*} action
- * @param {*} method
- * @param {*} intermediate
- */
-function unboundedError(action, method, intermediate = false){
+// TODO: These need to be error types, not functions returning strings
+
+// An error message for explaining that an input must be known to be bounded.
+export const unboundedError = (action, method, intermediate = false) => {
     return (
         `Failed to ${action} the sequence because to do so would require ` +
         "fully consuming an unbounded sequence" +
@@ -16,12 +13,8 @@ function unboundedError(action, method, intermediate = false){
     );
 }
 
-/**
- * An error message explaining why collapsing a sequence has failed.
- * @param {*} prevType
- * @param {*} breakingType
- */
-function collapseCopyError(prevType, breakingType){
+// An error message explaining why collapsing a sequence has failed.
+export const collapseCopyError = (prevType, breakingType) => {
     return (
         "Collapsing the sequence failed because one of the " +
         `intermediate sequences of type "${prevType}" does ` +
@@ -29,5 +22,3 @@ function collapseCopyError(prevType, breakingType){
         `special collapse behavior sequence "${breakingType}".`
     );
 }
-
-export {unboundedError, collapseCopyError};

@@ -1,8 +1,11 @@
-import Sequence from "../core/sequence";
+import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
+
+import {EmptySequence} from "./empty";
 import {InfiniteRepeatElementSequence} from "./repeatElement";
 
 // Result of calling range with a step of exactly 1.
-const NumberRangeSequence = function(start, end){
+export const NumberRangeSequence = function(start, end){
     this.start = start;
     this.end = end;
     this.frontValue = start;
@@ -10,7 +13,7 @@ const NumberRangeSequence = function(start, end){
 };
 
 // Result of calling range with a step of greater than 0.
-const ForwardNumberRangeSequence = function(start, end, step){
+export const ForwardNumberRangeSequence = function(start, end, step){
     if(step <= 0){
         throw "Failed to create range: Step must be greater than zero.";
     }
@@ -22,7 +25,7 @@ const ForwardNumberRangeSequence = function(start, end, step){
 };
 
 // Result of calling range with a step of less than 0.
-const BackwardNumberRangeSequence = function(start, end, step){
+export const BackwardNumberRangeSequence = function(start, end, step){
     if(step >= 0){
         throw "Failed to create range: Step must be less than zero.";
     }
@@ -114,11 +117,11 @@ Object.assign(ForwardNumberRangeSequence.prototype, {
         this.backValue -= this.step;
     },
     index: function(i){
-        return this.start + i * this.step;
+        return this.start + i// this.step;
     },
     slice: function(i, j){
         return new ForwardNumberRangeSequence(
-            this.start + i * this.step, this.start + j * this.step, this.step
+            this.start + i// this.step, this.start + j// this.step, this.step
         );
     },
     copy: function(){
@@ -167,11 +170,11 @@ Object.assign(BackwardNumberRangeSequence.prototype, {
         this.backValue -= this.step;
     },
     index: function(i){
-        return this.start + i * this.step;
+        return this.start + i// this.step;
     },
     slice: function(i, j){
         return new BackwardNumberRangeSequence(
-            this.start + i * this.step, this.start + j * this.step, this.step
+            this.start + i// this.step, this.start + j// this.step, this.step
         );
     },
     copy: function(){
@@ -189,52 +192,49 @@ Object.assign(BackwardNumberRangeSequence.prototype, {
     },
 });
 
-// Result of calling range with a step of 0.
-// Looks on the surface like any other number range sequence,
-// but is actually unbounded.
-const NullStepRangeSequence = function(start, end){
-    this.start = start;
-    this.end = end;
-    this.step = 0;
-    this.element = start;
-};
-
-NullStepRangeSequence.prototype = Object.create(
-    InfiniteRepeatElementSequence.prototype
-);
-
-
-/**
- * Create a sequence enumerating numbers in a linear range.
- * When one number is passed, it is an exclusive upper bound.
- * When two numbers are passed, they are the inclusive lower and exclusive
- * higher bounds, respectively.
- * When three numbers are passed they are the lower and higher bounds and
- * the step from one value to the next, respectively.
- * The step is 1 by default but fractical, negative, and zero values are
- * also accepted.
- * @param {*} numbers
- */
-const range = (numbers) => {
-    if(numbers.length === 1){
-        return new NumberRangeSequence(0, numbers[0]);
-    }else if(numbers.length === 2 || numbers[2] === 1){
-        return new NumberRangeSequence(numbers[0], numbers[1]);
-    }else if(numbers[2] > 0){
-        return new ForwardNumberRangeSequence(numbers[0], numbers[1], numbers[2]);
-    }else if(numbers[2] < 0){
-        return new BackwardNumberRangeSequence(numbers[0], numbers[1], numbers[2]);
-    }else{
-        return new NullStepRangeSequence(numbers[0], numbers[1]);
-    }
-};
-
-export const registration = {
+// Create a sequence enumerating numbers in a linear range.
+// When one number is passed, it is an exclusive upper bound.
+// When two numbers are passed, they are the inclusive lower and exclusive
+// higher bounds, respectively.
+// When three numbers are passed they are the lower and higher bounds and
+// the step from one value to the next, respectively.
+// The step is 1 by default but fractical, negative, and zero values are
+// also accepted.
+export const range = wrap({
     name: "range",
-    expected: {
-        numbers: [1, 3],
+    attachSequence: false,
+    async: false,
+    sequences: [
+        NumberRangeSequence,
+        ForwardNumberRangeSequence,
+        BackwardNumberRangeSequence
+    ],
+    arguments: {
+        unordered: {
+            numbers: [1, 3]
+        }
     },
-    implementation: range,
-};
+    implementation: (numbers) => {
+        if(numbers.length === 1){
+            // Only upper bound specified; enumerate [0, x) with a step of 1.
+            return new NumberRangeSequence(0, numbers[0]);
+        }else if(numbers.length === 2 || numbers[2] === 1){
+            // Both bounds specified; enumerate [x, y) with a step of 1.
+            return new NumberRangeSequence(numbers[0], numbers[1]);
+        }else if(numbers[2] > 0){
+            // Both bounds and a positive step; enumerate [x, y) with a positive step.
+            return new ForwardNumberRangeSequence(numbers[0], numbers[1], numbers[2]);
+        }else if(numbers[2] < 0){
+            // Both bounds and a negative step; enumerate [x, y) with a negative step.
+            return new BackwardNumberRangeSequence(numbers[0], numbers[1], numbers[2]);
+        }else if(numbers[1] <= numbers[0]){
+            // Both bounds and a zero step, but there are no elements anyway.
+            return new EmptySequence();
+        }else{
+            // Both bounds and a zero step; infinitely repeat the start value.
+            return new InfiniteRepeatElementSequence(numbers[0]);
+        }
+    },
+});
 
 export default range;

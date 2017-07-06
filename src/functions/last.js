@@ -1,31 +1,30 @@
-/**
- * Get the last element in a sequence or, if a predicate is passed,
- * get the last element meeting that predicate.
- * Returns undefined if there was no such element.
- * @param {*} predicate
- * @param {*} source
- */
-const last = (predicate, source) => {
-    if(predicate){
-        let back = null;
-        while(!source.done()){
-            back = source.back();
-            if(predicate(back)) return back;
-            source.popBack();
-        }
-    }else if(!source.done()){
-        return source.back();
-    }
-    return undefined;
-};
+import {wrap} from "../core/wrap";
 
-export const registration = {
+// Get the last element in a sequence or, if a predicate is passed,
+// get the last element meeting that predicate.
+export const last = wrap({
     name: "last",
-    expected: {
-        functions: "?",
-        sequences: 1,
+    attachSequence: true,
+    async: true,
+    arguments: {
+        unordered: {
+            functions: "?",
+            sequences: 1
+        }
     },
-    implementation: last,
-};
+    implementation: (predicate, source) => {
+        if(predicate){
+            let back = null;
+            while(!source.done()){
+                back = source.back();
+                if(predicate(back)) return back;
+                source.popBack();
+            }
+        }else if(!source.done()){
+            return source.back();
+        }
+        return undefined;
+    },
+});
 
 export default last;

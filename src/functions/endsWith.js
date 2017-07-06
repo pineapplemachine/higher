@@ -1,38 +1,35 @@
-/**
- * Determine equality of one or more sequences given a comparison function.
- * When only one sequence is given as input, the output is always true.
- * When no comparison function is given, (a, b) => (a == b) is used as a default.
- * @param {*} compare
- * @param {*} sources
- */
-const endsWith = (compare, sources) => {
-    const source = sources[0];
-    const search = sources[1];
-    if(source.length && search.length){
-        // Can't end with a sequence longer than the sequence itself.
-        if(source.length() < search.length()) return false;
-    }
-    // If either input isn't bidirectional, it needs to be fully in memory.
-    if(!source.back) source.forceEager();
-    if(!search.back) search.forceEager();
-    const compareFunc = compare || ((a, b) => (a === b));
-    while(!search.done()){
-        if(source.done() || !compareFunc(source.nextBack(), search.nextBack())){
-            return false;
-        }
-    }
-    return true;
-};
+import {wrap} from "../core/wrap";
 
-export const registration = {
+// Determine equality of one or more sequences given a comparison function.
+// When only one sequence is given as input, the output is always true.
+export const endsWith = wrap({
     name: "endsWith",
-    expected: {
-        functions: "?",
-        sequences: 2,
-        // Also generate an async version of this function
-        async: true,
+    attachSequence: true,
+    async: true,
+    arguments: {
+        unordered: {
+            functions: "?",
+            sequences: 2,
+        }
     },
-    implementation: endsWith,
-};
+    implementation: (compare, sources) => {
+        const source = sources[0];
+        const search = sources[1];
+        if(source.length && search.length){
+            // Can't end with a sequence longer than the sequence itself.
+            if(source.length() < search.length()) return false;
+        }
+        // If either input isn't bidirectional, it needs to be fully in memory.
+        if(!source.back) source.forceEager();
+        if(!search.back) search.forceEager();
+        const compareFunc = compare || ((a, b) => (a === b));
+        while(!search.done()){
+            if(source.done() || !compareFunc(source.nextBack(), search.nextBack())){
+                return false;
+            }
+        }
+        return true;
+    },
+});
 
 export default endsWith;

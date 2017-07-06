@@ -1,7 +1,9 @@
 import Sequence from "../core/sequence";
+import {wrap} from "../core/wrap";
+
 import {EmptySequence} from "./empty";
 
-const FiniteRepeatElementSequence = function(
+export const FiniteRepeatElementSequence = function(
     repetitions, element, finishedRepetitions = 0
 ){
     this.repetitions = repetitions;
@@ -9,11 +11,7 @@ const FiniteRepeatElementSequence = function(
     this.element = element;
 };
 
-const InfiniteRepeatElementSequence = function(element){
-    this.element = element;
-};
-
-const NullRepeatElementSequence = function(element){
+export const InfiniteRepeatElementSequence = function(element){
     this.element = element;
 };
 
@@ -22,6 +20,10 @@ FiniteRepeatElementSequence.prototype.constructor = FiniteRepeatElementSequence;
 Object.assign(FiniteRepeatElementSequence.prototype, {
     seed: function(element){
         this.element = element;
+        return this;
+    },
+    times: function(repetitions){
+        this.repetitions = times;
         return this;
     },
     repeat: function(repetitions = null){
@@ -90,6 +92,9 @@ Object.assign(InfiniteRepeatElementSequence.prototype, {
         this.element = element;
         return this;
     },
+    times: function(repetitions){
+        return new FiniteRepeatElementSequence(repetitions, this.element);
+    },
     repeat: function(repetitions){
         return this;
     },
@@ -127,58 +132,32 @@ Object.assign(InfiniteRepeatElementSequence.prototype, {
     },
 });
 
-NullRepeatElementSequence.prototype = Object.create(EmptySequence.prototype);
-NullRepeatElementSequence.prototype.constructor = NullRepeatElementSequence;
-Object.assign(NullRepeatElementSequence.prototype, {
-    repetitions: 0,
-    shuffle: function(){
-        return this;
+// Produce a sequence that repeats a single element.
+export const repeatElement = wrap({
+    name: "repeatElement",
+    attachSequence: false,
+    async: false,
+    sequences: [
+        FiniteRepeatElementSequence,
+        InfiniteRepeatElementSequence
+    ],
+    arguments: {
+        ordered: [wrap.expecting.anything, wrap.expecting.number]
     },
-    seed: function(element){
-        this.element = element;
-        return this;
-    },
-    slice: function(i, j){
-        return new NullRepeatElementSequence(this.element);
-    },
-    copy: function(){
-        return new NullRepeatElementSequence(this.element);
-    },
-});
-
-const repeatElement = function(){
-    if(arguments.length === 1){
-        return new InfiniteRepeatElementSequence(arguments[0]);
-    }else if(arguments.length >= 2){
-        const element = arguments[0];
-        const repetitions = arguments[1];
-        if(isNaN(repetitions)){
-            throw argumentsError;
-        }else if(repetitions <= 0){
-            return new NullRepeatElementSequence(element);
+    implementation: (...args) => {
+        const element = args[0];
+        const repetitions = args[1];
+        if(repetitions <= 0){
+            return new EmptySequence();
+        }else if(!repetitions){ // Argument wasn't provided
+            return new InfiniteRepeatElementSequence(repetitions);
         }else if(!isFinite(repetitions)){
             return new InfiniteRepeatElementSequence(element);
         }else{
             const repetitions = Math.floor(+repetitions);
             return new FiniteRepeatElementSequence(repetitions, element);
         }
-    }else{
-        throw argumentsError;
-    }
-};
-
-// Error object thrown when the arguments to repeatElement are incorrect.
-const argumentsError = (
-    "Failed to repeat element: The function must be called with one argument " +
-    "or two arguments. When there is one argument, it is the element to be " +
-    "infinitely repeated. When there are two arguments, the first must be the " +
-    "number of times to repeat and the second the element to be repeated."
-);
-
-export {
-    FiniteRepeatElementSequence,
-    InfiniteRepeatElementSequence,
-    NullRepeatElementSequence,
-};
+    },
+});
 
 export default repeatElement;

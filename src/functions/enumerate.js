@@ -1,7 +1,9 @@
-import Sequence from "../core/sequence";
+import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
 
-const EnumerateSequence = function(
-    source, start = 0, step = 1, frontIndex = 0, backIndex = 0, initialize = true
+export const EnumerateSequence = function(
+    source, start = 0, step = 1,
+    frontIndex = 0, backIndex = 0, initialize = true
 ){
     this.source = source;
     this.start = start;
@@ -72,21 +74,24 @@ Object.assign(EnumerateSequence.prototype, {
     },
 });
 
-const enumerate = (numbers, source) =>{
-    const start = numbers[0] || 0;
-    const step = numbers.length > 1 ? numbers[1] : 1;
-    return new EnumerateSequence(source, start, step);
-};
-
-export {EnumerateSequence};
-
-export const registration = {
+export const enumerate = wrap({
     name: "enumerate",
-    expected: {
-        numbers: [0, 2],
-        sequences: 1,
+    attachSequence: true,
+    async: false,
+    sequences: [
+        EnumerateSequence
+    ],
+    arguments: {
+        unordered: {
+            numbers: [0, 2],
+            sequences: 1,
+        },
     },
-    implementation: enumerate,
-};
+    implementation: (numbers, source) =>{
+        const start = numbers[0] || 0;
+        const step = numbers.length > 1 ? numbers[1] : 1;
+        return new EnumerateSequence(source, start, step);
+    },
+});
 
 export default enumerate;

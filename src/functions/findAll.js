@@ -1,6 +1,7 @@
-import Sequence from "../core/sequence";
+import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
 
-const FindSequenceResult = function(source, low, high){
+export const FindSequenceResult = function(source, low, high){
     this.source = source;
     this.low = low;
     this.high = high;
@@ -15,6 +16,7 @@ const FindSequenceResult = function(source, low, high){
 };
 
 // TODO: Maybe this should just be a sequence somehow?
+FindSequenceResult.prototype.constructor = FindSequenceResult;
 Object.assign(FindSequenceResult.prototype, {
     slice: function(){
         return this.source.slice(this.low, this.high);
@@ -30,16 +32,11 @@ Object.assign(FindSequenceResult.prototype, {
     },
 });
 
-/**
- * A find sequences uses a list of threads to find substring occurrences.
- * Forward-searching sequences use this constructor.
- * @param {*} compare
- * @param {*} index
- * @param {*} search
- * @param {*} searchElement
- * @param {*} alive
- */
-const ForwardFindSequenceThread = function(compare, index, search, searchElement, alive){
+// A find sequences uses a list of threads to find substring occurrences.
+// Forward-searching sequences use this constructor.
+export const ForwardFindSequenceThread = function(
+    compare, index, search, searchElement, alive
+){
     this.compare = compare;
     this.index = index;
     this.search = search;
@@ -47,16 +44,11 @@ const ForwardFindSequenceThread = function(compare, index, search, searchElement
     this.alive = alive;
 };
 
-/**
- * A find sequences uses a list of threads to find substring occurrences.
- * Backward-searching sequences use this constructor.
- * @param {*} compare
- * @param {*} index
- * @param {*} search
- * @param {*} searchElement
- * @param {*} alive
- */
-const BackwardFindSequenceThread = function(compare, index, search, searchElement, alive){
+// A find sequences uses a list of threads to find substring occurrences.
+// Backward-searching sequences use this constructor.
+export const BackwardFindSequenceThread = function(
+    compare, index, search, searchElement, alive
+){
     this.compare = compare;
     this.index = index;
     this.search = search;
@@ -64,6 +56,7 @@ const BackwardFindSequenceThread = function(compare, index, search, searchElemen
     this.alive = alive;
 };
 
+ForwardFindSequenceThread.prototype.constructor = ForwardFindSequenceThread;
 Object.assign(ForwardFindSequenceThread.prototype, {
     consume: function(element){
         if(this.compare(element, this.searchElement)){
@@ -93,6 +86,7 @@ Object.assign(ForwardFindSequenceThread.prototype, {
     },
 });
 
+BackwardFindSequenceThread.prototype.constructor = BackwardFindSequenceThread;
 Object.assign(BackwardFindSequenceThread.prototype, {
     consume: function(element){
         if(this.compare(element, this.searchElement)){
@@ -122,7 +116,7 @@ Object.assign(BackwardFindSequenceThread.prototype, {
     },
 });
 
-const ForwardFindSequence = function(
+export const ForwardFindSequence = function(
     compare, source, search, searchThreads = undefined
 ){
     if(!search.copy) throw (
@@ -144,7 +138,7 @@ const ForwardFindSequence = function(
     };
 };
 
-const BackwardFindSequence = function(
+export const BackwardFindSequence = function(
     compare, source, search, searchThreads = undefined
 ){
     if(!search.copy) throw (
@@ -162,7 +156,7 @@ const BackwardFindSequence = function(
     if(!source.reset) this.reset = null;
 };
 
-const stepFindThreads = function(element){
+export const stepFindThreads = function(element){
     let result = undefined;
     let deadThreads = 0;
     // Progress alive threads
@@ -439,36 +433,28 @@ Object.assign(BackwardFindSequence.prototype, {
     },
 });
 
-/**
- * Find all occurrences of a substring as judged by a comparison function.
- * When no comparison function is given, (a, b) => (a == b) is used as a default.
- * @param {*} compare
- * @param {*} sequences
- */
-const findAll = (compare, sequences) => {
-    const source = sequences[0];
-    const search = sequences[1];
-    return new ForwardFindSequence(
-        compare || ((a, b) => a === b), source, search
-    );
-};
-
-export {
-    FindSequenceResult,
-    ForwardFindSequence,
-    ForwardFindSequenceThread,
-    BackwardFindSequence,
-    BackwardFindSequenceThread,
-    stepFindThreads,
-};
-
-export const registration = {
+// Find all occurrences of a substring as judged by a comparison function.
+export const findAll = wrap({
     name: "findAll",
-    expected: {
-        functions: "?",
-        sequences: 2,
+    attachSequence: true,
+    async: false,
+    sequences: [
+        ForwardFindSequence,
+        BackwardFindSequence
+    ],
+    arguments: {
+        unordered: {
+            functions: "?",
+            sequences: 2
+        }
     },
-    implementation: findAll,
-};
+    implementation: (compare, sequences) => {
+        const source = sequences[0];
+        const search = sequences[1];
+        return new ForwardFindSequence(
+            compare || ((a, b) => a === b), source, search
+        );
+    },
+});
 
 export default findAll;

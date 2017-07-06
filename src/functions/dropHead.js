@@ -1,6 +1,7 @@
-import Sequence from "../core/sequence";
+import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
 
-const DropHeadSequence = function(dropElements, source, initialized = false){
+export const DropHeadSequence = function(dropElements, source, initialized = false){
     this.dropElements = dropElements;
     this.source = source;
     this.initialized = initialized;
@@ -63,25 +64,28 @@ Object.assign(DropHeadSequence.prototype, {
     },
 });
 
-const dropHead = (dropElements, source) => {
-    if(dropElements <= 0){
-        return source;
-    }else if(source.slice && source.length){
-        return source.slice(dropElements, source.length());
-    }else{
-        return new DropHeadSequence(dropElements, source);
-    }
-};
-
-export {DropHeadSequence};
-
-export const registration = {
+export const dropHead = wrap({
     name: "dropHead",
-    expected: {
-        numbers: 1,
-        sequences: 1,
+    attachSequence: true,
+    async: false,
+    sequences: [
+        DropHeadSequence
+    ],
+    arguments: {
+        unordered: {
+            numbers: 1,
+            sequences: 1
+        }
     },
-    implementation: dropHead,
-};
+    implementation: (dropElements, source) => {
+        if(dropElements <= 0){
+            return source;
+        }else if(source.slice && source.length){
+            return source.slice(dropElements, source.length());
+        }else{
+            return new DropHeadSequence(dropElements, source);
+        }
+    },
+});
 
 export default dropHead;

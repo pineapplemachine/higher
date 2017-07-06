@@ -1,6 +1,7 @@
-import Sequence from "../core/sequence";
+import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
 
-const DistinctSequence = function(
+export const DistinctSequence = function(
     source, history = null, frontValue = null, initialize = true
 ){
     this.source = source;
@@ -54,18 +55,19 @@ Object.assign(DistinctSequence.prototype, {
     },
 });
 
-const distinct = (source) => {
-    return new DistinctSequence(source);
-};
-
-export {DistinctSequence};
-
-export const registration = {
+export const distinct = wrap({
     name: "distinct",
-    expected: {
-        sequences: 1,
+    attachSequence: true,
+    async: false,
+    sequences: [
+        DistinctSequence
+    ],
+    arguments: {
+        one: wrap.expecting.sequence
     },
-    implementation: distinct,
-};
+    imlementation: (source) => {
+        return new DistinctSequence(source);
+    },
+});
 
 export default distinct;
