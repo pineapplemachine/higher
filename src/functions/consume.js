@@ -1,13 +1,20 @@
-hi.register("consume", {
-    sequences: 1,
-    // Don't waste time coercing input iterables to sequences
-    allowIterables: true,
-    // Also generate an async version of this function
+import {isSequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
+
+export const consume = wrap({
+    name: "consume",
+    attachSequence: true,
     async: true,
-}, function(source){
-    if(isSequence(source)){
-        while(!source.done()) source.popFront();
-    }else{
-        for(const element of source){}
-    }
+    arguments: {
+        one: wrap.expecting.iterable
+    },
+    implementation: (source) => {
+        if(isSequence(source)){
+            while(!source.done()) source.popFront();
+        }else{
+            for(const element of source){}
+        }
+    },
 });
+
+export default consume;

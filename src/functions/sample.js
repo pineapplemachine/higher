@@ -1,21 +1,28 @@
+import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
+
+import {EmptySequence} from "./empty";
+import {HeadSequence} from "./head";
+import {ShuffleSequence} from "./shuffle";
+
 // An alternative to commiting a sequence of indexes fully to memory and then
 // shuffling the entirety.
 // This algorithm is always less performant when shuffling an entire array,
 // but is often faster than acquiring the first few elements of a longer
 // shuffled sequence.
-hi.DistinctRandomIndexSequence = function(
+export const DistinctRandomIndexSequence = function(
     random, totalValues, valueHistory = undefined
 ){
     this.random = random;
     this.totalValues = totalValues;
     this.valueHistory = valueHistory || [
-        Math.floor(random() * totalValues)
+        Math.floor(random() * totalValues),
     ];
 };
 
-hi.DistinctRandomIndexSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.DistinctRandomIndexSequence.prototype.constructor = hi.DistinctRandomIndexSequence;
-Object.assign(hi.DistinctRandomIndexSequence.prototype, {
+DistinctRandomIndexSequence.prototype = Object.create(Sequence.prototype);
+DistinctRandomIndexSequence.prototype.constructor = DistinctRandomIndexSequence;
+Object.assign(DistinctRandomIndexSequence.prototype, {
     bounded: () => true,
     done: function(){
         return this.valueHistory.length > this.totalValues;
@@ -48,9 +55,6 @@ Object.assign(hi.DistinctRandomIndexSequence.prototype, {
         // In essence: Whenever a pair of elements are encountered that are
         // relatively in descending order, they are swapped to instead be
         // in ascending order.
-        // TODO: At what point, if any, does this stop being more performant
-        // than a Fisher-Yates shuffle? Can a heuristic be used to choose
-        // which algorithm to use depending on the length of the input?
         if(this.valueHistory.length < this.totalValues){
             let i = Math.floor(this.random() * (
                 this.totalValues - this.valueHistory.length
@@ -91,18 +95,18 @@ Object.assign(hi.DistinctRandomIndexSequence.prototype, {
 });
 
 // Input sequence must have length and indexing.
-hi.SampleSequence = function(samples, random, source, indexes = undefined){
+const SampleSequence = function(samples, random, source, indexes = undefined){
     this.samples = samples;
     this.random = random;
     this.source = source;
-    this.indexes = indexes || new hi.DistinctRandomIndexSequence(
+    this.indexes = indexes || new DistinctRandomIndexSequence(
         this.random, this.source.length()
     );
 };
 
-hi.SampleSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.SampleSequence.prototype.constructor = hi.SampleSequence;
-Object.assign(hi.SampleSequence.prototype, {
+SampleSequence.prototype = Object.create(Sequence.prototype);
+SampleSequence.prototype.constructor = SampleSequence;
+Object.assign(SampleSequence.prototype, {
     bounded: () => true,
     done: function(){
         return this.indexes.valueHistory.length > this.samples;
@@ -131,27 +135,41 @@ Object.assign(hi.SampleSequence.prototype, {
     reset: null,
 });
 
-hi.register("sample", {
-    numbers: "?",
-    functions: "?",
-    sequences: 1,
-}, function(samples, random, source){
-    if(samples <= 0){
-        return new hi.EmptySequence();
-    }
-    if(!source.index || !source.length){
-        source.forceEager();
-    }
-    const randomFunc = random || Math.random;
-    if(!samples){
-        return source.index(Math.floor(randomFunc() * source.length()));
-    }else if(samples <= source.length() / 5){
-        // Lazy implementation is usually more performant when the sample
-        // count is no more than 20% of the number of elements.
-        return new hi.SampleSequence(samples, randomFunc, source);
-    }else{
-        return new hi.HeadSequence(samples,
-            new hi.ShuffleSequence(randomFunc, source)
-        );
-    }
+export const sample = wrap({
+    name: "sample",
+    attachSequence: true,
+    async: false,
+    sequences: [
+        SampleSequence,
+        DistinctRandomIndexSequence
+    ],
+    arguments: {
+        unordered: {
+            numbers: "?",
+            functions: "?",
+            sequences: 1
+        }
+    },
+    implementation: (samples, random, source) => {
+        if(samples <= 0){
+            return new EmptySequence();
+        }
+        if(!source.index || !source.length){
+            source.forceEager();
+        }
+        const randomFunc = random || Math.random;
+        if(!samples){
+            return source.index(Math.floor(randomFunc() * source.length()));
+        }else if(samples <= source.length() / 5){
+            // Lazy implementation is usually more performant when the sample
+            // count is no more than 20% of the number of elements.
+            return new SampleSequence(samples, randomFunc, source);
+        }else{
+            return new HeadSequence(samples,
+                new ShuffleSequence(randomFunc, source)
+            );
+        }
+    },
 });
+
+export default sample;

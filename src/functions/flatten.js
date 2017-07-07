@@ -1,22 +1,26 @@
-hi.ForwardFlattenSequence = function(source, frontSource = null){
+import {Sequence} from "../core/sequence";
+import {asSequence, validAsSequence} from "../core/asSequence";
+import {wrap} from "../core/wrap";
+
+export const ForwardFlattenSequence = function(source, frontSource = null){
     this.source = source;
     this.frontSource = frontSource;
 };
 
-hi.BackwardFlattenSequence = function(source, frontSource = null){
+export const BackwardFlattenSequence = function(source, frontSource = null){
     this.source = source;
     this.frontSource = frontSource;
 };
 
-hi.ForwardFlattenSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.ForwardFlattenSequence.prototype.constructor = hi.ForwardFlattenSequence;
-Object.assign(hi.ForwardFlattenSequence.prototype, {
+ForwardFlattenSequence.prototype = Object.create(Sequence.prototype);
+ForwardFlattenSequence.prototype.constructor = ForwardFlattenSequence;
+Object.assign(ForwardFlattenSequence.prototype, {
     reverse: function(){
         return new hi.BackwardFlattenSequence(this.source);
     },
     initialize: function(){
         while((!this.frontSource || this.frontSource.done()) && !this.source.done()){
-            this.frontSource = hi.asSequence(this.source.nextFront());
+            this.frontSource = asSequence(this.source.nextFront());
         }
         this.done = function(){
             return this.frontSource.done();
@@ -27,7 +31,7 @@ Object.assign(hi.ForwardFlattenSequence.prototype, {
         this.popFront = function(){
             this.frontSource.popFront();
             while(this.frontSource.done() && !this.source.done()){
-                this.frontSource = hi.asSequence(this.source.nextFront());
+                this.frontSource = asSequence(this.source.nextFront());
             }
         };
     },
@@ -54,15 +58,15 @@ Object.assign(hi.ForwardFlattenSequence.prototype, {
     reset: null,
 });
 
-hi.BackwardFlattenSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.BackwardFlattenSequence.prototype.constructor = hi.BackwardFlattenSequence;
-Object.assign(hi.BackwardFlattenSequence.prototype, {
+BackwardFlattenSequence.prototype = Object.create(Sequence.prototype);
+BackwardFlattenSequence.prototype.constructor = BackwardFlattenSequence;
+Object.assign(BackwardFlattenSequence.prototype, {
     reverse: function(){
-        return new hi.ForwardFlattenSequence(this.source);
+        return new ForwardFlattenSequence(this.source);
     },
     initialize: function(){
         while((!this.frontSource || this.frontSource.done()) && !this.source.done()){
-            this.frontSource = hi.asSequence(this.source.nextBack());
+            this.frontSource = asSequence(this.source.nextBack());
         }
         this.done = function(){
             return this.frontSource.done();
@@ -73,7 +77,7 @@ Object.assign(hi.BackwardFlattenSequence.prototype, {
         this.popFront = function(){
             this.frontSource.popBack();
             while(this.frontSource.done() && !this.source.done()){
-                this.frontSource = hi.asSequence(this.source.nextBack());
+                this.frontSource = asSequence(this.source.nextBack());
             }
         };
     },
@@ -101,8 +105,20 @@ Object.assign(hi.BackwardFlattenSequence.prototype, {
 });
 
 // Flatten a single level deep.
-hi.register("flatten", {
-    sequences: 1,
-}, function(source){
-    return new hi.ForwardFlattenSequence(source);
+export const flatten = wrap({
+    name: "flatten",
+    attachSequence: true,
+    async: false,
+    sequences: [
+        ForwardFlattenSequence,
+        BackwardFlattenSequence
+    ],
+    arguments: {
+        one: wrap.expecting.sequence
+    },
+    imlementation: (source) => {
+        return new ForwardFlattenSequence(source);
+    },
 });
+
+export default flatten;

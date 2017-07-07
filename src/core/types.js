@@ -1,40 +1,37 @@
-// True when the input is undefined.
-hi.isUndefined = function(value){
-    return typeof(value) === "undefined";
+export const isUndefined = (value) => {
+    return value === undefined;
 };
-// True when the input is a number.
-hi.isNumber = function(value){
+
+export const isNumber = (value) => {
     return !isNaN(value);
 };
-// True when the input is a string.
-hi.isString = function(value){
+
+export const isString = (value) => {
     return value instanceof String || typeof value === "string";
 };
-// True when the input is an array.
-hi.isArray = function(value){
+
+export const isArray = (value) => {
     return value instanceof Array;
 };
-// True when the input is an object.
-hi.isObject = function(value){
+
+export const isObject = (value) => {
     return Object.prototype.toString.call(value) === "[object Object]";
 };
-// True when the input is callable.
-hi.isFunction = function(value){
+
+export const isFunction = (value) => {
     return value instanceof Function;
 };
-// True when the input is an iterable.
-hi.isIterable = function(value){
-    return hi.isFunction(value[Symbol.iterator]);
+
+export const isIterable = (value) => {
+    return isFunction(value[Symbol.iterator]);
 };
-// True when the input is a sequence.
-hi.isSequence = function(value){
-    return hi.isIterable(value) && (
-        hi.isFunction(value.front) &&
-        hi.isFunction(value.popFront) &&
-        hi.isFunction(value.nextFront) &&
-        hi.isFunction(value.consume) &&
-        hi.isFunction(value.done) &&
-        hi.isFunction(value.array) &&
-        hi.isFunction(value.object)
-    );
+
+export default {
+    isUndefined,
+    isNumber,
+    isString,
+    isArray,
+    isObject,
+    isFunction,
+    isIterable
 };

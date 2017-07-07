@@ -1,21 +1,31 @@
-hi.register("homogenous", {
-    functions: "?",
-    sequences: 1,
-    // Don't waste time coercing input iterables to sequences
-    allowIterables: true,
-    // Also generate an async version of this function
+import {constants} from "../core/constants";
+import {wrap} from "../core/wrap";
+
+export const homogenous = wrap({
+    name: "homogenous",
+    attachSequence: true,
     async: true,
-}, function(compare, source){
-    const compareFunc = compare || hi.defaultComparisonFunction;
-    let first = true;
-    let firstElement = null;
-    for(const element of source){
-        if(first){
-            firstElement = element;
-            first = false;
-        }else if(!compareFunc(element, firstElement)){
-            return false;
+    arguments: {
+        unordered: {
+            functions: 1,
+            sequences: 1,
+            allowIterables: true
         }
-    }
-    return true;
+    },
+    implementation: (compare, source) => {
+        const compareFunc = compare || constants.defaults.comparisonFunction;
+        let first = true;
+        let firstElement = null;
+        for(const element of source){
+            if(first){
+                firstElement = element;
+                first = false;
+            }else if(!compareFunc(element, firstElement)){
+                return false;
+            }
+        }
+        return true;
+    },
 });
+
+export default homogenous;

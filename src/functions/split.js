@@ -1,4 +1,8 @@
-hi.ForwardSplitSequence = function(
+import {constants} from "../core/constants";
+import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
+
+export const ForwardSplitSequence = function(
     compare, source, delimiter, beginDelimiter = undefined,
     endDelimiter = undefined, frontValue = undefined,
     frontResult = undefined, findDelimiters = undefined
@@ -16,12 +20,12 @@ hi.ForwardSplitSequence = function(
     this.endDelimiter = endDelimiter;
     this.frontValue = frontValue;
     this.frontResult = frontResult || {low: 0, high: 0};
-    this.findDelimiters = findDelimiters || new hi.ForwardFindSequence(
+    this.findDelimiters = findDelimiters || new ForwardFindSequence(
         compare, source, delimiter.copy()
     );
 };
 
-hi.BackwardSplitSequence = function(
+export const BackwardSplitSequence = function(
     compare, source, delimiter, beginDelimiter = undefined,
     endDelimiter = undefined, frontValue = undefined,
     frontResult = undefined, findDelimiters = undefined
@@ -40,16 +44,16 @@ hi.BackwardSplitSequence = function(
     this.frontValue = frontValue;
     const sourceLength = source.length();
     this.frontResult = frontResult || {low: sourceLength, high: sourceLength};
-    this.findDelimiters = findDelimiters || new hi.BackwardFindSequence(
+    this.findDelimiters = findDelimiters || new BackwardFindSequence(
         compare, source, delimiter.copy()
     );
 };
 
-hi.ForwardSplitSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.ForwardSplitSequence.prototype.constructor = hi.ForwardSplitSequence;
-Object.assign(hi.ForwardSplitSequence.prototype, {
+ForwardSplitSequence.prototype = Object.create(Sequence.prototype);
+ForwardSplitSequence.prototype.constructor = ForwardSplitSequence;
+Object.assign(ForwardSplitSequence.prototype, {
     reverse: function(){
-        return new hi.BackwardSplitSequence(
+        return new BackwardSplitSequence(
             this.compare, this.source, this.delimiter,
             this.beginDelimiter, this.endDelimiter
         );
@@ -99,7 +103,7 @@ Object.assign(hi.ForwardSplitSequence.prototype, {
     has: null,
     get: null,
     copy: function(){
-        return new hi.ForwardSplitSequence(
+        return new ForwardSplitSequence(
             this.compare, this.source, this.delimiter,
             this.beginDelimiter, this.endDelimiter, this.frontValue,
             this.frontResult, this.findDelimiters.copy()
@@ -111,11 +115,11 @@ Object.assign(hi.ForwardSplitSequence.prototype, {
     },
 });
 
-hi.BackwardSplitSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.BackwardSplitSequence.prototype.constructor = hi.BackwardSplitSequence;
-Object.assign(hi.BackwardSplitSequence.prototype, {
+BackwardSplitSequence.prototype = Object.create(Sequence.prototype);
+BackwardSplitSequence.prototype.constructor = BackwardSplitSequence;
+Object.assign(BackwardSplitSequence.prototype, {
     reverse: function(){
-        return new hi.ForwardSplitSequence(
+        return new ForwardSplitSequence(
             this.compare, this.source, this.delimiter,
             this.beginDelimiter, this.endDelimiter
         );
@@ -164,7 +168,7 @@ Object.assign(hi.BackwardSplitSequence.prototype, {
     has: null,
     get: null,
     copy: function(){
-        return new hi.BackwardSplitSequence(
+        return new BackwardSplitSequence(
             this.compare, this.source, this.delimiter,
             this.beginDelimiter, this.endDelimiter, this.frontValue,
             this.frontResult, this.findDelimiters.copy()
@@ -176,14 +180,30 @@ Object.assign(hi.BackwardSplitSequence.prototype, {
     },
 });
 
-hi.register("split", {
-    functions: "?",
-    sequences: 2,
-}, function(compare, sequences){
-    const compareFunc = compare || hi.defaultComparisonFunction;
-    const source = sequences[0];
-    const delimiter = sequences[1];
-    if(!source.slice || !source.length) source.forceEager();
-    if(!delimiter.copy) delimiter.forceEager();
-    return new hi.ForwardSplitSequence(compareFunc, source, delimiter);
+export const split = wrap({
+    name: "split",
+    attachSequence: true,
+    async: false,
+    sequences: [
+        ForwardSplitSequence,
+        BackwardSplitSequence
+    ],
+    arguments: {
+        unordered: {
+            functions: "?",
+            sequences: 2
+        }
+    },
+    implementation: (compare, sequences) => {
+        const compareFunc = compare || constants.defaults.comparisonFunction;
+        const source = sequences[0];
+        const delimiter = sequences[1];
+        // Source must support slicing and length.
+        if(!source.slice || !source.length) source.forceEager();
+        // Delimiter must be copyable.
+        if(!delimiter.copy) delimiter.forceEager();
+        return new ForwardSplitSequence(compareFunc, source, delimiter);
+    },
 });
+
+export default split;

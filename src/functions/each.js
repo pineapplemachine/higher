@@ -1,15 +1,22 @@
-hi.register("each", {
-    functions: 1,
-    sequences: 1,
-    // Don't waste time coercing input iterables to sequences
-    allowIterables: true,
-    // Also generate an async version of this function
+import {wrap} from "../core/wrap";
+
+export const each = wrap({
+    names: ["each", "forEach"],
+    attachSequence: true,
     async: true,
-}, function(callback, source){
-    for(const element of source){
-        callback(element);
+    arguments: {
+        unordered: {
+            functions: 1,
+            sequences: 1,
+            allowIterables: true
+        }
+    },
+    implementation: (callback, source) => {
+        for(const element of source) callback(element);
+        return source;
     }
-    return source;
 });
 
-hi.alias("forEach", "each");
+export const forEach = each;
+
+export default each;

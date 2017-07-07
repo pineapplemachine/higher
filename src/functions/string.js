@@ -1,15 +1,21 @@
-// Concatenate elements of an input sequence as a string.
-hi.register("string", {
-    sequences: 1,
-    // Don't waste time coercing input iterables to sequences
-    allowIterables: true,
-    // Also generate an async version of this function
+import {validAsBoundedSequence} from "../core/asSequence";
+import {wrap} from "../core/wrap";
+
+export const string = wrap({
+    name: "string",
+    attachSequence: true,
     async: true,
-}, function(source){
-    if(!hi.validAsBoundedSequence(source)){
-        throw "Failed to create string: Input sequence is not known to be bounded.";
-    }
-    let string = "";
-    for(const element of source) string += element;
-    return string;
+    arguments: {
+        one: wrap.expecting.iterable
+    },
+    implementation: (source) => {
+        if(!validAsBoundedSequence(source)){
+            throw "Failed to create string: Input sequence must be known to be bounded.";
+        }
+        let str = "";
+        for(const element of source) str += element;
+        return str;
+    },
 });
+
+export default string;

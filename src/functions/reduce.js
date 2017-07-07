@@ -1,38 +1,33 @@
-function SequenceReducer(
-    combine, source, seedValue = null, hasSeed = false
+import {asSequence, validAsBoundedSequence} from "../core/asSequence";
+import {callAsync} from "../core/callAsync";
+import {constants} from "../core/constants";
+import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
+
+export const ReduceSequence = function(
+    combine, source, seedValue = null, hasSeed = false, initialize = true
 ){
+    const done = source.done();
     this.combine = combine;
     this.source = source;
+    this.accumulator = seedValue;
     this.seedValue = seedValue;
     this.hasSeed = hasSeed;
-    if(!source.copy) this.copy = null;
-    if(!source.reset) this.reset = null;
-}
+    this.lastElement = hasSeed || !done;
+    this.maskAbsentMethods(source);
+    // TODO: Move this out of the creation function, into initialization logic
+    if(initialize && !hasSeed && !done){
+        this.accumulator = source.nextFront();
+    }
+};
 
-Object.assign(SequenceReducer.prototype, {
-    // Provide an initial seed value for the reduction.
-    seed: function(value){
-        this.seedValue = value;
-        this.hasSeed = true;
-        return this;
-    },
-    // Remove a previously-set seed from this object.
-    unseed: function(){
-        this.hasSeed = false;
-        return this;
-    },
-    // Get a sequence enumerating every step in the reduce operation,
-    // including the seed (if one was provided).
-    sequence: function(){
-        return new hi.ReduceSequence(
-            this.combine, asSequence(this.source),
-            this.seedValue, this.hasSeed
-        );
-    },
+ReduceSequence.prototype = Object.create(Sequence.prototype);
+ReduceSequence.prototype.constructor = ReduceSequence;
+Object.assign(ReduceSequence.prototype, {
     // Get the last value in the sequence synchronously.
     // Returns the fallback value if there was no last element.
     last: function(fallback = undefined){
-        if(!hi.validAsBoundedSequence(this.source)){
+        if(!validAsBoundedSequence(this.source)){
             throw "Failed to reduce sequence: Sequence isn't known to be bounded.";
         }
         if(this.hasSeed){
@@ -53,51 +48,25 @@ Object.assign(SequenceReducer.prototype, {
             return accumulator;
         }
     },
-    collapse: function(){
-        return this.sequence().collapse();
-    },
-    copy: function(){
-        return new SequenceReducer(
-            this.combine, this.source, this.seedValue, this.hasSeed
-        );
-    },
-    reset: function(){
-        this.source.reset();
-        return this;
-    },
-});
-Object.assign(SequenceReducer.prototype, {
-    // Shorthand alias for sequence method.
-    seq: SequenceReducer.prototype.sequence,
-    // Get the last value in the sequence asynchronously.
     lastAsync: function(fallback = undefined){
-        return new hi.Promise((resolve, reject) => {
-            hi.callAsync(() => resolve(this.last(fallback)));
+        return new constants.Promise((resolve, reject) => {
+            callAsync(() => resolve(this.last(fallback)));
         });
     },
-});
-
-hi.ReduceSequence = function(
-    combine, source, seedValue = null, hasSeed = false, initialize = true
-){
-    const done = source.done();
-    this.combine = combine;
-    this.source = source;
-    this.accumulator = seedValue;
-    this.seedValue = seedValue;
-    this.hasSeed = hasSeed;
-    this.lastElement = hasSeed || !done;
-    this.maskAbsentMethods(source);
-    if(initialize && !hasSeed && !done){
-        this.accumulator = source.nextFront();
-    }
-};
-
-hi.ReduceSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.ReduceSequence.prototype.constructor = hi.ReduceSequence;
-Object.assign(hi.ReduceSequence.prototype, {
+    seed: function(value){
+        this.seedValue = value;
+        this.hasSeed = true;
+        return this;
+    },
+    unseed: function(){
+        this.hasSeed = false;
+        return this;
+    },
     bounded: function(){
         return this.source.bounded();
+    },
+    unbounded: function(){
+        return this.source.unbounded();
     },
     done: function(){
         return !this.lastElement && this.source.done();
@@ -127,24 +96,42 @@ Object.assign(hi.ReduceSequence.prototype, {
     has: null,
     get: null,
     copy: function(){
-        return new hi.ReduceSequence(
+        return new ReduceSequence(
             this.combine, this.source.copy(),
             this.seedValue, this.hasSeed, false
         );
     },
     reset: function(){
         this.source.reset();
-        if(this.hasSeed) this.accumulator = this.seedValue;
-        else if(!this.source.done()) this.accumulator = this.source.nextFront();
+        if(this.hasSeed){
+            this.accumulator = this.seedValue;
+        }else if(!this.source.done()){
+            // TODO: Assign in an initialization function
+            this.accumulator = this.source.nextFront();
+        }
         return this;
     },
 });
 
-hi.register("reduce", {
-    functions: 1,
-    sequences: 1,
-    // Don't waste time coercing input iterables to sequences
-    allowIterables: true,
-}, function(combine, source){
-    return new SequenceReducer(combine, source);
+export const reduce = wrap({
+    names: ["reduce", "fold"],
+    attachSequence: true,
+    async: false,
+    sequences: [
+        ReduceSequence
+    ],
+    arguments: {
+        unordered: {
+            functions: 1,
+            sequences: 1,
+            allowIterables: true
+        }
+    },
+    implementation: (combine, source) => {
+        return new ReduceSequence(combine, source);
+    },
 });
+
+export const fold = reduce;
+
+export default reduce;

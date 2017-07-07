@@ -1,12 +1,15 @@
-hi.FilterSequence = function(predicate, source, initialize = true){
+import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
+
+export const FilterSequence = function(predicate, source, initialize = true){
     this.predicate = predicate;
     this.source = source;
     this.maskAbsentMethods(source);
 };
 
-hi.FilterSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.FilterSequence.prototype.constructor = hi.FilterSequence;
-Object.assign(hi.FilterSequence.prototype, {
+FilterSequence.prototype = Object.create(Sequence.prototype);
+FilterSequence.prototype.constructor = FilterSequence;
+Object.assign(FilterSequence.prototype, {
     initializeFront: function(){
         while(!this.predicate(this.source.front())){
             this.source.popFront();
@@ -71,7 +74,7 @@ Object.assign(hi.FilterSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        const copy = new hi.FilterSequence(
+        const copy = new FilterSequence(
             this.predicate, this.source.copy(), false
         );
         copy.front = this.front;
@@ -86,9 +89,24 @@ Object.assign(hi.FilterSequence.prototype, {
     },
 });
 
-hi.register("filter", {
-    functions: 1,
-    sequences: 1,
-}, function(predicate, source){
-    return new hi.FilterSequence(predicate, source);
+// Produce a new sequence enumerating only those elements of an input sequence
+// which satisfy a predicate function.
+export const filter = wrap({
+    name: "filter",
+    attachSequence: true,
+    async: false,
+    sequences: [
+        FilterSequence
+    ],
+    arguments: {
+        unordered: {
+            functions: 1,
+            sequences: 1
+        }
+    },
+    implementation: (predicate, source) => {
+        return new FilterSequence(predicate, source);
+    },
 });
+
+export default filter;

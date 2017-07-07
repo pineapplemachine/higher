@@ -1,18 +1,24 @@
-hi.FlattenDeepSequence = function(source){
+import {isSequence, Sequence} from "../core/sequence";
+import {asSequence, validAsSequence} from "../core/asSequence";
+import {isArray, isIterable, isString} from "../core/types";
+import {wrap} from "../core/wrap";
+
+export const FlattenDeepSequence = function(source){
     this.source = source;
     this.sourceStack = [source];
     this.frontSource = source;
 };
 
-hi.FlattenDeepSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.FlattenDeepSequence.prototype.constructor = hi.FlattenDeepSequence;
-Object.assign(hi.FlattenDeepSequence.prototype, {
+// TODO: Also write a backwards version of this sequence
+FlattenDeepSequence.prototype = Object.create(Sequence.prototype);
+FlattenDeepSequence.prototype.constructor = FlattenDeepSequence;
+Object.assign(FlattenDeepSequence.prototype, {
     // True when an element is a sequence which should be flattened.
     flattenElement: function(element){
-        return !hi.isString(element) && (
-            hi.isArray(element) ||
-            hi.isIterable(element) ||
-            hi.isSequence(element)
+        return !isString(element) && (
+            isArray(element) ||
+            isIterable(element) ||
+            isSequence(element)
         );
     },
     // Used internally to handle progression to the next element.
@@ -24,7 +30,7 @@ Object.assign(hi.FlattenDeepSequence.prototype, {
                 break;
             }else{
                 this.frontSource.popFront();
-                const source = hi.asSequence(front);
+                const source = asSequence(front);
                 this.sourceStack.push(source);
                 this.frontSource = source;
             }
@@ -80,8 +86,19 @@ Object.assign(hi.FlattenDeepSequence.prototype, {
 
 // Flatten recursively.
 // Flattens arrays, iterables except strings, and sequences.
-hi.register("flattenDeep", {
-    sequences: 1,
-}, function(source){
-    return new hi.FlattenDeepSequence(source);
+export const flattenDeep = wrap({
+    name: "flattenDeep",
+    attachSequence: true,
+    async: false,
+    sequences: [
+        FlattenDeepSequence
+    ],
+    arguments: {
+        one: wrap.expecting.sequence
+    },
+    implementation: (source) => {
+        return new FlattenDeepSequence(source);
+    },
 });
+
+export default flattenDeep;

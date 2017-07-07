@@ -1,4 +1,9 @@
-hi.FiniteRepeatElementSequence = function(
+import Sequence from "../core/sequence";
+import {wrap} from "../core/wrap";
+
+import {EmptySequence} from "./empty";
+
+export const FiniteRepeatElementSequence = function(
     repetitions, element, finishedRepetitions = 0
 ){
     this.repetitions = repetitions;
@@ -6,28 +11,28 @@ hi.FiniteRepeatElementSequence = function(
     this.element = element;
 };
 
-hi.InfiniteRepeatElementSequence = function(element){
+export const InfiniteRepeatElementSequence = function(element){
     this.element = element;
 };
 
-hi.NullRepeatElementSequence = function(element){
-    this.element = element;
-};
-
-hi.FiniteRepeatElementSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.FiniteRepeatElementSequence.prototype.constructor = hi.FiniteRepeatElementSequence;
-Object.assign(hi.FiniteRepeatElementSequence.prototype, {
+FiniteRepeatElementSequence.prototype = Object.create(Sequence.prototype);
+FiniteRepeatElementSequence.prototype.constructor = FiniteRepeatElementSequence;
+Object.assign(FiniteRepeatElementSequence.prototype, {
     seed: function(element){
         this.element = element;
         return this;
     },
+    times: function(repetitions){
+        this.repetitions = times;
+        return this;
+    },
     repeat: function(repetitions = null){
         if(repetitions === null || !isFinite(repetitions)){
-            return new hi.InfiniteRepeatElementSequence(this.element);
+            return new InfiniteRepeatElementSequence(this.element);
         }else if(repetitions <= 0){
-            return new hi.NullRepeatElementSequence(this.element);
+            return new NullRepeatElementSequence(this.element);
         }else{
-            return new hi.FiniteRepeatElementSequence(
+            return new FiniteRepeatElementSequence(
                 this.element, this.repetitions * repetitions
             );
         }
@@ -64,12 +69,12 @@ Object.assign(hi.FiniteRepeatElementSequence.prototype, {
         return this.element;
     },
     slice: function(i, j){
-        return new hi.FiniteRepeatElementSequence(this.element, j - i);
+        return new FiniteRepeatElementSequence(this.element, j - i);
     },
     has: null,
     get: null,
     copy: function(){
-        return new hi.FiniteRepeatElementSequence(
+        return new FiniteRepeatElementSequence(
             this.element, this.repetitions, this.finishedRepetitions
         );
     },
@@ -79,13 +84,16 @@ Object.assign(hi.FiniteRepeatElementSequence.prototype, {
     },
 });
 
-hi.InfiniteRepeatElementSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.InfiniteRepeatElementSequence.prototype.constructor = hi.InfiniteRepeatElementSequence;
-Object.assign(hi.InfiniteRepeatElementSequence.prototype, {
+InfiniteRepeatElementSequence.prototype = Object.create(Sequence.prototype);
+InfiniteRepeatElementSequence.prototype.constructor = InfiniteRepeatElementSequence;
+Object.assign(InfiniteRepeatElementSequence.prototype, {
     repetitions: Infinity,
     seed: function(element){
         this.element = element;
         return this;
+    },
+    times: function(repetitions){
+        return new FiniteRepeatElementSequence(repetitions, this.element);
     },
     repeat: function(repetitions){
         return this;
@@ -114,60 +122,42 @@ Object.assign(hi.InfiniteRepeatElementSequence.prototype, {
     has: null,
     get: null,
     slice: function(i, j){
-        return new hi.FiniteRepeatElementSequence(this.element, j - i);
+        return new FiniteRepeatElementSequence(this.element, j - i);
     },
     copy: function(){
-        return new hi.InfiniteRepeatElementSequence(this.element);
+        return new InfiniteRepeatElementSequence(this.element);
     },
     reset: function(){
         return this;
     },
 });
 
-hi.NullRepeatElementSequence.prototype = Object.create(hi.EmptySequence.prototype);
-hi.NullRepeatElementSequence.prototype.constructor = hi.NullRepeatElementSequence;
-Object.assign(hi.NullRepeatElementSequence.prototype, {
-    repetitions: 0,
-    shuffle: function(){
-        return this;
+// Produce a sequence that repeats a single element.
+export const repeatElement = wrap({
+    name: "repeatElement",
+    attachSequence: false,
+    async: false,
+    sequences: [
+        FiniteRepeatElementSequence,
+        InfiniteRepeatElementSequence
+    ],
+    arguments: {
+        ordered: [wrap.expecting.anything, wrap.expecting.number]
     },
-    seed: function(element){
-        this.element = element;
-        return this;
-    },
-    slice: function(i, j){
-        return new hi.NullRepeatElementSequence(this.element);
-    },
-    copy: function(){
-        return new hi.NullRepeatElementSequence(this.element);
+    implementation: (...args) => {
+        const element = args[0];
+        const repetitions = args[1];
+        if(repetitions <= 0){
+            return new EmptySequence();
+        }else if(!repetitions){ // Argument wasn't provided
+            return new InfiniteRepeatElementSequence(repetitions);
+        }else if(!isFinite(repetitions)){
+            return new InfiniteRepeatElementSequence(element);
+        }else{
+            const repetitions = Math.floor(+repetitions);
+            return new FiniteRepeatElementSequence(repetitions, element);
+        }
     },
 });
 
-hi.repeatElement = function(){
-    if(arguments.length === 1){
-        return new hi.InfiniteRepeatElementSequence(arguments[0]);
-    }else if(arguments.length >= 2){
-        const element = arguments[0];
-        const repetitions = arguments[1];
-        if(isNaN(repetitions)){
-            throw hi.repeatElement.argumentsError;
-        }else if(repetitions <= 0){
-            return new hi.NullRepeatElementSequence(element);
-        }else if(!isFinite(repetitions)){
-            return new hi.InfiniteRepeatElementSequence(element);
-        }else{
-            const repetitions = Math.floor(+repetitions);
-            return new hi.FiniteRepeatElementSequence(repetitions, element);
-        }
-    }else{
-        throw hi.repeatElement.argumentsError;
-    }
-};
-
-// Error object thrown when the arguments to repeatElement are incorrect.
-hi.repeatElement.argumentsError = (
-    "Failed to repeat element: The function must be called with one argument " +
-    "or two arguments. When there is one argument, it is the element to be " +
-    "infinitely repeated. When there are two arguments, the first must be the " +
-    "number of times to repeat and the second the element to be repeated."
-);
+export default repeatElement;

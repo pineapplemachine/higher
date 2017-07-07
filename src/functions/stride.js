@@ -1,3 +1,8 @@
+import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
+
+import {InfiniteRepeatElementSequence} from "./repeatElement";
+
 const getStrideLength = function(strideLength){
     const value = Math.floor(+strideLength);
     if(value < 1) throw (
@@ -8,7 +13,8 @@ const getStrideLength = function(strideLength){
 
 // Implement stride using repeated popping of elements.
 // Note that initialization potentially changes the state of the source sequence.
-hi.PoppingStrideSequence = function(strideLength, source){
+// TODO: Fix initialization changing the source
+export const PoppingStrideSequence = function(strideLength, source){
     this.strideLength = getStrideLength(strideLength);
     this.source = source;
     this.maskAbsentMethods(source);
@@ -24,9 +30,10 @@ hi.PoppingStrideSequence = function(strideLength, source){
 
 // Implement stride using indexing.
 // For this to be available, the source must support index and length methods.
-hi.IndexStrideSequence = function(strideLength, source){
-    if(!source.bounded()){
-        throw "Failed to create stride sequence: Source must be bounded.";
+export const IndexStrideSequence = function(strideLength, source){
+    if(!source.index || !source.length || !source.bounded()){
+        // TODO: More descriptive error
+        throw "Failed to create stride sequence.";
     }
     this.strideLength = getStrideLength(strideLength);
     this.source = source;
@@ -36,9 +43,9 @@ hi.IndexStrideSequence = function(strideLength, source){
     this.maskAbsentMethods(source);
 };
 
-hi.PoppingStrideSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.PoppingStrideSequence.prototype.constructor = hi.PoppingStrideSequence;
-Object.assign(hi.PoppingStrideSequence.prototype, {
+PoppingStrideSequence.prototype = Object.create(Sequence.prototype);
+PoppingStrideSequence.prototype.constructor = PoppingStrideSequence;
+Object.assign(PoppingStrideSequence.prototype, {
     bounded: function(){
         return this.source.bounded();
     },
@@ -74,7 +81,7 @@ Object.assign(hi.PoppingStrideSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        const copy = new hi.StrideSequence(this.strideLength, this.source.copy());
+        const copy = new StrideSequence(this.strideLength, this.source.copy());
     },
     reset: function(){
         this.source.reset();
@@ -82,9 +89,9 @@ Object.assign(hi.PoppingStrideSequence.prototype, {
     },
 });
 
-hi.IndexStrideSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.IndexStrideSequence.prototype.constructor = hi.IndexStrideSequence;
-Object.assign(hi.IndexStrideSequence.prototype, {
+IndexStrideSequence.prototype = Object.create(Sequence.prototype);
+IndexStrideSequence.prototype.constructor = IndexStrideSequence;
+Object.assign(IndexStrideSequence.prototype, {
     bounded: () => true,
     done: function(){
         return this.frontIndex >= this.backIndex;
@@ -111,7 +118,7 @@ Object.assign(hi.IndexStrideSequence.prototype, {
         return this.source.index(i * this.strideLength);
     },
     slice: function(i, j){
-        return new hi.IndexStrideSequence(this.strideLength,
+        return new IndexStrideSequence(this.strideLength,
             this.source.slice(i * this.strideLength, j * this.strideLength)
         );
     },
@@ -120,7 +127,7 @@ Object.assign(hi.IndexStrideSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        const copy = new hi.IndexStrideSequence(this.strideLength, this.source.copy());
+        const copy = new IndexStrideSequence(this.strideLength, this.source.copy());
     },
     reset: function(){
         this.source.reset();
@@ -131,15 +138,31 @@ Object.assign(hi.IndexStrideSequence.prototype, {
     },
 });
 
-hi.register("stride", {
-    numbers: 1,
-    sequences: 1,
-}, function(strideLength, source){
-    if(strideLength === 1){
-        return source;
-    }else if(source.index && source.length && source.bounded()){
-        return new hi.IndexStrideSequence(strideLength, source);
-    }else{
-        return new hi.PoppingStrideSequence(strideLength, source);
-    }
+export const stride = wrap({
+    name: "stride",
+    attachSequence: true,
+    async: false,
+    sequences: [
+        PoppingStrideSequence,
+        IndexStrideSequence
+    ],
+    arguments: {
+        unordered: {
+            numbers: 1,
+            sequences: 1
+        }
+    },
+    implementation: (strideLength, source) => {
+        if(strideLength <= 0){
+            return new InfiniteRepeatElementSequence(source.front());
+        }else if(strideLength === 1){
+            return source;
+        }else if(source.index && source.length && source.bounded()){
+            return new IndexStrideSequence(strideLength, source);
+        }else{
+            return new PoppingStrideSequence(strideLength, source);
+        }
+    },
 });
+
+export default stride;

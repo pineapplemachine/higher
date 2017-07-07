@@ -1,6 +1,11 @@
+import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
+
+import {ArraySequence} from "../core/asSequence";
+
 // https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_.22inside-out.22_algorithm
 
-hi.ShuffleSequence = function(
+export const ShuffleSequence = function(
     random, source, shuffledSource = undefined,
     lowIndex = undefined, highIndex = undefined,
     frontIndex = undefined, backIndex = undefined
@@ -22,14 +27,14 @@ hi.ShuffleSequence = function(
     if(!source.copy) this.copy = null;
 };
 
-hi.ShuffleSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.ShuffleSequence.prototype.constructor = hi.ShuffleSequence;
-Object.assign(hi.ShuffleSequence.prototype, {
+ShuffleSequence.prototype = Object.create(Sequence.prototype);
+ShuffleSequence.prototype.constructor = ShuffleSequence;
+Object.assign(ShuffleSequence.prototype, {
     initialize: function(){
         this.shuffledSource = [];
         let i = 0;
         for(const element of this.source){
-            let j = Math.floor(this.random() * i);
+            const j = Math.floor(this.random() * i);
             if(j === i){
                 this.shuffledSource.push(element);
             }else{
@@ -64,10 +69,10 @@ Object.assign(hi.ShuffleSequence.prototype, {
             return this.shuffledSource[i];
         };
         this.slice = function(i, j){
-            return new hi.ArraySequence(this.shuffledSource, i, j);
+            return new ArraySequence(this.shuffledSource, i, j);
         };
         this.copy = function(){
-            return new hi.ShuffleSequence(
+            return new ShuffleSequence(
                 this.random, this.source, this.shuffledSource,
                 this.lowIndex, this.highIndex, this.frontIndex, this.backIndex
             );
@@ -111,7 +116,7 @@ Object.assign(hi.ShuffleSequence.prototype, {
     },
     slice: function(i, j){
         if(!this.shuffledSource) this.initialize();
-        return new hi.ArraySequence(this.shuffledSource, i, j);
+        return new ArraySequence(this.shuffledSource, i, j);
     },
     has: function(i){
         return this.source.has(i);
@@ -120,14 +125,14 @@ Object.assign(hi.ShuffleSequence.prototype, {
         return this.source.get(i);
     },
     copy: function(){
-        return new hi.ShuffleSequence(this.random, this.source.copy());
+        return new ShuffleSequence(this.random, this.source.copy());
     },
     reset: function(){
         return this;
     },
     collapseBreak: function(target, length){
         for(let i = 0; i < length; i++){
-            let j = Math.floor(this.random() * i);
+            const j = Math.floor(this.random() * i);
             if(j !== i){
                 const t = target[i];
                 target[i] = target[j];
@@ -145,9 +150,22 @@ Object.assign(hi.ShuffleSequence.prototype, {
 // The produced sequence has the same interface as any other, but note that
 // the first time many of its properties are accessed (e.g. front, back)
 // the source sequence must be immediately entirely consumed.
-hi.register("shuffle", {
-    functions: "?",
-    sequences: 1,
-}, function(random, source){
-    return new hi.ShuffleSequence(random || Math.random, source);
+export const shuffle = wrap({
+    name: "shuffle",
+    attachSequence: true,
+    async: false,
+    sequences: [
+        ShuffleSequence
+    ],
+    arguments: {
+        unordered: {
+            functions: "?",
+            sequences: 1
+        }
+    },
+    implementation: (random, source) => {
+        return new ShuffleSequence(random || Math.random, source);
+    },
 });
+
+export default shuffle;

@@ -1,5 +1,9 @@
-hi.EnumerateSequence = function(
-    source, start = 0, step = 1, frontIndex = 0, backIndex = 0, initialize = true
+import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
+
+export const EnumerateSequence = function(
+    source, start = 0, step = 1,
+    frontIndex = 0, backIndex = 0, initialize = true
 ){
     this.source = source;
     this.start = start;
@@ -14,9 +18,9 @@ hi.EnumerateSequence = function(
     this.maskAbsentMethods(source);
 };
 
-hi.EnumerateSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.EnumerateSequence.prototype.constructor = hi.EnumerateSequence;
-Object.assign(hi.EnumerateSequence.prototype, {
+EnumerateSequence.prototype = Object.create(Sequence.prototype);
+EnumerateSequence.prototype.constructor = EnumerateSequence;
+Object.assign(EnumerateSequence.prototype, {
     bounded: function(){
         return this.source.bounded();
     },
@@ -50,14 +54,14 @@ Object.assign(hi.EnumerateSequence.prototype, {
         return {index: this.start + i * this.step, value: this.source.index(i)};
     },
     slice: function(i, j){
-        return new hi.EnumerateSequence(
+        return new EnumerateSequence(
             this.source.slice(i, j), this.start + i * this.step, this.step
         );
     },
     has: null,
     get: null,
     copy: function(){
-        return new hi.EnumerateSequence(
+        return new EnumerateSequence(
             this.source.copy(), this.start, this.step,
             this.frontIndex, this.backIndex, false
         );
@@ -70,11 +74,24 @@ Object.assign(hi.EnumerateSequence.prototype, {
     },
 });
 
-hi.register("enumerate", {
-    numbers: [0, 2],
-    sequences: 1,
-}, function(numbers, source){
-    const start = numbers[0] || 0;
-    const step = numbers.length > 1 ? numbers[1] : 1;
-    return new hi.EnumerateSequence(source, start, step);
+export const enumerate = wrap({
+    name: "enumerate",
+    attachSequence: true,
+    async: false,
+    sequences: [
+        EnumerateSequence
+    ],
+    arguments: {
+        unordered: {
+            numbers: [0, 2],
+            sequences: 1,
+        },
+    },
+    implementation: (numbers, source) =>{
+        const start = numbers[0] || 0;
+        const step = numbers.length > 1 ? numbers[1] : 1;
+        return new EnumerateSequence(source, start, step);
+    },
 });
+
+export default enumerate;

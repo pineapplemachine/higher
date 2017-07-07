@@ -1,48 +1,52 @@
-hi.internal.unboundedError = function(action, method, intermediate = false){
-    return (
-        `Failed to ${action} the sequence because to do so would require ` +
-        "fully consuming an unbounded sequence" +
-        (intermediate ? " in an intermediate step." : ". Try passing " +
-        `a length limit to the "${method}" call to only store the ` +
-        "first so many elements or, if you're sure the sequence will " +
-        "eventually end, use the sequence's assumeBounded method " +
-        "before collapsing it.")
-    );
-};
-hi.internal.collapseCopyError = function(prevType, breakingType){
-    return (
-        "Collapsing the sequence failed because one of the " +
-        `intermediate sequences of type "${prevType}" does ` +
-        "not support copying even though it appears before a " +
-        `special collapse behavior sequence "${breakingType}".`
-    );
+import {callAsync} from "./callAsync";
+import {constants} from "./constants";
+import {unboundedError, collapseCopyError} from "./errors";
+import {isArray} from "./types";
+import {ArraySequence} from "./asSequence";
+
+export const Sequence = function(){};
+
+export const isSequence = (value) => {
+    return value instanceof Sequence;
 };
 
-hi.Sequence = function(){};
+// Accepts a fancy function wrapper object returned by the wrap function.
+// Attaches methods to the sequence prototype for method chaining.
+Sequence.attach = function(fancy){
+    if(fancy.method){
+        for(const name of fancy.names){
+            Sequence.prototype[name] = fancy.method;
+            if(fancy.method.async){
+                Sequence.prototype[name + "Async"] = fancy.method.async;
+            }
+        }
+    }
+    return fancy;
+};
 
-hi.Sequence.prototype[Symbol.iterator] = function(){
+Sequence.prototype[Symbol.iterator] = function(){
     return this;
 };
-hi.Sequence.prototype.next = function(){
+Sequence.prototype.next = function(){
     const done = this.done();
     const value = done ? undefined : this.nextFront();
     return {value: value, done: done};
 };
-hi.Sequence.prototype.nextFront = function(){
+Sequence.prototype.nextFront = function(){
     const value = this.front();
     this.popFront();
     return value;
 };
-hi.Sequence.prototype.nextBack = function(){
+Sequence.prototype.nextBack = function(){
     const value = this.back();
     this.popBack();
     return value;
 };
 // TODO: Make this part of normal sequence spec just like bounded
-hi.Sequence.prototype.unbounded = function(){
+Sequence.prototype.unbounded = function(){
     return this.source ? this.source.unbounded() : false;
 };
-hi.Sequence.prototype.maskAbsentMethods = function(source){
+Sequence.prototype.maskAbsentMethods = function(source){
     if(!source.back){
         this.back = null;
         this.popBack = null;
@@ -58,20 +62,20 @@ hi.Sequence.prototype.maskAbsentMethods = function(source){
     if(this.reset && !source.reset) this.reset = null;
 };
 // Here be dragons
-hi.Sequence.prototype.collapse = function(limit = -1){
+Sequence.prototype.collapse = function(limit = -1){
     if(limit < 0 && !this.bounded()){
-        throw hi.internal.unboundedError("collapse", "collapse");
+        throw unboundedError("collapse", "collapse");
     }
     let source = this;
     const stack = [];
     const breaks = [];
     let i = 0;
-    while(source && hi.isSequence(source)){
+    while(source && isSequence(source)){
         if(source.collapseBreak) breaks.push(stack.length);
         stack.push(source);
         source = source.source;
     }
-    if(!hi.isArray(source)){
+    if(!isArray(source)){
         throw (
             "Sequence collapsing is supported only for sequences that are " +
             "based on an array. To acquire other sequences in-memory, see " +
@@ -80,7 +84,7 @@ hi.Sequence.prototype.collapse = function(limit = -1){
     }
     const arraySequence = stack[stack.length - 1];
     function write(seq, limit, intermediate){
-        if(limit < 0 && !seq.bounded()) throw hi.internal.unboundedError(
+        if(limit < 0 && !seq.bounded()) throw unboundedError(
             "collapse", "collapse", intermediate
         );
         i = 0;
@@ -101,7 +105,7 @@ hi.Sequence.prototype.collapse = function(limit = -1){
             const next = stack[breakIndex - 1];
             if(prev){
                 if(!prev.collapseBreak){
-                    if(!prev.copy) throw hi.internal.collapseCopyError(
+                    if(!prev.copy) throw collapseCopyError(
                         prev.type, breaking.type
                     );
                     write(prev.copy(), -1, true);
@@ -128,18 +132,19 @@ hi.Sequence.prototype.collapse = function(limit = -1){
     }
     return source;
 };
-hi.Sequence.prototype.collapseAsync = function(limit = -1){
-    return new hi.Promise((resolve, reject) => {
-        hi.callAsync(function(){
+Sequence.prototype.collapseAsync = function(limit = -1){
+    return new constants.Promise((resolve, reject) => {
+        callAsync(function(){
             resolve(this.collapse(limit));
         });
     });
 };
+
 // Turn a lazy sequence into an array-based one.
 // Used internally by functions when a purely lazy implementation won't work
 // because a sequence doesn't support the necessary operations.
 // Not necessarily intended for external use.
-hi.Sequence.prototype.forceEager = function(){
+Sequence.prototype.forceEager = function(){
     if(!this.bounded()){
         throw "Failed to consume sequence: Sequence is not known to be bounded.";
     }
@@ -160,19 +165,19 @@ hi.Sequence.prototype.forceEager = function(){
         this.highIndex = this.source.length;
         this.frontIndex = this.lowIndex;
         this.backIndex = this.highIndex;
-        this.done = hi.ArraySequence.prototype.done;
-        this.length = hi.ArraySequence.prototype.length;
-        this.left = hi.ArraySequence.prototype.left;
-        this.front = hi.ArraySequence.prototype.front;
-        this.popFront = hi.ArraySequence.prototype.popFront;
-        this.back = hi.ArraySequence.prototype.back;
-        this.popBack = hi.ArraySequence.prototype.popBack;
-        this.index = hi.ArraySequence.prototype.index;
-        this.slice = hi.ArraySequence.prototype.slice;
-        this.has = hi.ArraySequence.prototype.has;
-        this.get = hi.ArraySequence.prototype.get;
-        this.copy = hi.ArraySequence.prototype.copy;
-        this.reset = hi.ArraySequence.prototype.reset;
+        this.done = ArraySequence.prototype.done;
+        this.length = ArraySequence.prototype.length;
+        this.left = ArraySequence.prototype.left;
+        this.front = ArraySequence.prototype.front;
+        this.popFront = ArraySequence.prototype.popFront;
+        this.back = ArraySequence.prototype.back;
+        this.popBack = ArraySequence.prototype.popBack;
+        this.index = ArraySequence.prototype.index;
+        this.slice = ArraySequence.prototype.slice;
+        this.has = ArraySequence.prototype.has;
+        this.get = ArraySequence.prototype.get;
+        this.copy = ArraySequence.prototype.copy;
+        this.reset = ArraySequence.prototype.reset;
     };
     this.bounded = () => true;
     if(!this.length) this.length = function(){
@@ -216,3 +221,5 @@ hi.Sequence.prototype.forceEager = function(){
     };
     return this;
 };
+
+export default Sequence;

@@ -1,4 +1,7 @@
-hi.FindSequenceResult = function(source, low, high){
+import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
+
+export const FindSequenceResult = function(source, low, high){
     this.source = source;
     this.low = low;
     this.high = high;
@@ -13,7 +16,8 @@ hi.FindSequenceResult = function(source, low, high){
 };
 
 // TODO: Maybe this should just be a sequence somehow?
-Object.assign(hi.FindSequenceResult.prototype, {
+FindSequenceResult.prototype.constructor = FindSequenceResult;
+Object.assign(FindSequenceResult.prototype, {
     slice: function(){
         return this.source.slice(this.low, this.high);
     },
@@ -29,8 +33,10 @@ Object.assign(hi.FindSequenceResult.prototype, {
 });
 
 // A find sequences uses a list of threads to find substring occurrences.
-// Foward-searching sequences use this constructor.
-hi.ForwardFindSequenceThread = function(compare, index, search, searchElement, alive){
+// Forward-searching sequences use this constructor.
+export const ForwardFindSequenceThread = function(
+    compare, index, search, searchElement, alive
+){
     this.compare = compare;
     this.index = index;
     this.search = search;
@@ -40,7 +46,9 @@ hi.ForwardFindSequenceThread = function(compare, index, search, searchElement, a
 
 // A find sequences uses a list of threads to find substring occurrences.
 // Backward-searching sequences use this constructor.
-hi.BackwardFindSequenceThread = function(compare, index, search, searchElement, alive){
+export const BackwardFindSequenceThread = function(
+    compare, index, search, searchElement, alive
+){
     this.compare = compare;
     this.index = index;
     this.search = search;
@@ -48,7 +56,8 @@ hi.BackwardFindSequenceThread = function(compare, index, search, searchElement, 
     this.alive = alive;
 };
 
-Object.assign(hi.ForwardFindSequenceThread.prototype, {
+ForwardFindSequenceThread.prototype.constructor = ForwardFindSequenceThread;
+Object.assign(ForwardFindSequenceThread.prototype, {
     consume: function(element){
         if(this.compare(element, this.searchElement)){
             this.searchElement = this.search.front();
@@ -67,17 +76,18 @@ Object.assign(hi.ForwardFindSequenceThread.prototype, {
     result: function(source, index){
         const low = this.index;
         const high = index + 1;
-        return new hi.FindSequenceResult(source, low, high);
+        return new FindSequenceResult(source, low, high);
     },
     copy: function(){
-        return new hi.ForwardFindSequenceThread(
+        return new ForwardFindSequenceThread(
             this.compare, this.index, this.search.copy(),
             this.searchElement, this.alive
         );
     },
 });
 
-Object.assign(hi.BackwardFindSequenceThread.prototype, {
+BackwardFindSequenceThread.prototype.constructor = BackwardFindSequenceThread;
+Object.assign(BackwardFindSequenceThread.prototype, {
     consume: function(element){
         if(this.compare(element, this.searchElement)){
             this.searchElement = this.search.back();
@@ -96,17 +106,17 @@ Object.assign(hi.BackwardFindSequenceThread.prototype, {
     result: function(source, index){
         const low = index - 1;
         const high = this.index;
-        return new hi.FindSequenceResult(source, low, high);
+        return new FindSequenceResult(source, low, high);
     },
     copy: function(){
-        return new hi.BackwardFindSequenceThread(
+        return new BackwardFindSequenceThread(
             this.compare, this.index, this.search.copy(),
             this.searchElement, this.alive
         );
     },
 });
 
-hi.ForwardFindSequence = function(
+export const ForwardFindSequence = function(
     compare, source, search, searchThreads = undefined
 ){
     if(!search.copy) throw (
@@ -128,7 +138,7 @@ hi.ForwardFindSequence = function(
     };
 };
 
-hi.BackwardFindSequence = function(
+export const BackwardFindSequence = function(
     compare, source, search, searchThreads = undefined
 ){
     if(!search.copy) throw (
@@ -146,7 +156,7 @@ hi.BackwardFindSequence = function(
     if(!source.reset) this.reset = null;
 };
 
-hi.stepFindThreads = function(element){
+export const stepFindThreads = function(element){
     let result = undefined;
     let deadThreads = 0;
     // Progress alive threads
@@ -175,13 +185,13 @@ hi.stepFindThreads = function(element){
     return result;
 };
 
-hi.ForwardFindSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.ForwardFindSequence.prototype.constructor = hi.ForwardFindSequence;
-Object.assign(hi.ForwardFindSequence.prototype, {
-    threadType: hi.ForwardFindSequenceThread,
-    stepThreads: hi.stepFindThreads,
+ForwardFindSequence.prototype = Object.create(Sequence.prototype);
+ForwardFindSequence.prototype.constructor = ForwardFindSequence;
+Object.assign(ForwardFindSequence.prototype, {
+    threadType: ForwardFindSequenceThread,
+    stepThreads: stepFindThreads,
     reverse: function(){
-        return new hi.BackwardFindSequence(
+        return new BackwardFindSequence(
             this.compare, this.source, this.search
         );
     },
@@ -199,7 +209,7 @@ Object.assign(hi.ForwardFindSequence.prototype, {
             // Search subject contains one element
             while(!this.source.done() && !this.currentResult){
                 if(this.compare(this.source.nextFront(), this.searchElement)){
-                    this.currentResult = new hi.FindSequenceResult(
+                    this.currentResult = new FindSequenceResult(
                         this.source, this.index, this.index + 1
                     );
                 }
@@ -215,7 +225,7 @@ Object.assign(hi.ForwardFindSequence.prototype, {
                 this.currentResult = null;
                 while(!this.currentResult && !this.source.done()){
                     if(this.compare(this.source.nextFront(), this.searchElement)){
-                        this.currentResult = new hi.FindSequenceResult(
+                        this.currentResult = new FindSequenceResult(
                             this.source, this.index, this.index + 1
                         );
                     }
@@ -275,7 +285,7 @@ Object.assign(hi.ForwardFindSequence.prototype, {
         for(const thread of this.searchThreads){
             if(thread.alive) copyThreads.push(thread.copy());
         }
-        const copy = new hi.ForwardFindSequence(
+        const copy = new ForwardFindSequence(
             this.compare, this.source.copy(), this.search.copy(), copyThreads
         );
         copy.currentResult = this.currentResult;
@@ -299,13 +309,13 @@ Object.assign(hi.ForwardFindSequence.prototype, {
     },
 });
 
-hi.BackwardFindSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.BackwardFindSequence.prototype.constructor = hi.BackwardFindSequence;
-Object.assign(hi.BackwardFindSequence.prototype, {
-    threadType: hi.BackwardFindSequenceThread,
-    stepThreads: hi.stepFindThreads,
+BackwardFindSequence.prototype = Object.create(Sequence.prototype);
+BackwardFindSequence.prototype.constructor = BackwardFindSequence;
+Object.assign(BackwardFindSequence.prototype, {
+    threadType: BackwardFindSequenceThread,
+    stepThreads: stepFindThreads,
     reverse: function(){
-        return new hi.ForwardFindSequence(
+        return new ForwardFindSequence(
             this.compare, this.source, this.search
         );
     },
@@ -323,7 +333,7 @@ Object.assign(hi.BackwardFindSequence.prototype, {
             // Search subject contains one element
             while(!this.source.done() && !this.currentResult){
                 if(this.compare(this.source.nextBack(), this.searchElement)){
-                    this.currentResult = new hi.FindSequenceResult(
+                    this.currentResult = new FindSequenceResult(
                         this.source, this.index - 1, this.index
                     );
                 }
@@ -339,7 +349,7 @@ Object.assign(hi.BackwardFindSequence.prototype, {
                 this.currentResult = null;
                 while(!this.currentResult && !this.source.done()){
                     if(this.compare(this.source.nextBack(), this.searchElement)){
-                        this.currentResult = new hi.FindSequenceResult(
+                        this.currentResult = new FindSequenceResult(
                             this.source, this.index - 1, this.index
                         );
                     }
@@ -399,7 +409,7 @@ Object.assign(hi.BackwardFindSequence.prototype, {
         for(const thread of this.searchThreads){
             if(thread.alive) copyThreads.push(thread.copy());
         }
-        const copy = new hi.ForwardFindSequence(
+        const copy = new ForwardFindSequence(
             this.compare, this.source.copy(), this.search.copy(), copyThreads
         );
         copy.currentResult = this.currentResult;
@@ -424,14 +434,27 @@ Object.assign(hi.BackwardFindSequence.prototype, {
 });
 
 // Find all occurrences of a substring as judged by a comparison function.
-// When no comparison function is given, (a, b) => (a == b) is used as a default.
-hi.register("findAll", {
-    functions: "?",
-    sequences: 2,
-}, function(compare, sequences){
-    const source = sequences[0];
-    const search = sequences[1];
-    return new hi.ForwardFindSequence(
-        compare || ((a, b) => a === b), source, search
-    );
+export const findAll = wrap({
+    name: "findAll",
+    attachSequence: true,
+    async: false,
+    sequences: [
+        ForwardFindSequence,
+        BackwardFindSequence
+    ],
+    arguments: {
+        unordered: {
+            functions: "?",
+            sequences: 2
+        }
+    },
+    implementation: (compare, sequences) => {
+        const source = sequences[0];
+        const search = sequences[1];
+        return new ForwardFindSequence(
+            compare || ((a, b) => a === b), source, search
+        );
+    },
 });
+
+export default findAll;

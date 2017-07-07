@@ -1,17 +1,33 @@
-// Get the maximum value in a sequence as judged by a comparison function
-// If no comparison function is provided, then (a, b) => (a < b) is used.
-// Returns undefined when the input sequence was empty.
-hi.register("max", {
-    functions: 1,
-    sequences: 1,
-    // Don't waste time coercing input iterables to sequences
-    allowIterables: true,
-    // Also generate an async version of this function
+import {constants} from "../core/constants";
+import {wrap} from "../core/wrap";
+
+// Get the maximum value in a sequence as judged by a relational function.
+// If no relational function is provided, then (a, b) => (a < b) is used.
+export const max = wrap({
+    name: "max",
+    attachSequence: true,
     async: true,
-}, function(relate, source){
-    const combine = (relate ?
-        (a, b) => (relate(b, a) ? a : b) :
-        (a, b) => (b < a ? a : b)
-    );
-    return hi.reduce.raw(combine, source).last();
+    arguments: {
+        unordered: {
+            functions: 1,
+            sequences: 1,
+            allowIterables: true
+        }
+    },
+    implementation: (relate, source) => {
+        const relateFunc = relate || constants.defaults.relationalFunction;
+        let max = undefined;
+        let first = true;
+        for(const element of source){
+            if(first){
+                max = element;
+                first = false;
+            }else if(relateFunc(max, element)){
+                max = element;
+            }
+        }
+        return max;
+    },
 });
+
+export default max;

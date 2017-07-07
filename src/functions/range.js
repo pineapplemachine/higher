@@ -1,5 +1,11 @@
+import {Sequence} from "../core/sequence";
+import {wrap} from "../core/wrap";
+
+import {EmptySequence} from "./empty";
+import {InfiniteRepeatElementSequence} from "./repeatElement";
+
 // Result of calling range with a step of exactly 1.
-hi.NumberRangeSequence = function(start, end){
+export const NumberRangeSequence = function(start, end){
     this.start = start;
     this.end = end;
     this.frontValue = start;
@@ -7,7 +13,7 @@ hi.NumberRangeSequence = function(start, end){
 };
 
 // Result of calling range with a step of greater than 0.
-hi.ForwardNumberRangeSequence = function(start, end, step){
+export const ForwardNumberRangeSequence = function(start, end, step){
     if(step <= 0){
         throw "Failed to create range: Step must be greater than zero.";
     }
@@ -19,7 +25,7 @@ hi.ForwardNumberRangeSequence = function(start, end, step){
 };
 
 // Result of calling range with a step of less than 0.
-hi.BackwardNumberRangeSequence = function(start, end, step){
+export const BackwardNumberRangeSequence = function(start, end, step){
     if(step >= 0){
         throw "Failed to create range: Step must be less than zero.";
     }
@@ -30,12 +36,12 @@ hi.BackwardNumberRangeSequence = function(start, end, step){
     this.backValue = end + (end % -step || -step);
 };
 
-hi.NumberRangeSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.NumberRangeSequence.prototype.constructor = hi.NumberRangeSequence;
-Object.assign(hi.NumberRangeSequence.prototype, {
+NumberRangeSequence.prototype = Object.create(Sequence.prototype);
+NumberRangeSequence.prototype.constructor = NumberRangeSequence;
+Object.assign(NumberRangeSequence.prototype, {
     step: 1,
     reverse: function(){
-        return new hi.BackwardNumberRangeSequence(
+        return new BackwardNumberRangeSequence(
             this.end - 1, this.start - 1, -1
         );
     },
@@ -65,10 +71,10 @@ Object.assign(hi.NumberRangeSequence.prototype, {
         return this.start + i;
     },
     slice: function(i, j){
-        return new hi.NumberRangeSequence(this.start + i, this.start + j);
+        return new NumberRangeSequence(this.start + i, this.start + j);
     },
     copy: function(){
-        const copy = new hi.NumberRangeSequence(this.start, this.end);
+        const copy = new NumberRangeSequence(this.start, this.end);
         copy.frontValue = this.frontValue;
         copy.backValue = this.backValue;
         return copy;
@@ -80,11 +86,11 @@ Object.assign(hi.NumberRangeSequence.prototype, {
     },
 });
 
-hi.ForwardNumberRangeSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.ForwardNumberRangeSequence.prototype.constructor = hi.ForwardNumberRangeSequence;
-Object.assign(hi.ForwardNumberRangeSequence.prototype, {
+ForwardNumberRangeSequence.prototype = Object.create(Sequence.prototype);
+ForwardNumberRangeSequence.prototype.constructor = ForwardNumberRangeSequence;
+Object.assign(ForwardNumberRangeSequence.prototype, {
     reverse: function(){
-        return new hi.BackwardNumberRangeSequence(
+        return new BackwardNumberRangeSequence(
             this.end - this.step, this.start - this.step, -this.step
         );
     },
@@ -111,15 +117,15 @@ Object.assign(hi.ForwardNumberRangeSequence.prototype, {
         this.backValue -= this.step;
     },
     index: function(i){
-        return this.start + i * this.step;
+        return this.start + i// this.step;
     },
     slice: function(i, j){
-        return new hi.ForwardNumberRangeSequence(
-            this.start + i * this.step, this.start + j * this.step, this.step
+        return new ForwardNumberRangeSequence(
+            this.start + i// this.step, this.start + j// this.step, this.step
         );
     },
     copy: function(){
-        const copy = new hi.ForwardNumberRangeSequence(
+        const copy = new ForwardNumberRangeSequence(
             this.start, this.end, this.step
         );
         copy.frontValue = this.frontValue;
@@ -133,11 +139,11 @@ Object.assign(hi.ForwardNumberRangeSequence.prototype, {
     },
 });
 
-hi.BackwardNumberRangeSequence.prototype = Object.create(hi.Sequence.prototype);
-hi.BackwardNumberRangeSequence.prototype.constructor = hi.BackwardNumberRangeSequence;
-Object.assign(hi.BackwardNumberRangeSequence.prototype, {
+BackwardNumberRangeSequence.prototype = Object.create(Sequence.prototype);
+BackwardNumberRangeSequence.prototype.constructor = BackwardNumberRangeSequence;
+Object.assign(BackwardNumberRangeSequence.prototype, {
     reverse: function(){
-        return new hi.ForwardNumberRangeSequence(
+        return new ForwardNumberRangeSequence(
             this.end - this.step, this.start - this.step, -this.step
         );
     },
@@ -164,15 +170,15 @@ Object.assign(hi.BackwardNumberRangeSequence.prototype, {
         this.backValue -= this.step;
     },
     index: function(i){
-        return this.start + i * this.step;
+        return this.start + i// this.step;
     },
     slice: function(i, j){
-        return new hi.BackwardNumberRangeSequence(
-            this.start + i * this.step, this.start + j * this.step, this.step
+        return new BackwardNumberRangeSequence(
+            this.start + i// this.step, this.start + j// this.step, this.step
         );
     },
     copy: function(){
-        const copy = new hi.BackwardNumberRangeSequence(
+        const copy = new BackwardNumberRangeSequence(
             this.start, this.end, this.step
         );
         copy.frontValue = this.frontValue;
@@ -186,20 +192,6 @@ Object.assign(hi.BackwardNumberRangeSequence.prototype, {
     },
 });
 
-// Result of calling range with a step of 0.
-// Looks on the surface like any other number range sequence,
-// but is actually unbounded.
-hi.NullStepRangeSequence = function(start, end){
-    this.start = start;
-    this.end = end;
-    this.step = 0;
-    this.element = start;
-};
-
-hi.NullStepRangeSequence.prototype = Object.create(
-    hi.InfiniteRepeatElementSequence.prototype
-);
-
 // Create a sequence enumerating numbers in a linear range.
 // When one number is passed, it is an exclusive upper bound.
 // When two numbers are passed, they are the inclusive lower and exclusive
@@ -208,18 +200,41 @@ hi.NullStepRangeSequence.prototype = Object.create(
 // the step from one value to the next, respectively.
 // The step is 1 by default but fractical, negative, and zero values are
 // also accepted.
-hi.register("range", {
-    numbers: [1, 3],
-}, function(numbers){
-    if(numbers.length === 1){
-        return new hi.NumberRangeSequence(0, numbers[0]);
-    }else if(numbers.length === 2 || numbers[2] === 1){
-        return new hi.NumberRangeSequence(numbers[0], numbers[1]);
-    }else if(numbers[2] > 0){
-        return new hi.ForwardNumberRangeSequence(numbers[0], numbers[1], numbers[2]);
-    }else if(numbers[2] < 0){
-        return new hi.BackwardNumberRangeSequence(numbers[0], numbers[1], numbers[2]);
-    }else{
-        return new hi.NullStepRangeSequence(numbers[0], numbers[1]);
-    }
+export const range = wrap({
+    name: "range",
+    attachSequence: false,
+    async: false,
+    sequences: [
+        NumberRangeSequence,
+        ForwardNumberRangeSequence,
+        BackwardNumberRangeSequence
+    ],
+    arguments: {
+        unordered: {
+            numbers: [1, 3]
+        }
+    },
+    implementation: (numbers) => {
+        if(numbers.length === 1){
+            // Only upper bound specified; enumerate [0, x) with a step of 1.
+            return new NumberRangeSequence(0, numbers[0]);
+        }else if(numbers.length === 2 || numbers[2] === 1){
+            // Both bounds specified; enumerate [x, y) with a step of 1.
+            return new NumberRangeSequence(numbers[0], numbers[1]);
+        }else if(numbers[2] > 0){
+            // Both bounds and a positive step; enumerate [x, y) with a positive step.
+            return new ForwardNumberRangeSequence(numbers[0], numbers[1], numbers[2]);
+        }else if(numbers[2] < 0){
+            // Both bounds and a negative step; enumerate [x, y) with a negative step.
+            return new BackwardNumberRangeSequence(numbers[0], numbers[1], numbers[2]);
+        }else if(numbers[1] <= numbers[0]){
+            // Both bounds and a zero step, but there are no elements anyway.
+            return new EmptySequence();
+        }else{
+            // Both bounds and a zero step; infinitely repeat the start value.
+            return new InfiniteRepeatElementSequence(numbers[0]);
+        }
+    },
 });
+
+export default range;
