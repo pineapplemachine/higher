@@ -71,13 +71,14 @@ hi.sequence.IterableSequence = IterableSequence;
 
 // Assertions
 import {
-    AssertError, assert, assertNot, assertUndefined, assertEqual
-} from "./functions/assert";
+    AssertError, assert, assertNot, assertUndefined, assertEqual, assertSeqEqual
+} from "./core/assert";
 hi.error.AssertError = AssertError;
 hi.assert = assert;
 hi.assertNot = assertNot;
 hi.assertUndefined = assertUndefined;
 hi.assertEqual = assertEqual;
+hi.assertSeqEqual = assertSeqEqual;
 
 // Function registry
 import {any} from "./functions/any"; hi.register(any);
