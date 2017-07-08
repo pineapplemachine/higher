@@ -4,25 +4,12 @@ import {wrap} from "../core/wrap";
 import {EmptySequence} from "./empty";
 
 // Map sequence optimized for one input sequence.
-export const SingularMapSequence = function(transform, source){
-    this.source = source;
-    this.transform = transform;
-    this.maskAbsentMethods(source);
-};
-
-// Map sequence for any number of input sequences.
-export const PluralMapSequence = function(transform, sources){
-    this.sources = sources;
-    this.source = sources[0];
-    this.transform = transform;
-    for(const source of sources){
+export const SingularMapSequence = Sequence.extend({
+    constructor: function(transform, source){
+        this.source = source;
+        this.transform = transform;
         this.maskAbsentMethods(source);
-    }
-};
-
-SingularMapSequence.prototype = Object.create(Sequence.prototype);
-SingularMapSequence.prototype.constructor = SingularMapSequence;
-Object.assign(SingularMapSequence.prototype, {
+    },
     bounded: function(){
         return this.source.bounded();
     },
@@ -71,9 +58,16 @@ Object.assign(SingularMapSequence.prototype, {
     },
 });
 
-PluralMapSequence.prototype = Object.create(Sequence.prototype);
-PluralMapSequence.prototype.constructor = PluralMapSequence;
-Object.assign(PluralMapSequence.prototype, {
+// Map sequence for any number of input sequences.
+export const PluralMapSequence = Sequence.extend({
+    constructor: function(transform, sources){
+        this.sources = sources;
+        this.source = sources[0];
+        this.transform = transform;
+        for(const source of sources){
+            this.maskAbsentMethods(source);
+        }
+    },
     bounded: function(){
         for(const source of this.sources){
             if(!source.bounded()) return false;

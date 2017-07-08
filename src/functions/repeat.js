@@ -3,44 +3,31 @@ import {wrap} from "../core/wrap";
 
 import {EmptySequence} from "./empty";
 
-export const FiniteRepeatSequence = function(
-    repetitions, source, frontSource = undefined, backSource = undefined
-){
-    // Input sequence must be copyable.
-    this.repetitions = repetitions;
-    this.source = source;
-    this.frontSource = frontSource;
-    this.backSource = backSource;
-    this.frontRepetitions = 0;
-    this.backRepetitions = 0;
-    this.maskAbsentMethods(source);
-    // Source must have known length to support left, index, slice operations.
-    if(!source.length){
-        this.left = null;
-        this.index = null;
-        this.slice = null;
-    }
-    // Source must be bidirectional to support slicing
-    if(!source.back){
-        this.slice = null;
-    }
-    // Only needs to break a collapse if it repeats more than once
-    if(repetitions <= 1) this.collapseBreak = null;
-};
-
-export const InfiniteRepeatSequence = function(source, frontSource = null, backSource = null){
-    if(!source.copy){
-        throw "Error repeating sequence: Only copyable sequences can be repeated.";
-    }
-    this.source = source;
-    this.frontSource = frontSource;
-    this.backSource = backSource;
-    this.maskAbsentMethods(source);
-};
-
-FiniteRepeatSequence.prototype = Object.create(Sequence.prototype);
-FiniteRepeatSequence.prototype.constructor = FiniteRepeatSequence;
-Object.assign(FiniteRepeatSequence.prototype, {
+export const FiniteRepeatSequence = Sequence.extend({
+    constructor: function(
+        repetitions, source, frontSource = undefined, backSource = undefined
+    ){
+        // Input sequence must be copyable.
+        this.repetitions = repetitions;
+        this.source = source;
+        this.frontSource = frontSource;
+        this.backSource = backSource;
+        this.frontRepetitions = 0;
+        this.backRepetitions = 0;
+        this.maskAbsentMethods(source);
+        // Source must have known length to support left, index, slice operations.
+        if(!source.length){
+            this.left = null;
+            this.index = null;
+            this.slice = null;
+        }
+        // Source must be bidirectional to support slicing
+        if(!source.back){
+            this.slice = null;
+        }
+        // Only needs to break a collapse if it repeats more than once
+        if(repetitions <= 1) this.collapseBreak = null;
+    },
     finishedRepetitions: function(){
         return this.frontRepetitions + this.backRepetitions;
     },
@@ -170,9 +157,16 @@ Object.assign(FiniteRepeatSequence.prototype, {
     },
 });
 
-InfiniteRepeatSequence.prototype = Object.create(Sequence.prototype);
-InfiniteRepeatSequence.prototype.constructor = InfiniteRepeatSequence;
-Object.assign(InfiniteRepeatSequence.prototype, {
+export const InfiniteRepeatSequence = Sequence.extend({
+    constructor: function(source, frontSource = null, backSource = null){
+        if(!source.copy){
+            throw "Error repeating sequence: Only copyable sequences can be repeated.";
+        }
+        this.source = source;
+        this.frontSource = frontSource;
+        this.backSource = backSource;
+        this.maskAbsentMethods(source);
+    },
     repetitions: Infinity,
     unbounded: () => true,
     bounded: () => false,

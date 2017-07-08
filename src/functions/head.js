@@ -4,16 +4,13 @@ import {Sequence} from "../core/sequence";
 import {EmptySequence} from "./empty";
 
 // Fallback implementation of head function for when slicing is unavailable.
-export const HeadSequence = function(elements, source, frontIndex = 0){
-    this.elements = elements;
-    this.source = source;
-    this.frontIndex = frontIndex;
-    this.maskAbsentMethods(source);
-};
-
-HeadSequence.prototype = Object.create(Sequence.prototype);
-HeadSequence.prototype.constructor = HeadSequence;
-Object.assign(HeadSequence.prototype, {
+export const HeadSequence = Sequence.extend({
+    constructor: function(elements, source, frontIndex = 0){
+        this.elements = elements;
+        this.source = source;
+        this.frontIndex = frontIndex;
+        this.maskAbsentMethods(source);
+    },
     bounded: () => true,
     done: function(){
         return this.frontIndex >= this.elements || this.source.done();

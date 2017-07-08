@@ -1,22 +1,19 @@
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
-export const ReverseSequence = function(source){
-    if(!source.back){
-        throw "Failed to reverse sequence: Sequence must be bidirectional.";
-    }
-    this.source = source;
-    this.maskAbsentMethods(source);
-    // Length property is required to support index and slice operations.
-    if(!source.length){
-        this.index = null;
-        this.slice = null;
-    }
-};
-
-ReverseSequence.prototype = Object.create(Sequence.prototype);
-ReverseSequence.prototype.constructor = ReverseSequence;
-Object.assign(ReverseSequence.prototype, {
+export const ReverseSequence = Sequence.extend({
+    constructor: function(source){
+        if(!source.back){
+            throw "Failed to reverse sequence: Sequence must be bidirectional.";
+        }
+        this.source = source;
+        this.maskAbsentMethods(source);
+        // Length property is required to support index and slice operations.
+        if(!source.length){
+            this.index = null;
+            this.slice = null;
+        }
+    },
     bounded: function(){
         return this.source.bounded();
     },

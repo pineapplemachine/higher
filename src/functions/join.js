@@ -1,31 +1,17 @@
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
-export const ForwardJoinSequence = function(
-    source, delimiter, frontSource = undefined,
-    frontDelimiter = undefined, onDelimiter = undefined
-){
-    this.source = source;
-    this.delimiter = delimiter;
-    this.frontSource = frontSource;
-    this.frontDelimiter = frontDelimiter;
-    this.onDelimiter = onDelimiter;
-};
-
-export const BackwardJoinSequence = function(
-    source, delimiter, frontSource = undefined,
-    frontDelimiter = undefined, onDelimiter = undefined
-){
-    this.source = source;
-    this.delimiter = delimiter;
-    this.frontSource = frontSource;
-    this.frontDelimiter = frontDelimiter;
-    this.onDelimiter = onDelimiter;
-};
-
-ForwardJoinSequence.prototype = Object.create(Sequence.prototype);
-ForwardJoinSequence.prototype.constructor = ForwardJoinSequence;
-Object.assign(ForwardJoinSequence.prototype, {
+export const ForwardJoinSequence = Sequence.extend({
+    constructor: function(
+        source, delimiter, frontSource = undefined,
+        frontDelimiter = undefined, onDelimiter = undefined
+    ){
+        this.source = source;
+        this.delimiter = delimiter;
+        this.frontSource = frontSource;
+        this.frontDelimiter = frontDelimiter;
+        this.onDelimiter = onDelimiter;
+    },
     reverse: function(){
         return new BackwardJoinSequence(this.source, this.delimiter);
     },
@@ -105,9 +91,17 @@ Object.assign(ForwardJoinSequence.prototype, {
     reset: null,
 });
 
-BackwardJoinSequence.prototype = Object.create(Sequence.prototype);
-BackwardJoinSequence.prototype.constructor = BackwardJoinSequence;
-Object.assign(BackwardJoinSequence.prototype, {
+export const BackwardJoinSequence = Sequence.extend({
+    constructor: function(
+        source, delimiter, frontSource = undefined,
+        frontDelimiter = undefined, onDelimiter = undefined
+    ){
+        this.source = source;
+        this.delimiter = delimiter;
+        this.frontSource = frontSource;
+        this.frontDelimiter = frontDelimiter;
+        this.onDelimiter = onDelimiter;
+    },
     reverse: function(){
         return new ForwardJoinSequence(this.source, this.delimiter);
     },

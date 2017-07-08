@@ -41,38 +41,13 @@ and is not known to be bounded, then an error will be thrown.
 
 // Implement chunking for sequences that are copyable but don't have
 // both slicing and known length.
-export const ForwardChunkSequence = function(chunkLength, source){
-    if(!source.copy) throw "Input must be copyable.";
-    this.chunkLength = chunkLength;
-    this.source = source;
-    this.maskAbsentMethods(source);
-};
-
-// Implement chunking for sequences with slicing and known length.
-export const BidirectionalChunkSequence = function(
-    chunkLength, source,
-    lowIndex = undefined, highIndex = undefined,
-    frontIndex = undefined, backIndex = undefined
-){
-    if(!source.slice) throw "Input must support slicing.";
-    if(!source.length) throw "Input must have known length.";
-    this.chunkLength = chunkLength;
-    this.source = source;
-    this.lowIndex = lowIndex || 0;
-    this.frontIndex = frontIndex || 0;
-    if(highIndex === undefined){
-        const sourceLength = source.length();
-        const remLength = sourceLength % chunkLength;
-        this.highIndex = 1 + Math.floor(sourceLength / chunkLength) - (remLength === 0);
-    }else{
-        this.highIndex = highIndex;
-    }
-    this.backIndex = this.highIndex;
-};
-
-ForwardChunkSequence.prototype = Object.create(Sequence.prototype);
-ForwardChunkSequence.prototype.constructor = ForwardChunkSequence;
-Object.assign(ForwardChunkSequence.prototype, {
+export const ForwardChunkSequence = Sequence.extend({
+    constructor: function(chunkLength, source){
+        if(!source.copy) throw "Input must be copyable.";
+        this.chunkLength = chunkLength;
+        this.source = source;
+        this.maskAbsentMethods(source);
+    },
     bounded: function(){
         return this.source.bounded();
     },
@@ -115,9 +90,28 @@ Object.assign(ForwardChunkSequence.prototype, {
     },
 });
 
-BidirectionalChunkSequence.prototype = Object.create(Sequence.prototype);
-BidirectionalChunkSequence.prototype.constructor = BidirectionalChunkSequence;
-Object.assign(BidirectionalChunkSequence.prototype, {
+// Implement chunking for sequences with slicing and known length.
+export const BidirectionalChunkSequence = Sequence.extend({
+    constructor: function(
+        chunkLength, source,
+        lowIndex = undefined, highIndex = undefined,
+        frontIndex = undefined, backIndex = undefined
+    ){
+        if(!source.slice) throw "Input must support slicing.";
+        if(!source.length) throw "Input must have known length.";
+        this.chunkLength = chunkLength;
+        this.source = source;
+        this.lowIndex = lowIndex || 0;
+        this.frontIndex = frontIndex || 0;
+        if(highIndex === undefined){
+            const sourceLength = source.length();
+            const remLength = sourceLength % chunkLength;
+            this.highIndex = 1 + Math.floor(sourceLength / chunkLength) - (remLength === 0);
+        }else{
+            this.highIndex = highIndex;
+        }
+        this.backIndex = this.highIndex;
+    },
     bounded: function(){
         return this.source.bounded();
     },

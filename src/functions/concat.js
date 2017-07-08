@@ -1,26 +1,23 @@
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
-export const ConcatSequence = function(sources){
-    this.sources = sources;
-    this.source = sources[0];
-    this.frontSourceIndex = 0;
-    this.backSourceIndex = sources.length;
-    let noLength = false;
-    for(const source of sources){
-        this.maskAbsentMethods(source);
-        noLength = noLength || !source.length;
-    }
-    // All sources must have length for index and slice to be supported.
-    if(noLength){
-        this.index = null;
-        this.slice = null;
-    }
-};
-
-ConcatSequence.prototype = Object.create(Sequence.prototype);
-ConcatSequence.prototype.constructor = ConcatSequence;
-Object.assign(ConcatSequence.prototype, {
+export const ConcatSequence = Sequence.extend({
+    constructor: function(sources){
+        this.sources = sources;
+        this.source = sources[0];
+        this.frontSourceIndex = 0;
+        this.backSourceIndex = sources.length;
+        let noLength = false;
+        for(const source of sources){
+            this.maskAbsentMethods(source);
+            noLength = noLength || !source.length;
+        }
+        // All sources must have length for index and slice to be supported.
+        if(noLength){
+            this.index = null;
+            this.slice = null;
+        }
+    },
     bounded: function(){
         for(const source of this.sources){
             if(!source.bounded()) return false;

@@ -5,31 +5,28 @@ import {ArraySequence} from "../core/asSequence";
 
 // https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_.22inside-out.22_algorithm
 
-export const ShuffleSequence = function(
-    random, source, shuffledSource = undefined,
-    lowIndex = undefined, highIndex = undefined,
-    frontIndex = undefined, backIndex = undefined
-){
-    if(!source.bounded()){
-        throw "Error shuffling sequence: Input must be known to be bounded.";
-    }
-    this.random = random;
-    this.source = source;
-    // Note that shuffledSource will be an array, not a sequence.
-    this.shuffledSource = shuffledSource;
-    this.lowIndex = lowIndex;
-    this.highIndex = highIndex;
-    this.frontIndex = frontIndex;
-    this.backIndex = backIndex;
-    if(!source.length) this.length = null;
-    if(!source.has) this.has = null;
-    if(!source.get) this.get = null;
-    if(!source.copy) this.copy = null;
-};
-
-ShuffleSequence.prototype = Object.create(Sequence.prototype);
-ShuffleSequence.prototype.constructor = ShuffleSequence;
-Object.assign(ShuffleSequence.prototype, {
+export const ShuffleSequence = Sequence.extend({
+    constructor: function(
+        random, source, shuffledSource = undefined,
+        lowIndex = undefined, highIndex = undefined,
+        frontIndex = undefined, backIndex = undefined
+    ){
+        if(!source.bounded()){
+            throw "Error shuffling sequence: Input must be known to be bounded.";
+        }
+        this.random = random;
+        this.source = source;
+        // Note that shuffledSource will be an array, not a sequence.
+        this.shuffledSource = shuffledSource;
+        this.lowIndex = lowIndex;
+        this.highIndex = highIndex;
+        this.frontIndex = frontIndex;
+        this.backIndex = backIndex;
+        if(!source.length) this.length = null;
+        if(!source.has) this.has = null;
+        if(!source.get) this.get = null;
+        if(!source.copy) this.copy = null;
+    },
     initialize: function(){
         this.shuffledSource = [];
         let i = 0;

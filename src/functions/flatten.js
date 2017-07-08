@@ -2,19 +2,11 @@ import {Sequence} from "../core/sequence";
 import {asSequence, validAsSequence} from "../core/asSequence";
 import {wrap} from "../core/wrap";
 
-export const ForwardFlattenSequence = function(source, frontSource = null){
-    this.source = source;
-    this.frontSource = frontSource;
-};
-
-export const BackwardFlattenSequence = function(source, frontSource = null){
-    this.source = source;
-    this.frontSource = frontSource;
-};
-
-ForwardFlattenSequence.prototype = Object.create(Sequence.prototype);
-ForwardFlattenSequence.prototype.constructor = ForwardFlattenSequence;
-Object.assign(ForwardFlattenSequence.prototype, {
+export const ForwardFlattenSequence = Sequence.extend({
+    constructor: function(source, frontSource = null){
+        this.source = source;
+        this.frontSource = frontSource;
+    },
     reverse: function(){
         return new hi.BackwardFlattenSequence(this.source);
     },
@@ -58,9 +50,11 @@ Object.assign(ForwardFlattenSequence.prototype, {
     reset: null,
 });
 
-BackwardFlattenSequence.prototype = Object.create(Sequence.prototype);
-BackwardFlattenSequence.prototype.constructor = BackwardFlattenSequence;
-Object.assign(BackwardFlattenSequence.prototype, {
+export const BackwardFlattenSequence = Sequence.extend({
+    constructor: function(source, frontSource = null){
+        this.source = source;
+        this.frontSource = frontSource;
+    },
     reverse: function(){
         return new ForwardFlattenSequence(this.source);
     },

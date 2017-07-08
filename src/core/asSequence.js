@@ -40,17 +40,14 @@ export const asSequence = (source) => {
 // Optionally accepts an inclusive start index and an exclusive end index.
 // When start and end indexes aren't given, the sequence enumerates the
 // entire contents of the array.
-export const ArraySequence = function(source, low, high){
-    this.source = source;
-    this.lowIndex = isNaN(low) ? 0 : low;
-    this.highIndex = isNaN(high) ? source.length : high;
-    this.frontIndex = this.lowIndex;
-    this.backIndex = this.highIndex;
-};
-
-ArraySequence.prototype = Object.create(Sequence.prototype);
-ArraySequence.prototype.constructor = ArraySequence;
-Object.assign(ArraySequence.prototype, {
+export const ArraySequence = Sequence.extend({
+    constructor: function(source, low, high){
+        this.source = source;
+        this.lowIndex = isNaN(low) ? 0 : low;
+        this.highIndex = isNaN(high) ? source.length : high;
+        this.frontIndex = this.lowIndex;
+        this.backIndex = this.highIndex;
+    },
     array: function(limit){
         if(limit <= 0){
             return [];
@@ -137,17 +134,14 @@ Object.assign(ArraySequence.prototype, {
 // Optionally accepts an inclusive start index and an exclusive end index.
 // When start and end indexes aren't given, the sequence enumerates the
 // entire contents of the string.
-export const StringSequence = function(source, low, high){
-    this.source = source;
-    this.lowIndex = isNaN(low) ? 0 : low;
-    this.highIndex = isNaN(high) ? source.length : high;
-    this.frontIndex = this.lowIndex;
-    this.backIndex = this.highIndex;
-};
-
-StringSequence.prototype = Object.create(Sequence.prototype);
-StringSequence.prototype.constructor = StringSequence;
-Object.assign(StringSequence.prototype, {
+export const StringSequence = Sequence.extend({
+    constructor: function(source, low, high){
+        this.source = source;
+        this.lowIndex = isNaN(low) ? 0 : low;
+        this.highIndex = isNaN(high) ? source.length : high;
+        this.frontIndex = this.lowIndex;
+        this.backIndex = this.highIndex;
+    },
     string: function(){
         if(this.lowIndex === 0 && this.highIndex === this.source.length){
             return this.source;
@@ -211,15 +205,12 @@ Object.assign(StringSequence.prototype, {
 // Optionally accepts an array of keys indicating which keys of the object
 // should be enumerated. When not explicitly provided, the sequence enumerates
 // key, value pairs for all of the object's own keys.
-export const ObjectSequence = function(source, keys){
-    this.source = source;
-    this.keys = keys || Object.keys(source);
-    this.keyIndex = 0;
-};
-
-ObjectSequence.prototype = Object.create(Sequence.prototype);
-ObjectSequence.prototype.constructor = ObjectSequence;
-Object.assign(ObjectSequence.prototype, {
+export const ObjectSequence = Sequence.extend({
+    constructor: function(source, keys){
+        this.source = source;
+        this.keys = keys || Object.keys(source);
+        this.keyIndex = 0;
+    },
     bounded: () => true,
     done: function(){
         return this.keyIndex >= this.keys.length;
@@ -263,14 +254,11 @@ Object.assign(ObjectSequence.prototype, {
 // An iterable is anything with a "next" method returning an object with two
 // attributes, "done" being a boolean indicating when the iterator has been
 // fully consumed and "value" being the current element of the iterator.
-export const IterableSequence = function(source){
-    this.source = source;
-    this.item = source.next();
-};
-
-IterableSequence.prototype = Object.create(Sequence.prototype);
-IterableSequence.prototype.constructor = IterableSequence;
-Object.assign(IterableSequence.prototype, {
+export const IterableSequence = Sequence.extend({
+    constructor: function(source){
+        this.source = source;
+        this.item = source.next();
+    },
     bounded: () => false,
     done: function(){
         return this.item.done;

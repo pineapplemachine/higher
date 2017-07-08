@@ -2,33 +2,16 @@ import {Sequence} from "../core/sequence";
 import {FiniteRepeatElementSequence} from "./repeatElement";
 import {wrap} from "../core/wrap";
 
-export const PadLeftSequence = function(
-    source, padElement, padTotal, padCount = undefined
-){
-    this.source = source;
-    this.padElement = padElement;
-    this.padTotal = padTotal;
-    this.padCount = padCount || 0;
-    this.maskAbsentMethods(source);
-};
-
-export const PadRightSequence = function(
-    source, padElement, padTotal, padCount = undefined
-){
-    this.source = source;
-    this.padElement = padElement;
-    this.padTotal = padTotal;
-    this.padCount = padCount || 0;
-    this.maskAbsentMethods(source);
-    if(!source.length){
-        this.index = null;
-        this.slice = null;
-    }
-};
-
-PadLeftSequence.prototype = Object.create(Sequence.prototype);
-PadLeftSequence.prototype.constructor = PadLeftSequence;
-Object.assign(PadLeftSequence.prototype, {
+export const PadLeftSequence = Sequence.extend({
+    constructor: function(
+        source, padElement, padTotal, padCount = undefined
+    ){
+        this.source = source;
+        this.padElement = padElement;
+        this.padTotal = padTotal;
+        this.padCount = padCount || 0;
+        this.maskAbsentMethods(source);
+    },
     bounded: function(){
         return this.source.bounded();
     },
@@ -98,9 +81,20 @@ Object.assign(PadLeftSequence.prototype, {
     },
 });
 
-PadRightSequence.prototype = Object.create(Sequence.prototype);
-PadRightSequence.prototype.constructor = PadRightSequence;
-Object.assign(PadRightSequence.prototype, {
+export const PadRightSequence = Sequence.extend({
+    constructor: function(
+        source, padElement, padTotal, padCount = undefined
+    ){
+        this.source = source;
+        this.padElement = padElement;
+        this.padTotal = padTotal;
+        this.padCount = padCount || 0;
+        this.maskAbsentMethods(source);
+        if(!source.length){
+            this.index = null;
+            this.slice = null;
+        }
+    },
     bounded: function(){
         return this.source.bounded();
     },

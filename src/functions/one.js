@@ -2,14 +2,11 @@ import {Sequence} from "../core/sequence";
 import {FiniteRepeatElementSequence, InfiniteRepeatElementSequence} from "./repeatElement";
 import {wrap} from "../core/wrap";
 
-export const OneElementSequence = function(element, isDone = false){
-    this.element = element;
-    this.isDone = isDone;
-};
-
-OneElementSequence.prototype = Object.create(Sequence.prototype);
-OneElementSequence.prototype.constructor = OneElementSequence;
-Object.assign(OneElementSequence.prototype, {
+export const OneElementSequence = Sequence.extend({
+    constructor: function(element, isDone = false){
+        this.element = element;
+        this.isDone = isDone;
+    },
     seed: function(element){
         this.element = element;
         return this;

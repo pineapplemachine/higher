@@ -4,26 +4,23 @@ import {constants} from "../core/constants";
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
-export const ReduceSequence = function(
-    combine, source, seedValue = null, hasSeed = false, initialize = true
-){
-    const done = source.done();
-    this.combine = combine;
-    this.source = source;
-    this.accumulator = seedValue;
-    this.seedValue = seedValue;
-    this.hasSeed = hasSeed;
-    this.lastElement = hasSeed || !done;
-    this.maskAbsentMethods(source);
-    // TODO: Move this out of the creation function, into initialization logic
-    if(initialize && !hasSeed && !done){
-        this.accumulator = source.nextFront();
-    }
-};
-
-ReduceSequence.prototype = Object.create(Sequence.prototype);
-ReduceSequence.prototype.constructor = ReduceSequence;
-Object.assign(ReduceSequence.prototype, {
+export const ReduceSequence = Sequence.extend({
+    constructor: function(
+        combine, source, seedValue = null, hasSeed = false, initialize = true
+    ){
+        const done = source.done();
+        this.combine = combine;
+        this.source = source;
+        this.accumulator = seedValue;
+        this.seedValue = seedValue;
+        this.hasSeed = hasSeed;
+        this.lastElement = hasSeed || !done;
+        this.maskAbsentMethods(source);
+        // TODO: Move this out of the creation function, into initialization logic
+        if(initialize && !hasSeed && !done){
+            this.accumulator = source.nextFront();
+        }
+    },
     // Get the last value in the sequence synchronously.
     // Returns the fallback value if there was no last element.
     last: function(fallback = undefined){

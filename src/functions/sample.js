@@ -10,19 +10,16 @@ import {ShuffleSequence} from "./shuffle";
 // This algorithm is always less performant when shuffling an entire array,
 // but is often faster than acquiring the first few elements of a longer
 // shuffled sequence.
-export const DistinctRandomIndexSequence = function(
-    random, totalValues, valueHistory = undefined
-){
-    this.random = random;
-    this.totalValues = totalValues;
-    this.valueHistory = valueHistory || [
-        Math.floor(random() * totalValues),
-    ];
-};
-
-DistinctRandomIndexSequence.prototype = Object.create(Sequence.prototype);
-DistinctRandomIndexSequence.prototype.constructor = DistinctRandomIndexSequence;
-Object.assign(DistinctRandomIndexSequence.prototype, {
+export const DistinctRandomIndexSequence = Sequence.extend({
+    constructor: function(
+        random, totalValues, valueHistory = undefined
+    ){
+        this.random = random;
+        this.totalValues = totalValues;
+        this.valueHistory = valueHistory || [
+            Math.floor(random() * totalValues),
+        ];
+    },
     bounded: () => true,
     done: function(){
         return this.valueHistory.length > this.totalValues;
@@ -95,18 +92,15 @@ Object.assign(DistinctRandomIndexSequence.prototype, {
 });
 
 // Input sequence must have length and indexing.
-const SampleSequence = function(samples, random, source, indexes = undefined){
-    this.samples = samples;
-    this.random = random;
-    this.source = source;
-    this.indexes = indexes || new DistinctRandomIndexSequence(
-        this.random, this.source.length()
-    );
-};
-
-SampleSequence.prototype = Object.create(Sequence.prototype);
-SampleSequence.prototype.constructor = SampleSequence;
-Object.assign(SampleSequence.prototype, {
+const SampleSequence = Sequence.extend({
+    constructor: function(samples, random, source, indexes = undefined){
+        this.samples = samples;
+        this.random = random;
+        this.source = source;
+        this.indexes = indexes || new DistinctRandomIndexSequence(
+            this.random, this.source.length()
+        );
+    },
     bounded: () => true,
     done: function(){
         return this.indexes.valueHistory.length > this.samples;

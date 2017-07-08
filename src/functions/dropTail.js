@@ -1,20 +1,17 @@
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
-export const DropTailSequence = function(dropElements, source, frontIndex = 0){
-    if(!source.length){
-        throw "Error dropping tail: Input sequence must have known length.";
-    }
-    this.dropElements = dropElements;
-    this.source = source;
-    this.frontIndex = frontIndex;
-    this.lastIndex = source.length() - dropElements;
-    this.maskAbsentMethods(source);
-};
-
-DropTailSequence.prototype = Object.create(Sequence.prototype);
-DropTailSequence.prototype.constructor = DropTailSequence;
-Object.assign(DropTailSequence.prototype, {
+export const DropTailSequence = Sequence.extend({
+    constructor: function(dropElements, source, frontIndex = 0){
+        if(!source.length){
+            throw "Error dropping tail: Input sequence must have known length.";
+        }
+        this.dropElements = dropElements;
+        this.source = source;
+        this.frontIndex = frontIndex;
+        this.lastIndex = source.length() - dropElements;
+        this.maskAbsentMethods(source);
+    },
     bounded: function(){
         return this.source.bounded();
     },
