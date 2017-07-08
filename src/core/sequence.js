@@ -24,6 +24,14 @@ Sequence.attach = function(fancy){
     return fancy;
 };
 
+// Helper for creating a type which inherits the Sequence prototype.
+Sequence.extend = function(methods){
+    const constructor = methods.constructor;
+    constructor.prototype = Object.create(Sequence.prototype);
+    Object.assign(constructor.prototype, methods);
+    return constructor;
+};
+
 Sequence.prototype[Symbol.iterator] = function(){
     return this;
 };
