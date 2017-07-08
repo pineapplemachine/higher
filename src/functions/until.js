@@ -35,6 +35,7 @@ Object.assign(UntilSequence.prototype, {
     bounded: function(){
         return this.source.bounded();
     },
+    unbounded: () => false,
     done: function(){
         return (this.satisfied || this.source.done()) && this.included;
     },
