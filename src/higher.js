@@ -86,6 +86,7 @@ import {array} from "./functions/array"; hi.register(array);
 import {assumeBounded} from "./functions/assumeBounded"; hi.register(assumeBounded);
 import {benchmark} from "./functions/benchmark"; hi.register(benchmark);
 import {bigrams} from "./functions/bigrams"; hi.register(bigrams);
+import {chunk} from "./functions/chunk"; hi.register(chunk);
 import {concat} from "./functions/concat"; hi.register(concat);
 import {consume} from "./functions/consume"; hi.register(consume);
 import {containsElement} from "./functions/containsElement"; hi.register(containsElement);
