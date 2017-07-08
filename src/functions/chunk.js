@@ -1,7 +1,43 @@
+/* @Dependencies */
+
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 import {HeadSequence} from "./head";
+
+/* @Documentation
+
+@Summary
+
+Chunk an input sequence into a sequence containing many ordered sub-sequences.
+
+@Params
+
+The function accepts a sequence to be chunked and a number indicating the
+length of each chunk.
+Note that the last chunk in the sequence will be shorter than the provided
+length if the length of the input sequence was not evenly divisible by the
+chunk length.
+
+@Returns
+
+Returns a new sequence enumerating the chunks of the input sequence.
+
+@Warnings
+
+If the input sequence supports slicing and has known length, then the
+outputted sequence will be bidirectional. Otherwise, if the input sequence
+supports copying, the outputted sequence will be unidirectional.
+If the input sequence meets neither of those requirements but is at least
+known to be bounded, then it will be eagerly consumed in order to construct
+a bidirectional chunking sequence from it.
+
+If the input does not have known length, cannot be sliced, cannot be copied,
+and is not known to be bounded, then an error will be thrown.
+
+*/
+
+/* @Implementation */
 
 // Implement chunking for sequences that are copyable but don't have
 // both slicing and known length.
@@ -155,9 +191,11 @@ export const chunk = wrap({
             return new BidirectionalChunkSequence(chunkLength, source);
         }else if(source.copy){
             return new ForwardChunkSequence(chunkLength, source);
-        }else{
+        }else if(source.bounded()){
             source.forceEager();
             return new BidirectionalChunkSequence(chunkLength, source);
+        }else{
+            throw "Failed to chunk sequence."; // TODO: Better error
         }
     },
 });
