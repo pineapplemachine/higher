@@ -82,6 +82,7 @@ export const ArraySequence = Sequence.extend({
         return new constants.Promise((resolve, reject) => resolve(this.newArray(limit)));
     },
     bounded: () => true,
+    unbounded: () => false,
     done: function(){
         return this.frontIndex >= this.backIndex;
     },
@@ -153,6 +154,7 @@ export const StringSequence = Sequence.extend({
         return new constants.Promise((resolve, reject) => resolve(this.string()));
     },
     bounded: () => true,
+    unbounded: () => false,
     done: function(){
         return this.frontIndex >= this.backIndex;
     },
@@ -212,6 +214,7 @@ export const ObjectSequence = Sequence.extend({
         this.keyIndex = 0;
     },
     bounded: () => true,
+    unbounded: () => false,
     done: function(){
         return this.keyIndex >= this.keys.length;
     },
@@ -260,6 +263,7 @@ export const IterableSequence = Sequence.extend({
         this.item = source.next();
     },
     bounded: () => false,
+    unbounded: () => false,
     done: function(){
         return this.item.done;
     },
