@@ -11,7 +11,7 @@ import {ShuffleSequence} from "./shuffle";
 // but is often faster than acquiring the first few elements of a longer
 // shuffled sequence.
 export const DistinctRandomIndexSequence = Sequence.extend({
-    constructor: function(
+    constructor: function DistinctRandomIndexSequence(
         random, totalValues, valueHistory = undefined
     ){
         this.random = random;

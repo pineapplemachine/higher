@@ -15,7 +15,7 @@ const getStrideLength = function(strideLength){
 // Note that initialization potentially changes the state of the source sequence.
 // TODO: Fix initialization changing the source
 export const PoppingStrideSequence = Sequence.extend({
-    constructor: function(strideLength, source){
+    constructor: function PoppingStrideSequence(strideLength, source){
         this.strideLength = getStrideLength(strideLength);
         this.source = source;
         this.maskAbsentMethods(source);
@@ -74,7 +74,7 @@ export const PoppingStrideSequence = Sequence.extend({
 // Implement stride using indexing.
 // For this to be available, the source must support index and length methods.
 export const IndexStrideSequence = Sequence.extend({
-    constructor: function(strideLength, source){
+    constructor: function IndexStrideSequence(strideLength, source){
         if(!source.index || !source.length || !source.bounded()){
             // TODO: More descriptive error
             throw "Failed to create stride sequence.";

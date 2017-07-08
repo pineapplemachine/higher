@@ -5,7 +5,7 @@ import {wrap} from "../core/wrap";
 
 // TODO: Also write a backwards version of this sequence
 export const FlattenDeepSequence = Sequence.extend({
-    constructor: function(source){
+    constructor: function FlattenDeepSequence(source){
         this.source = source;
         this.sourceStack = [source];
         this.frontSource = source;

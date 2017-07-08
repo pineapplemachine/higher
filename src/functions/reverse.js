@@ -2,7 +2,7 @@ import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 export const ReverseSequence = Sequence.extend({
-    constructor: function(source){
+    constructor: function ReverseSequence(source){
         if(!source.back){
             throw "Failed to reverse sequence: Sequence must be bidirectional.";
         }

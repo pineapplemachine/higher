@@ -3,7 +3,7 @@ import {asSequence, validAsSequence} from "../core/asSequence";
 import {wrap} from "../core/wrap";
 
 export const ForwardFlattenSequence = Sequence.extend({
-    constructor: function(source, frontSource = null){
+    constructor: function ForwardFlattenSequence(source, frontSource = null){
         this.source = source;
         this.frontSource = frontSource;
     },
@@ -51,7 +51,7 @@ export const ForwardFlattenSequence = Sequence.extend({
 });
 
 export const BackwardFlattenSequence = Sequence.extend({
-    constructor: function(source, frontSource = null){
+    constructor: function BackwardFlattenSequence(source, frontSource = null){
         this.source = source;
         this.frontSource = frontSource;
     },

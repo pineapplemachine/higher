@@ -2,7 +2,7 @@ import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 export const TapSequence = Sequence.extend({
-    constructor: function(callback, source){
+    constructor: function TapSequence(callback, source){
         this.callback = callback;
         this.source = source;
         this.frontValue = null;

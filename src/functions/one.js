@@ -3,7 +3,7 @@ import {FiniteRepeatElementSequence, InfiniteRepeatElementSequence} from "./repe
 import {wrap} from "../core/wrap";
 
 export const OneElementSequence = Sequence.extend({
-    constructor: function(element, isDone = false){
+    constructor: function OneElementSequence(element, isDone = false){
         this.element = element;
         this.isDone = isDone;
     },

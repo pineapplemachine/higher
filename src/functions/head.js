@@ -5,7 +5,7 @@ import {EmptySequence} from "./empty";
 
 // Fallback implementation of head function for when slicing is unavailable.
 export const HeadSequence = Sequence.extend({
-    constructor: function(elements, source, frontIndex = 0){
+    constructor: function HeadSequence(elements, source, frontIndex = 0){
         this.elements = elements;
         this.source = source;
         this.frontIndex = frontIndex;

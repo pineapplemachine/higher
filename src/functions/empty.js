@@ -3,7 +3,7 @@ import {wrap} from "../core/wrap";
 
 // A chronically empty sequence.
 export const EmptySequence = Sequence.extend({
-    constructor: function(){},
+    constructor: function EmptySequence(){},
     repeat: function(repetitions){
         return this;
     },

@@ -4,7 +4,7 @@ import {wrap} from "../core/wrap";
 import {InfiniteRepeatElementSequence} from "./repeatElement";
 
 export const NgramSequence = Sequence.extend({
-    constructor: function(ngramSize, source, currentNgram = null){
+    constructor: function NgramSequence(ngramSize, source, currentNgram = null){
         this.ngramSize = Math.floor(+ngramSize);
         this.source = source;
         this.currentNgram = currentNgram || [];

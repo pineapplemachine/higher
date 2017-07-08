@@ -6,7 +6,7 @@ import {EmptySequence} from "./empty";
 import {wrap} from "../core/wrap";
 
 export const DropSliceSequence = Sequence.extend({
-    constructor: function(dropLow, dropHigh, source){
+    constructor: function DropSliceSequence(dropLow, dropHigh, source){
         if(dropLow === 0){
             throw "Error creating drop slice sequence: Use dropHead instead.";
         }

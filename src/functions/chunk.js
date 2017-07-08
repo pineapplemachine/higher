@@ -42,7 +42,7 @@ and is not known to be bounded, then an error will be thrown.
 // Implement chunking for sequences that are copyable but don't have
 // both slicing and known length.
 export const ForwardChunkSequence = Sequence.extend({
-    constructor: function(chunkLength, source){
+    constructor: function ForwardChunkSequence(chunkLength, source){
         if(!source.copy) throw "Input must be copyable.";
         this.chunkLength = chunkLength;
         this.source = source;
@@ -92,7 +92,7 @@ export const ForwardChunkSequence = Sequence.extend({
 
 // Implement chunking for sequences with slicing and known length.
 export const BidirectionalChunkSequence = Sequence.extend({
-    constructor: function(
+    constructor: function BidirectionalChunkSequence(
         chunkLength, source,
         lowIndex = undefined, highIndex = undefined,
         frontIndex = undefined, backIndex = undefined

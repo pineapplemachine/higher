@@ -2,7 +2,7 @@ import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 export const RecurSequence = Sequence.extend({
-    constructor: function(
+    constructor: function RecurSequence(
         transform, seedValue = null, frontValue = null
     ){
         this.transform = transform;

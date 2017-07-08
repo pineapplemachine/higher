@@ -2,7 +2,7 @@ import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 export const EnumerateSequence = Sequence.extend({
-    constructor: function(
+    constructor: function EnumerateSequence(
         source, start = 0, step = 1,
         frontIndex = 0, backIndex = 0, initialize = true
     ){

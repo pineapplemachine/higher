@@ -4,7 +4,7 @@ import {wrap} from "../core/wrap";
 import {EmptySequence} from "./empty";
 
 export const FiniteRepeatSequence = Sequence.extend({
-    constructor: function(
+    constructor: function FiniteRepeatSequence(
         repetitions, source, frontSource = undefined, backSource = undefined
     ){
         // Input sequence must be copyable.
@@ -158,7 +158,7 @@ export const FiniteRepeatSequence = Sequence.extend({
 });
 
 export const InfiniteRepeatSequence = Sequence.extend({
-    constructor: function(source, frontSource = null, backSource = null){
+    constructor: function InfiniteRepeatSequence(source, frontSource = null, backSource = null){
         if(!source.copy){
             throw "Error repeating sequence: Only copyable sequences can be repeated.";
         }

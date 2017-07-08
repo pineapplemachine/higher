@@ -41,7 +41,7 @@ export const asSequence = (source) => {
 // When start and end indexes aren't given, the sequence enumerates the
 // entire contents of the array.
 export const ArraySequence = Sequence.extend({
-    constructor: function(source, low, high){
+    constructor: function ArraySequence(source, low, high){
         this.source = source;
         this.lowIndex = isNaN(low) ? 0 : low;
         this.highIndex = isNaN(high) ? source.length : high;
@@ -136,7 +136,7 @@ export const ArraySequence = Sequence.extend({
 // When start and end indexes aren't given, the sequence enumerates the
 // entire contents of the string.
 export const StringSequence = Sequence.extend({
-    constructor: function(source, low, high){
+    constructor: function StringSequence(source, low, high){
         this.source = source;
         this.lowIndex = isNaN(low) ? 0 : low;
         this.highIndex = isNaN(high) ? source.length : high;
@@ -208,7 +208,7 @@ export const StringSequence = Sequence.extend({
 // should be enumerated. When not explicitly provided, the sequence enumerates
 // key, value pairs for all of the object's own keys.
 export const ObjectSequence = Sequence.extend({
-    constructor: function(source, keys){
+    constructor: function ObjectSequence(source, keys){
         this.source = source;
         this.keys = keys || Object.keys(source);
         this.keyIndex = 0;
@@ -258,7 +258,7 @@ export const ObjectSequence = Sequence.extend({
 // attributes, "done" being a boolean indicating when the iterator has been
 // fully consumed and "value" being the current element of the iterator.
 export const IterableSequence = Sequence.extend({
-    constructor: function(source){
+    constructor: function IterableSequence(source){
         this.source = source;
         this.item = source.next();
     },

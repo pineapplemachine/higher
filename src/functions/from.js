@@ -4,7 +4,7 @@ import {wrap} from "../core/wrap";
 // Enumerate those elements of an input sequence starting from the first
 // element matching a predicate.
 export const FromSequence = Sequence.extend({
-    constructor: function(
+    constructor: function FromSequence(
         predicate, source, isInclusive = true, initialized = false
     ){
         this.predicate = predicate;
