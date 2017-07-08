@@ -107,6 +107,7 @@ import {first} from "./functions/first"; hi.register(first);
 import {flatten} from "./functions/flatten"; hi.register(flatten);
 import {flattenDeep} from "./functions/flattenDeep"; hi.register(flattenDeep);
 import {from} from "./functions/from"; hi.register(from);
+import {groupBy} from "./functions/groupBy"; hi.register(groupBy);
 import {head} from "./functions/head"; hi.register(head);
 import {homogenous} from "./functions/homogenous"; hi.register(homogenous);
 import {join} from "./functions/join"; hi.register(join);
