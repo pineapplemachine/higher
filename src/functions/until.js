@@ -1,27 +1,24 @@
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
-export const UntilSequence = function(
-    predicate, source, isInclusive = false, included = true,
-    satisfied = false, frontValue = null, initialize = true
-){
-    this.predicate = predicate;
-    this.source = source;
-    this.isInclusive = isInclusive;
-    this.included = included;
-    if(source.done() || !initialize){
-        this.frontValue = frontValue;
-        this.satisfied = satisfied;
-    }else{
-        this.frontValue = source.nextFront();
-        this.satisfied = predicate(this.frontValue);
-    }
-    this.maskAbsentMethods(source);
-};
-
-UntilSequence.prototype = Object.create(Sequence.prototype);
-UntilSequence.prototype.constructor = UntilSequence;
-Object.assign(UntilSequence.prototype, {
+export const UntilSequence = Sequence.extend({
+    constructor: function(
+        predicate, source, isInclusive = false, included = true,
+        satisfied = false, frontValue = null, initialize = true
+    ){
+        this.predicate = predicate;
+        this.source = source;
+        this.isInclusive = isInclusive;
+        this.included = included;
+        if(source.done() || !initialize){
+            this.frontValue = frontValue;
+            this.satisfied = satisfied;
+        }else{
+            this.frontValue = source.nextFront();
+            this.satisfied = predicate(this.frontValue);
+        }
+        this.maskAbsentMethods(source);
+    },
     inclusive: function(){
         this.isInclusive = true;
         this.included = false;

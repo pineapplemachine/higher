@@ -5,30 +5,27 @@ import {DropTailSequence} from "./dropTail";
 import {EmptySequence} from "./empty";
 import {wrap} from "../core/wrap";
 
-export const DropSliceSequence = function(dropLow, dropHigh, source){
-    if(dropLow === 0){
-        throw "Error creating drop slice sequence: Use dropHead instead.";
-    }
-    if(source.back && source.length && dropHigh === source.length()){
-        throw "Error creating drop slice sequence: Use dropTail instead.";
-    }
-    this.dropLow = dropLow < 0 ? 0 : dropLow;
-    this.dropHigh = dropHigh;
-    if(source.length){
-        const length = source.length();
-        if(this.dropHigh > length) this.dropHigh = length;
-    }
-    this.source = source;
-    this.dropLength = dropHigh - dropLow;
-    this.frontIndex = 0;
-    this.backIndex = 0;
-    this.droppedSlice = false;
-    this.maskAbsentMethods(source);
-};
-
-DropSliceSequence.prototype = Object.create(Sequence.prototype);
-DropSliceSequence.prototype.constructor = DropSliceSequence;
-Object.assign(DropSliceSequence.prototype, {
+export const DropSliceSequence = Sequence.extend({
+    constructor: function(dropLow, dropHigh, source){
+        if(dropLow === 0){
+            throw "Error creating drop slice sequence: Use dropHead instead.";
+        }
+        if(source.back && source.length && dropHigh === source.length()){
+            throw "Error creating drop slice sequence: Use dropTail instead.";
+        }
+        this.dropLow = dropLow < 0 ? 0 : dropLow;
+        this.dropHigh = dropHigh;
+        if(source.length){
+            const length = source.length();
+            if(this.dropHigh > length) this.dropHigh = length;
+        }
+        this.source = source;
+        this.dropLength = dropHigh - dropLow;
+        this.frontIndex = 0;
+        this.backIndex = 0;
+        this.droppedSlice = false;
+        this.maskAbsentMethods(source);
+    },
     bounded: function(){
         return this.source.bounded();
     },

@@ -1,15 +1,12 @@
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
-export const FilterSequence = function(predicate, source, initialize = true){
-    this.predicate = predicate;
-    this.source = source;
-    this.maskAbsentMethods(source);
-};
-
-FilterSequence.prototype = Object.create(Sequence.prototype);
-FilterSequence.prototype.constructor = FilterSequence;
-Object.assign(FilterSequence.prototype, {
+export const FilterSequence = Sequence.extend({
+    constructor: function(predicate, source, initialize = true){
+        this.predicate = predicate;
+        this.source = source;
+        this.maskAbsentMethods(source);
+    },
     initializeFront: function(){
         while(!this.predicate(this.source.front())){
             this.source.popFront();

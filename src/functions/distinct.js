@@ -1,18 +1,15 @@
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
-export const DistinctSequence = function(
-    source, history = null, frontValue = null, initialize = true
-){
-    this.source = source;
-    this.history = history || {};
-    this.frontValue = initialize && !source.done() ? source.front() : frontValue;
-    this.maskAbsentMethods(source);
-};
-
-DistinctSequence.prototype = Object.create(Sequence.prototype);
-DistinctSequence.prototype.constructor = DistinctSequence;
-Object.assign(DistinctSequence.prototype, {
+export const DistinctSequence = Sequence.extend({
+    constructor: function(
+        source, history = null, frontValue = null, initialize = true
+    ){
+        this.source = source;
+        this.history = history || {};
+        this.frontValue = initialize && !source.done() ? source.front() : frontValue;
+        this.maskAbsentMethods(source);
+    },
     bounded: function(){
         return this.source.bounded();
     },

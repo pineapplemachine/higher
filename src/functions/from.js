@@ -3,19 +3,16 @@ import {wrap} from "../core/wrap";
 
 // Enumerate those elements of an input sequence starting from the first
 // element matching a predicate.
-export const FromSequence = function(
-    predicate, source, isInclusive = true, initialized = false
-){
-    this.predicate = predicate;
-    this.source = source;
-    this.isInclusive = isInclusive;
-    this.initialized = initialized;
-    this.maskAbsentMethods(source);
-};
-
-FromSequence.prototype = Object.create(Sequence.prototype);
-FromSequence.prototype.constructor = FromSequence;
-Object.assign(FromSequence.prototype, {
+export const FromSequence = Sequence.extend({
+    constructor: function(
+        predicate, source, isInclusive = true, initialized = false
+    ){
+        this.predicate = predicate;
+        this.source = source;
+        this.isInclusive = isInclusive;
+        this.initialized = initialized;
+        this.maskAbsentMethods(source);
+    },
     initialize: function(){
         this.initialized = true;
         while(!this.source.done()){

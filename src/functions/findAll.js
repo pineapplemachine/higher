@@ -116,46 +116,6 @@ Object.assign(BackwardFindSequenceThread.prototype, {
     },
 });
 
-export const ForwardFindSequence = function(
-    compare, source, search, searchThreads = undefined
-){
-    if(!search.copy) throw (
-        "Failed to create find sequence: Search sequence must be copyable."
-    );
-    this.compare = compare;
-    this.source = source;
-    this.search = search;
-    this.currentResult = null;
-    this.searchElement = null;
-    this.nextSearchElement = null;
-    this.searchThreads = searchThreads || [];
-    this.index = 0;
-    if(!source.copy) this.copy = null;
-    if(!source.reset) this.reset = null;
-    if(!source.back || !search.back || !source.length) this.reverse = function(){
-        // TODO: Fall back on eager eval where possible
-        throw "Failed to reverse find sequence: An input is unidirectional.";
-    };
-};
-
-export const BackwardFindSequence = function(
-    compare, source, search, searchThreads = undefined
-){
-    if(!search.copy) throw (
-        "Failed to create find sequence: Search sequence must be copyable."
-    );
-    this.compare = compare;
-    this.source = source;
-    this.search = search;
-    this.currentResult = null;
-    this.searchElement = null;
-    this.nextSearchElement = null;
-    this.searchThreads = searchThreads || [];
-    this.index = source.length();
-    if(!source.copy) this.copy = null;
-    if(!source.reset) this.reset = null;
-};
-
 export const stepFindThreads = function(element){
     let result = undefined;
     let deadThreads = 0;
@@ -185,9 +145,28 @@ export const stepFindThreads = function(element){
     return result;
 };
 
-ForwardFindSequence.prototype = Object.create(Sequence.prototype);
-ForwardFindSequence.prototype.constructor = ForwardFindSequence;
-Object.assign(ForwardFindSequence.prototype, {
+export const ForwardFindSequence = Sequence.extend({
+    constructor: function(
+        compare, source, search, searchThreads = undefined
+    ){
+        if(!search.copy) throw (
+            "Failed to create find sequence: Search sequence must be copyable."
+        );
+        this.compare = compare;
+        this.source = source;
+        this.search = search;
+        this.currentResult = null;
+        this.searchElement = null;
+        this.nextSearchElement = null;
+        this.searchThreads = searchThreads || [];
+        this.index = 0;
+        if(!source.copy) this.copy = null;
+        if(!source.reset) this.reset = null;
+        if(!source.back || !search.back || !source.length) this.reverse = function(){
+            // TODO: Fall back on eager eval where possible
+            throw "Failed to reverse find sequence: An input is unidirectional.";
+        };
+    },
     threadType: ForwardFindSequenceThread,
     stepThreads: stepFindThreads,
     reverse: function(){
@@ -309,9 +288,24 @@ Object.assign(ForwardFindSequence.prototype, {
     },
 });
 
-BackwardFindSequence.prototype = Object.create(Sequence.prototype);
-BackwardFindSequence.prototype.constructor = BackwardFindSequence;
-Object.assign(BackwardFindSequence.prototype, {
+export const BackwardFindSequence = Sequence.extend({
+    constructor: function(
+        compare, source, search, searchThreads = undefined
+    ){
+        if(!search.copy) throw (
+            "Failed to create find sequence: Search sequence must be copyable."
+        );
+        this.compare = compare;
+        this.source = source;
+        this.search = search;
+        this.currentResult = null;
+        this.searchElement = null;
+        this.nextSearchElement = null;
+        this.searchThreads = searchThreads || [];
+        this.index = source.length();
+        if(!source.copy) this.copy = null;
+        if(!source.reset) this.reset = null;
+    },
     threadType: BackwardFindSequenceThread,
     stepThreads: stepFindThreads,
     reverse: function(){

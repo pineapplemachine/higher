@@ -2,11 +2,8 @@ import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 // A chronically empty sequence.
-export const EmptySequence = function(){};
-
-EmptySequence.prototype = Object.create(Sequence.prototype);
-EmptySequence.prototype.constructor = EmptySequence;
-Object.assign(EmptySequence.prototype, {
+export const EmptySequence = Sequence.extend({
+    constructor: function(){},
     repeat: function(repetitions){
         return this;
     },

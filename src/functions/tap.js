@@ -1,19 +1,16 @@
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
-export const TapSequence = function(callback, source){
-    this.callback = callback;
-    this.source = source;
-    this.frontValue = null;
-    this.backValue = null;
-    this.cachedFront = false;
-    this.cachedBack = false;
-    this.maskAbsentMethods(source);
-};
-
-TapSequence.prototype = Object.create(Sequence.prototype);
-TapSequence.prototype.constructor = TapSequence;
-Object.assign(TapSequence.prototype, {
+export const TapSequence = Sequence.extend({
+    constructor: function(callback, source){
+        this.callback = callback;
+        this.source = source;
+        this.frontValue = null;
+        this.backValue = null;
+        this.cachedFront = false;
+        this.cachedBack = false;
+        this.maskAbsentMethods(source);
+    },
     bounded: function(){
         return this.source.bounded();
     },

@@ -3,16 +3,13 @@ import {asSequence, validAsSequence} from "../core/asSequence";
 import {isArray, isIterable, isString} from "../core/types";
 import {wrap} from "../core/wrap";
 
-export const FlattenDeepSequence = function(source){
-    this.source = source;
-    this.sourceStack = [source];
-    this.frontSource = source;
-};
-
 // TODO: Also write a backwards version of this sequence
-FlattenDeepSequence.prototype = Object.create(Sequence.prototype);
-FlattenDeepSequence.prototype.constructor = FlattenDeepSequence;
-Object.assign(FlattenDeepSequence.prototype, {
+export const FlattenDeepSequence = Sequence.extend({
+    constructor: function(source){
+        this.source = source;
+        this.sourceStack = [source];
+        this.frontSource = source;
+    },
     // True when an element is a sequence which should be flattened.
     flattenElement: function(element){
         return !isString(element) && (

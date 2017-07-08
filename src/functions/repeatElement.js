@@ -3,21 +3,14 @@ import {wrap} from "../core/wrap";
 
 import {EmptySequence} from "./empty";
 
-export const FiniteRepeatElementSequence = function(
-    repetitions, element, finishedRepetitions = 0
-){
-    this.repetitions = repetitions;
-    this.finishedRepetitions = finishedRepetitions || 0;
-    this.element = element;
-};
-
-export const InfiniteRepeatElementSequence = function(element){
-    this.element = element;
-};
-
-FiniteRepeatElementSequence.prototype = Object.create(Sequence.prototype);
-FiniteRepeatElementSequence.prototype.constructor = FiniteRepeatElementSequence;
-Object.assign(FiniteRepeatElementSequence.prototype, {
+export const FiniteRepeatElementSequence = Sequence.extend({
+    constructor: function(
+        repetitions, element, finishedRepetitions = 0
+    ){
+        this.repetitions = repetitions;
+        this.finishedRepetitions = finishedRepetitions || 0;
+        this.element = element;
+    },
     seed: function(element){
         this.element = element;
         return this;
@@ -84,9 +77,10 @@ Object.assign(FiniteRepeatElementSequence.prototype, {
     },
 });
 
-InfiniteRepeatElementSequence.prototype = Object.create(Sequence.prototype);
-InfiniteRepeatElementSequence.prototype.constructor = InfiniteRepeatElementSequence;
-Object.assign(InfiniteRepeatElementSequence.prototype, {
+export const InfiniteRepeatElementSequence = Sequence.extend({
+    constructor: function(element){
+        this.element = element;
+    },
     repetitions: Infinity,
     seed: function(element){
         this.element = element;

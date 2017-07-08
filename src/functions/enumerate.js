@@ -1,26 +1,23 @@
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
-export const EnumerateSequence = function(
-    source, start = 0, step = 1,
-    frontIndex = 0, backIndex = 0, initialize = true
-){
-    this.source = source;
-    this.start = start;
-    this.step = step;
-    this.frontIndex = frontIndex;
-    if(initialize){
-        this.backIndex = source.length ? start + (step * (source.length() - 1)) : 0;
-    }else{
-        this.backIndex = backIndex;
-    }
-    if(!source.length) this.back = null;
-    this.maskAbsentMethods(source);
-};
-
-EnumerateSequence.prototype = Object.create(Sequence.prototype);
-EnumerateSequence.prototype.constructor = EnumerateSequence;
-Object.assign(EnumerateSequence.prototype, {
+export const EnumerateSequence = Sequence.extend({
+    constructor: function(
+        source, start = 0, step = 1,
+        frontIndex = 0, backIndex = 0, initialize = true
+    ){
+        this.source = source;
+        this.start = start;
+        this.step = step;
+        this.frontIndex = frontIndex;
+        if(initialize){
+            this.backIndex = source.length ? start + (step * (source.length() - 1)) : 0;
+        }else{
+            this.backIndex = backIndex;
+        }
+        if(!source.length) this.back = null;
+        this.maskAbsentMethods(source);
+    },
     bounded: function(){
         return this.source.bounded();
     },

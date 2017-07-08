@@ -3,19 +3,16 @@ import {wrap} from "../core/wrap";
 
 import {InfiniteRepeatElementSequence} from "./repeatElement";
 
-export const NgramSequence = function(ngramSize, source, currentNgram = null){
-    this.ngramSize = Math.floor(+ngramSize);
-    this.source = source;
-    this.currentNgram = currentNgram || [];
-    while(!source.done() && this.currentNgram.length < this.ngramSize){
-        this.currentNgram.push(source.nextFront());
-    }
-    this.maskAbsentMethods(source);
-};
-
-NgramSequence.prototype = Object.create(Sequence.prototype);
-NgramSequence.prototype.constructor = NgramSequence;
-Object.assign(NgramSequence.prototype, {
+export const NgramSequence = Sequence.extend({
+    constructor: function(ngramSize, source, currentNgram = null){
+        this.ngramSize = Math.floor(+ngramSize);
+        this.source = source;
+        this.currentNgram = currentNgram || [];
+        while(!source.done() && this.currentNgram.length < this.ngramSize){
+            this.currentNgram.push(source.nextFront());
+        }
+        this.maskAbsentMethods(source);
+    },
     bounded: function(){
         return this.source.bounded();
     },

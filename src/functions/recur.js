@@ -1,17 +1,14 @@
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
-export const RecurSequence = function(
-    transform, seedValue = null, frontValue = null
-){
-    this.transform = transform;
-    this.seedValue = seedValue;
-    this.frontValue = frontValue;
-};
-
-RecurSequence.prototype = Object.create(Sequence.prototype);
-RecurSequence.prototype.constructor = RecurSequence;
-Object.assign(RecurSequence.prototype, {
+export const RecurSequence = Sequence.extend({
+    constructor: function(
+        transform, seedValue = null, frontValue = null
+    ){
+        this.transform = transform;
+        this.seedValue = seedValue;
+        this.frontValue = frontValue;
+    },
     // Call this to set the initial value of the generator.
     // Necessarily resets the state of the sequence.
     seed: function(value){

@@ -2,56 +2,29 @@ import {constants} from "../core/constants";
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
-export const ForwardSplitSequence = function(
-    compare, source, delimiter, beginDelimiter = undefined,
-    endDelimiter = undefined, frontValue = undefined,
-    frontResult = undefined, findDelimiters = undefined
-){
-    if(!source.slice || !source.length){
-        throw "Error splitting sequence: Input must support slicing and length.";
-    }
-    if(!delimiter.copy){
-        throw "Error splitting sequence: Delimiter must support copying.";
-    }
-    this.compare = compare;
-    this.source = source;
-    this.delimiter = delimiter;
-    this.beginDelimiter = beginDelimiter;
-    this.endDelimiter = endDelimiter;
-    this.frontValue = frontValue;
-    this.frontResult = frontResult || {low: 0, high: 0};
-    this.findDelimiters = findDelimiters || new ForwardFindSequence(
-        compare, source, delimiter.copy()
-    );
-};
-
-export const BackwardSplitSequence = function(
-    compare, source, delimiter, beginDelimiter = undefined,
-    endDelimiter = undefined, frontValue = undefined,
-    frontResult = undefined, findDelimiters = undefined
-){
-    if(!source.slice || !source.length){
-        throw "Error splitting sequence: Input must support slicing and length.";
-    }
-    if(!delimiter.copy){
-        throw "Error splitting sequence: Delimiter must support copying.";
-    }
-    this.compare = compare;
-    this.source = source;
-    this.delimiter = delimiter;
-    this.beginDelimiter = beginDelimiter;
-    this.endDelimiter = endDelimiter;
-    this.frontValue = frontValue;
-    const sourceLength = source.length();
-    this.frontResult = frontResult || {low: sourceLength, high: sourceLength};
-    this.findDelimiters = findDelimiters || new BackwardFindSequence(
-        compare, source, delimiter.copy()
-    );
-};
-
-ForwardSplitSequence.prototype = Object.create(Sequence.prototype);
-ForwardSplitSequence.prototype.constructor = ForwardSplitSequence;
-Object.assign(ForwardSplitSequence.prototype, {
+export const ForwardSplitSequence = Sequence.extend({
+    constructor: function(
+        compare, source, delimiter, beginDelimiter = undefined,
+        endDelimiter = undefined, frontValue = undefined,
+        frontResult = undefined, findDelimiters = undefined
+    ){
+        if(!source.slice || !source.length){
+            throw "Error splitting sequence: Input must support slicing and length.";
+        }
+        if(!delimiter.copy){
+            throw "Error splitting sequence: Delimiter must support copying.";
+        }
+        this.compare = compare;
+        this.source = source;
+        this.delimiter = delimiter;
+        this.beginDelimiter = beginDelimiter;
+        this.endDelimiter = endDelimiter;
+        this.frontValue = frontValue;
+        this.frontResult = frontResult || {low: 0, high: 0};
+        this.findDelimiters = findDelimiters || new ForwardFindSequence(
+            compare, source, delimiter.copy()
+        );
+    },
     reverse: function(){
         return new BackwardSplitSequence(
             this.compare, this.source, this.delimiter,
@@ -115,9 +88,30 @@ Object.assign(ForwardSplitSequence.prototype, {
     },
 });
 
-BackwardSplitSequence.prototype = Object.create(Sequence.prototype);
-BackwardSplitSequence.prototype.constructor = BackwardSplitSequence;
-Object.assign(BackwardSplitSequence.prototype, {
+export const BackwardSplitSequence = Sequence.extend({
+    constructor: function(
+        compare, source, delimiter, beginDelimiter = undefined,
+        endDelimiter = undefined, frontValue = undefined,
+        frontResult = undefined, findDelimiters = undefined
+    ){
+        if(!source.slice || !source.length){
+            throw "Error splitting sequence: Input must support slicing and length.";
+        }
+        if(!delimiter.copy){
+            throw "Error splitting sequence: Delimiter must support copying.";
+        }
+        this.compare = compare;
+        this.source = source;
+        this.delimiter = delimiter;
+        this.beginDelimiter = beginDelimiter;
+        this.endDelimiter = endDelimiter;
+        this.frontValue = frontValue;
+        const sourceLength = source.length();
+        this.frontResult = frontResult || {low: sourceLength, high: sourceLength};
+        this.findDelimiters = findDelimiters || new BackwardFindSequence(
+            compare, source, delimiter.copy()
+        );
+    },
     reverse: function(){
         return new ForwardSplitSequence(
             this.compare, this.source, this.delimiter,

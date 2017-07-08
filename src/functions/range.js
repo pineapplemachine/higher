@@ -5,40 +5,13 @@ import {EmptySequence} from "./empty";
 import {InfiniteRepeatElementSequence} from "./repeatElement";
 
 // Result of calling range with a step of exactly 1.
-export const NumberRangeSequence = function(start, end){
-    this.start = start;
-    this.end = end;
-    this.frontValue = start;
-    this.backValue = end - 1;
-};
-
-// Result of calling range with a step of greater than 0.
-export const ForwardNumberRangeSequence = function(start, end, step){
-    if(step <= 0){
-        throw "Failed to create range: Step must be greater than zero.";
-    }
-    this.start = start;
-    this.end = end;
-    this.step = step;
-    this.frontValue = start;
-    this.backValue = end - (end % step || step);
-};
-
-// Result of calling range with a step of less than 0.
-export const BackwardNumberRangeSequence = function(start, end, step){
-    if(step >= 0){
-        throw "Failed to create range: Step must be less than zero.";
-    }
-    this.start = start;
-    this.end = end;
-    this.step = step;
-    this.frontValue = start;
-    this.backValue = end + (end % -step || -step);
-};
-
-NumberRangeSequence.prototype = Object.create(Sequence.prototype);
-NumberRangeSequence.prototype.constructor = NumberRangeSequence;
-Object.assign(NumberRangeSequence.prototype, {
+export const NumberRangeSequence = Sequence.extend({
+    constructor: function(start, end){
+        this.start = start;
+        this.end = end;
+        this.frontValue = start;
+        this.backValue = end - 1;
+    },
     step: 1,
     reverse: function(){
         return new BackwardNumberRangeSequence(
@@ -86,9 +59,18 @@ Object.assign(NumberRangeSequence.prototype, {
     },
 });
 
-ForwardNumberRangeSequence.prototype = Object.create(Sequence.prototype);
-ForwardNumberRangeSequence.prototype.constructor = ForwardNumberRangeSequence;
-Object.assign(ForwardNumberRangeSequence.prototype, {
+// Result of calling range with a step of greater than 0.
+export const ForwardNumberRangeSequence = Sequence.extend({
+    constructor: function(start, end, step){
+        if(step <= 0){
+            throw "Failed to create range: Step must be greater than zero.";
+        }
+        this.start = start;
+        this.end = end;
+        this.step = step;
+        this.frontValue = start;
+        this.backValue = end - (end % step || step);
+    },
     reverse: function(){
         return new BackwardNumberRangeSequence(
             this.end - this.step, this.start - this.step, -this.step
@@ -139,9 +121,18 @@ Object.assign(ForwardNumberRangeSequence.prototype, {
     },
 });
 
-BackwardNumberRangeSequence.prototype = Object.create(Sequence.prototype);
-BackwardNumberRangeSequence.prototype.constructor = BackwardNumberRangeSequence;
-Object.assign(BackwardNumberRangeSequence.prototype, {
+// Result of calling range with a step of less than 0.
+export const BackwardNumberRangeSequence = Sequence.extend({
+    constructor: function(start, end, step){
+        if(step >= 0){
+            throw "Failed to create range: Step must be less than zero.";
+        }
+        this.start = start;
+        this.end = end;
+        this.step = step;
+        this.frontValue = start;
+        this.backValue = end + (end % -step || -step);
+    },
     reverse: function(){
         return new ForwardNumberRangeSequence(
             this.end - this.step, this.start - this.step, -this.step

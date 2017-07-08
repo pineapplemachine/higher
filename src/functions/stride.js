@@ -14,38 +14,20 @@ const getStrideLength = function(strideLength){
 // Implement stride using repeated popping of elements.
 // Note that initialization potentially changes the state of the source sequence.
 // TODO: Fix initialization changing the source
-export const PoppingStrideSequence = function(strideLength, source){
-    this.strideLength = getStrideLength(strideLength);
-    this.source = source;
-    this.maskAbsentMethods(source);
-    if(source.back && source.length){
-        const pop = source.length() % strideLength;
-        for(let i = 0; i < pop && !source.done(); i++){
-            source.popBack();
+export const PoppingStrideSequence = Sequence.extend({
+    constructor: function(strideLength, source){
+        this.strideLength = getStrideLength(strideLength);
+        this.source = source;
+        this.maskAbsentMethods(source);
+        if(source.back && source.length){
+            const pop = source.length() % strideLength;
+            for(let i = 0; i < pop && !source.done(); i++){
+                source.popBack();
+            }
+        }else{
+            this.back = null;
         }
-    }else{
-        this.back = null;
-    }
-};
-
-// Implement stride using indexing.
-// For this to be available, the source must support index and length methods.
-export const IndexStrideSequence = function(strideLength, source){
-    if(!source.index || !source.length || !source.bounded()){
-        // TODO: More descriptive error
-        throw "Failed to create stride sequence.";
-    }
-    this.strideLength = getStrideLength(strideLength);
-    this.source = source;
-    this.frontIndex = 0;
-    this.backIndex = source.length();
-    this.backIndex -= (this.backIndex % strideLength);
-    this.maskAbsentMethods(source);
-};
-
-PoppingStrideSequence.prototype = Object.create(Sequence.prototype);
-PoppingStrideSequence.prototype.constructor = PoppingStrideSequence;
-Object.assign(PoppingStrideSequence.prototype, {
+    },
     bounded: function(){
         return this.source.bounded();
     },
@@ -89,9 +71,21 @@ Object.assign(PoppingStrideSequence.prototype, {
     },
 });
 
-IndexStrideSequence.prototype = Object.create(Sequence.prototype);
-IndexStrideSequence.prototype.constructor = IndexStrideSequence;
-Object.assign(IndexStrideSequence.prototype, {
+// Implement stride using indexing.
+// For this to be available, the source must support index and length methods.
+export const IndexStrideSequence = Sequence.extend({
+    constructor: function(strideLength, source){
+        if(!source.index || !source.length || !source.bounded()){
+            // TODO: More descriptive error
+            throw "Failed to create stride sequence.";
+        }
+        this.strideLength = getStrideLength(strideLength);
+        this.source = source;
+        this.frontIndex = 0;
+        this.backIndex = source.length();
+        this.backIndex -= (this.backIndex % strideLength);
+        this.maskAbsentMethods(source);
+    },
     bounded: () => true,
     done: function(){
         return this.frontIndex >= this.backIndex;

@@ -1,16 +1,13 @@
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
-export const DropHeadSequence = function(dropElements, source, initialized = false){
-    this.dropElements = dropElements;
-    this.source = source;
-    this.initialized = initialized;
-    this.maskAbsentMethods(source);
-};
-
-DropHeadSequence.prototype = Object.create(Sequence.prototype);
-DropHeadSequence.prototype.constructor = DropHeadSequence;
-Object.assign(DropHeadSequence.prototype, {
+export const DropHeadSequence = Sequence.extend({
+    constructor: function(dropElements, source, initialized = false){
+        this.dropElements = dropElements;
+        this.source = source;
+        this.initialized = initialized;
+        this.maskAbsentMethods(source);
+    },
     initialize: function(){
         this.initialized = true;
         for(let i = 0; i < this.dropElements && !this.source.done(); i++){
