@@ -2,7 +2,7 @@ import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 export const DropHeadSequence = Sequence.extend({
-    constructor: function(dropElements, source, initialized = false){
+    constructor: function DropHeadSequence(dropElements, source, initialized = false){
         this.dropElements = dropElements;
         this.source = source;
         this.initialized = initialized;

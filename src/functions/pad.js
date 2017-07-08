@@ -3,7 +3,7 @@ import {FiniteRepeatElementSequence} from "./repeatElement";
 import {wrap} from "../core/wrap";
 
 export const PadLeftSequence = Sequence.extend({
-    constructor: function(
+    constructor: function PadLeftSequence(
         source, padElement, padTotal, padCount = undefined
     ){
         this.source = source;
@@ -82,7 +82,7 @@ export const PadLeftSequence = Sequence.extend({
 });
 
 export const PadRightSequence = Sequence.extend({
-    constructor: function(
+    constructor: function PadRightSequence(
         source, padElement, padTotal, padCount = undefined
     ){
         this.source = source;

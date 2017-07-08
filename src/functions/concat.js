@@ -2,7 +2,7 @@ import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 export const ConcatSequence = Sequence.extend({
-    constructor: function(sources){
+    constructor: function ConcatSequence(sources){
         this.sources = sources;
         this.source = sources[0];
         this.frontSourceIndex = 0;

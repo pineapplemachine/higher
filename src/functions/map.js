@@ -5,7 +5,7 @@ import {EmptySequence} from "./empty";
 
 // Map sequence optimized for one input sequence.
 export const SingularMapSequence = Sequence.extend({
-    constructor: function(transform, source){
+    constructor: function SingularMapSequence(transform, source){
         this.source = source;
         this.transform = transform;
         this.maskAbsentMethods(source);
@@ -60,7 +60,7 @@ export const SingularMapSequence = Sequence.extend({
 
 // Map sequence for any number of input sequences.
 export const PluralMapSequence = Sequence.extend({
-    constructor: function(transform, sources){
+    constructor: function PluralMapSequence(transform, sources){
         this.sources = sources;
         this.source = sources[0];
         this.transform = transform;

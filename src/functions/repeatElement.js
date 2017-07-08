@@ -4,7 +4,7 @@ import {wrap} from "../core/wrap";
 import {EmptySequence} from "./empty";
 
 export const FiniteRepeatElementSequence = Sequence.extend({
-    constructor: function(
+    constructor: function FiniteRepeatElementSequence(
         repetitions, element, finishedRepetitions = 0
     ){
         this.repetitions = repetitions;
@@ -78,7 +78,7 @@ export const FiniteRepeatElementSequence = Sequence.extend({
 });
 
 export const InfiniteRepeatElementSequence = Sequence.extend({
-    constructor: function(element){
+    constructor: function InfiniteRepeatElementSequence(element){
         this.element = element;
     },
     repetitions: Infinity,

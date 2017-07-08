@@ -2,7 +2,7 @@ import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 export const DropTailSequence = Sequence.extend({
-    constructor: function(dropElements, source, frontIndex = 0){
+    constructor: function DropTailSequence(dropElements, source, frontIndex = 0){
         if(!source.length){
             throw "Error dropping tail: Input sequence must have known length.";
         }

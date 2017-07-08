@@ -2,7 +2,7 @@ import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 export const DistinctSequence = Sequence.extend({
-    constructor: function(
+    constructor: function DistinctSequence(
         source, history = null, frontValue = null, initialize = true
     ){
         this.source = source;

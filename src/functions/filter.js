@@ -2,7 +2,7 @@ import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 export const FilterSequence = Sequence.extend({
-    constructor: function(predicate, source, initialize = true){
+    constructor: function FilterSequence(predicate, source, initialize = true){
         this.predicate = predicate;
         this.source = source;
         this.maskAbsentMethods(source);

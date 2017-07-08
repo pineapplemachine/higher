@@ -6,7 +6,7 @@ import {InfiniteRepeatElementSequence} from "./repeatElement";
 
 // Result of calling range with a step of exactly 1.
 export const NumberRangeSequence = Sequence.extend({
-    constructor: function(start, end){
+    constructor: function NumberRangeSequence(start, end){
         this.start = start;
         this.end = end;
         this.frontValue = start;
@@ -61,7 +61,7 @@ export const NumberRangeSequence = Sequence.extend({
 
 // Result of calling range with a step of greater than 0.
 export const ForwardNumberRangeSequence = Sequence.extend({
-    constructor: function(start, end, step){
+    constructor: function ForwardNumberRangeSequence(start, end, step){
         if(step <= 0){
             throw "Failed to create range: Step must be greater than zero.";
         }
@@ -123,7 +123,7 @@ export const ForwardNumberRangeSequence = Sequence.extend({
 
 // Result of calling range with a step of less than 0.
 export const BackwardNumberRangeSequence = Sequence.extend({
-    constructor: function(start, end, step){
+    constructor: function BackwardNumberRangeSequence(start, end, step){
         if(step >= 0){
             throw "Failed to create range: Step must be less than zero.";
         }

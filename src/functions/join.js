@@ -2,7 +2,7 @@ import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 export const ForwardJoinSequence = Sequence.extend({
-    constructor: function(
+    constructor: function ForwardJoinSequence(
         source, delimiter, frontSource = undefined,
         frontDelimiter = undefined, onDelimiter = undefined
     ){
@@ -92,7 +92,7 @@ export const ForwardJoinSequence = Sequence.extend({
 });
 
 export const BackwardJoinSequence = Sequence.extend({
-    constructor: function(
+    constructor: function BackwardJoinSequence(
         source, delimiter, frontSource = undefined,
         frontDelimiter = undefined, onDelimiter = undefined
     ){

@@ -5,7 +5,7 @@ import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 export const ReduceSequence = Sequence.extend({
-    constructor: function(
+    constructor: function ReduceSequence(
         combine, source, seedValue = null, hasSeed = false, initialize = true
     ){
         const done = source.done();

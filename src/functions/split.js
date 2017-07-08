@@ -5,7 +5,7 @@ import {wrap} from "../core/wrap";
 import {ForwardFindSequence, BackwardFindSequence} from "./findAll";
 
 export const ForwardSplitSequence = Sequence.extend({
-    constructor: function(
+    constructor: function ForwardSplitSequence(
         compare, source, delimiter, beginDelimiter = undefined,
         endDelimiter = undefined, frontValue = undefined,
         frontResult = undefined, findDelimiters = undefined
@@ -94,7 +94,7 @@ export const ForwardSplitSequence = Sequence.extend({
 });
 
 export const BackwardSplitSequence = Sequence.extend({
-    constructor: function(
+    constructor: function BackwardSplitSequence(
         compare, source, delimiter, beginDelimiter = undefined,
         endDelimiter = undefined, frontValue = undefined,
         frontResult = undefined, findDelimiters = undefined

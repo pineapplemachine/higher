@@ -2,7 +2,7 @@ import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 export const UntilSequence = Sequence.extend({
-    constructor: function(
+    constructor: function UntilSequence(
         predicate, source, isInclusive = false, included = true,
         satisfied = false, frontValue = null, initialize = true
     ){

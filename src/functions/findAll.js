@@ -146,7 +146,7 @@ export const stepFindThreads = function(element){
 };
 
 export const ForwardFindSequence = Sequence.extend({
-    constructor: function(
+    constructor: function ForwardFindSequence(
         compare, source, search, searchThreads = undefined
     ){
         if(!search.copy) throw (
@@ -289,7 +289,7 @@ export const ForwardFindSequence = Sequence.extend({
 });
 
 export const BackwardFindSequence = Sequence.extend({
-    constructor: function(
+    constructor: function BackwardFindSequence(
         compare, source, search, searchThreads = undefined
     ){
         if(!search.copy) throw (
