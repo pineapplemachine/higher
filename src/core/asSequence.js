@@ -54,7 +54,7 @@ Object.assign(ArraySequence.prototype, {
     array: function(limit){
         if(limit <= 0){
             return [];
-        }else if(this.lowIndex !== 0){
+        }else if(this.lowIndex !== 0 || this.highIndex !== this.source.length){
             if(!limit){
                 return this.source.slice(this.lowIndex, this.highIndex);
             }else{
