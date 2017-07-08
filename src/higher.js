@@ -128,6 +128,7 @@ import {pad} from "./functions/pad"; hi.register(pad);
 import {partial} from "./functions/partial"; hi.register(partial);
 import {partition} from "./functions/partition"; hi.register(partition);
 import {pipe} from "./functions/pipe"; hi.register(pipe);
+import {pluck} from "./functions/pluck"; hi.register(pluck);
 import {product} from "./functions/product"; hi.register(product);
 import {range} from "./functions/range"; hi.register(range);
 import {recur} from "./functions/recur"; hi.register(recur);
