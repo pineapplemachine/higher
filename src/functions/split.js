@@ -2,6 +2,8 @@ import {constants} from "../core/constants";
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
+import {ForwardFindSequence, BackwardFindSequence} from "./findAll";
+
 export const ForwardSplitSequence = Sequence.extend({
     constructor: function(
         compare, source, delimiter, beginDelimiter = undefined,
@@ -43,6 +45,9 @@ export const ForwardSplitSequence = Sequence.extend({
     },
     bounded: function(){
         return this.source.bounded();
+    },
+    unbounded: function(){
+        return this.source.unbounded();
     },
     done: function(){
         return !this.frontValue && this.findDelimiters.done();
@@ -130,6 +135,9 @@ export const BackwardSplitSequence = Sequence.extend({
     },
     bounded: function(){
         return this.source.bounded();
+    },
+    unbounded: function(){
+        return this.source.unbounded();
     },
     done: function(){
         return !this.frontValue && this.findDelimiters.done();
