@@ -1,7 +1,8 @@
 import {callAsync} from "./callAsync";
 import {constants} from "./constants";
 import {error} from "./error";
-import {isArray} from "./types";
+import {isArray, isString} from "./types";
+import {joinSeries} from "./joinSeries";
 import {ArraySequence} from "./asSequence";
 
 // Error thrown when an operation would involve fully consuming a potentially

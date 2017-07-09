@@ -1,6 +1,3 @@
-import {joinSeries} from "./joinSeries";
-import {isString} from "./types";
-
 export const error = function(methods){
     const name = methods.constructor.name;
     const wrapped = (...args) => {
