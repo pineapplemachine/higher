@@ -60,6 +60,7 @@ export const OneElementSequence = Sequence.extend({
         this.isDone = false;
         return this;
     },
+    rebase: null,
 });
 
 export const one = wrap({

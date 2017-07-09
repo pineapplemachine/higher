@@ -2,6 +2,7 @@ import {Sequence} from "../core/sequence";
 import {asSequence, validAsSequence} from "../core/asSequence";
 import {wrap} from "../core/wrap";
 
+// TODO: These sequences probably need to implement collapseBreak methods
 export const ForwardFlattenSequence = Sequence.extend({
     constructor: function ForwardFlattenSequence(source, frontSource = null){
         this.source = source;
@@ -49,6 +50,11 @@ export const ForwardFlattenSequence = Sequence.extend({
     slice: null,
     copy: null,
     reset: null,
+    rebase: function(source){
+        this.source = source;
+        this.frontSource = source;
+        return this;
+    },
 });
 
 export const BackwardFlattenSequence = Sequence.extend({
@@ -98,6 +104,11 @@ export const BackwardFlattenSequence = Sequence.extend({
     slice: null,
     copy: null,
     reset: null,
+    rebase: function(source){
+        this.source = source;
+        this.frontSource = source;
+        return this;
+    },
 });
 
 // Flatten a single level deep.
@@ -112,7 +123,7 @@ export const flatten = wrap({
     arguments: {
         one: wrap.expecting.sequence
     },
-    imlementation: (source) => {
+    implementation: (source) => {
         return new ForwardFlattenSequence(source);
     },
 });

@@ -58,6 +58,7 @@ export const NumberRangeSequence = Sequence.extend({
         this.backValue = this.end;
         return this;
     },
+    rebase: null,
 });
 
 // Result of calling range with a step of greater than 0.
@@ -121,6 +122,7 @@ export const ForwardNumberRangeSequence = Sequence.extend({
         this.backValue = this.end;
         return this;
     },
+    rebase: null,
 });
 
 // Result of calling range with a step of less than 0.
@@ -184,6 +186,7 @@ export const BackwardNumberRangeSequence = Sequence.extend({
         this.backValue = this.end;
         return this;
     },
+    rebase: null,
 });
 
 // Create a sequence enumerating numbers in a linear range.

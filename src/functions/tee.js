@@ -74,6 +74,31 @@ export const TeeSequence = Sequence.extend({
         return sequence;
     },
     reset: null,
+    // Implementation is weird because rebasing this sequence must not affect
+    // the state of its companion TeeSequences.
+    rebase: function(source){
+        // Remove from buffer
+        const otherSequences = [];
+        for(const sequence of this.elementBuffer.sequences){
+            if(sequence !== this) otherSequences.push(sequence);
+        }
+        this.elementBuffer.sequences = otherSequences;
+        // Change methods
+        this.source = source;
+        this.done = function(){
+            return this.source.done();
+        };
+        this.front = function(){
+            return this.source.front();
+        };
+        this.popFront = function(){
+            return this.source.popFront();
+        };
+        this.rebase = function(source){
+            this.source = source;
+        };
+        return this;
+    },
 });
 
 // Produce several sequences enumerating the elements of a single source

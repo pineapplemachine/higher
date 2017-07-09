@@ -82,6 +82,10 @@ export const PadLeftSequence = Sequence.extend({
         this.padCount = 0;
         return this;
     },
+    rebase: function(source){
+        this.source = source;
+        return this;
+    },
 });
 
 export const PadRightSequence = Sequence.extend({
@@ -166,6 +170,10 @@ export const PadRightSequence = Sequence.extend({
     reset: function(){
         this.source.reset();
         this.padCount = 0;
+        return this;
+    },
+    rebase: function(source){
+        this.source = source;
         return this;
     },
 });

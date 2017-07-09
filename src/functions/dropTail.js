@@ -55,6 +55,10 @@ export const DropTailSequence = Sequence.extend({
         this.frontIndex = 0;
         return this;
     },
+    rebase: function(source){
+        this.source = source;
+        return this;
+    },
 });
 
 export const dropTail = wrap({

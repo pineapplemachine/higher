@@ -88,6 +88,10 @@ export const ForwardChunkSequence = Sequence.extend({
         this.source.reset();
         return this;
     },
+    rebase: function(source){
+        this.source = source;
+        return this;
+    },
 });
 
 // Implement chunking for sequences with slicing and known length.
@@ -162,6 +166,10 @@ export const BidirectionalChunkSequence = Sequence.extend({
     reset: function(){
         this.frontIndex = this.lowIndex;
         this.backIndex = this.highIndex;
+        return this;
+    },
+    rebase: function(source){
+        this.source = source;
         return this;
     },
 });

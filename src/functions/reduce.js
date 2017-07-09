@@ -108,6 +108,14 @@ export const ReduceSequence = Sequence.extend({
         }
         return this;
     },
+    rebase: function(source){
+        this.source = source;
+        // TODO: Move into initialization logic
+        if(!this.hasSeed && !source.done()){
+            this.accumulator = source.nextFront();
+        }
+        return this;
+    },
 });
 
 export const reduce = wrap({

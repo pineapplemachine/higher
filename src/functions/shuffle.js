@@ -128,6 +128,10 @@ export const ShuffleSequence = Sequence.extend({
     reset: function(){
         return this;
     },
+    rebase: function(source){
+        this.source = source;
+        return this;
+    },
     collapseBreak: function(target, length){
         for(let i = 0; i < length; i++){
             const j = Math.floor(this.random() * i);

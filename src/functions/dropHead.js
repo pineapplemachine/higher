@@ -56,7 +56,11 @@ export const DropHeadSequence = Sequence.extend({
     },
     reset: function(){
         this.source.reset();
-        this.DropHeadSequence = false;
+        this.initialized = false;
+        return this;
+    },
+    rebase: function(source){
+        this.source = source;
         return this;
     },
 });

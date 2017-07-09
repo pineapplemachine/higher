@@ -8,6 +8,7 @@ export const NgramSequence = Sequence.extend({
         this.ngramSize = Math.floor(+ngramSize);
         this.source = source;
         this.currentNgram = currentNgram || [];
+        // TODO: Move this into initializiation logic
         while(!source.done() && this.currentNgram.length < this.ngramSize){
             this.currentNgram.push(source.nextFront());
         }
@@ -62,6 +63,16 @@ export const NgramSequence = Sequence.extend({
     reset: function(){
         this.source.reset();
         this.currentNgram = [];
+        // TODO: Move this into initializiation logic
+        while(!this.source.done() && this.currentNgram.length < this.ngramSize){
+            this.currentNgram.push(this.source.nextFront());
+        }
+        return this;
+    },
+    rebase: function(source){
+        this.source = source;
+        this.currentNgram = [];
+        // TODO: Move this into initializiation logic
         while(!this.source.done() && this.currentNgram.length < this.ngramSize){
             this.currentNgram.push(this.source.nextFront());
         }

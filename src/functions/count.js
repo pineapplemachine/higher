@@ -65,8 +65,6 @@ Object.assign(SequenceCounter.prototype, {
         this.source.reset();
         return this;
     },
-});
-Object.assign(SequenceCounter.prototype, {
     sumAsync: function(){
         return new constants.Promise((resolve, reject) => {
             callAsync(() => resolve(this.sum()));

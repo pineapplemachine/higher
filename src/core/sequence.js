@@ -119,12 +119,10 @@ Sequence.prototype.collapse = function(limit = -1){
             }
             i = breaking.collapseBreak(source, i);
             if(next){
-                // TODO: Can this be accomplished more safely?
-                // Idea: Reset method should accept an optional source,
-                // if it's passed then the sequence uses it as the new basis
-                next.source = arraySequence;
+                // TODO: Better thrown error
+                if(!next.rebase) throw "Sequence must support rebasing."
+                next.rebase(arraySequence);
                 arraySequence.backIndex = i;
-                if(next.sources) next.sources[0] = arraySequence;
             }
         }
         if(breaks[0] !== 0){

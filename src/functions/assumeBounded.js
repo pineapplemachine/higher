@@ -48,6 +48,10 @@ export const AssumeBoundedSequence = Sequence.extend({
         this.source.reset();
         return this;
     },
+    rebase: function(source){
+        this.source = source;
+        return this;
+    },
 });
 
 // An AssumeBoundedSequence can be used to assure higher that a potentially

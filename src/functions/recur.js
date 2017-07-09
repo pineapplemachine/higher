@@ -40,6 +40,7 @@ export const RecurSequence = Sequence.extend({
         this.frontValue = this.seedValue;
         return this;
     },
+    rebase: null,
 });
 
 // Produce a sequence via repeated application of a transformation function

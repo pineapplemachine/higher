@@ -113,6 +113,11 @@ export const ConcatSequence = Sequence.extend({
         this.backSourceIndex = this.sources.length;
         return this;
     },
+    rebase: function(source){
+        this.source = source;
+        this.sources[0] = source;
+        return this;
+    },
 });
 
 export const concat = wrap({

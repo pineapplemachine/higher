@@ -286,6 +286,10 @@ export const ForwardFindSequence = Sequence.extend({
         delete this.popFront;
         return this;
     },
+    rebase: function(source){
+        this.source = source;
+        return this;
+    },
 });
 
 export const BackwardFindSequence = Sequence.extend({
@@ -423,6 +427,10 @@ export const BackwardFindSequence = Sequence.extend({
         delete this.done;
         delete this.front;
         delete this.popFront;
+        return this;
+    },
+    rebase: function(source){
+        this.source = source;
         return this;
     },
 });

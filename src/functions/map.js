@@ -56,6 +56,10 @@ export const SingularMapSequence = Sequence.extend({
         this.source.reset();
         return this;
     },
+    rebase: function(source){
+        this.source = source;
+        return this;
+    },
 });
 
 // Map sequence for any number of input sequences.
@@ -148,6 +152,11 @@ export const PluralMapSequence = Sequence.extend({
     },
     reset: function(){
         for(const source of this.sources) source.reset();
+        return this;
+    },
+    rebase: function(source){
+        this.source = source;
+        this.sources[0] = source;
         return this;
     },
 });
