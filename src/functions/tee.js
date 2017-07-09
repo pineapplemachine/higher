@@ -2,10 +2,12 @@ import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 export const TeeSequence = Sequence.extend({
-    constructor: function TeeSequence(source, elementBuffer, bufferIndex){
+    constructor: function TeeSequence(
+        source, elementBuffer, bufferIndex = undefined
+    ){
         this.source = source;
         this.elementBuffer = elementBuffer;
-        this.bufferIndex = 0;
+        this.bufferIndex = bufferIndex || 0;
         if(!source.length) this.length = null;
         if(!source.left) this.left = null;
         if(!source.index) this.index = null;
