@@ -133,6 +133,7 @@ import {pluck} from "./functions/pluck"; hi.register(pluck);
 import {product} from "./functions/product"; hi.register(product);
 import {range} from "./functions/range"; hi.register(range);
 import {recur} from "./functions/recur"; hi.register(recur);
+import {reject} from "./functions/reject"; hi.register(reject);
 import {repeat} from "./functions/repeat"; hi.register(repeat);
 import {repeatElement} from "./functions/repeatElement"; hi.register(repeatElement);
 import {reverse} from "./functions/reverse"; hi.register(reverse);
