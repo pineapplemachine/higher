@@ -1,18 +1,95 @@
+import {ArraySequence} from "../core/asSequence";
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 import {InfiniteRepeatElementSequence} from "./repeatElement";
 
-export const NgramSequence = Sequence.extend({
-    constructor: function NgramSequence(ngramSize, source, currentNgram = null){
-        this.ngramSize = Math.floor(+ngramSize);
+export const SlicingNgramSequence = Sequence.extend({
+    constructor: function SlicingNgramSequence(
+        ngramSize, source,
+        lowIndex = undefined, highIndex = undefined,
+        frontIndex = undefined, backIndex = undefined
+    ){
+        if(!source.length) throw "Source must have length.";
+        if(!source.slice) throw "Source must allow slicing.";
+        this.ngramSize = ngramSize;
         this.source = source;
-        this.currentNgram = currentNgram || [];
-        // TODO: Move this into initializiation logic
-        while(!source.done() && this.currentNgram.length < this.ngramSize){
-            this.currentNgram.push(source.nextFront());
-        }
+        this.lowIndex = lowIndex || 0;
+        this.highIndex = (highIndex !== undefined ?
+            highIndex : 1 + source.length() - ngramSize
+        );
+        this.frontIndex = frontIndex !== undefined ? frontIndex : this.lowIndex;
+        this.backIndex = backIndex !== undefined ? backIndex : this.highIndex;
         this.maskAbsentMethods(source);
+    },
+    bounded: () => true,
+    unbounded: () => false,
+    done: function(){
+        return this.frontIndex >= this.backIndex;
+    },
+    length: function(){
+        return this.highIndex - this.lowIndex;
+    },
+    left: function(){
+        return this.backIndex - this.frontIndex;
+    },
+    front: function(){
+        return this.source.slice(
+            this.frontIndex, this.frontIndex + this.ngramSize
+        );
+    },
+    popFront: function(){
+        this.frontIndex++;
+    },
+    back: function(){
+        return this.source.slice(
+            this.backIndex - 1, this.backIndex - 1 + this.ngramSize
+        );
+    },
+    popBack: function(){
+        this.backIndex--;
+    },
+    index: function(i){
+        return this.source.slice(i, i + this.ngramSize);
+    },
+    slice: function(i, j){
+        return new SlicingNgramSequence(
+            this.ngramSize, this.source, this.lowIndex + i, this.lowIndex + j
+        );
+    },
+    has: null,
+    get: null,
+    copy: function(){
+        return new SlicingNgramSequence(
+            this.ngramSize, this.source, this.lowIndex,
+            this.highIndex, this.frontIndex, this.backIndex
+        );
+    },
+    reset: function(){
+        this.frontIndex = this.lowIndex;
+        this.backIndex = this.highIndex;
+        return this;
+    },
+    rebase: function(source){
+        this.source = source;
+        return this;
+    },
+});
+
+export const TrackingNgramSequence = Sequence.extend({
+    constructor: function TrackingNgramSequence(
+        ngramSize, source, currentNgram = undefined
+    ){
+        this.ngramSize = ngramSize;
+        this.source = source;
+        this.currentNgram = currentNgram;
+        this.maskAbsentMethods(source);
+    },
+    initialize: function(){
+        this.currentNgram = [];
+        while(!this.source.done() && this.currentNgram.length < this.ngramSize){
+            this.currentNgram.push(this.source.nextFront());
+        }
     },
     bounded: function(){
         return this.source.bounded();
@@ -21,21 +98,23 @@ export const NgramSequence = Sequence.extend({
         return this.source.unbounded();
     },
     done: function(){
+        if(!this.currentNgram) this.initialize();
         return this.source.done() && this.currentNgram.length < this.ngramSize;
     },
     length: function(){
         return 1 + this.source.length() - this.ngramSize;
     },
     left: function(){
-        return 1 + this.source.left();
+        if(!this.currentNgram) this.initialize();
+        return (this.currentNgram.length >= this.ngramSize) + this.source.left();
     },
-    // Note that modifying the returned array will break the behavior of this
-    // sequence. For a value that's safe to modify, slice() the returned array.
     front: function(){
-        return this.currentNgram;
+        if(!this.currentNgram) this.initialize();
+        return new ArraySequence(this.currentNgram);
     },
     popFront: function(){
-        this.currentNgram.shift();
+        if(!this.currentNgram) this.initialize();
+        this.currentNgram = this.currentNgram.slice(1);
         if(!this.source.done()){
             this.currentNgram.push(this.source.nextFront());
         }
@@ -47,6 +126,7 @@ export const NgramSequence = Sequence.extend({
         for(let j = i; j < i + this.ngramSize; j++){
             ngram.push(this.source.index(i));
         }
+        return ngram;
     },
     slice: function(i, j){
         return new NgramSequence(
@@ -57,25 +137,17 @@ export const NgramSequence = Sequence.extend({
     get: null,
     copy: function(){
         const copy = new NgramSequence(this.ngramSize, this.source.copy());
-        copy.currentNgram = this.currentNgram.slice();
+        if(this.currentNgram) copy.currentNgram = this.currentNgram.slice();
         return copy;
     },
     reset: function(){
         this.source.reset();
-        this.currentNgram = [];
-        // TODO: Move this into initializiation logic
-        while(!this.source.done() && this.currentNgram.length < this.ngramSize){
-            this.currentNgram.push(this.source.nextFront());
-        }
+        this.currentNgram = undefined;
         return this;
     },
     rebase: function(source){
         this.source = source;
-        this.currentNgram = [];
-        // TODO: Move this into initializiation logic
-        while(!this.source.done() && this.currentNgram.length < this.ngramSize){
-            this.currentNgram.push(this.source.nextFront());
-        }
+        this.currentNgram = undefined;
         return this;
     },
 });
@@ -85,7 +157,8 @@ export const ngrams = wrap({
     attachSequence: true,
     async: false,
     sequences: [
-        NgramSequence
+        SlicingNgramSequence,
+        TrackingNgramSequence
     ],
     arguments: {
         unordered: {
@@ -95,9 +168,11 @@ export const ngrams = wrap({
     },
     implementation: (ngramSize, source) => {
         if(ngramSize < 1){
-            return new InfiniteRepeatElementSequence([]);
+            return new InfiniteRepeatElementSequence(new ArraySequence([]));
+        }else if(source.length && source.slice && source.bounded()){
+            return new SlicingNgramSequence(ngramSize, source);
         }else{
-            return new NgramSequence(ngramSize, source);
+            return new TrackingNgramSequence(ngramSize, source);
         }
     },
 });
