@@ -1,8 +1,84 @@
 import {callAsync} from "./callAsync";
 import {constants} from "./constants";
-import {unboundedError, collapseCopyError} from "./errors";
+import {error} from "./error";
 import {isArray} from "./types";
 import {ArraySequence} from "./asSequence";
+
+// Error thrown when an operation would involve fully consuming a potentially
+// unbounded input sequence.
+export const NotBoundedError = error({
+    url: "", // TODO
+    constructor: function NotBoundedError(source, options){
+        this.source = source;
+        this.options = options || {};
+        const knownBounded = (isSequence(source) && source.unbounded() ?
+            "known to be unbounded" : "not known to be bounded"
+        );
+        const sourceType = (isSequence(source) ?
+            "a " + source.typeChainString() + " sequence" : "an iterable"
+        );
+        this.message = (
+            `The action requires fully consuming ${sourceType} that is ` +
+            `${knownBounded}. ` +
+            "Try using a method such as 'head', 'limit', or 'assumeBounded' to " +
+            "resolve this error."
+        );
+        if(this.options.limitArgument) this.message += " " + (
+            "You could alternatively pass a single numeric argument indicating " +
+            "the maximum number of elements of the sequence to consume."
+        );
+        if(this.options.message){
+            this.message = this.options.message + ": " + this.message;
+        }
+    },
+    enforce: function(source, options){
+        if(
+            (isSequence(source) && !source.bounded()) ||
+            (!isArray(source) && !isString(source) && !isObject(source))
+        ) throw NotBoundedError(source, options);
+        return source;
+    },
+});
+
+// Error thrown when a sequence operation or operations must be supported in
+// order for an action to be valid, yet the requirement wasn't met.
+export const OperationNotSupportedError = error({
+    url: "", // TODO
+    constructor: function OperationNotSupportedError(sequence, operations, options){
+        this.sequence = sequence;
+        this.operations = isString(operations) ? [operations] : operations;
+        this.options = options || {};
+        this.message = (
+            `The action requires ${joinSeries(this.operations)} operations, ` +
+            `but the ${sequence.typeChainString()} input sequence does not ` +
+            `support all of them.`
+        );
+        if(options.message){
+            this.message = options.message + ": " + this.message;
+        }
+    },
+    enforce: function(sequence, operations, options){
+        for(const operation of operations){
+            if(!sequence[operation]) throw OperationNotSupportedError(
+                sequence, operations, options
+            );
+        }
+        return sequence;
+    },
+});
+
+export const CollapseRootError = error({
+    url: "", // TODO
+    constructor: function CollapseRootError(sequence){
+        this.sequence = sequence;
+        this.message = (
+            "Only sequences which have an array at their root may be " +
+            `collapsed, but this is not true of the ${sequence.typeChainString()} ` +
+            "input sequence. To acquire other sequences in-memory, try the " +
+            "'array', 'write', 'string', and 'object' methods."
+        );
+    },
+});
 
 export const Sequence = function(){};
 
@@ -25,10 +101,12 @@ Sequence.attach = function(fancy){
 };
 
 // Helper for creating a type which inherits the Sequence prototype.
+Sequence.types = {};
 Sequence.extend = function(methods){
     const constructor = methods.constructor;
     constructor.prototype = Object.create(Sequence.prototype);
     Object.assign(constructor.prototype, methods);
+    Sequence.types[constructor.name] = constructor;
     return constructor;
 };
 
@@ -65,11 +143,21 @@ Sequence.prototype.maskAbsentMethods = function(source){
     if(this.copy && !source.copy) this.copy = null;
     if(this.reset && !source.reset) this.reset = null;
 };
+
+Sequence.prototype.root = function(){
+    let source = this;
+    while(source && isSequence(source)){
+        source = source.source;
+    }
+    return source;
+};
+
 // Here be dragons
 Sequence.prototype.collapse = function(limit = -1){
-    if(limit < 0 && !this.bounded()){
-        throw unboundedError("collapse", "collapse");
-    }
+    if(limit < 0 && !this.bounded()) throw NotBoundedError(this, {
+        message: "Failed to collapse sequence",
+        limitArgument: true,
+    });
     let source = this;
     const stack = [];
     const breaks = [];
@@ -80,17 +168,14 @@ Sequence.prototype.collapse = function(limit = -1){
         source = source.source;
     }
     if(!isArray(source)){
-        throw (
-            "Sequence collapsing is supported only for sequences that are " +
-            "based on an array. To acquire other sequences in-memory, see " +
-            "the write, array, and object methods."
-        );
+        throw CollapseRootError(source);
     }
     const arraySequence = stack[stack.length - 1];
     function write(seq, limit, intermediate){
-        if(limit < 0 && !seq.bounded()) throw unboundedError(
-            "collapse", "collapse", intermediate
-        );
+        if(limit < 0 && !seq.bounded()) throw NotBoundedError(this, {
+            message: "Failure handling intermediate sequence during collapse",
+            limitArgument: true,
+        });
         i = 0;
         while(!seq.done()){
             const value = seq.nextFront();
@@ -109,9 +194,7 @@ Sequence.prototype.collapse = function(limit = -1){
             const next = stack[breakIndex - 1];
             if(prev){
                 if(!prev.collapseBreak){
-                    if(!prev.copy) throw collapseCopyError(
-                        prev.type, breaking.type
-                    );
+                    if(!prev.copy) prev.forceEager();
                     write(prev.copy(), -1, true);
                 }
             }else{
@@ -120,7 +203,9 @@ Sequence.prototype.collapse = function(limit = -1){
             i = breaking.collapseBreak(source, i);
             if(next){
                 // TODO: Better thrown error
-                if(!next.rebase) throw "Sequence must support rebasing."
+                if(!next.rebase) throw OperationNotSupportedError(next, "rebase", {
+                    message: "Failure handling intermediate sequence during collapse",
+                });
                 next.rebase(arraySequence);
                 arraySequence.backIndex = i;
             }
@@ -222,6 +307,21 @@ Sequence.prototype.forceEager = function(){
         return this;
     };
     return this;
+};
+
+// Get a string indicating the sequence type chain represented by sources.
+Sequence.prototype.typeChainString = function(){
+    if(this.sources){
+        const sourceStrings = [];
+        for(const source of this.sources){
+            sourceStrings.push(source.typeChainString());
+        }
+        return `[${sourceStrings.join(", ")}].${this.constructor.name}`;
+    }else if(this.source && isSequence(source)){
+        return this.source.typeChainString() + "." + this.constructor.name;
+    }else{
+        return this.constructor.name;
+    }
 };
 
 export default Sequence;

@@ -1,13 +1,14 @@
 import {isArray} from "../core/types";
-import {unboundedError} from "../core/errors";
+import {NotBoundedError} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 // Base implementation for array and newArray functions.
 export const asArray = function(limit, source){
     if(!limit){
-        if(!source.bounded()){
-            throw unboundedError("write", "array");
-        }
+        if(!source.bounded()) throw NotBoundedError(source, {
+            message: "Failed to create array from sequence",
+            limitArgument: true,
+        });
         const result = [];
         for(const element of source){
             result.push(element);

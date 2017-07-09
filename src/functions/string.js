@@ -1,4 +1,5 @@
 import {validAsBoundedSequence} from "../core/asSequence";
+import {NotBoundedError} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 export const string = wrap({
@@ -9,12 +10,12 @@ export const string = wrap({
         one: wrap.expecting.iterable
     },
     implementation: (source) => {
-        if(!validAsBoundedSequence(source)){
-            throw "Failed to create string: Input sequence must be known to be bounded.";
-        }
-        let str = "";
-        for(const element of source) str += element;
-        return str;
+        NotBoundedError.enforce(source, {
+            message: "Failed to create string",
+        });
+        let result = "";
+        for(const element of source) result += element;
+        return result;
     },
 });
 
