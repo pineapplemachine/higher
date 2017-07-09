@@ -31,6 +31,9 @@ export const PoppingStrideSequence = Sequence.extend({
     bounded: function(){
         return this.source.bounded();
     },
+    unbounded: function(){
+        return this.source.unbounded();
+    },
     done: function(){
         return this.source.done();
     },
@@ -87,6 +90,7 @@ export const IndexStrideSequence = Sequence.extend({
         this.maskAbsentMethods(source);
     },
     bounded: () => true,
+    unbounded: () => false,
     done: function(){
         return this.frontIndex >= this.backIndex;
     },

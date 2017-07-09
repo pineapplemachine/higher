@@ -12,6 +12,7 @@ export const HeadSequence = Sequence.extend({
         this.maskAbsentMethods(source);
     },
     bounded: () => true,
+    unbounded: () => false,
     done: function(){
         return this.frontIndex >= this.elements || this.source.done();
     },

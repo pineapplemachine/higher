@@ -34,6 +34,10 @@ export const FiniteRepeatSequence = Sequence.extend({
     bounded: function(){
         return this.source.bounded();
     },
+    // Please don't repeat an already unbounded sequence
+    unbounded: function(){
+        return this.source.unbounded();
+    },
     done: function(){
         return (
             this.source.done() || (
@@ -168,8 +172,8 @@ export const InfiniteRepeatSequence = Sequence.extend({
         this.maskAbsentMethods(source);
     },
     repetitions: Infinity,
-    unbounded: () => true,
     bounded: () => false,
+    unbounded: () => true,
     done: () => false,
     length: null,
     left: null,
@@ -243,7 +247,7 @@ export const repeat = wrap({
         }
     },
     implementation: (repetitions, source) => {
-        if(repetitions <= 0 && repetitions !== null){
+        if(repetitions <= 0){
             return new EmptySequence();
         }else if(source.unbounded()){
             return source;

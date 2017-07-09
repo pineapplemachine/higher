@@ -44,6 +44,14 @@ export const FromSequence = Sequence.extend({
     bounded: function(){
         return this.source.bounded();
     },
+    // This holds if the predicate matches any element.
+    // If it doesn't match any element then attempting to initialize this
+    // sequence will produce an infinite loop, so I think this is a safe
+    // assumption to make; users should not be producing that situation in the
+    // first place.
+    unbounded: function(){
+        return this.source.unbounded();
+    },
     done: function(){
         return this.source.done();
     },

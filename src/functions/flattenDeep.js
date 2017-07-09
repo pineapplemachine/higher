@@ -58,6 +58,7 @@ export const FlattenDeepSequence = Sequence.extend({
         };
     },
     bounded: () => false,
+    unbounded: () => false,
     done: function(){
         return this.sourceStack[0].done();
     },

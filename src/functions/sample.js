@@ -21,6 +21,7 @@ export const DistinctRandomIndexSequence = Sequence.extend({
         ];
     },
     bounded: () => true,
+    unbounded: () => false,
     done: function(){
         return this.valueHistory.length > this.totalValues;
     },
@@ -102,6 +103,7 @@ const SampleSequence = Sequence.extend({
         );
     },
     bounded: () => true,
+    unbounded: () => false,
     done: function(){
         return this.indexes.valueHistory.length > this.samples;
     },

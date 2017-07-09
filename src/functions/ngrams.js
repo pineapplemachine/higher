@@ -16,6 +16,9 @@ export const NgramSequence = Sequence.extend({
     bounded: function(){
         return this.source.bounded();
     },
+    unbounded: function(){
+        return this.source.unbounded();
+    },
     done: function(){
         return this.source.done() && this.currentNgram.length < this.ngramSize;
     },

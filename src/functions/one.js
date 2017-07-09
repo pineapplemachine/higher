@@ -25,6 +25,7 @@ export const OneElementSequence = Sequence.extend({
         return this;
     },
     bounded: () => true,
+    unbounded: () => false,
     done: function(){
         return this.isDone;
     },
