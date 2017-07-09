@@ -129,6 +129,7 @@ export const ArraySequence = Sequence.extend({
         this.backIndex = this.highIndex;
         return this;
     },
+    rebase: null,
 });
 
 // Get a sequence for enumerating the characters in a string.
@@ -201,6 +202,7 @@ export const StringSequence = Sequence.extend({
         this.backIndex = this.highIndex;
         return this;
     },
+    rebase: null,
 });
 
 // Get a sequence that enumerates the key, value pairs of an arbitrary object.
@@ -251,6 +253,7 @@ export const ObjectSequence = Sequence.extend({
         this.keyIndex = 0;
         return this;
     },
+    rebase: null,
 });
 
 // Get a sequence that enumerates the items of an iterable.
@@ -283,6 +286,7 @@ export const IterableSequence = Sequence.extend({
     get: null,
     copy: null,
     reset: null,
+    rebase: null,
 });
 
 export default asSequence;

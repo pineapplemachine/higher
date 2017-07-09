@@ -91,6 +91,13 @@ export const ForwardSplitSequence = Sequence.extend({
         this.findDelimiters.reset();
         return this;
     },
+    rebase: function(source){
+        this.source = source;
+        this.findDelimiters = new ForwardFindSequence(
+            this.compare, source, this.delimiter.copy()
+        );
+        return this;
+    },
 });
 
 export const BackwardSplitSequence = Sequence.extend({
@@ -178,6 +185,13 @@ export const BackwardSplitSequence = Sequence.extend({
     },
     reset: function(){
         this.findDelimiters.reset();
+        return this;
+    },
+    rebase: function(source){
+        this.source = source;
+        this.findDelimiters = new BackwardFindSequence(
+            this.compare, source, this.delimiter.copy()
+        );
         return this;
     },
 });

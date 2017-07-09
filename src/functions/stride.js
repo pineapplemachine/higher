@@ -72,6 +72,10 @@ export const PoppingStrideSequence = Sequence.extend({
         this.source.reset();
         return this;
     },
+    rebase: function(source){
+        this.source = source;
+        return this;
+    },
 });
 
 // Implement stride using indexing.
@@ -132,6 +136,10 @@ export const IndexStrideSequence = Sequence.extend({
         this.frontIndex = 0;
         this.backIndex = source.length();
         this.backIndex -= (this.backIndex % strideLength);
+        return this;
+    },
+    rebase: function(source){
+        this.source = source;
         return this;
     },
 });

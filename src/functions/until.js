@@ -14,6 +14,7 @@ export const UntilSequence = Sequence.extend({
             this.frontValue = frontValue;
             this.satisfied = satisfied;
         }else{
+            // TODO: This should be in an initialization method
             this.frontValue = source.nextFront();
             this.satisfied = predicate(this.frontValue);
         }
@@ -69,6 +70,15 @@ export const UntilSequence = Sequence.extend({
         this.source.reset();
         this.included = !this.isInclusive;
         if(!this.source.done()){
+            this.frontValue = this.source.nextFront();
+            this.satisfied = this.predicate(this.frontValue);
+        }
+        return this;
+    },
+    rebase: function(source){
+        this.source = source;
+        if(!this.source.done()){
+            // TODO: This should be in an initialization method
             this.frontValue = this.source.nextFront();
             this.satisfied = this.predicate(this.frontValue);
         }

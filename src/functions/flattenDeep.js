@@ -4,6 +4,7 @@ import {isArray, isIterable, isString} from "../core/types";
 import {wrap} from "../core/wrap";
 
 // TODO: Also write a backwards version of this sequence
+// TODO: This sequence probably needs a collapseBreak method
 export const FlattenDeepSequence = Sequence.extend({
     constructor: function FlattenDeepSequence(source){
         this.source = source;
@@ -80,6 +81,12 @@ export const FlattenDeepSequence = Sequence.extend({
     slice: null,
     copy: null,
     reset: null,
+    rebase: function(source){
+        this.source = source;
+        this.sourceStack = [source];
+        this.frontSource = source;
+        return this;
+    },
 });
 
 // Flatten recursively.

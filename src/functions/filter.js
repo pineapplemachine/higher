@@ -84,6 +84,10 @@ export const FilterSequence = Sequence.extend({
         this.source.reset();
         return this;
     },
+    rebase: function(source){
+        this.source = source;
+        return this;
+    },
 });
 
 // Produce a new sequence enumerating only those elements of an input sequence

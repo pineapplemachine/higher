@@ -5,8 +5,8 @@ import {EmptySequence} from "./empty";
 
 // Fallback implementation of head function for when slicing is unavailable.
 export const HeadSequence = Sequence.extend({
-    constructor: function HeadSequence(elements, source, frontIndex = 0){
-        this.elements = elements;
+    constructor: function HeadSequence(headLength, source, frontIndex = 0){
+        this.headLength = headLength;
         this.source = source;
         this.frontIndex = frontIndex;
         this.maskAbsentMethods(source);
@@ -14,15 +14,15 @@ export const HeadSequence = Sequence.extend({
     bounded: () => true,
     unbounded: () => false,
     done: function(){
-        return this.frontIndex >= this.elements || this.source.done();
+        return this.frontIndex >= this.headLength || this.source.done();
     },
     length: function(){
         const sourceLength = this.source.length();
-        return sourceLength < this.elements ? sourceLength : this.elements;
+        return sourceLength < this.headLength ? sourceLength : this.headLength;
     },
     left: function(){
         const sourceLeft = this.source.left();
-        const indexLeft = this.elements - this.frontIndex;
+        const indexLeft = this.headLength - this.frontIndex;
         return sourceLeft < indexLeft ? sourceLeft : indexLeft;
     },
     front: function(){
@@ -42,12 +42,16 @@ export const HeadSequence = Sequence.extend({
     },
     copy: function(){
         return new HeadSequence(
-            this.elements, this.source.copy(), this.frontIndex
+            this.headLength, this.source.copy(), this.frontIndex
         );
     },
     reset: function(){
         this.source.reset();
         this.frontIndex = 0;
+        return this;
+    },
+    rebase: function(source){
+        this.source = source;
         return this;
     },
 });

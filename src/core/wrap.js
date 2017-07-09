@@ -6,6 +6,10 @@ import {Sequence} from "./sequence";
 import {isFunction, isIterable} from "./types";
 
 export const wrap = function(info){
+    // TODO: Better errors
+    if(!info.implementation) throw "No implementation!";
+    if(!info.arguments) throw "No argument information!";
+    if(!info.name && !info.names) throw "No names!";
     const fancy = wrap.fancy(info);
     fancy.names = info.names || [info.name];
     fancy.sequences = info.sequences;

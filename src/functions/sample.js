@@ -90,9 +90,11 @@ export const DistinctRandomIndexSequence = Sequence.extend({
     // TODO: Use resettable RNG objects instead of e.g. Math.random?
     copy: null,
     reset: null,
+    rebase: null,
 });
 
 // Input sequence must have length and indexing.
+// TODO: This sequence probably needs a collapseBreak method.
 const SampleSequence = Sequence.extend({
     constructor: function(samples, random, source, indexes = undefined){
         this.samples = samples;
@@ -129,6 +131,10 @@ const SampleSequence = Sequence.extend({
     // TODO: Use resettable RNG objects instead of e.g. Math.random?
     copy: null,
     reset: null,
+    rebase: function(source){
+        this.source = source;
+        return this;
+    },
 });
 
 export const sample = wrap({

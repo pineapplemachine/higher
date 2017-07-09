@@ -92,6 +92,10 @@ export const FromSequence = Sequence.extend({
         delete this.popFront;
         return this;
     },
+    rebase: function(source){
+        this.source = source;
+        return this;
+    },
 });
 
 export const from = wrap({

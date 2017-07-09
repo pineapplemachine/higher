@@ -89,6 +89,14 @@ export const ForwardJoinSequence = Sequence.extend({
     slice: null,
     copy: null,
     reset: null,
+    rebase: function(source){
+        this.source = source;
+        // Must uninitialize to rebase
+        delete this.done;
+        delete this.front;
+        delete this.popFront;
+        return this;
+    },
 });
 
 export const BackwardJoinSequence = Sequence.extend({
@@ -179,6 +187,14 @@ export const BackwardJoinSequence = Sequence.extend({
     slice: null,
     copy: null,
     reset: null,
+    rebase: function(source){
+        this.source = source;
+        // Must uninitialize to rebase
+        delete this.done;
+        delete this.front;
+        delete this.popFront;
+        return this;
+    },
 });
 
 export const join = wrap({

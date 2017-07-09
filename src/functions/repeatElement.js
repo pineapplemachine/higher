@@ -76,6 +76,7 @@ export const FiniteRepeatElementSequence = Sequence.extend({
         this.finishedRepetitions = 0;
         return this;
     },
+    rebase: null,
 });
 
 export const InfiniteRepeatElementSequence = Sequence.extend({
@@ -126,6 +127,7 @@ export const InfiniteRepeatElementSequence = Sequence.extend({
     reset: function(){
         return this;
     },
+    rebase: null,
 });
 
 // Produce a sequence that repeats a single element.

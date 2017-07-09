@@ -69,6 +69,10 @@ export const EnumerateSequence = Sequence.extend({
         if(this.back) this.backIndex = start + (step * (source.length() - 1));
         return this;
     },
+    rebase: function(source){
+        this.source = source;
+        return this;
+    },
 });
 
 export const enumerate = wrap({

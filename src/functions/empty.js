@@ -31,6 +31,7 @@ export const EmptySequence = Sequence.extend({
     reset: function(){
         return this;
     },
+    rebase: null,
 });
 
 export const empty = wrap({

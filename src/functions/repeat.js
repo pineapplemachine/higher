@@ -140,6 +140,12 @@ export const FiniteRepeatSequence = Sequence.extend({
         }
         return this;
     },
+    rebase: function(source){
+        this.source = source;
+        this.frontSource = null;
+        this.backSource = null;
+        return this;
+    },
     collapseBreak: function(target, length){
         if(this.repetitions === 0){
             return 0;
@@ -226,8 +232,14 @@ export const InfiniteRepeatSequence = Sequence.extend({
         this.frontSource = null;
         this.backSource = null;
     },
+    rebase: function(source){
+        this.source = source;
+        this.frontSource = null;
+        this.backSource = null;
+        return this;
+    },
     collapseBreak: function(target, length){
-        // TODO: Can this be fixed?
+        // TODO: Can this possibly be fixed?
         throw "Cannot collapse infinitely repeated sequence.";
     },
 });

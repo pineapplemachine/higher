@@ -63,6 +63,10 @@ export const ReverseSequence = Sequence.extend({
         this.source.reset();
         return this;
     },
+    rebase: function(source){
+        this.source = source;
+        return this;
+    },
     // This sequence requires special handling when collapsing.
     collapseBreak: function(target, length){
         let i = 0;

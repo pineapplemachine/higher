@@ -69,6 +69,10 @@ export const TapSequence = Sequence.extend({
         this.source.reset();
         return this;
     },
+    rebase: function(source){
+        this.source = source;
+        return this;
+    },
 });
 
 // Like each, except the callbacks are invoked as the sequence is consumed,

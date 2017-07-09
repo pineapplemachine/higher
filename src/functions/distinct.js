@@ -50,6 +50,10 @@ export const DistinctSequence = Sequence.extend({
         this.history = {};
         return this;
     },
+    rebase: function(source){
+        this.source = source;
+        return this;
+    },
 });
 
 export const distinct = wrap({
@@ -62,7 +66,7 @@ export const distinct = wrap({
     arguments: {
         one: wrap.expecting.sequence
     },
-    imlementation: (source) => {
+    implementation: (source) => {
         return new DistinctSequence(source);
     },
 });
