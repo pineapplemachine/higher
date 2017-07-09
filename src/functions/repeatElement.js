@@ -1,7 +1,9 @@
-import Sequence from "../core/sequence";
+import {constants} from "../core/constants";
+import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 import {EmptySequence} from "./empty";
+import {OneElementSequence} from "./one";
 
 export const FiniteRepeatElementSequence = Sequence.extend({
     constructor: function FiniteRepeatElementSequence(
@@ -11,13 +13,25 @@ export const FiniteRepeatElementSequence = Sequence.extend({
         this.finishedRepetitions = finishedRepetitions || 0;
         this.element = element;
     },
+    uniq: function(compare){
+        const compareFunc = compare || constants.defaults.comparisonFunction;
+        if(compareFunc(this.element, this.element)){
+            return new OneElementSequence(this.element);
+        }else{
+            return this;
+        }
+    },
     seed: function(element){
         this.element = element;
         return this;
     },
     times: function(repetitions){
-        this.repetitions = times;
-        return this;
+        if(isFinite(repetitions)){
+            this.repetitions = times;
+            return this;
+        }else{
+            return new InfiniteRepeatElementSequence(this.element);
+        }
     },
     repeat: function(repetitions = null){
         if(repetitions === null || !isFinite(repetitions)){
@@ -83,13 +97,25 @@ export const InfiniteRepeatElementSequence = Sequence.extend({
     constructor: function InfiniteRepeatElementSequence(element){
         this.element = element;
     },
+    uniq: function(compare){
+        const compareFunc = compare || constants.defaults.comparisonFunction;
+        if(compareFunc(this.element, this.element)){
+            return new OneElementSequence(this.element);
+        }else{
+            return this;
+        }
+    },
     repetitions: Infinity,
     seed: function(element){
         this.element = element;
         return this;
     },
     times: function(repetitions){
-        return new FiniteRepeatElementSequence(repetitions, this.element);
+        if(isFinite(repetitions)){
+            return new FiniteRepeatElementSequence(repetitions, this.element);
+        }else{
+            return this;
+        }
     },
     repeat: function(repetitions){
         return this;
@@ -147,9 +173,7 @@ export const repeatElement = wrap({
         const repetitions = args[1];
         if(repetitions <= 0){
             return new EmptySequence();
-        }else if(!repetitions){ // Argument wasn't provided
-            return new InfiniteRepeatElementSequence(repetitions);
-        }else if(!isFinite(repetitions)){
+        }else if(!repetitions || !isFinite(repetitions)){
             return new InfiniteRepeatElementSequence(element);
         }else{
             const repetitions = Math.floor(+repetitions);
