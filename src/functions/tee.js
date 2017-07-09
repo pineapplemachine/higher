@@ -20,33 +20,34 @@ export const TeeSequence = Sequence.extend({
         return this.source.unbounded();
     },
     done: function(){
-        return this.elementBuffer.length === 0 && this.source.done();
+        return this.bufferIndex >= (this.elementBuffer.elements.length + this.elementBuffer.offset) && this.source.done();
     },
     length: function(){
         return this.source.length();
     },
     left: function(){
-        return this.source.left() + (
-            this.elementBuffer.length - (this.bufferIndex - this.elementBuffer.offset)
-        );
+        return this.source.left() + (this.elementBuffer.length - (
+            this.bufferIndex - this.elementBuffer.offset
+        ));
     },
     front: function(){
         const index = this.bufferIndex - this.elementBuffer.offset;
-        if(index < this.elementBuffer.length){
-            return this.elementBuffer[index];
+        if(index < this.elementBuffer.elements.length){
+            return this.elementBuffer.elements[index];
         }else{
             return this.source.front();
         }
     },
     popFront(){
         this.bufferIndex++;
-        if(this.bufferIndex - this.elementBuffer.offset >= this.elementBuffer.length){
-            this.elementBuffer.push(this.source.nextFront());
+        const index = this.bufferIndex - this.elementBuffer.offset;
+        if(index >= this.elementBuffer.elements.length && !this.source.done()){
+            this.elementBuffer.elements.push(this.source.nextFront());
         }
         for(const sequence of this.elementBuffer.sequences){
             if(sequence.bufferIndex <= this.elementBuffer.offset) return;
         }
-        this.elementBuffer.shift();
+        this.elementBuffer.elements.shift();
         this.elementBuffer.offset++;
     },
     back: null,
@@ -99,21 +100,23 @@ export const tee = wrap({
         }else if(count === 1){
             return [source];
         }else{
-            const sequences = [];
-            const sequenceCount = count;
             if(source.copy){
-                for(let i = 0; i < sequenceCount; i++){
-                    sequence.push(source.copy())
+                const sequences = [];
+                for(let i = 0; i < count; i++){
+                    sequences.push(source.copy())
                 }
+                return sequences;
             }else{
-                const buffer = [];
-                buffer.offset = 0;
-                for(let i = 0; i < sequenceCount; i++){
-                    sequences.push(new TeeSequence(source, buffer));
+                const buffer = {
+                    sequences: [],
+                    offset: 0,
+                    elements: []
+                };
+                for(let i = 0; i < count; i++){
+                    buffer.sequences.push(new TeeSequence(source, buffer));
                 }
-                buffer.sequences = sequences;
+                return buffer.sequences;
             }
-            return sequences;
         }
     },
 });
