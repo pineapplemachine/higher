@@ -6,6 +6,7 @@ export const error = function(methods){
         return err;
     };
     Object.defineProperty(wrapped, "name", {value: name, writable: false});
+    wrapped.enforce = methods.enforce;
     error[name] = wrapped;
     return wrapped;
 };

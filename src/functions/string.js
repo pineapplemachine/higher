@@ -1,4 +1,3 @@
-import {validAsBoundedSequence} from "../core/asSequence";
 import {NotBoundedError} from "../core/sequence";
 import {wrap} from "../core/wrap";
 

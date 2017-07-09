@@ -1,7 +1,7 @@
 import {callAsync} from "./callAsync";
 import {constants} from "./constants";
 import {error} from "./error";
-import {isArray, isString} from "./types";
+import {isArray, isObject, isString} from "./types";
 import {joinSeries} from "./joinSeries";
 import {ArraySequence} from "./asSequence";
 

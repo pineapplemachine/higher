@@ -51,7 +51,7 @@ export const write = wrap({
         if(limit === 0){
             // Do nothing
         }else if(!limit){
-            if(!source.bounded()) throw NotBoundedError(target, {
+            NotBoundedError.enforce(target, {
                 message: "Failed to write sequence to array",
                 limitArgument: true,
             });

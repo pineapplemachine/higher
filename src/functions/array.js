@@ -5,7 +5,7 @@ import {wrap} from "../core/wrap";
 // Base implementation for array and newArray functions.
 export const asArray = function(limit, source){
     if(!limit){
-        if(!source.bounded()) throw NotBoundedError(source, {
+        NotBoundedError.enforce(source, {
             message: "Failed to create array from sequence",
             limitArgument: true,
         });
