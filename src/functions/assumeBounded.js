@@ -1,14 +1,11 @@
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
-export const AssumeBoundedSequence = function(source){
-    this.source = source;
-    this.maskAbsentMethods(source);
-};
-
-AssumeBoundedSequence.prototype = Object.create(Sequence.prototype);
-AssumeBoundedSequence.prototype.constructor = AssumeBoundedSequence;
-Object.assign(AssumeBoundedSequence.prototype, {
+export const AssumeBoundedSequence = Sequence.extend({
+    constructor: function AssumeBoundedSequences(source){
+        this.source = source;
+        this.maskAbsentMethods(source);
+    },
     bounded: () => true,
     unbounded: () => false,
     done: function(){
