@@ -1,3 +1,4 @@
+import {asSequence} from "../core/asSequence";
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
