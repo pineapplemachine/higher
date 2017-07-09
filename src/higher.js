@@ -117,6 +117,7 @@ import {last} from "./functions/last"; hi.register(last);
 import {lexOrder} from "./functions/lexOrder"; hi.register(lexOrder);
 import {limit} from "./functions/limit"; hi.register(limit);
 import {map} from "./functions/map"; hi.register(map);
+import {match} from "./functions/match"; hi.register(match);
 import {max} from "./functions/max"; hi.register(max);
 import {min} from "./functions/min"; hi.register(min);
 import {newArray} from "./functions/newArray"; hi.register(newArray);
