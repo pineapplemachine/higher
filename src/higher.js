@@ -146,6 +146,7 @@ import {sumLinear} from "./functions/sumLinear"; hi.register(sumLinear);
 import {sumShew} from "./functions/sumShew"; hi.register(sumShew);
 import {tail} from "./functions/tail"; hi.register(tail);
 import {tap} from "./functions/tap"; hi.register(tap);
+import {tee} from "./functions/tee"; hi.register(tee);
 import {time} from "./functions/time"; hi.register(time);
 import {trigrams} from "./functions/trigrams"; hi.register(trigrams);
 import {until} from "./functions/until"; hi.register(until);
