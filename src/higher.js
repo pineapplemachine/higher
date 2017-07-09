@@ -135,6 +135,7 @@ import {recur} from "./functions/recur"; hi.register(recur);
 import {repeat} from "./functions/repeat"; hi.register(repeat);
 import {repeatElement} from "./functions/repeatElement"; hi.register(repeatElement);
 import {reverse} from "./functions/reverse"; hi.register(reverse);
+import {roundRobin} from "./functions/roundRobin"; hi.register(roundRobin);
 import {sample} from "./functions/sample"; hi.register(sample);
 import {shuffle} from "./functions/shuffle"; hi.register(shuffle);
 import {split} from "./functions/split"; hi.register(split);
