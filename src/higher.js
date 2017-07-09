@@ -35,7 +35,8 @@ import {error} from "./core/error";
 import {isSequence, Sequence} from "./core/sequence";
 import {wrap} from "./core/wrap";
 import {
-    isUndefined, isNumber, isString, isArray, isObject, isFunction, isIterable
+    isUndefined, isBoolean, isNumber, isString, isArray,
+    isObject, isFunction, isIterable
 } from "./core/types";
 import {
     asSequence, validAsSequence, validAsBoundedSequence,
@@ -49,6 +50,7 @@ hi.isSequence = isSequence;
 hi.Sequence = Sequence;
 hi.wrap = wrap;
 hi.isUndefined = isUndefined;
+hi.isBoolean = isBoolean;
 hi.isNumber = isNumber;
 hi.isString = isString;
 hi.isArray = isArray;
