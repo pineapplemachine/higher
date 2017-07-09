@@ -111,6 +111,7 @@ import {from} from "./functions/from"; hi.register(from);
 import {groupBy} from "./functions/groupBy"; hi.register(groupBy);
 import {head} from "./functions/head"; hi.register(head);
 import {homogenous} from "./functions/homogenous"; hi.register(homogenous);
+import {isSorted} from "./functions/isSorted"; hi.register(isSorted);
 import {join} from "./functions/join"; hi.register(join);
 import {last} from "./functions/last"; hi.register(last);
 import {lexOrder} from "./functions/lexOrder"; hi.register(lexOrder);
