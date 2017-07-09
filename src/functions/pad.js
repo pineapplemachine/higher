@@ -15,6 +15,9 @@ export const PadLeftSequence = Sequence.extend({
     bounded: function(){
         return this.source.bounded();
     },
+    unbounded: function(){
+        return this.source.unbounded();
+    },
     done: function(){
         return this.padCount >= this.padTotal && this.source.done();
     },
@@ -97,6 +100,10 @@ export const PadRightSequence = Sequence.extend({
     },
     bounded: function(){
         return this.source.bounded();
+    },
+    // Please don't right-pad unbounded sequences that doesn't make any sense
+    unbounded: function(){
+        return this.source.unbounded();
     },
     done: function(){
         return this.padCount >= this.padTotal && this.source.done();
@@ -209,7 +216,8 @@ Object.assign(SequencePadder.prototype, {
         }
     },
     rightCount: function(count, element){
-        return count <= 0 ? source : new PadRightSequence(
+        if(this.source.unbounded()) return source;
+        else return count <= 0 ? source : new PadRightSequence(
             this.source, element, count
         );
     },

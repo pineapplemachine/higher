@@ -81,6 +81,7 @@ export const ShuffleSequence = Sequence.extend({
         };
     },
     bounded: () => true,
+    unbounded: () => false,
     done: function(){
         return this.source.done();
     },

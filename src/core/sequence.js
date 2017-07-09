@@ -50,10 +50,6 @@ Sequence.prototype.nextBack = function(){
     this.popBack();
     return value;
 };
-// TODO: Make this part of normal sequence spec just like bounded
-Sequence.prototype.unbounded = function(){
-    return this.source ? this.source.unbounded() : false;
-};
 Sequence.prototype.maskAbsentMethods = function(source){
     if(!source.back){
         this.back = null;

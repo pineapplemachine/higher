@@ -16,8 +16,8 @@ export const RecurSequence = Sequence.extend({
         this.frontValue = value;
         return this;
     },
-    unbounded: () => true,
     bounded: () => false,
+    unbounded: () => true,
     done: () => false,
     length: null,
     left: null,

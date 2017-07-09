@@ -19,6 +19,7 @@ export const NumberRangeSequence = Sequence.extend({
         );
     },
     bounded: () => true,
+    unbounded: () => false,
     done: function(){
         return this.frontValue > this.backValue;
     },
@@ -77,6 +78,7 @@ export const ForwardNumberRangeSequence = Sequence.extend({
         );
     },
     bounded: () => true,
+    unbounded: () => false,
     done: function(){
         return this.frontValue > this.backValue;
     },
@@ -139,6 +141,7 @@ export const BackwardNumberRangeSequence = Sequence.extend({
         );
     },
     bounded: () => true,
+    unbounded: () => false,
     done: function(){
         return this.frontValue < this.backValue;
     },

@@ -37,6 +37,7 @@ export const FiniteRepeatElementSequence = Sequence.extend({
         return this;
     },
     bounded: () => true,
+    unbounded: () => false,
     done: function(){
         return this.finishedRepetitions >= this.repetitions;
     },
@@ -99,6 +100,7 @@ export const InfiniteRepeatElementSequence = Sequence.extend({
         return this;
     },
     bounded: () => false,
+    unbounded: () => true,
     done: () => false,
     length: null,
     left: null,

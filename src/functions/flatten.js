@@ -28,6 +28,7 @@ export const ForwardFlattenSequence = Sequence.extend({
         };
     },
     bounded: () => false,
+    unbounded: () => false,
     done: function(){
         this.initialize();
         return this.frontSource.done();
@@ -76,6 +77,7 @@ export const BackwardFlattenSequence = Sequence.extend({
         };
     },
     bounded: () => false,
+    unbounded: () => false,
     done: function(){
         this.initialize();
         return this.frontSource.done();
