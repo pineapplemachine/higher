@@ -3,7 +3,7 @@ import {asSequence, validAsSequence} from "./asSequence";
 import {callAsync} from "./callAsync";
 import {constants} from "./constants";
 import {Sequence} from "./sequence";
-import {isFunction, isIterable} from "./types";
+import {isFunction, isIterable, isObject} from "./types";
 
 export const wrap = function(info){
     // TODO: Better errors
@@ -45,6 +45,13 @@ Object.assign(wrap, {
         function: (value) => {
             if(!isFunction(value)){
                 throw "Expecting a function.";
+            }else{
+                return value;
+            }
+        },
+        object: (value) => {
+            if(!isObject(value)){
+                throw "Expecting an object.";
             }else{
                 return value;
             }

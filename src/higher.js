@@ -155,5 +155,6 @@ import {time} from "./functions/time"; hi.register(time);
 import {trigrams} from "./functions/trigrams"; hi.register(trigrams);
 import {uniq} from "./functions/uniq"; hi.register(uniq);
 import {until} from "./functions/until"; hi.register(until);
+import {where} from "./functions/where"; hi.register(where);
 import {write} from "./functions/write"; hi.register(write);
 import {zip} from "./functions/zip"; hi.register(zip);
