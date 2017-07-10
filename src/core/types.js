@@ -2,12 +2,16 @@ export const isUndefined = (value) => {
     return value === undefined;
 };
 
+export const isBoolean = (value) => {
+    return value instanceof Boolean;
+};
+
 export const isNumber = (value) => {
-    return !isNaN(value);
+    return value.constructor === Number;
 };
 
 export const isString = (value) => {
-    return value instanceof String || typeof value === "string";
+    return value.constructor === String;
 };
 
 export const isArray = (value) => {
@@ -28,6 +32,7 @@ export const isIterable = (value) => {
 
 export default {
     isUndefined,
+    isBoolean,
     isNumber,
     isString,
     isArray,

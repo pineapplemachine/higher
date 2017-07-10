@@ -116,9 +116,8 @@ Object.assign(wrap, {
         const sequences = args.expectCount(expected.sequences);
         const validate = function(callArgs){
             const found = args.countTypes(callArgs);
-            const counts = args.countSeparated(found);
-            if(!args.satisfied(expected, counts)){
-                const error = args.describe.discrepancy(expected, counts);
+            if(!args.satisfied(expected, found)){
+                const error = args.describe.discrepancy(expected, found);
                 throw `Error calling function: ${error}`;
             }
         };
@@ -235,12 +234,9 @@ Object.assign(wrap, {
             }else if(numbers === 0 || functions === 0){
                 const validate = function(argz){
                     const found = args.countTypes(argz);
-                    const counts = args.countSeparated(found);
-                    counts.sequences++;
-                    if(!args.satisfied(expected, counts)){
-                        const error = args.describe.discrepancy(
-                            expected, counts
-                        );
+                    found.sequences++;
+                    if(!args.satisfied(expected, found)){
+                        const error = args.describe.discrepancy(expected, found);
                         throw `Error calling function: ${error}`;
                     }
                 };

@@ -1,4 +1,5 @@
 import {asSequence, validAsSequence} from "./asSequence";
+import {joinSeries} from "./joinSeries";
 import {isArray, isFunction} from "./types";
 
 // Important term definition: "Argument expectation token".
@@ -144,26 +145,10 @@ export const args = {
             functions: args.typeSatisfied(expected.functions, found.functions),
             sequences: args.typeSatisfied(expected.sequences, found.sequences),
         };
-        satisfied.all = (
-            satisfied.numbers && satisfied.functions && satisfied.sequences
-        );
-        return satisfied;
+        return satisfied.numbers && satisfied.functions && satisfied.sequences;
     },
 
     describe: {
-        // Join a series of strings with "and"s and commas.
-        joinSeries: function(series){
-            if(series.length === 0){
-                return "";
-            }else if(series.length === 1){
-                return series[0];
-            }else if(series.length === 2){
-                return `${series[0]} and ${series[1]}`;
-            }else{
-                const left = series.slice(0, series.length - 1).join(", ");
-                return `${left}, and ${series[series.length - 1]}`;
-            }
-        },
         expected: function(expected){
             const parts = [];
             if(expected.numbers) parts.push(
@@ -175,7 +160,7 @@ export const args = {
             if(expected.sequences) parts.push(
                 args.describe.expectedSequences(expected.sequences)
             );
-            return args.describe.joinSeries(parts);
+            return joinSeries(parts);
         },
         expectedNumbers: function(expected){
             return args.describe.expectedType(expected, "number", "numbers");
@@ -211,21 +196,21 @@ export const args = {
             const parts = [];
             if(!args.typeSatisfied(expected.numbers, found.numbers)) parts.push(
                 `Expected ${args.describe.expectedNumbers(expected.numbers)} ` +
-                `but found ${args.foundCount(found.numbers)}.`
+                `but found ${args.describe.foundCount(found.numbers)}.`
             );
             if(!args.typeSatisfied(expected.functions, found.functions)) parts.push(
                 `Expected ${args.describe.expectedFunctions(expected.functions)} ` +
-                `but found ${args.foundCount(found.functions)}.`
+                `but found ${args.describe.foundCount(found.functions)}.`
             );
             if(!args.typeSatisfied(expected.sequences, found.sequences)) parts.push(
                 `Expected ${args.describe.expectedSequences(expected.sequences)} ` +
-                `but found ${args.foundCount(found.sequences)}.`
+                `but found ${args.describe.foundCount(found.sequences)}.`
             );
             if(found.invalid) parts.push(
                 `Found ${found.invalid} ${found.invalid === 1 ? "argument" : "arguments"} ` +
                 "that are invalid because they are neither numbers, functions, or sequences."
             );
-            return args.describe.joinSeries(parts);
+            return parts.join(" ");
         },
         foundCount: function(found){
             return `${found ? found : "none"}`;

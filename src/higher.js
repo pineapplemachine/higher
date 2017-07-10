@@ -21,12 +21,6 @@ Object.assign(hi, {
                     this[name + "Async"] = fancy.async;
                 }
             }
-            if(fancy.sequences) for(const sequence of fancy.sequences){
-                this.sequence[sequence.name] = sequence;
-            }
-            if(fancy.errors) for(const error of fancy.errors){
-                this.error[error.name] = error;
-            }
         }
         return fancyFunctions[0];
     },
@@ -36,11 +30,13 @@ Object.assign(hi, {
 import {args} from "./core/arguments";
 import {callAsync} from "./core/callAsync";
 import {constants} from "./core/constants";
+import {error} from "./core/error";
 // import {canGetLength, getLength} from "../core/length"; // Not exposed
 import {isSequence, Sequence} from "./core/sequence";
 import {wrap} from "./core/wrap";
 import {
-    isUndefined, isNumber, isString, isArray, isObject, isFunction, isIterable
+    isUndefined, isBoolean, isNumber, isString, isArray,
+    isObject, isFunction, isIterable
 } from "./core/types";
 import {
     asSequence, validAsSequence, validAsBoundedSequence,
@@ -54,6 +50,7 @@ hi.isSequence = isSequence;
 hi.Sequence = Sequence;
 hi.wrap = wrap;
 hi.isUndefined = isUndefined;
+hi.isBoolean = isBoolean;
 hi.isNumber = isNumber;
 hi.isString = isString;
 hi.isArray = isArray;
@@ -64,10 +61,8 @@ hi.asSequence = asSequence;
 hi.validAsSequence = validAsSequence;
 hi.validAsBoundedSequence = validAsBoundedSequence;
 
-hi.sequence.ArraySequence = ArraySequence;
-hi.sequence.StringSequence = StringSequence;
-hi.sequence.ObjectSequence = ObjectSequence;
-hi.sequence.IterableSequence = IterableSequence;
+hi.sequence = Sequence.types;
+hi.error = error;
 
 // Assertions
 import {

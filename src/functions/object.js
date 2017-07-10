@@ -1,4 +1,4 @@
-import {sequenceBoundsError} from "../core/errors";
+import {NotBoundedError} from "../core/sequence";
 import {isArray, isObject} from "../core/types";
 import {wrap} from "../core/wrap";
 
@@ -28,9 +28,10 @@ export const object = wrap({
         if(limit <= 0){
             return {};
         }else if(!limit){
-            if(!source.bounded()){
-                throw hi.internal.unboundedError("write", "object");
-            }
+            if(!source.bounded()) throw NotBoundedError(source, {
+                message: "Failed to create object from sequence",
+                limitArgument: true,
+            });
             const result = {};
             for(const element of source){
                 pushKeyValuePair(result, element);
