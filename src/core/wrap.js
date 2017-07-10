@@ -72,7 +72,7 @@ Object.assign(wrap, {
         },
     },
     fancy: function(info){
-        if(info.arguments.none){
+        if(info.arguments.none || info.arguments.anything){
             return info.implementation;
         }else if(info.arguments.one){
             return wrap.fancyOne(info);
@@ -169,6 +169,8 @@ Object.assign(wrap, {
     method: function(info, implementation){
         if(info.arguments.none){
             return null; // Not applicable
+        }else if(info.arguments.anything){
+            return wrap.methodAnything(info);
         }else if(info.arguments.one){
             return wrap.methodOne(info);
         }else if(info.arguments.ordered){
@@ -178,6 +180,12 @@ Object.assign(wrap, {
         }else{
             throw "Function has no arguments information.";
         }
+    },
+    methodAnything: function(info){
+        const implementation = info.methodImplementation || info.implementation;
+        return function(...args){
+            return implementation(this, ...args);
+        };
     },
     methodOne: function(info){
         if(!(
@@ -190,7 +198,7 @@ Object.assign(wrap, {
         const implementation = info.methodImplementation || info.implementation;
         return function(){
             return implementation(this);
-        }
+        };
     },
     methodOrdered: function(info){
         if(!(
