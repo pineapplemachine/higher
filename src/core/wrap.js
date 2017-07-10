@@ -3,7 +3,7 @@ import {asSequence, validAsSequence} from "./asSequence";
 import {callAsync} from "./callAsync";
 import {constants} from "./constants";
 import {Sequence} from "./sequence";
-import {isFunction, isIterable, isObject} from "./types";
+import {isFunction, isIterable, isObject, isString} from "./types";
 
 export const wrap = function(info){
     // TODO: Better errors
@@ -12,10 +12,16 @@ export const wrap = function(info){
     if(!info.name && !info.names) throw "No names!";
     const fancy = wrap.fancy(info);
     fancy.names = info.names || [info.name];
+    Object.defineProperty(fancy, "name", {
+        value: info.name || info.names[0], writable: false
+    });
     fancy.sequences = info.sequences;
     fancy.errors = info.errors;
     fancy.args = info.arguments;
     fancy.implementation = info.implementation;
+    fancy.docs = wrap.cleanDocs(info);
+    fancy.tests = info.tests;
+    fancy.test = wrap.testRunner(fancy.name, info);
     fancy.method = wrap.method(info);
     if(fancy.method){
         fancy.method.implementation = info.methodImplementation || info.implementation;
@@ -278,6 +284,43 @@ Object.assign(wrap, {
             return new constants.Promise((resolve, reject) => {
                 callAsync(() => resolve(callback(this, callArgs)));
             });
+        };
+    },
+    cleanDocs: function(info){
+        if(info.docs) for(const key in info.docs){
+            if(isString(info.docs[key])){
+                const lines = info.docs[key].split("\n");
+                const trimmedLines = [];
+                for(const line of lines){
+                    const trimmed = line.trim();
+                    if(trimmed.length) trimmedLines.push(trimmed);
+                }
+                info.docs[key] = trimmedLines.join(" ");
+            }
+        }
+        return info.docs;
+    },
+    testRunner: function(name, info){
+        if(!info.tests) return undefined;
+        return hi => {
+            const result = {
+                pass: [],
+                fail: [],
+            };
+            for(const testName in info.tests){
+                const test = info.tests[testName];
+                let success = true;
+                try{
+                    test(hi);
+                }catch(error){
+                    success = false;
+                    result.fail.push({test: testName, error: error});
+                }
+                if(success){
+                    result.pass.push({test: testName});
+                }
+            }
+            return result;
         };
     },
 });
