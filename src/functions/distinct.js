@@ -3,11 +3,11 @@ import {wrap} from "../core/wrap";
 
 export const DistinctSequence = Sequence.extend({
     constructor: function DistinctSequence(
-        source, history = null, frontValue = null, initialize = true
+        transform, source, history = null
     ){
+        this.transform = transform;
         this.source = source;
         this.history = history || {};
-        this.frontValue = initialize && !source.done() ? source.front() : frontValue;
         this.maskAbsentMethods(source);
     },
     bounded: function(){
@@ -22,13 +22,14 @@ export const DistinctSequence = Sequence.extend({
     length: null,
     left: null,
     front: function(){
-        return this.frontValue;
+        return this.source.front();
     },
     popFront: function(){
-        this.history[this.frontValue] = true;
+        this.history[this.transform(this.source.nextFront())] = true;
         while(!this.source.done()){
-            this.frontValue = this.source.nextFront();
-            if(!(this.frontValue in this.history)) break;
+            const front = this.source.front();
+            if(!(this.transform(front) in this.history)) break;
+            this.source.popFront();
         }
     },
     back: null,
@@ -41,8 +42,7 @@ export const DistinctSequence = Sequence.extend({
     },
     copy: function(){
         return new DistinctSequence(
-            this.source.copy(), Object.assign({}, this.history),
-            this.frontValue, false
+            this.source.copy(), Object.assign({}, this.history)
         );
     },
     reset: function(){
@@ -64,10 +64,15 @@ export const distinct = wrap({
         DistinctSequence
     ],
     arguments: {
-        one: wrap.expecting.sequence
+        unordered: {
+            functions: "?",
+            sequences: 1
+        }
     },
-    implementation: (source) => {
-        return new DistinctSequence(source);
+    implementation: (transform, source) => {
+        return new DistinctSequence(
+            transform || (element => element), source
+        );
     },
 });
 
