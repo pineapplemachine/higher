@@ -40,43 +40,15 @@ Object.assign(hi, {
 
 // Core modules
 import {args} from "./core/arguments";
-import {callAsync} from "./core/callAsync";
-import {constants} from "./core/constants";
-import {error} from "./core/error";
-// import {canGetLength, getLength} from "../core/length"; // Not exposed
-import {isSequence, Sequence} from "./core/sequence";
-import {wrap} from "./core/wrap";
-import {
-    isUndefined, isBoolean, isNumber, isString, isArray,
-    isObject, isFunction, isIterable
-} from "./core/types";
-import {
-    asSequence, validAsSequence, validAsBoundedSequence,
-    ArraySequence, StringSequence, ObjectSequence, IterableSequence
-} from "./core/asSequence";
-
 hi.args = args;
-hi.callAsync = callAsync;
-hi.constants = constants;
-hi.isSequence = isSequence;
-hi.Sequence = Sequence;
-hi.wrap = wrap;
-hi.isUndefined = isUndefined;
-hi.isBoolean = isBoolean;
-hi.isNumber = isNumber;
-hi.isString = isString;
-hi.isArray = isArray;
-hi.isObject = isObject;
-hi.isFunction = isFunction;
-hi.isIterable = isIterable;
+
+import {
+    asSequence, validAsSequence, validAsBoundedSequence
+} from "./core/asSequence";
 hi.asSequence = asSequence;
 hi.validAsSequence = validAsSequence;
 hi.validAsBoundedSequence = validAsBoundedSequence;
 
-hi.sequence = Sequence.types;
-hi.error = error;
-
-// Assertions
 import {
     AssertError, assert, assertNot, assertUndefined, assertEqual, assertSeqEqual
 } from "./core/assert";
@@ -86,6 +58,36 @@ hi.assertNot = assertNot;
 hi.assertUndefined = assertUndefined;
 hi.assertEqual = assertEqual;
 hi.assertSeqEqual = assertSeqEqual;
+
+import {callAsync} from "./core/callAsync";
+hi.callAsync = callAsync;
+
+import {constants} from "./core/constants";
+hi.constants = constants;
+
+import {error} from "./core/error";
+hi.error = error;
+
+import {isSequence, Sequence} from "./core/sequence";
+hi.isSequence = isSequence;
+hi.Sequence = Sequence;
+hi.sequence = Sequence.types;
+
+import {
+    isUndefined, isBoolean, isNumber, isString, isArray,
+    isObject, isFunction, isIterable
+} from "./core/types";
+hi.isUndefined = isUndefined;
+hi.isBoolean = isBoolean;
+hi.isNumber = isNumber;
+hi.isString = isString;
+hi.isArray = isArray;
+hi.isObject = isObject;
+hi.isFunction = isFunction;
+hi.isIterable = isIterable;
+
+import {wrap} from "./core/wrap";
+hi.wrap = wrap;
 
 // Function registry
 import {any} from "./functions/any"; hi.register(any);
