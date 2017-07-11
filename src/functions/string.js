@@ -1,5 +1,6 @@
-import {NotBoundedError} from "../core/sequence";
 import {wrap} from "../core/wrap";
+
+import {NotBoundedError} from "../errors/NotBoundedError";
 
 export const string = wrap({
     name: "string",

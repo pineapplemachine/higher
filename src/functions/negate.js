@@ -31,7 +31,7 @@ export const negate = wrap({
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {
-            const even = (a) => (a % 2 === 0);
+            const even = (i) => (i % 2 === 0);
             const odd = hi.negate(even);
             hi.assert(even(2));
             hi.assert(odd(3));

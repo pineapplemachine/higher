@@ -101,6 +101,19 @@ export const TeeSequence = Sequence.extend({
     },
 });
 
+// Get a buffer object with some number of TeeSequences attached.
+export const getTeeBuffer = (count, source) => {
+    const buffer = {
+        sequences: [],
+        offset: 0,
+        elements: []
+    };
+    for(let i = 0; i < count; i++){
+        buffer.sequences.push(new TeeSequence(source, buffer));
+    }
+    return buffer;
+};
+
 // Produce several sequences enumerating the elements of a single source
 // sequence. Returns copies of the input sequence if it supports copying,
 // otherwise returns an array of TeeSequences that behave as though they
@@ -134,15 +147,7 @@ export const tee = wrap({
                 }
                 return sequences;
             }else{
-                const buffer = {
-                    sequences: [],
-                    offset: 0,
-                    elements: []
-                };
-                for(let i = 0; i < count; i++){
-                    buffer.sequences.push(new TeeSequence(source, buffer));
-                }
-                return buffer.sequences;
+                return getTeeBuffer(count, source).sequences;
             }
         }
     },

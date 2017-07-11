@@ -1,3 +1,4 @@
+import {ArraySequence} from "../core/arrayAsSequence";
 import {wrap} from "../core/wrap";
 
 import {EmptySequence} from "./empty";
@@ -23,8 +24,14 @@ export const tail = wrap({
             const slice = length < elements ? length : elements;
             return source.slice(length - slice, length);
         }else if(source.bounded()){
-            source.forceEager();
-            return source.slice(source.length() - elements);
+            // TODO: It ought to be possible to put off this consumption until
+            // the sequence is actually accessed
+            const array = [];
+            for(const element of source) array.push(element);
+            const slice = array.length < elements ? array.length : elements;
+            return new ArraySequence(array).slice(
+                array.length - slice, array.length
+            );
         }else{
             throw "Failed to get tail: Input must be known to be bounded.";
         }

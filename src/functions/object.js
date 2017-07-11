@@ -1,6 +1,7 @@
-import {NotBoundedError} from "../core/sequence";
 import {isArray, isObject} from "../core/types";
 import {wrap} from "../core/wrap";
+
+import {NotBoundedError} from "../errors/NotBoundedError";
 
 export const object = wrap({
     name: "object",

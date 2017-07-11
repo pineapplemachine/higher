@@ -1,6 +1,7 @@
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
+import {EagerSequence} from "./eager";
 import {EmptySequence} from "./empty";
 
 export const FiniteRepeatSequence = Sequence.extend({
@@ -263,13 +264,14 @@ export const repeat = wrap({
             return new EmptySequence();
         }else if(source.unbounded()){
             return source;
-        }
-        // Source sequence must be copyable to be repeatable.
-        if(!source.copy) source.forceEager();
-        if(repetitions && isFinite(repetitions)){
-            return new FiniteRepeatSequence(repetitions, source);
+        }else if(repetitions && isFinite(repetitions)){
+            return new FiniteRepeatSequence(
+                repetitions, copyable.implementation(source)
+            );
         }else{
-            return new InfiniteRepeatSequence(source);
+            return new InfiniteRepeatSequence(copyable.implementation(source));
         }
     },
 });
+
+export default repeat;

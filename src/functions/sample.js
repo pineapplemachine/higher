@@ -3,6 +3,7 @@ import {wrap} from "../core/wrap";
 
 import {EmptySequence} from "./empty";
 import {HeadSequence} from "./head";
+import {mustSupport} from "./mustSupport";
 import {ShuffleSequence} from "./shuffle";
 
 // An alternative to commiting a sequence of indexes fully to memory and then
@@ -153,22 +154,19 @@ export const sample = wrap({
         }
     },
     implementation: (samples, random, source) => {
-        if(samples <= 0){
-            return new EmptySequence();
-        }
-        if(!source.index || !source.length){
-            source.forceEager();
-        }
+        if(samples <= 0) return new EmptySequence();
         const randomFunc = random || Math.random;
+        const useSource = mustSupport(source, "length", "index");
+        const sourceLength = source.length();
         if(!samples){
-            return source.index(Math.floor(randomFunc() * source.length()));
-        }else if(samples <= source.length() / 5){
+            return source.index(Math.floor(randomFunc() * sourceLength));
+        }else if(samples <= sourceLength / 5){
             // Lazy implementation is usually more performant when the sample
-            // count is no more than 20% of the number of elements.
+            // count is no more than 20% of the total number of elements.
             return new SampleSequence(samples, randomFunc, source);
         }else{
-            return new HeadSequence(samples,
-                new ShuffleSequence(randomFunc, source)
+            return new HeadSequence(
+                samples, new ShuffleSequence(randomFunc, source)
             );
         }
     },

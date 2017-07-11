@@ -1,7 +1,8 @@
 import {error} from "../core/error";
-import {NotBoundedError} from "../core/sequence";
 import {isArray, isFunction, isNumber, isString} from "../core/types";
 import {wrap} from "../core/wrap";
+
+import {NotBoundedError} from "../errors/NotBoundedError";
 
 export const WriteTargetError = error({
     url: "", // TODO

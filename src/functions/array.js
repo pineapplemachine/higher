@@ -1,6 +1,7 @@
 import {isArray} from "../core/types";
-import {NotBoundedError} from "../core/sequence";
 import {wrap} from "../core/wrap";
+
+import {NotBoundedError} from "../errors/NotBoundedError";
 
 // Base implementation for array and newArray functions.
 export const asArray = function(limit, source){

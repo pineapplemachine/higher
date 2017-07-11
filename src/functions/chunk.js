@@ -3,6 +3,7 @@
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
+import {copyable} from "./copyable";
 import {HeadSequence} from "./head";
 
 /* @Documentation
@@ -191,13 +192,10 @@ export const chunk = wrap({
     implementation: (chunkLength, source) => {
         if(source.slice && source.length){
             return new BidirectionalChunkSequence(chunkLength, source);
-        }else if(source.copy){
-            return new ForwardChunkSequence(chunkLength, source);
-        }else if(source.bounded()){
-            source.forceEager();
-            return new BidirectionalChunkSequence(chunkLength, source);
         }else{
-            throw "Failed to chunk sequence."; // TODO: Better error
+            return new ForwardChunkSequence(
+                chunkLength, copyable.implementation(source)
+            );
         }
     },
 });

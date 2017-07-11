@@ -2,8 +2,11 @@ import {constants} from "../core/constants";
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
+import {copyable} from "./copyable";
 import {ForwardFindSequence, BackwardFindSequence} from "./findAll";
+import {mustSupport} from "./mustSupport";
 
+// TODO: It may be feasible to support splitting for sequences without slicing
 export const ForwardSplitSequence = Sequence.extend({
     constructor: function ForwardSplitSequence(
         compare, source, delimiter, beginDelimiter = undefined,
@@ -214,11 +217,10 @@ export const split = wrap({
         const compareFunc = compare || constants.defaults.comparisonFunction;
         const source = sequences[0];
         const delimiter = sequences[1];
-        // Source must support slicing and length.
-        if(!source.slice || !source.length) source.forceEager();
-        // Delimiter must be copyable.
-        if(!delimiter.copy) delimiter.forceEager();
-        return new ForwardSplitSequence(compareFunc, source, delimiter);
+        return new ForwardSplitSequence(
+            compareFunc, source.mustSupport("slice", "length"),
+            copyable.implementation(delimiter)
+        );
     },
 });
 

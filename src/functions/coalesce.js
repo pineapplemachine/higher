@@ -1,5 +1,6 @@
-import {NotBoundedError} from "../core/sequence";
 import {wrap} from "../core/wrap";
+
+import {NotBoundedError} from "../errors/NotBoundedError";
 
 // Get the first element of a sequence that isn't null or undefined.
 // When no such element exists, get the last element of the sequence.
@@ -13,7 +14,7 @@ export const coalesce = wrap({
     },
     implementation: (source) => {
         NotBoundedError.enforce(source, {
-            message: "Failed to coalesce",
+            message: "Failed to coalesce sequence",
         });
         let last = undefined;
         for(const element of source){

@@ -3,8 +3,9 @@ import {constants} from "../core/constants";
 import {canGetLength, getLength} from "../core/length";
 import {wrap} from "../core/wrap";
 
-import {FindSequenceResult, ForwardFindSequenceThread, stepFindThreads} from "./findAll";
+import {copyable} from "./copyable";
 import {equals} from "./equals";
+import {FindSequenceResult, ForwardFindSequenceThread, stepFindThreads} from "./findAll";
 
 // Find the first occurrence of a substring as judged by a comparison function.
 // Finding the first instance of a substring is overwhelmingly the most
@@ -23,7 +24,7 @@ export const findFirst = wrap({
     },
     implementation: (compare, sequences) => {
         const source = sequences[0];
-        const search = asSequence(sequences[1]);
+        let search = asSequence(sequences[1]);
         const compareFunc = compare || constants.defaults.comparisonFunction;
         // Handle empty or unbounded search subject
         if(search.done() || search.unbounded()){
@@ -40,9 +41,7 @@ export const findFirst = wrap({
             }
         }
         // Search sequence absolutely must be copyable
-        if(!search.copy){
-            search.forceEager();
-        }
+        search = copyable.implementation(search);
         const searchElement = search.nextFront();
         // Handle single-element search subject
         if(search.done()){
