@@ -30,6 +30,10 @@ If you want to create a sequence based on another excepting some elements of the
 
 TODO: Include links to further reading on these functions
 
+### Sequence invalidation
+
+When an array, object, or sequence is modified in any way, then it becomes unsafe to consume or otherwise interact with any sequence that was created from that source and that was not itself responsible for the modification, or that was created from that now-invalidated sequence, etc.
+
 ### Consuming completed sequences
 
 It is unsafe to call `sequence.front()`, `sequence.popFront()`, `sequence.nextFront()`, `sequence.back()`, `sequence.popBack()`, `sequence.nextBack()`, or `sequence.next()` on any sequence for which `sequence.done()` returns a truthy value.
@@ -37,6 +41,10 @@ It is unsafe to call `sequence.front()`, `sequence.popFront()`, `sequence.nextFr
 ### Consuming unbounded sequences
 
 Before fully consuming any sequence with functions apart from higher's API (such as by using a loop like `for(element of sequence)`), it is prudent to first check whether `sequence.bounded()` returns a truthy value. The method returning a falsey value means that higher does not know for sure that the sequence ever ends. Be careful, and don't ever attempt to fully consume a range that you aren't certain is bounded.
+
+### Out-of-bounds indexes
+
+It is unsafe to call `sequence.index(i)` if `i` is not at least `0` and less than the length of the sequence. It is unsafe to call `sequence.slice(i, j)` if the same is not true of both `i` and `j`, and if `i` is not less than or equal to `j`.
 
 ### Undocumented methods
 
@@ -47,6 +55,14 @@ It is unsafe to call undocumented methods, or methods marked explicitly as being
 It is unsafe to assign a value to any attribute of a sequence.
 All operations done with sequences should be done by calling documented methods.
 
+### Function purity
+
+It is unsafe to provide an impure function as input where higher expects a pure function. One of the primary reasons for this lack of safety is that higher does not make any guarantees or assertions about whether or how many times an assumed-pure function will be called for some input.
+
+### Argument modification
+
+It is always unsafe to pass a function as input to higher if that function may modify any objects passed to it as arguments.
+
 ## Higher's rules
 
 These are rules that you can rely on higher following:
@@ -54,6 +70,10 @@ These are rules that you can rely on higher following:
 ### Infinite loop avoidance
 
 Higher keeps track of whether sequences are known to be bounded. (Some sequences may never end!) If you tell higher to perform an operation which would involve fully consuming any sequence that isn't known to be bounded, higher will refuse with a thrown error. If you know a sequence is bounded when higher doesn't, you can call `sequence.assumeBounded()` to acquire a new sequence which behaves like the original one except that higher will treat it as though it is guaranteed to eventually end.
+
+### Array and object non-modification
+
+The only time that higher will ever modify any object passed to it as input is if a function intended specifically for that purpose such as `collapse` or `write` is called; note that all higher functions that may modify their inputs are explicitly documented as such.
 
 ### Creation isn't modification
 
