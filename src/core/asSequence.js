@@ -1,292 +1,57 @@
 import {constants} from "./constants";
-import {isArray, isIterable, isObject, isString} from "./types";
-import {isSequence, Sequence} from "./sequence";
+import {isIterable, isObject} from "./types";
+import {isSequence} from "./sequence";
 
-// Check whether a value is a sequence or can be coerced to a sequence type.
+// True when asSequence(value) would return a sequence.
 export const validAsSequence = (value) => {
-    return isIterable(value) || isObject(value);
-};
-
-export const validAsBoundedSequence = (value) => {
-    return (
-        (isSequence(value) && value.bounded()) ||
-        isArray(value) || isString(value) || isObject(value)
-    );
-};
-
-// Get an array, string, iterable, or object as a sequence.
-// If it receives a sequences as input, returns that sequence.
-// For all other inputs an error is thrown.
-export const asSequence = (source) => {
-    if(isSequence(source)){
-        return source;
-    }else if(isArray(source)){
-        return new ArraySequence(source);
-    }else if(isString(source)){
-        return new StringSequence(source);
-    }else if(isIterable(source)){
-        return new IterableSequence(source);
-    }else if(isObject(source)){
-        return new ObjectSequence(source);
-    }else{
-        throw (
-            "Value is not valid as a sequence. Only arrays, strings, " +
-            "iterables, and objects can be made into sequences."
-        );
+    // Easy short-circuit for core sequence converters
+    if(isIterable(value) || isObject(value)) return true;
+    for(const converter of asSequence.converters){
+        if(converter.predicate(value)) return true;
     }
+    return false;
 };
 
-// Get a sequence for enumerating the elements of an array.
-// Optionally accepts an inclusive start index and an exclusive end index.
-// When start and end indexes aren't given, the sequence enumerates the
-// entire contents of the array.
-export const ArraySequence = Sequence.extend({
-    constructor: function ArraySequence(source, low, high){
-        this.source = source;
-        this.lowIndex = isNaN(low) ? 0 : low;
-        this.highIndex = isNaN(high) ? source.length : high;
-        this.frontIndex = this.lowIndex;
-        this.backIndex = this.highIndex;
-    },
-    array: function(limit){
-        if(limit <= 0){
-            return [];
-        }else if(this.lowIndex !== 0 || this.highIndex !== this.source.length){
-            if(!limit){
-                return this.source.slice(this.lowIndex, this.highIndex);
-            }else{
-                const length = this.source.length - this.lowIndex;
-                return this.source.slice(this.lowIndex, this.lowIndex + (
-                    limit < length ? limit : length
-                ));
-            }
-        }else if(!limit || limit >= this.source.length){
-            return this.source;
-        }else{
-            return this.source.slice(limit);
-        }
-    },
-    arrayAsync: function(limit){
-        return new constants.Promise((resolve, reject) => resolve(this.array(limit)));
-    },
-    newArray: function(limit){
-        if(limit <= 0){
-            return [];
-        }else if(!limit || limit >= this.source.length){
-            return this.source.slice();
-        }else{
-            return this.source.slice(limit);
-        }
-    },
-    newArrayAsync: function(limit){
-        return new constants.Promise((resolve, reject) => resolve(this.newArray(limit)));
-    },
-    bounded: () => true,
-    unbounded: () => false,
-    done: function(){
-        return this.frontIndex >= this.backIndex;
-    },
-    length: function(){
-        return this.highIndex - this.lowIndex;
-    },
-    left: function(){
-        return this.backIndex - this.frontIndex;
-    },
-    front: function(){
-        return this.source[this.frontIndex];
-    },
-    popFront: function(){
-        this.frontIndex++;
-    },
-    back: function(){
-        return this.source[this.backIndex - 1];
-    },
-    popBack: function(){
-        this.backIndex--;
-    },
-    index: function(i){
-        return this.source[this.lowIndex + i];
-    },
-    slice: function(i, j){
-        return new ArraySequence(
-            this.source, this.lowIndex + i, this.lowIndex + j
-        );
-    },
-    has: function(i){
-        return Number.isInteger(i) && i >= 0 && i < this.length();
-    },
-    get: function(i){
-        return this.source[i - this.lowIndex];
-    },
-    copy: function(){
-        const copy = new ArraySequence(this.source, this.lowIndex, this.highIndex);
-        copy.frontIndex = this.frontIndex;
-        copy.backIndex = this.backIndex;
-        return copy;
-    },
-    reset: function(){
-        this.frontIndex = this.lowIndex;
-        this.backIndex = this.highIndex;
-        return this;
-    },
-    rebase: null,
-});
+// True when asSequence(value) would return a known-bounded sequence.
+export const validAsBoundedSequence = (value) => {
+    if(isSequence(value)) return value.bounded();
+    for(const converter of asSequence.converters){
+        if(converter.predicate(value)) return converter.bounded(value);
+    }
+    return false;
+};
 
-// Get a sequence for enumerating the characters in a string.
-// Optionally accepts an inclusive start index and an exclusive end index.
-// When start and end indexes aren't given, the sequence enumerates the
-// entire contents of the string.
-export const StringSequence = Sequence.extend({
-    constructor: function StringSequence(source, low, high){
-        this.source = source;
-        this.lowIndex = isNaN(low) ? 0 : low;
-        this.highIndex = isNaN(high) ? source.length : high;
-        this.frontIndex = this.lowIndex;
-        this.backIndex = this.highIndex;
-    },
-    string: function(){
-        if(this.lowIndex === 0 && this.highIndex === this.source.length){
-            return this.source;
-        }else{
-            return this.source.slice(this.lowIndex, this.highIndex);
-        }
-    },
-    stringAsync: function(){
-        return new constants.Promise((resolve, reject) => resolve(this.string()));
-    },
-    bounded: () => true,
-    unbounded: () => false,
-    done: function(){
-        return this.frontIndex >= this.backIndex;
-    },
-    length: function(){
-        return this.source.length;
-    },
-    left: function(){
-        return this.backIndex - this.frontIndex;
-    },
-    front: function(){
-        return this.source[this.frontIndex];
-    },
-    popFront: function(){
-        this.frontIndex++;
-    },
-    back: function(){
-        return this.source[this.backIndex - 1];
-    },
-    popBack: function(){
-        this.backIndex--;
-    },
-    index: function(i){
-        return this.source[this.lowIndex + i];
-    },
-    slice: function(i, j){
-        return new StringSequence(
-            this.source, this.lowIndex + i, this.lowIndex + j
-        );
-    },
-    has: function(i){
-        return Number.isInteger(i) && i >= 0 && i < this.length();
-    },
-    get: function(i){
-        return this.source[i - this.lowIndex];
-    },
-    copy: function(){
-        const copy = new StringSequence(this.source, this.lowIndex, this.highIndex);
-        copy.frontIndex = this.frontIndex;
-        copy.backIndex = this.backIndex;
-        return copy;
-    },
-    reset: function(){
-        this.frontIndex = this.lowIndex;
-        this.backIndex = this.highIndex;
-        return this;
-    },
-    rebase: null,
-});
+// True when asSequence(value) would return a known-unbounded sequence.
+export const validAsUnboundedSequence = (value) => {
+    if(isSequence(value)) return value.unbounded();
+    for(const converter of asSequence.converters){
+        if(converter.predicate(value)) return converter.unbounded(value);
+    }
+    return false;
+};
 
-// Get a sequence that enumerates the key, value pairs of an arbitrary object.
-// Optionally accepts an array of keys indicating which keys of the object
-// should be enumerated. When not explicitly provided, the sequence enumerates
-// key, value pairs for all of the object's own keys.
-export const ObjectSequence = Sequence.extend({
-    constructor: function ObjectSequence(source, keys){
-        this.source = source;
-        this.keys = keys || Object.keys(source);
-        this.keyIndex = 0;
-    },
-    bounded: () => true,
-    unbounded: () => false,
-    done: function(){
-        return this.keyIndex >= this.keys.length;
-    },
-    length: function(){
-        return this.keys.length;
-    },
-    left: function(){
-        return this.keys.length - this.keyIndex;
-    },
-    front: function(){
-        const key = this.keys[this.keyIndex];
-        return {key: key, value: this.source[key]};
-    },
-    popFront: function(){
-        return this.keyIndex++;
-    },
-    // Bidirectionality is technically possible but conceptually dodgy
-    back: null,
-    popBack: null,
-    index: null,
-    slice: null,
-    has: function(i){
-        return i in this.source;
-    },
-    get: function(i){
-        return this.source[i];
-    },
-    copy: function(){
-        const copy = new ObjectSequence(this.source, this.keys);
-        copy.keyIndex = this.keyIndex;
-        return copy;
-    },
-    reset: function(){
-        this.keyIndex = 0;
-        return this;
-    },
-    rebase: null,
-});
+// Get a sequence from an arbitrary input if it is possible to convert.
+// Returns undefined when the input is not valid as a sequence.
+export const asSequence = (value) => {
+    if(isSequence(value)) return value;
+    for(const converter of asSequence.converters){
+        if(converter.predicate(value)) return converter.transform(value);
+    }
+    // TODO: Is it better to return undefined or to throw an error in this case?
+    return undefined;
+};
 
-// Get a sequence that enumerates the items of an iterable.
-// An iterable is anything with a "next" method returning an object with two
-// attributes, "done" being a boolean indicating when the iterator has been
-// fully consumed and "value" being the current element of the iterator.
-export const IterableSequence = Sequence.extend({
-    constructor: function IterableSequence(source){
-        this.source = source;
-        this.item = source.next();
-    },
-    bounded: () => false,
-    unbounded: () => false,
-    done: function(){
-        return this.item.done;
-    },
-    length: null,
-    left: null,
-    front: function(){
-        return this.item.value;
-    },
-    popFront: function(){
-        this.item = this.source.next();
-    },
-    back: null,
-    popBack: null,
-    index: null,
-    slice: null,
-    has: null,
-    get: null,
-    copy: null,
-    reset: null,
-    rebase: null,
-});
+// Logic for adding new converters for getting values as sequences.
+asSequence.converters = [];
+asSequence.addConverter = (converter) => {
+    // Insert new converters in ascending order of priority,
+    // i.e. first priority is given the first position in the list.
+    let i = 0;
+    for(; i < asSequence.converters.length; i++){
+        if(asSequence.converters[i].priority > converter.priority) break;
+    }
+    asSequence.converters.splice(i, 0, converter);
+    return converter;
+};
 
 export default asSequence;

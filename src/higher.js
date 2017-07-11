@@ -89,6 +89,12 @@ hi.isIterable = isIterable;
 import {wrap} from "./core/wrap";
 hi.wrap = wrap;
 
+// Core sequence types
+import {arrayAsSequence} from "./core/arrayAsSequence"; hi.register(arrayAsSequence);
+import {stringAsSequence} from "./core/stringAsSequence"; hi.register(stringAsSequence);
+import {iterableAsSequence} from "./core/iterableAsSequence"; hi.register(iterableAsSequence);
+import {objectAsSequence} from "./core/objectAsSequence"; hi.register(objectAsSequence);
+
 // Function registry
 import {any} from "./functions/any"; hi.register(any);
 import {anyPass} from "./functions/anyPass"; hi.register(anyPass);
