@@ -2,6 +2,8 @@ import {asSequence} from "../core/asSequence";
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
+import {copyable} from "./copyable";
+
 export const ForwardJoinSequence = Sequence.extend({
     constructor: function ForwardJoinSequence(
         source, delimiter, frontSource = undefined,
@@ -210,9 +212,7 @@ export const join = wrap({
         ordered: [wrap.expecting.sequence, wrap.expecting.sequence]
     },
     implementation: (source, delimiter) => {
-        // Delimiter must be copyable.
-        if(!delimiter.copy) delimiter.forceEager();
-        return new ForwardJoinSequence(source, delimiter);
+        return new ForwardJoinSequence(source, copyable.implementation(delimiter));
     },
 });
 

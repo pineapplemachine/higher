@@ -43,11 +43,12 @@ import {args} from "./core/arguments";
 hi.args = args;
 
 import {
-    asSequence, validAsSequence, validAsBoundedSequence
+    asSequence, validAsSequence, validAsBoundedSequence, validAsUnboundedSequence
 } from "./core/asSequence";
 hi.asSequence = asSequence;
 hi.validAsSequence = validAsSequence;
 hi.validAsBoundedSequence = validAsBoundedSequence;
+hi.validAsUnboundedSequence = validAsUnboundedSequence;
 
 import {
     AssertError, assert, assertNot, assertUndefined, assertEqual, assertSeqEqual
@@ -66,20 +67,21 @@ import {constants} from "./core/constants";
 hi.constants = constants;
 
 import {error} from "./core/error";
-hi.error = error;
+hi.error = error; // This attribute will contain all error types
 
 import {isSequence, Sequence} from "./core/sequence";
 hi.isSequence = isSequence;
 hi.Sequence = Sequence;
-hi.sequence = Sequence.types;
+hi.sequence = Sequence.types; // This attribute will contain all sequence types
 
 import {
-    isUndefined, isBoolean, isNumber, isString, isArray,
+    isUndefined, isBoolean, isNumber, isInteger, isString, isArray,
     isObject, isFunction, isIterable
 } from "./core/types";
 hi.isUndefined = isUndefined;
 hi.isBoolean = isBoolean;
 hi.isNumber = isNumber;
+hi.isInteger = isInteger;
 hi.isString = isString;
 hi.isArray = isArray;
 hi.isObject = isObject;
@@ -88,6 +90,12 @@ hi.isIterable = isIterable;
 
 import {wrap} from "./core/wrap";
 hi.wrap = wrap;
+
+// Core sequence types
+import {arrayAsSequence} from "./core/arrayAsSequence"; hi.register(arrayAsSequence);
+import {stringAsSequence} from "./core/stringAsSequence"; hi.register(stringAsSequence);
+import {iterableAsSequence} from "./core/iterableAsSequence"; hi.register(iterableAsSequence);
+import {objectAsSequence} from "./core/objectAsSequence"; hi.register(objectAsSequence);
 
 // Function registry
 import {any} from "./functions/any"; hi.register(any);
@@ -100,14 +108,17 @@ import {benchmark} from "./functions/benchmark"; hi.register(benchmark);
 import {bigrams} from "./functions/bigrams"; hi.register(bigrams);
 import {coalesce} from "./functions/coalesce"; hi.register(coalesce);
 import {chunk} from "./functions/chunk"; hi.register(chunk);
+import {collapse} from "./functions/collapse"; hi.register(collapse);
 import {concat} from "./functions/concat"; hi.register(concat);
 import {consume} from "./functions/consume"; hi.register(consume);
 import {containsElement} from "./functions/containsElement"; hi.register(containsElement);
+import {copyable} from "./functions/copyable"; hi.register(copyable);
 import {count} from "./functions/count"; hi.register(count);
 import {distinct} from "./functions/distinct"; hi.register(distinct);
 import {dropHead} from "./functions/dropHead"; hi.register(dropHead);
 import {dropTail} from "./functions/dropTail"; hi.register(dropTail);
 import {each} from "./functions/each"; hi.register(each);
+import {eager} from "./functions/eager"; hi.register(eager);
 import {empty} from "./functions/empty"; hi.register(empty);
 import {endsWith} from "./functions/endsWith"; hi.register(endsWith);
 import {enumerate} from "./functions/enumerate"; hi.register(enumerate);

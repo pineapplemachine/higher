@@ -2,6 +2,10 @@ import {Sequence} from "../core/sequence";
 import {FiniteRepeatElementSequence} from "./repeatElement";
 import {wrap} from "../core/wrap";
 
+import {BoundsUnknownError} from "../errors/BoundsUnknownError";
+
+import {mustSupport} from "./mustSupport";
+
 export const PadLeftSequence = Sequence.extend({
     constructor: function PadLeftSequence(
         source, padElement, padTotal, padCount = undefined
@@ -185,12 +189,7 @@ export const SequencePadder = function(source){
 SequencePadder.prototype.constructor = SequencePadder;
 Object.assign(SequencePadder.prototype, {
     left: function(length, element){
-        if(this.source.unbounded()){
-            return this.source;
-        }else if(!this.source.bounded()){
-            throw "Failed to pad sequence: Input must be known bounded or unbounded.";
-        }
-        if(!this.source.length) this.source.forceEager();
+        this.source = mustSupport(this.source, "length");
         const sourceLength = this.source.length();
         const targetLength = +length;
         if(sourceLength >= targetLength){
@@ -210,9 +209,11 @@ Object.assign(SequencePadder.prototype, {
         if(this.source.unbounded()){
             return this.source;
         }else if(!this.source.bounded()){
-            throw "Failed to pad sequence: Input must be known bounded or unbounded.";
+            throw BoundsUnknownError(this.source, {
+                message: "Failed to right pad sequence",
+            });
         }
-        if(!this.source.length) this.source.forceEager();
+        this.source = mustSupport(this.source, "length");
         const sourceLength = this.source.length();
         const targetLength = +length;
         if(sourceLength >= targetLength){

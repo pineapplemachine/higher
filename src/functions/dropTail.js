@@ -1,5 +1,10 @@
+import {ArraySequence} from "../core/arrayAsSequence";
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
+
+import {BoundsUnknownError} from "../errors/BoundsUnknownError";
+
+import {EmptySequence} from "./empty";
 
 export const DropTailSequence = Sequence.extend({
     constructor: function DropTailSequence(dropElements, source, frontIndex = 0){
@@ -75,17 +80,26 @@ export const dropTail = wrap({
         }
     },
     implementation: (dropElements, source) => {
-        if(dropElements <= 0){
+        if(dropElements <= 0 || source.unbounded()){
             return source;
-        }else if(source.slice && source.length){
-            return source.slice(0, source.length() - dropElements);
         }else if(source.length){
-            return new DropTailSequence(dropElements, source);
+            const sourceLength = source.length();
+            if(dropElements >= sourceLength){
+                return new EmptySequence();
+            }else if(source.slice){
+                return source.slice(0, sourceLength - dropElements);
+            }else{
+                return new DropTailSequence(dropElements, source);
+            }
         }else if(source.bounded()){
-            source.forceEager();
-            return source.slice(0, source.length() - dropElements);
+            // TODO: Can this be delayed until the range is actually consumed?
+            const array = [];
+            for(const element of source) array.push(element);
+            return new ArraySequence(array).slice(0, array.length - dropElements);
         }else{
-            throw "Failed to drop sequence tail: Input is not known to be bounded.";
+            throw BoundsUnknownError(source, {
+                message: "Failed to drop sequence tail"
+            });
         }
     },
 });

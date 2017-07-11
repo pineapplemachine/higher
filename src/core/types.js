@@ -10,6 +10,10 @@ export const isNumber = (value) => {
     return value.constructor === Number;
 };
 
+export const isInteger = (value) => {
+    return Number.isInteger(value);
+};
+
 export const isString = (value) => {
     return value.constructor === String;
 };

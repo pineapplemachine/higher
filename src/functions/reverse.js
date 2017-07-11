@@ -1,5 +1,21 @@
+import {error} from "../core/error";
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
+
+import {mustSupport} from "./mustSupport";
+
+export const ReverseError = error({
+    summary: "Failed to reverse sequence because it was not bidirectional nor known to be bounded.",
+    constructor: function ReverseError(sequence){
+        this.sequence = sequence;
+        this.message = (
+            "Only sequences that are bidirectional or known to be bounded " +
+            "may be reversed using a ReverseSequence. " +
+            "The 'assumeBounded' method can be used to fix this error if " +
+            "the input sequence is surely bounded."
+        );
+    },
+});
 
 export const ReverseSequence = Sequence.extend({
     constructor: function ReverseSequence(source){
@@ -96,13 +112,10 @@ export const reverse = wrap({
     implementation: (source) => {
         if(source instanceof ReverseSequence){
             return source.source;
-        }else if(source.back){
-            return new ReverseSequence(source);
         }else if(source.bounded()){
-            source.forceEager();
-            return new ReverseSequence(source);
+            return new ReverseSequence(mustSupport(source, "back"));
         }else{
-            throw "Failed to reverse sequence: Can't reverse unidirectional unbounded sequence.";
+            throw ReverseError(source);
         }
     },
 });

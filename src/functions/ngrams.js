@@ -1,4 +1,4 @@
-import {ArraySequence} from "../core/asSequence";
+import {ArraySequence} from "../core/arrayAsSequence";
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 

@@ -1,7 +1,6 @@
+import {ArraySequence} from "../core/arrayAsSequence";
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
-
-import {ArraySequence} from "../core/asSequence";
 
 // https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_.22inside-out.22_algorithm
 

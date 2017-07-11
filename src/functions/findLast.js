@@ -3,8 +3,9 @@ import {constants} from "../core/constants";
 import {canGetLength, getLength} from "../core/length";
 import {wrap} from "../core/wrap";
 
-import {FindSequenceResult, BackwardFindSequenceThread, stepFindThreads} from "./findAll";
 import {equals} from "./equals";
+import {FindSequenceResult, BackwardFindSequenceThread, stepFindThreads} from "./findAll";
+import {mustSupport} from "./mustSupport";
 
 // Find the last occurrence of a substring as judged by a comparison function.
 export const findLast = wrap({
@@ -18,8 +19,8 @@ export const findLast = wrap({
         }
     },
     implementation: (compare, sequences) => {
-        const source = sequences[0];
-        const search = sequences[1];
+        let source = sequences[0];
+        let search = sequences[1];
         const compareFunc = compare || constants.defaults.comparisonFunction;
         // Handle empty or unbounded search subject
         if(search.done() || search.unbounded()){
@@ -36,13 +37,9 @@ export const findLast = wrap({
             }
         }
         // Source sequence absolutely must be bidirectional and have known length
-        if(!source.length || !source.back){
-            source.forceEager();
-        }
-        // Search sequence absolutely must be copyable and bidirectional
-        if(!search.copy || !search.back){
-            search.forceEager();
-        }
+        source = mustSupport(source, "length", "back");
+        // Search sequence absolutely must be bidirectional and copyable
+        search = mustSupport(source, "copy", "back");
         const searchElement = search.nextBack();
         // Handle single-element search subject
         if(search.done()){
