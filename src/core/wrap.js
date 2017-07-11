@@ -19,6 +19,7 @@ export const wrap = function(info){
     fancy.errors = info.errors;
     fancy.args = info.arguments;
     fancy.implementation = info.implementation;
+    fancy.summary = info.summary;
     fancy.docs = wrap.cleanDocs(info);
     fancy.tests = info.tests;
     fancy.test = wrap.testRunner(fancy.name, info);
@@ -34,6 +35,12 @@ export const wrap = function(info){
     }
     if(info.attachSequence){
         Sequence.attach(fancy);
+    }
+    if(info.asSequence){
+        const converter = Object.assign(
+            {transform: info.implementation}, info.asSequence
+        );
+        asSequence.addConverter(converter);
     }
     return fancy;
 };
@@ -62,6 +69,16 @@ Object.assign(wrap, {
                 return value;
             }
         },
+        array: (value) => {
+            if(!isArray(value)){
+                throw "Expecting an array.";
+            }else{
+                return value;
+            }
+        },
+        string: (value) => {
+            return value.toString();
+        },
         iterable: (value) => {
             if(!isIterable(value)){
                 throw "Expecting an iterable.";
@@ -76,6 +93,21 @@ Object.assign(wrap, {
                 return asSequence(value);
             }
         },
+        oneOf: (options) => ((value) => {
+            for(const option of options){
+                if(value === option) return option;
+            }
+            throw `Expecting one of ${options.join(", ")}.`;
+        }),
+        arrayOf: (each) => ((value) => {
+            if(!isArray(value)){
+                throw "Expecting an array."
+            }
+            for(let i = 0; i < value.length; i++){
+                value[i] = each(value[i]);
+            }
+            return value;
+        }),
     },
     fancy: function(info){
         if(info.arguments.none || info.arguments.anything){
