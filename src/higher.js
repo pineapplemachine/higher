@@ -74,12 +74,13 @@ hi.Sequence = Sequence;
 hi.sequence = Sequence.types;
 
 import {
-    isUndefined, isBoolean, isNumber, isString, isArray,
+    isUndefined, isBoolean, isNumber, isInteger, isString, isArray,
     isObject, isFunction, isIterable
 } from "./core/types";
 hi.isUndefined = isUndefined;
 hi.isBoolean = isBoolean;
 hi.isNumber = isNumber;
+hi.isInteger = isInteger;
 hi.isString = isString;
 hi.isArray = isArray;
 hi.isObject = isObject;
