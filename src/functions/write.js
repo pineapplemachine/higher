@@ -5,7 +5,7 @@ import {wrap} from "../core/wrap";
 import {NotBoundedError} from "../errors/NotBoundedError";
 
 export const WriteTargetError = error({
-    url: "", // TODO
+    summary: "Write failed because the target was not an array.",
     constructor: function WriteTargetError(target){
         this.target = target;
         this.message = (
