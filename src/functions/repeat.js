@@ -1,7 +1,6 @@
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
-import {EagerSequence} from "./eager";
 import {EmptySequence} from "./empty";
 
 export const FiniteRepeatSequence = Sequence.extend({
