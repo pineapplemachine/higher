@@ -1,4 +1,5 @@
 import {asSequence} from "./asSequence";
+import {error} from "./error";
 import {isSequence} from "./sequence";
 import {isArray, isFunction, isUndefined} from "./types";
 
@@ -8,17 +9,17 @@ const assertMessage = (message, value) => (isFunction(message) ?
     message(value) : (message || "Assertion error")
 );
 
-export const AssertError = function(message, value = undefined){
-    this.message = message;
-    this.value = value;
-};
-
-AssertError.prototype = Object.create(Error.prototype);
-AssertError.prototype.constructor = AssertError;
+export const AssertError = error({
+    url: "", // TODO
+    constructor: function(message, value = undefined){
+        this.message = message;
+        this.value = value;
+    },
+});
 
 // Throw an error if the condition isn't met.
 export const assert = function(condition, message = undefined){
-    if(!condition) throw new AssertError(
+    if(!condition) throw AssertError(
         assertMessage(message, condition), condition
     );
     return condition;
@@ -26,7 +27,7 @@ export const assert = function(condition, message = undefined){
 
 // Throw an error if the condition is met.
 export const assertNot = function(condition, message = undefined){
-    if(condition) throw new AssertError(
+    if(condition) throw AssertError(
         assertMessage(message, condition), condition
     );
     return condition;
@@ -34,7 +35,7 @@ export const assertNot = function(condition, message = undefined){
 
 // Throw an error if the input value isn't undefined.
 export const assertUndefined = function(value, message = undefined){
-    if(!isUndefined(value)) throw new AssertError(
+    if(!isUndefined(value)) throw AssertError(
         assertMessage(message, value), value
     );
     return value;
@@ -43,7 +44,7 @@ export const assertUndefined = function(value, message = undefined){
 // Throw an error if all the given values aren't equal.
 export const assertEqual = function(...values){
     for(let i = 1; i < values.length; i++){
-        if(values[i] !== values[0]) throw new AssertError(
+        if(values[i] !== values[0]) throw AssertError(
             "Values must be equal.", values
         );
     }
@@ -63,7 +64,9 @@ export const assertSeqEqual = function(sequenceA, sequenceB){
             return a === b;
         }
     };
-    return compare(sequenceA, sequenceB);
+    if(!compare(sequenceA, sequenceB)) throw AssertError(
+        "Sequences must be equal.", [sequenceA, sequenceB]
+    );
 };
 
 export default assert;
