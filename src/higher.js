@@ -11,10 +11,13 @@ Object.assign(hi, {
     error: {},
     // Sequence types will be placed here.
     sequence: {},
+    // Registered functions will be placed here.
+    functions: [],
     
     // Receives an object or objects returned by the wrap function.
     register: function(...fancyFunctions){
         for(const fancy of fancyFunctions){
+            this.functions.push(fancy);
             for(const name of fancy.names){
                 this[name] = fancy;
                 if(fancy.async){
@@ -23,6 +26,15 @@ Object.assign(hi, {
             }
         }
         return fancyFunctions[0];
+    },
+    
+    // Run all tests
+    test: process.env.NODE_ENV !== "development" ? undefined : function(){
+        const result = {};
+        for(const func of this.functions){
+            if(func.test) result[func.name] = func.test(this);
+        }
+        return result;
     },
 });
 
