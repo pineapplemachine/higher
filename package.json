@@ -34,7 +34,7 @@
         "build": "nwb build-web-module",
         "clean": "nwb clean-module && nwb clean-demo",
         "start": "nwb serve-react-demo",
-        "test": "nwb build && node lib/test/testRunner.js",
+        "test": "export NODE_ENV='development' && nwb build && node lib/test/testRunner.js",
         "test:coverage": "nwb test --coverage",
         "test:watch": "nwb test --server"
     }
