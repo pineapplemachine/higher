@@ -69,4 +69,15 @@ export const assertSeqEqual = function(sequenceA, sequenceB){
     );
 };
 
+export const assertEmpty = function(source, message = undefined){
+    const sequence = asSequence(source);
+    if(sequence.done() &&
+        (!sequence.length || sequence.length() === 0) &&
+        (!sequence.left || sequence.left() === 0)
+    ) return source;
+    throw AssertError(
+        assertMessage(message || "Sequence must be empty.", source), source
+    );
+};
+
 export default assert;
