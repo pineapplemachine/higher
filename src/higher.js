@@ -30,9 +30,16 @@ Object.assign(hi, {
     
     // Run all tests
     test: process.env.NODE_ENV !== "development" ? undefined : function(){
-        const result = {};
+        const result = {
+            functions: {},
+            failures: [],
+        };
         for(const func of this.functions){
-            if(func.test) result[func.name] = func.test(this);
+            if(func.test){
+                const status = func.test(this);
+                result.functions[func.name] = status;
+                for(const failure of status.fail) result.failures.push(failure);
+            }
         }
         return result;
     },
@@ -43,23 +50,25 @@ import {args} from "./core/arguments";
 hi.args = args;
 
 import {
-    asSequence, validAsSequence, validAsBoundedSequence, validAsUnboundedSequence
+    asSequence, validAsSequence, validAsImplicitSequence,
+    validAsBoundedSequence, validAsUnboundedSequence
 } from "./core/asSequence";
 hi.asSequence = asSequence;
 hi.validAsSequence = validAsSequence;
+hi.validAsImplicitSequence = validAsImplicitSequence;
 hi.validAsBoundedSequence = validAsBoundedSequence;
 hi.validAsUnboundedSequence = validAsUnboundedSequence;
 
 import {
     AssertError, assert, assertNot, assertUndefined,
-    assertEqual, assertSeqEqual, assertEmpty, assertFail
+    assertEqual, assertNotEqual, assertEmpty, assertFail
 } from "./core/assert";
 hi.error.AssertError = AssertError;
 hi.assert = assert;
 hi.assertNot = assertNot;
 hi.assertUndefined = assertUndefined;
 hi.assertEqual = assertEqual;
-hi.assertSeqEqual = assertSeqEqual;
+hi.assertNotEqual = assertNotEqual;
 hi.assertEmpty = assertEmpty;
 hi.assertFail = assertFail;
 

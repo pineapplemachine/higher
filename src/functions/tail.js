@@ -86,7 +86,7 @@ export const tail = wrap({
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {
-            hi.assertSeqEqual(hi.tail(3, [0, 1, 2, 3, 4, 5]), [3, 4, 5]);
+            hi.assertEqual(hi.tail(3, [0, 1, 2, 3, 4, 5]), [3, 4, 5]);
         },
         "zeroLength": hi => {
             hi.assertEmpty(hi.tail(0, []));
@@ -102,30 +102,30 @@ export const tail = wrap({
         },
         "boundedSlicingInput": hi => {
             const array = [0, 1, 2, 3, 4, 5, 6, 7];
-            hi.assertSeqEqual(hi.tail(1, array), [7]);
-            hi.assertSeqEqual(hi.tail(2, array), [6, 7]);
-            hi.assertSeqEqual(hi.tail(4, array), [4, 5, 6, 7]);
-            hi.assertSeqEqual(hi.tail(8, array), [0, 1, 2, 3, 4, 5, 6, 7]);
-            hi.assertSeqEqual(hi.tail(20, array), [0, 1, 2, 3, 4, 5, 6, 7]);
+            hi.assertEqual(hi.tail(1, array), [7]);
+            hi.assertEqual(hi.tail(2, array), [6, 7]);
+            hi.assertEqual(hi.tail(4, array), [4, 5, 6, 7]);
+            hi.assertEqual(hi.tail(8, array), [0, 1, 2, 3, 4, 5, 6, 7]);
+            hi.assertEqual(hi.tail(20, array), [0, 1, 2, 3, 4, 5, 6, 7]);
         },
         "unboundedBidirectionalInput": hi => {
             const seq = () => hi.repeat([0, 1, 2, 3]);
             hi.assertEmpty(seq().tail(0));
-            hi.assertSeqEqual(seq().tail(1), [3]);
-            hi.assertSeqEqual(seq().tail(2), [2, 3]);
-            hi.assertSeqEqual(seq().tail(4), [0, 1, 2, 3]);
-            hi.assertSeqEqual(seq().tail(6), [2, 3, 0, 1, 2, 3]);
+            hi.assertEqual(seq().tail(1), [3]);
+            hi.assertEqual(seq().tail(2), [2, 3]);
+            hi.assertEqual(seq().tail(4), [0, 1, 2, 3]);
+            hi.assertEqual(seq().tail(6), [2, 3, 0, 1, 2, 3]);
         },
         "boundedNonSlicingInput": hi => {
             const seq = () => (
                 hi.recur(i => i + 1).seed(0).until(i => i >= 8).assumeBounded()
             );
             hi.assertEmpty(seq().tail(0));
-            hi.assertSeqEqual(seq().tail(1), [7]);
-            hi.assertSeqEqual(seq().tail(2), [6, 7]);
-            hi.assertSeqEqual(seq().tail(4), [4, 5, 6, 7]);
-            hi.assertSeqEqual(seq().tail(8), [0, 1, 2, 3, 4, 5, 6, 7]);
-            hi.assertSeqEqual(seq().tail(20), [0, 1, 2, 3, 4, 5, 6, 7]);
+            hi.assertEqual(seq().tail(1), [7]);
+            hi.assertEqual(seq().tail(2), [6, 7]);
+            hi.assertEqual(seq().tail(4), [4, 5, 6, 7]);
+            hi.assertEqual(seq().tail(8), [0, 1, 2, 3, 4, 5, 6, 7]);
+            hi.assertEqual(seq().tail(20), [0, 1, 2, 3, 4, 5, 6, 7]);
         },
         "illegalInput": hi => {
             hi.assertFail(

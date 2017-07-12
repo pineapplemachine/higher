@@ -69,6 +69,7 @@ export const iterableAsSequence = wrap({
     asSequence: {
         // Extremely low priority converter due to how generic it is.
         // Second-last priority of all core converters, before objectAsSequence.
+        implicit: true,
         priority: 800,
         predicate: isIterable,
         bounded: () => false,
