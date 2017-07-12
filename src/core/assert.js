@@ -69,4 +69,27 @@ export const assertSeqEqual = function(sequenceA, sequenceB){
     );
 };
 
+export const assertEmpty = function(source, message = undefined){
+    const sequence = asSequence(source);
+    if(sequence.done() &&
+        (!sequence.length || sequence.length() === 0) &&
+        (!sequence.left || sequence.left() === 0)
+    ) return source;
+    throw AssertError(
+        assertMessage(message || "Sequence must be empty.", source), source
+    );
+};
+
+export const assertFail = function(predicate, callback){
+    try{
+        callback();
+    }catch(error){
+        if(predicate(error)) return error;
+        throw AssertError(
+            "Function must throw an error satisfying the predicate.", callback
+        );
+    }
+    throw AssertError("Function must throw an error.", callback);
+};
+
 export default assert;

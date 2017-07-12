@@ -51,7 +51,8 @@ hi.validAsBoundedSequence = validAsBoundedSequence;
 hi.validAsUnboundedSequence = validAsUnboundedSequence;
 
 import {
-    AssertError, assert, assertNot, assertUndefined, assertEqual, assertSeqEqual
+    AssertError, assert, assertNot, assertUndefined,
+    assertEqual, assertSeqEqual, assertEmpty, assertFail
 } from "./core/assert";
 hi.error.AssertError = AssertError;
 hi.assert = assert;
@@ -59,6 +60,8 @@ hi.assertNot = assertNot;
 hi.assertUndefined = assertUndefined;
 hi.assertEqual = assertEqual;
 hi.assertSeqEqual = assertSeqEqual;
+hi.assertEmpty = assertEmpty;
+hi.assertFail = assertFail;
 
 import {callAsync} from "./core/callAsync";
 hi.callAsync = callAsync;
