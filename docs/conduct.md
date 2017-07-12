@@ -9,3 +9,18 @@ While using or contributing to higher, please observe that:
 **Higher is a cooperative endeavor.** Respect and understanding is absolutely necessary to sustain a cooperative environment. Remain aware of how your own way of working is affecting other people. And it's not a competition, so don't undercut other people's efforts.
 
 Those who do not so observe may be disallowed from contributing to higher.
+
+**Examples of appropriate behavior include:**
+
+- Giving constructive feedback and criticism to other contributors.
+- Helping others to feel welcome in sharing their perspective.
+- Using inclusive language.
+
+**Examples of inappropriate behavior include:**
+
+- Trivializing the experiences and perspectives of others.
+- Insulting others, their contributions, or their opinions.
+- Using slurs or making bigoted remarks or jokes.
+- Revealing others' personal information without their consent.
+
+**If someone is acting inappropriately,** please contact one of the project owners, [@pineapplemachine](https://github.com/pineapplemachine) or [@jpsullivan](https://github.com/jpsullivan).
