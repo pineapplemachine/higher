@@ -14,6 +14,13 @@ export const ArraySequence = Sequence.extend({
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         methods: {},
     },
+    getSequence: process.env.NODE_ENV !== "development" ? undefined : [
+        hi => new ArraySequence([]),
+        hi => new ArraySequence([0]),
+        hi => new ArraySequence(["hello", "world"]),
+        hi => new ArraySequence([0, 1, 2, 3, 4, 5, 6]),
+        hi => new ArraySequence([[0, 1], [1, 2]]),
+    ],
     constructor: function ArraySequence(
         source, lowIndex = undefined, highIndex = undefined,
         frontIndex = undefined, backIndex = undefined
