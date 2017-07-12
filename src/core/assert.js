@@ -1,5 +1,6 @@
 import {asSequence} from "./asSequence";
 import {error} from "./error";
+import {isEqual} from "./isEqual";
 import {isSequence} from "./sequence";
 import {isArray, isFunction, isUndefined} from "./types";
 
@@ -43,30 +44,19 @@ export const assertUndefined = function(value, message = undefined){
 
 // Throw an error if all the given values aren't equal.
 export const assertEqual = function(...values){
-    for(let i = 1; i < values.length; i++){
-        if(values[i] !== values[0]) throw AssertError(
-            "Values must be equal.", values
-        );
-    }
-    return values[0];
+    if(values.length === 0) return undefined;
+    if(!isEqual(...values)) throw AssertError(
+        "Values must be equal.", values
+    );
+    return values;
 };
 
-// Throw an error if the elements of two sequences aren't equal.
-// Compares elements recursively, i.e. if the inputs are sequences of sequences
-// then those corresponding contained sequences are checked for equality, too.
-export const assertSeqEqual = function(sequenceA, sequenceB){
-    const compare = (a, b) => {
-        if(isSequence(a) || isSequence(b) || isArray(a) || isArray(b)){
-            return equals.implementation(compare, [
-                asSequence(a), asSequence(b)
-            ]);
-        }else{
-            return a === b;
-        }
-    };
-    if(!compare(sequenceA, sequenceB)) throw AssertError(
-        "Sequences must be equal.", [sequenceA, sequenceB]
+export const assertNotEqual = function(...values){
+    if(values.length === 0) return undefined;
+    if(isEqual(...values)) throw AssertError(
+        "Values must not be equal.", values
     );
+    return values;
 };
 
 export const assertEmpty = function(source, message = undefined){

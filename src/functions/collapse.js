@@ -183,7 +183,7 @@ export const collapse = wrap({
         "basicUsage": hi => {
             const array = [1, 2, 3, 4, 5];
             hi.map(array, n => n * n).collapse();
-            hi.assertSeqEqual(array, [1, 4, 9, 16, 25]);
+            hi.assertEqual(array, [1, 4, 9, 16, 25]);
         },
     },
 });

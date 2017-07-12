@@ -2,12 +2,20 @@ import {constants} from "./constants";
 import {isIterable, isObject} from "./types";
 import {isSequence} from "./sequence";
 
-// True when asSequence(value) would return a sequence.
+// True when asSequence(value) could return a sequence.
 export const validAsSequence = (value) => {
     // Easy short-circuit for core sequence converters
     if(isIterable(value) || isObject(value)) return true;
     for(const converter of asSequence.converters){
         if(converter.predicate(value)) return true;
+    }
+    return false;
+};
+
+export const validAsImplicitSequence = (value) => {
+    if(isSequence(value)) return true;
+    for(const converter of asSequence.converters){
+        if(converter.predicate(value)) return converter.implicit;
     }
     return false;
 };

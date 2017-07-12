@@ -92,6 +92,7 @@ export const stringAsSequence = wrap({
     async: false,
     asSequence: {
         // Comes after only array conversion and before generic iterable conversion.
+        implicit: false,
         priority: -800,
         predicate: isString,
         bounded: () => true,

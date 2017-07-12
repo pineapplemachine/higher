@@ -156,6 +156,7 @@ export const objectAsSequence = wrap({
     asSequence: {
         // Extremely low priority converter due to how generic it is.
         // Last priority of all core converters.
+        implicit: false,
         priority: 1000,
         predicate: isObject,
         bounded: () => true,
