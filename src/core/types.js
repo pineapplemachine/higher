@@ -7,7 +7,7 @@ export const isBoolean = (value) => {
 };
 
 export const isNumber = (value) => {
-    return value.constructor === Number;
+    return typeof(value) === "number";
 };
 
 export const isInteger = (value) => {
@@ -15,7 +15,7 @@ export const isInteger = (value) => {
 };
 
 export const isString = (value) => {
-    return value.constructor === String;
+    return typeof(value) === "string";
 };
 
 export const isArray = (value) => {
@@ -31,13 +31,14 @@ export const isFunction = (value) => {
 };
 
 export const isIterable = (value) => {
-    return isFunction(value[Symbol.iterator]);
+    return value && isFunction(value[Symbol.iterator]);
 };
 
 export default {
     isUndefined,
     isBoolean,
     isNumber,
+    isInteger,
     isString,
     isArray,
     isObject,
