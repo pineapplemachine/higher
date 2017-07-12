@@ -6,7 +6,7 @@ import {EmptySequence} from "./empty";
 
 export const TailError = error({
     summary: "Failed to get tail of sequence.",
-    constructor: function WriteTargetError(source){
+    constructor: function TailError(source){
         this.source = source;
         this.message = (
             "The tail operation is supported only for sequences that are either " +
@@ -126,6 +126,12 @@ export const tail = wrap({
             hi.assertSeqEqual(seq().tail(4), [4, 5, 6, 7]);
             hi.assertSeqEqual(seq().tail(8), [0, 1, 2, 3, 4, 5, 6, 7]);
             hi.assertSeqEqual(seq().tail(20), [0, 1, 2, 3, 4, 5, 6, 7]);
+        },
+        "illegalInput": hi => {
+            hi.assertFail(
+                error => error.type === "TailError",
+                () => hi.recur(i => i + 1).tail(10)
+            );
         },
     },
 });

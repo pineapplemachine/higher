@@ -80,4 +80,16 @@ export const assertEmpty = function(source, message = undefined){
     );
 };
 
+export const assertFail = function(predicate, callback){
+    try{
+        callback();
+    }catch(error){
+        if(predicate(error)) return error;
+        throw AssertError(
+            "Function must throw an error satisfying the predicate.", callback
+        );
+    }
+    throw AssertError("Function must throw an error.", callback);
+};
+
 export default assert;
