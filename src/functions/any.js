@@ -1,12 +1,25 @@
 import {wrap} from "../core/wrap";
 
-// Get whether any element in a sequence matches a predicate or,
-// if no predicate is provided, whether any of the elements are truthy.
-// With no predicate, returns the first truthy element, or false if there
-// is no truthy element.
-// Returns false when the input is an empty sequence.
 export const any = wrap({
     name: "any",
+    summary: "Get whether any elements in a sequence satisfy a predicate.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        detail: (`
+            Get whether any of the elements in an input sequence satisfy an
+            optional predicate or, if no predicate was provided, whether any
+            elements of the input are truthy.
+        `),
+        expects: (`
+            The function expects as input a sequence known to be bounded and
+            an optional predicate function to apply to each element.
+        `),
+        returns: (`
+            The function returns @true when any element in the sequence
+            satisfied the predicate or, if no predicate was given, if any of the
+            elements were truthy. The function returns @false otherwise, or
+            if the sequence was empty.
+        `),
+    },
     attachSequence: true,
     async: true,
     arguments: {
@@ -18,10 +31,16 @@ export const any = wrap({
     },
     implementation: (predicate, source) => {
         if(predicate){
+            NotBoundedError.enforce(source, {
+                message: "Failed to determine whether any elements satisfied the predicate"
+            });
             for(const element of source){
                 if(predicate(element)) return true;
             }
         }else{
+            NotBoundedError.enforce(source, {
+                message: "Failed to determine whether any elements were truthy"
+            });
             for(const element of source){
                 if(element) return element;
             }
