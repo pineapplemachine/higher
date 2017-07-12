@@ -342,10 +342,10 @@ Object.assign(wrap, {
                     test(hi);
                 }catch(error){
                     success = false;
-                    result.fail.push({test: testName, error: error});
+                    result.fail.push({name: testName, error: error});
                 }
                 if(success){
-                    result.pass.push({test: testName});
+                    result.pass.push({name: testName});
                 }
             }
             return result;
