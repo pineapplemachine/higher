@@ -2,13 +2,20 @@ import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 export const TapSequence = Sequence.extend({
+    summary: "Enumerate elements of the input, invoking a callback per element when consumed.",
+    supportsWith: [
+        "length", "left", "back", "index", "slice", "has", "get", "copy", "reset"
+    ],
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        detail: (`
+            Enumerates the elements of the source sequence and invokes a callback
+            every time an element is popped from the front or back, passing the
+            popped element as an argument to that callback.
+        `),
+    },
     constructor: function TapSequence(callback, source){
         this.callback = callback;
         this.source = source;
-        this.frontValue = null;
-        this.backValue = null;
-        this.cachedFront = false;
-        this.cachedBack = false;
         this.maskAbsentMethods(source);
     },
     bounded: function(){
@@ -27,24 +34,16 @@ export const TapSequence = Sequence.extend({
         return this.source.left();
     },
     front: function(){
-        this.frontValue = this.source.front();
-        this.cachedFront = true;
-        return this.frontValue;
+        return this.source.front();
     },
     popFront: function(){
-        this.callback(this.cachedFront ? this.frontValue : this.source.front());
-        this.source.popFront();
-        this.cachedFront = false;
+        return this.callback(this.source.nextFront());
     },
     back: function(){
-        this.backValue = this.source.back();
-        this.cachedBack = true;
-        return this.backValue;
+        return this.source.back();
     },
     popBack: function(){
-        this.callback(this.cachedBack ? this.backValue : this.source.back());
-        this.source.popBack();
-        this.cachedBack = false;
+        return this.callback(this.source.nextBack());
     },
     index: function(i){
         return this.source.index(i);
@@ -59,11 +58,7 @@ export const TapSequence = Sequence.extend({
         return this.source.get(i);
     },
     copy: function(){
-        const copy = new TapSequence(this.callback, this.source.copy());
-        copy.frontValue = this.frontValue;
-        copy.backValue = this.backValue;
-        copy.cachedFront = this.cachedFront;
-        copy.cachedBack = this.cachedBack;
+        return new TapSequence(this.callback, this.source.copy());
     },
     reset: function(){
         this.source.reset();
@@ -79,6 +74,25 @@ export const TapSequence = Sequence.extend({
 // as opposed to the sequence being consumed immediately.
 export const tap = wrap({
     name: "tap",
+    summary: "Get a sequence invoking a callback for each element of the input.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        expects: (`
+            The function expects a sequence and a callback as input.
+            The callback will be invoked once for every element in the input
+            sequence, receiving that element as an argument.
+            There are no limitations on what sequence the function will accept.
+        `),
+        returns: (`
+            A new @TapSequence which will apply the callback to every element
+            of the input at the time that the element is consumed.
+        `),
+        examples: [
+            "basicUsage"
+        ],
+        related: [
+            "each"
+        ],
+    },
     attachSequence: true,
     async: false,
     sequences: [
@@ -92,6 +106,19 @@ export const tap = wrap({
     },
     implementation: (callback, source) => {
         return new TapSequence(callback, source);
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": hi => {
+            let sum = 0;
+            const array = [1, 2, 3, 4];
+            const seq = hi.tap(array, i => {sum += i;});
+            hi.assert(seq.front() === 1);
+            hi.assert(sum === 0);
+            seq.popFront(); // Invoke callback for the first element
+            hi.assert(sum === 1);
+            while(!seq.done()) seq.popFront();
+            hi.assert(sum === 1 + 2 + 3 + 4);
+        },
     },
 });
 
