@@ -45,7 +45,16 @@ export const asSequence = (value) => {
     for(const converter of asSequence.converters){
         if(converter.predicate(value)) return converter.transform(value);
     }
-    // TODO: Is it better to return undefined or to throw an error in this case?
+    return undefined;
+};
+
+export const asImplicitSequence = (value) => {
+    if(isSequence(value)) return value;
+    for(const converter of asSequence.converters){
+        if(converter.implicit && converter.predicate(value)){
+            return converter.transform(value);
+        }
+    }
     return undefined;
 };
 

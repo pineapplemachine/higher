@@ -1,39 +1,12 @@
 import {asImplicitSequence} from "../core/asSequence";
-import {error} from "../core/error";
 import {isArray, isObject} from "../core/types";
 import {wrap} from "../core/wrap";
 
-import {NotBoundedError} from "../errors/NotBoundedError";
+import {asObject, ObjectError} from "./object";
 
-export const asObject = (pairs) => {
-    if(!pairs.bounded()) throw NotBoundedError(pairs, {
-        message: "Failed to create object from sequence"
-    });
-    const result = {};
-    for(const pair of pairs){
-        if("key" in pair){
-            result[pair.key] = pair.value;
-        }else if(pair.length && isArray(pair)){
-            result[pair[0]] = pair[1];
-        }
-    }
-    return result;
-};
-
-export const ObjectError = error({
-    summary: "Failed to create object because the input was not a sequence nor object.",
-    constructor: function ObjectError(source){
-        this.source = source;
-        this.message = (
-            "Failed to create object from key, value pairs because the input was " +
-            "not a bounded sequence of key, value pairs nor itself an object."
-        );
-    },
-});
-
-export const object = wrap({
-    name: "object",
-    summary: "Get an object from key, value pairs.",
+export const newObject = wrap({
+    name: "newObject",
+    summary: "Get a new object from key, value pairs.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         expects: (`
             The function expects either an object or a known-bounded sequence
@@ -44,19 +17,20 @@ export const object = wrap({
         returns: (`
             The function returns an object with the key, value pairs as
             described by the input.
-            If the input was itself an object, the function returns its input.
+            If the input was itself an object, the function returns a shallow
+            copy of that object.
         `),
         examples: [
             "basicUsage", "objectInput"
         ],
         related: [
-            "newObject"
+            "object"
         ],
     },
     attachSequence: true,
     async: true,
     arguments: {
-        one: wrap.expecting.anything // TODO: Be more specific, ditch ObjectError
+        one: wrap.expecting.anything // TODO: Be more specific
     },
     implementation: (source) => {
         const pairs = asImplicitSequence(source);
@@ -64,7 +38,9 @@ export const object = wrap({
             // Throws an error if the sequence is unbounded
             return asObject(pairs);
         }else if(isObject(source)){
-            return source;
+            const result = {};
+            for(const key in source) result[key] = source[key];
+            return result;
         }else{
             throw ObjectError(source);
         }
@@ -72,22 +48,22 @@ export const object = wrap({
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {
             const seq = hi.range(0, 10).map(i => ({key: i, value: i * i}));
-            const obj = seq.object();
+            const obj = seq.newObject();
             hi.assert(obj["0"] === 0);
             hi.assert(obj["2"] === 4);
             hi.assert(obj["9"] === 81);
         },
         "objectInput": hi => {
             const obj = {a: 0, b:1};
-            hi.assert(hi.object(obj) === obj);
+            hi.assert(hi.newObject(obj) !== obj);
         },
         "unboundedInput": hi => {
             hi.assertFail(
                 error => error.type === "NotBoundedError",
-                () => hi.object(hi.repeatElement({key: "hello", value: "world"}))
+                () => hi.newObject(hi.repeatElement({key: "hello", value: "world"}))
             );
         },
     },
 });
 
-export default object;
+export default newObject;
