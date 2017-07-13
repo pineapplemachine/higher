@@ -21,6 +21,7 @@
     "dependencies": {},
     "devDependencies": {
         "babel-eslint": "7.2.2",
+        "cross-env": "^5.0.1",
         "eslint": "4.1.0",
         "eslint-config-google": "0.8.0",
         "nwb": "0.17.x",
@@ -34,7 +35,7 @@
         "build": "nwb build-web-module",
         "clean": "nwb clean-module && nwb clean-demo",
         "start": "nwb serve-react-demo",
-        "test": "export NODE_ENV='development' && nwb build && node lib/test/testRunner.js",
+        "test": "cross-env NODE_ENV=development nwb build && cross-env NODE_ENV=development node lib/test/testRunner.js",
         "test:coverage": "nwb test --coverage",
         "test:watch": "nwb test --server"
     }
