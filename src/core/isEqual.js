@@ -1,7 +1,7 @@
 import {asSequence, validAsImplicitSequence} from "./asSequence";
 import {isObject} from "./types";
 
-// Compare sequences for deep isEquality.
+// Compare sequences for deep equality.
 export const sequencesEqual = (...sources) => {
     if(sources.length > 1){
         const sequences = [];
@@ -19,7 +19,7 @@ export const sequencesEqual = (...sources) => {
     return true;
 };
 
-// Compare arbitrary objects for deep isEquality.
+// Compare arbitrary objects for deep equality.
 export const objectsEqual = (...objects) => {
     if(objects.length > 1){
         const visited = {};
@@ -39,7 +39,7 @@ export const objectsEqual = (...objects) => {
     return true;
 };
 
-// Compare values for isEquality.
+// Compare values for equality.
 export const valuesEqual = (...values) => {
     for(let i = 1; i < values.length; i++){
         if(values[i] !== values[0]) return false;
@@ -47,7 +47,7 @@ export const valuesEqual = (...values) => {
     return true;
 };
 
-// Compare values for isEquality.
+// Compare values for equality.
 // If they are all implicitly valid as sequences, treat them as sequences.
 // If they are all objects, treat them as objects.
 export const isEqual = (...values) => {
