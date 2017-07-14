@@ -152,7 +152,7 @@ export const PluralMapSequence = Sequence.extend({
         for(const source of this.sources){
             if(source.done()) return true;
         }
-        return false;
+        return this.sources.length === 0;
     },
     length: function(){
         if(this.sources.length === 0) return 0;
