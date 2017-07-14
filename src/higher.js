@@ -160,6 +160,7 @@ import {consume} from "./functions/consume"; hi.register(consume);
 import {containsElement} from "./functions/containsElement"; hi.register(containsElement);
 import {copyable} from "./functions/copyable"; hi.register(copyable);
 import {count} from "./functions/count"; hi.register(count);
+import {counter} from "./functions/counter"; hi.register(counter);
 import {distinct} from "./functions/distinct"; hi.register(distinct);
 import {dropHead} from "./functions/dropHead"; hi.register(dropHead);
 import {dropTail} from "./functions/dropTail"; hi.register(dropTail);
