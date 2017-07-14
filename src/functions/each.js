@@ -2,6 +2,12 @@ import {wrap} from "../core/wrap";
 
 export const each = wrap({
     names: ["each", "forEach"],
+    summary: "Invoke a callback for every element in a sequence.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        links: [
+            "https://en.wikipedia.org/wiki/Foreach_loop",
+        ],
+    },
     attachSequence: true,
     async: true,
     arguments: {

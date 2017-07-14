@@ -163,6 +163,11 @@ export const PluralMapSequence = Sequence.extend({
 
 export const map = wrap({
     name: "map",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        links: [
+            "https://en.wikipedia.org/wiki/Map_(higher-order_function)",
+        ],
+    },
     attachSequence: true,
     async: false,
     sequences: [

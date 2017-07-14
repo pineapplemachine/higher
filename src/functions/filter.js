@@ -153,6 +153,9 @@ export const filter = wrap({
         related: [
             "reject"
         ],
+        links: [
+            "https://en.wikipedia.org/wiki/Filter_(higher-order_function)",
+        ],
     },
     attachSequence: true,
     async: false,
