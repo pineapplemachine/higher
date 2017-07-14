@@ -69,7 +69,7 @@ export const counter = wrap({
             element to acquire the next number.
         `),
         related: [
-            "recur"
+            "range", "recur"
         ],
         examples: [
             "basicUsage", "positiveInput"
