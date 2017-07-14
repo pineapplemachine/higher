@@ -58,7 +58,11 @@ export const BidirectionalityContract = contract({
             while(!b.done()) backward.push(b.nextBack());
             if(a.length !== b.length) return false;
             for(let i = 0; i < forward.length; i++){
-                if(!isEqual(a[i], b[forward.length - i - 1])) return false;
+                if(!isEqual(a[i], b[forward.length - i - 1])){
+                    throw ContractError(sequence(), {
+                        message: `Elements at forward index ${i} were unequal.`
+                    });
+                }
             }
             return true;
         },
@@ -95,5 +99,43 @@ export const CopyingContract = contract({
             return true;
         },
     ],
+});
+
+export const LengthContract = contract({
+    name: "LengthContract",
+    summary: "The sequence must report a correct length.",
+    predicate: (sequence) => (sequence.length),
+    tests: [
+        (sequence) => {
+            const a = sequence();
+            if(!a.bounded()) throw ContractError(sequence(), {
+                message: "Unbounded sequences must not implement a length method."
+            });
+            if(a.done()){
+                if(a.length() !== 0) throw ContractError(sequence(), {
+                    message: "An empty sequence must have a length of zero."
+                });
+                return true;
+            }
+            let aCount = 0;
+            const length = a.length();
+            while(!a.done()){
+                a.popFront();
+                aCount++;
+            }
+            if(length !== aCount) return false;
+            if(a.length() !== aCount) return false;
+            const b = sequence();
+            let bCount = 0;
+            while(!b.done()){
+                let x = b.front();
+                b.popFront();
+                bCount++;
+            }
+            if(bCount !== aCount) return false;
+            if(b.length() !== bCount) return false;
+            return true;
+        },
+    ]
 });
 
