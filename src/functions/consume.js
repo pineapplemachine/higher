@@ -14,6 +14,7 @@ export const consume = wrap({
         }else{
             for(const element of source){}
         }
+        return source;
     },
 });
 
