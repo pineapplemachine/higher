@@ -2,6 +2,7 @@ import {wrap} from "../core/wrap";
 
 export const time = wrap({
     name: "time",
+    summary: "Get the time in milliseconds that it takes to evaluate a function.",
     attachSequence: false,
     async: true,
     arguments: {

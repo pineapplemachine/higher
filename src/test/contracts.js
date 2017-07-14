@@ -51,7 +51,7 @@ export const BidirectionalityContract = contract({
             const backward = [];
             const a = sequence();
             const b = sequence();
-            if(!a.bounded) return true;
+            if(!a.bounded()) return true;
             while(!a.done()) forward.push(a.nextFront());
             while(!b.done()) backward.push(b.nextBack());
             if(a.length !== b.length) return false;
@@ -69,24 +69,25 @@ export const CopyingContract = contract({
     predicate: (sequence) => (sequence.copy),
     tests: [
         (sequence) => {
+            const max = 60;
             const a = sequence();
             const b = a.copy();
             const c = a.copy();
             const d = c.copy();
             if(!isEqual(a.front(), b.front(), c.front(), d.front())) return false;
             const aArray = [];
-            while(!a.done()) aArray.push(a.nextFront());
+            while(!a.done() && aArray.length < max) aArray.push(a.nextFront());
             if(!isEqual(aArray[0], b.front(), c.front(), d.front())) return false;
             const bArray = [];
-            while(!b.done()) bArray.push(b.nextFront());
+            while(!b.done() && bArray.length < max) bArray.push(b.nextFront());
             if(!isEqual(aArray, bArray)) return false;
             if(!isEqual(aArray[0], c.front(), d.front())) return false;
             const dArray = [];
-            while(!d.done()) dArray.push(d.nextFront());
+            while(!d.done() && dArray.length < max) dArray.push(d.nextFront());
             if(!isEqual(aArray, dArray)) return false;
             if(!isEqual(aArray[0], c.front())) return false;
             const cArray = [];
-            while(!c.done()) cArray.push(c.nextFront());
+            while(!c.done() && cArray.length < max) cArray.push(c.nextFront());
             if(!isEqual(aArray, cArray)) return false;
             return true;
         },
