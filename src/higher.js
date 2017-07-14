@@ -6,14 +6,8 @@ export default hi;
 
 Object.assign(hi, {
     version: "0.1.0",
-
-    // Error types will be placed here.
-    error: {},
-    // Sequence types will be placed here.
-    sequence: {},
     // Registered functions will be placed here.
     functions: [],
-
     // Receives an object or objects returned by the wrap function.
     register: function(...fancyFunctions){
         for(const fancy of fancyFunctions){
@@ -27,9 +21,8 @@ Object.assign(hi, {
         }
         return fancyFunctions[0];
     },
-
-    // Run all tests
-    test: process.env.NODE_ENV !== "development" ? undefined : function(){
+    // Run function unit tests
+    testFunctions: process.env.NODE_ENV !== "development" ? undefined : function(){
         const result = {
             functions: {},
             failures: [],
@@ -41,6 +34,35 @@ Object.assign(hi, {
                 for(const failure of status.fail) result.failures.push(failure);
             }
         }
+        return result;
+    },
+    // Run sequence contract tests
+    testSequences: process.env.NODE_ENV !== "development" ? undefined : function(){
+        const result = {
+            sequences: {},
+            failures: [],
+        };
+        for(const sequenceName in this.sequences){
+            const sequence = this.sequences[sequenceName];
+            if(sequence.test){
+                const status = sequence.test(this);
+                result.sequences[sequenceName] = status;
+                for(const failure of status.fail) result.failures.push(failure);
+            }
+        }
+        return result;
+    },
+    // Run all tests
+    test: process.env.NODE_ENV !== "development" ? undefined : function(){
+        const functions = this.testFunctions();
+        const sequences = this.testSequences();
+        const result = {
+            functions: functions.functions,
+            sequences: sequences.sequences,
+            failures: [],
+        };
+        result.failures.push(...functions.failures);
+        result.failures.push(...sequences.failures);
         return result;
     },
 });
@@ -60,10 +82,9 @@ hi.validAsBoundedSequence = validAsBoundedSequence;
 hi.validAsUnboundedSequence = validAsUnboundedSequence;
 
 import {
-    AssertError, assert, assertNot, assertUndefined,
-    assertEqual, assertNotEqual, assertEmpty, assertFail,
+    assert, assertNot, assertUndefined,
+    assertEqual, assertNotEqual, assertEmpty, assertFail
 } from "./core/assert";
-hi.error.AssertError = AssertError;
 hi.assert = assert;
 hi.assertNot = assertNot;
 hi.assertUndefined = assertUndefined;
@@ -79,12 +100,12 @@ import {constants} from "./core/constants";
 hi.constants = constants;
 
 import {error} from "./core/error";
-hi.error = error; // This attribute will contain all error types
+hi.errors = error; // This attribute will contain all error types
 
 import {isSequence, Sequence} from "./core/sequence";
 hi.isSequence = isSequence;
 hi.Sequence = Sequence;
-hi.sequence = Sequence.types; // This attribute will contain all sequence types
+hi.sequences = Sequence.types; // This attribute will contain all sequence types
 
 import {
     isUndefined, isBoolean, isNumber, isInteger, isString, isArray,
@@ -102,6 +123,11 @@ hi.isIterable = isIterable;
 
 import {wrap} from "./core/wrap";
 hi.wrap = wrap;
+
+// Test modules
+import {contract} from "./test/contracts";
+hi.contract = contract;
+hi.contracts = contract.contracts;
 
 // Core sequence types
 import {arrayAsSequence} from "./core/arrayAsSequence"; hi.register(arrayAsSequence);

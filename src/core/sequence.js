@@ -31,6 +31,30 @@ Sequence.extend = function(methods){
     constructor.prototype = Object.create(Sequence.prototype);
     Object.assign(constructor.prototype, methods);
     Sequence.types[constructor.name] = constructor;
+    if(process.env.NODE_ENV === "development"){
+        constructor.test = !methods.getSequence ? undefined : hi => {
+            console.log("Testing a sequence!", constructor.name);
+            const result = {
+                pass: [],
+                fail: [],
+            }
+            for(const contract of hi.contracts){
+                let success = true;
+                try{
+                    for(const getter of methods.getSequence){
+                        contract.enforce(() => getter(hi));
+                    }
+                }catch(error){
+                    success = false;
+                    result.fail.push({name: contract.name, error: error});
+                }
+                if(success){
+                    result.pass.push({name: contract.name});
+                }
+            }
+            return result;
+        };
+    }
     return constructor;
 };
 
