@@ -1,6 +1,5 @@
 import {wrap} from "../core/wrap";
 
-// Get the complement of a function.
 export const negate = wrap({
     name: "negate",
     summary: "Get the logical negation of a predicate function.",

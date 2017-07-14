@@ -1,6 +1,5 @@
 import {wrap} from "../core/wrap";
 
-// A function that returns its argument.
 export const identity = wrap({
     name: "identity",
     summary: "A function accepting a single argument that always returns its input.",
