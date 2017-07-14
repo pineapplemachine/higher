@@ -33,7 +33,9 @@ export const contract = (info) => {
                     if(!test(getSequence)) throw ContractError(sequence, this);
                 }
             }catch(error){
-                throw ContractError(sequence, this, {error: error});
+                throw (error.type === "ContractError" ? error :
+                    ContractError(sequence, this, {error: error})
+                );
             }
         }
     };
@@ -71,6 +73,7 @@ export const CopyingContract = contract({
         (sequence) => {
             const max = 60;
             const a = sequence();
+            if(a.done()) return true;
             const b = a.copy();
             const c = a.copy();
             const d = c.copy();
