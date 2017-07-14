@@ -1,7 +1,7 @@
 import {wrap} from "../core/wrap";
 import {Sequence} from "../core/sequence";
 
-import {EmptySequence} from "./empty";
+import {EmptySequence} from "./emptySequence";
 
 // Fallback implementation of head function for when slicing is unavailable.
 export const HeadSequence = Sequence.extend({

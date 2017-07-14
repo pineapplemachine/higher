@@ -1,7 +1,7 @@
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
-import {EmptySequence} from "./empty";
+import {EmptySequence} from "./emptySequence";
 import {InfiniteRepeatElementSequence} from "./repeatElement";
 
 // Result of calling range with a step of exactly 1.

@@ -1,7 +1,7 @@
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
-import {EmptySequence} from "./empty";
+import {EmptySequence} from "./emptySequence";
 import {HeadSequence} from "./head";
 import {mustSupport} from "./mustSupport";
 import {ShuffleSequence} from "./shuffle";

@@ -1,7 +1,7 @@
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
-import {EmptySequence} from "./empty";
+import {EmptySequence} from "./emptySequence";
 
 // Map sequence optimized for one input sequence.
 export const SingularMapSequence = Sequence.extend({

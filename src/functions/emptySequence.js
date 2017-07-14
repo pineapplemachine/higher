@@ -34,8 +34,8 @@ export const EmptySequence = Sequence.extend({
     rebase: null,
 });
 
-export const empty = wrap({
-    name: "empty",
+export const emptySequence = wrap({
+    name: "emptySequence",
     attachSequence: false,
     async: false,
     arguments: {
@@ -49,4 +49,4 @@ export const empty = wrap({
     },
 });
 
-export default empty;
+export default emptySequence;

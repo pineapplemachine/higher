@@ -165,7 +165,7 @@ import {dropHead} from "./functions/dropHead"; hi.register(dropHead);
 import {dropTail} from "./functions/dropTail"; hi.register(dropTail);
 import {each} from "./functions/each"; hi.register(each);
 import {eager} from "./functions/eager"; hi.register(eager);
-import {empty} from "./functions/empty"; hi.register(empty);
+import {emptySequence} from "./functions/emptySequence"; hi.register(emptySequence);
 import {endsWith} from "./functions/endsWith"; hi.register(endsWith);
 import {enumerate} from "./functions/enumerate"; hi.register(enumerate);
 import {equals} from "./functions/equals"; hi.register(equals);
