@@ -17,6 +17,7 @@ export const FilterSequence = Sequence.extend({
         hi => new FilterSequence(i => i >= 3, hi([0, 1, 2, 3, 4, 5])),
         hi => new FilterSequence(i => i <= 3, hi([0, 1, 2, 3, 4, 5])),
         hi => new FilterSequence(i => i % 2, hi.range(0, 10)),
+        hi => new FilterSequence(i => i % 2, hi.counter()),
         hi => new FilterSequence(i => i !== 27, hi.recur(j => j * j).seed(3)),
     ],
     constructor: function FilterSequence(predicate, source){

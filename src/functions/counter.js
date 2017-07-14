@@ -9,11 +9,11 @@ export const CounterSequence = Sequence.extend({
         "back", "index", "slice", "copy", "reset"
     ],
     getSequence: process.env.NODE_ENV !== "development" ? undefined : [
-        hi => return new CounterSequence(0),
-        hi => return new CounterSequence(1),
-        hi => return new CounterSequence(-1),
-        hi => return new CounterSequence(0.5),
-        hi => return new CounterSequence(-0.5),
+        hi => new CounterSequence(0),
+        hi => new CounterSequence(1),
+        hi => new CounterSequence(-1),
+        hi => new CounterSequence(0.5),
+        hi => new CounterSequence(-0.5),
     ],
     constructor: function CounterSequence(startValue, currentValue = undefined){
         this.startValue = startValue;
@@ -72,7 +72,7 @@ export const counter = wrap({
             "recur"
         ],
         examples: [
-            "basicUsage"
+            "basicUsage", "positiveInput"
         ],
     },
     attachSequence: false,
