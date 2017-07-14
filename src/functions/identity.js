@@ -31,6 +31,10 @@ export const identity = wrap({
             const a = {"hello": "world"};
             hi.assert(hi.identity(a) === a); // Doesn't copy the object
         },
+        "sequenceMethod": hi => {
+            const seq = hi([0, 1, 2]);
+            hi.assert(seq.identity() === seq);
+        },
     },
 });
 
