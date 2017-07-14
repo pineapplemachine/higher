@@ -5,6 +5,19 @@ import {EmptySequence} from "./emptySequence";
 
 // Map sequence optimized for one input sequence.
 export const SingularMapSequence = Sequence.extend({
+    summary: "Enumerate transformed elements of a source sequence.",
+    supportsWith: [
+        "length", "left", "back", "index", "slice", "has", "get", "copy", "reset"
+    ],
+    getSequence: process.env.NODE_ENV !== "development" ? undefined : [
+        hi => new SingularMapSequence(i => i, hi.emptySequence()),
+        hi => new SingularMapSequence(i => i, hi([0, 1, 2, 3, 4, 5])),
+        hi => new SingularMapSequence(i => 0, hi([0, 1, 2, 3, 4, 5])),
+        hi => new SingularMapSequence(i => i + i, hi([0, 1, 2, 3, 4, 5])),
+        hi => new SingularMapSequence(i => i, hi.range(0, 10)),
+        hi => new SingularMapSequence(i => -i, hi.recur(j => j * j).seed(3)),
+        hi => new SingularMapSequence(i => i * i, hi.repeat([0, 1, 2, 3])),
+    ],
     constructor: function SingularMapSequence(transform, source){
         this.source = source;
         this.transform = transform;
@@ -64,12 +77,63 @@ export const SingularMapSequence = Sequence.extend({
 
 // Map sequence for any number of input sequences.
 export const PluralMapSequence = Sequence.extend({
+    summary: "Enumerate transformed elements of any number of source sequences.",
+    supportsWithAll: [
+        "length", "left", "index", "slice", "has", "get", "copy", "reset"
+    ],
+    getSequence: process.env.NODE_ENV !== "development" ? undefined : [
+        // No sources
+        hi => new PluralMapSequence(i => i, []),
+        // One source
+        hi => new PluralMapSequence(i => i, [hi.emptySequence()]),
+        hi => new PluralMapSequence(i => i, [hi([0, 1, 2, 3])]),
+        hi => new PluralMapSequence(i => i, [hi.range(0, 10)]),
+        hi => new PluralMapSequence(i => i, [hi.counter()]),
+        // Two sources
+        hi => new PluralMapSequence((i, j) => (i + j), [
+            hi.emptySequence(), hi.emptySequence()
+        ]),
+        hi => new PluralMapSequence((i, j) => (i + j), [
+            hi.emptySequence(), hi([0, 1, 2, 3])
+        ]),
+        hi => new PluralMapSequence((i, j) => (i + j), [
+            hi([20, 30, 40, 50]), hi([0, 1, 2, 3])
+        ]),
+        hi => new PluralMapSequence((i, j) => (i + j), [
+            hi.counter(), hi([0, 1, 2, 3])
+        ]),
+        hi => new PluralMapSequence((i, j) => (i + j), [
+            hi.counter(100), hi.counter(300)
+        ]),
+        // Three sources
+        hi => new PluralMapSequence((i, j) => (i + j), [
+            hi.emptySequence(), hi.emptySequence(), hi.emptySequence()
+        ]),
+        hi => new PluralMapSequence((i, j) => (i + j), [
+            hi.emptySequence(), hi.emptySequence(), hi([0, 1, 2, 3])
+        ]),
+        hi => new PluralMapSequence((i, j) => (i + j), [
+            hi.emptySequence(), hi([20, 30, 40, 50]), hi([0, 1, 2, 3])
+        ]),
+        hi => new PluralMapSequence((i, j) => (i + j), [
+            hi([200, 300, 400, 500]), hi([20, 30, 40, 50]), hi([0, 1, 2, 3])
+        ]),
+        hi => new PluralMapSequence((i, j) => (i + j), [
+            hi.counter(), hi.counter(), hi([0, 1, 2, 3])
+        ]),
+        hi => new PluralMapSequence((i, j) => (i + j), [
+            hi.counter(10), hi.counter(100), hi.counter(300)
+        ]),
+    ],
     constructor: function PluralMapSequence(transform, sources){
         this.sources = sources;
         this.source = sources[0];
         this.transform = transform;
         for(const source of sources){
             this.maskAbsentMethods(source);
+        }
+        if(sources.length === 0){
+            this.rebase = null;
         }
     },
     bounded: function(){
@@ -82,7 +146,7 @@ export const PluralMapSequence = Sequence.extend({
         for(const source of this.sources){
             if(!source.unbounded()) return false;
         }
-        return true;
+        return this.sources.length !== 0;
     },
     done: function(){
         for(const source of this.sources){
@@ -91,14 +155,16 @@ export const PluralMapSequence = Sequence.extend({
         return false;
     },
     length: function(){
-        let min = this.sources[0].length;
+        if(this.sources.length === 0) return 0;
+        let min = this.sources[0].length();
         for(let i = 1; i < this.sources.length; i++){
             min = Math.min(min, this.sources[i].length());
         }
         return min;
     },
     left: function(){
-        let min = this.sources[0].left;
+        if(this.sources.length === 0) return 0;
+        let min = this.sources[0].left();
         for(let i = 1; i < this.sources.length; i++){
             min = Math.min(min, this.sources[i].left());
         }
@@ -114,16 +180,8 @@ export const PluralMapSequence = Sequence.extend({
             source.popFront();
         }
     },
-    back: function(){
-        const elements = [];
-        for(const source of this.sources) elements.push(source.back());
-        return this.transform.apply(this, elements);
-    },
-    popBack: function(){
-        for(const source of this.sources){
-            source.popBack();
-        }
-    },
+    back: null,
+    popBack: null,
     index: function(i){
         const elements = [];
         for(const source of this.sources) elements.push(source.index(i));
@@ -138,7 +196,7 @@ export const PluralMapSequence = Sequence.extend({
         for(const source of this.sources){
             if(!source.has(i)) return false;
         }
-        return true;
+        return this.sources.length !== 0;
     },
     get: function(i){
         const elements = [];
@@ -163,17 +221,41 @@ export const PluralMapSequence = Sequence.extend({
 
 export const map = wrap({
     name: "map",
+    summary: "Get a sequence enumerating elements with a transformation applied to each.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        detail: (`
+            Get a sequence enumerating the result of applying a transformation
+            function to each corresponding set of elements of the input
+            sequences.
+        `),
+        expects: (`
+            The function expects as input one transformation function and any
+            number of sequences. The transformation function must accept as
+            many arguments as there are sequences; the corresponding elements
+            of each input sequence will be passed in order as arguments to the
+            transformation function.
+            When there is one input sequence, each element will be passed as a
+            single argument to the transformation function; the outputted
+            sequence will behave like any other conventional [singular map]
+            function.
+        `),
+        returns: (`
+            The function returns a sequence enumerating the outputs of the
+            transformation function as applied to each set of corresponding
+            elements of the input sequences.
+            The produced sequence is as long as the shortest input sequence.
+            When there were no input sequences, the function returns an
+            empty sequence.
+        `),
+        examples: [
+            "basicSingularUsage", "basicPluralUsage"
+        ],
         links: [
             "https://en.wikipedia.org/wiki/Map_(higher-order_function)",
         ],
     },
     attachSequence: true,
     async: false,
-    sequences: [
-        SingularMapSequence,
-        PluralMapSequence
-    ],
     arguments: {
         unordered: {
             functions: 1,
@@ -182,13 +264,42 @@ export const map = wrap({
     },
     implementation: (transform, sources) => {
         if(sources.length === 1){
-            // Most common use case
-            return new SingularMapSequence(transform, sources[0]);
+            if(sources[0] instanceof SingularMapSequence){
+                return SingularMapSequence(
+                    element => transform(sources[0].transform(element)),
+                    sources[0].source
+                );
+            }else if(sources[0] instanceof PluralMapSequence){
+                return PluralMapSequence(
+                    ...args => transform(sources[0].transform(...args)),
+                    sources[0].sources
+                );
+            }else{
+                return new SingularMapSequence(transform, sources[0]);
+            }
         }else if(sources.length === 0){
             return new EmptySequence();
         }else{
             return new PluralMapSequence(transform, sources);
         }
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicSingularUsage": hi => {
+            const square = (i) => (i * i);
+            const seq = hi.map(square, [1, 2, 3, 4, 5]);
+            hi.assertEqual(seq, [1, 4, 9, 16, 25]);
+        },
+        "basicPluralUsage": hi => {
+            const sum = (a, b) => (a + b);
+            const seq = hi.map(sum, [0, 1, 2], [10, 20, 30]);
+            hi.assertEqual(seq, [10, 21, 32]);
+        },
+        "differingSequenceLengths": hi => {
+            const sum = (a, b, c) => (a + b + c);
+            hi.assertEmpty(hi.map(sum, [1, 2], [3], hi.emptySequence()));
+            hi.assertEqual(hi.map(sum, [1], [2, 3, 4], [4, 5]), [7]);
+            hi.assertEqual(hi.map(sum, [1, 2], [3], [3, 4, 5]), [7]);
+        },
     },
 });
 

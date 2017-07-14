@@ -330,6 +330,41 @@ export const glossary = [
             "sequence source"
         ],
     },
+    // Implementation-related terms
+    {
+        term: "singular map",
+        category: "specific function",
+        definition: (`
+            A singular map [sequence] is produced by calling the @map function
+            with a single sequence as input. This is the most common and
+            conventional usage of a map function. When there are zero sequences
+            or more than one sequence given as input, the resulting map
+            sequence is called a [plural map sequence](plural map).
+        `),
+        relatedTerms: [
+            "plural map"
+        ],
+        links: [
+            "https://en.wikipedia.org/wiki/Map_(higher-order_function)",
+        ],
+    },
+    {
+        term: "plural map",
+        category: "specific function",
+        definition: (`
+            A plural map [sequence] is produced by calling the @map function
+            with no sequence or more than one sequence as input.
+            The [transformation function] given when constructing the map
+            sequence is invoked with corresponding elements of the input
+            sequences passed as arguments in the same order that those input
+            sequences were first provided. When there is exactly one input
+            sequence, the resulting map sequence is called a
+            [singular map sequence](singular map).
+        `),
+        relatedTerms: [
+            "singular map"
+        ],
+    },
 ];
 
 export default glossary;
