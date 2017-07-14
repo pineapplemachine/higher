@@ -5,6 +5,8 @@ import {constants} from "./constants";
 import {Sequence} from "./sequence";
 import {isFunction, isIterable, isObject, isString} from "./types";
 
+import {cleanString} from "../docs/cleanString";
+
 export const wrap = function(info){
     // TODO: Better errors
     if(!info.implementation) throw "No implementation!";
@@ -315,17 +317,12 @@ Object.assign(wrap, {
         };
     },
     cleanDocs: function(info){
-        if(info.docs) for(const key in info.docs){
-            if(isString(info.docs[key])){
-                const lines = info.docs[key].split("\n");
-                const trimmedLines = [];
-                for(const line of lines){
-                    const trimmed = line.trim();
-                    if(trimmed.length) trimmedLines.push(trimmed);
-                }
-                info.docs[key] = trimmedLines.join(" ");
-            }
-        }
+        if(!info.docs) return undefined;
+        info.docs.detail = cleanString(info.docs.detail || "");
+        info.docs.expects = cleanString(info.docs.expects || "");
+        info.docs.returns = cleanString(info.docs.returns || "");
+        info.docs.warnings = cleanString(info.docs.warnings || "");
+        info.docs.trivia = cleanString(info.docs.trivia || "");
         return info.docs;
     },
     testRunner: function(name, info){

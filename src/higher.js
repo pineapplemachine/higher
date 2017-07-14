@@ -72,10 +72,12 @@ import {args} from "./core/arguments";
 hi.args = args;
 
 import {
-    asSequence, validAsSequence, validAsImplicitSequence,
+    asSequence, asImplicitSequence,
+    validAsSequence, validAsImplicitSequence,
     validAsBoundedSequence, validAsUnboundedSequence,
 } from "./core/asSequence";
 hi.asSequence = asSequence;
+hi.asImplicitSequence = asImplicitSequence;
 hi.validAsSequence = validAsSequence;
 hi.validAsImplicitSequence = validAsImplicitSequence;
 hi.validAsBoundedSequence = validAsBoundedSequence;
@@ -124,10 +126,16 @@ hi.isIterable = isIterable;
 import {wrap} from "./core/wrap";
 hi.wrap = wrap;
 
-// Test modules
+// Tests and documentation modules
+import {coreDocs} from "./docs/coreDocs";
+import {glossary} from "./docs/glossary";
 import {contract} from "./test/contracts";
-hi.contract = contract;
-hi.contracts = contract.contracts;
+if(process.env.NODE_ENV === "development"){
+    hi.coreDocs = coreDocs;
+    hi.glossary = glossary;
+    hi.contract = contract;
+    hi.contracts = contract.contracts;
+}
 
 // Core sequence types
 import {arrayAsSequence} from "./core/arrayAsSequence"; hi.register(arrayAsSequence);
