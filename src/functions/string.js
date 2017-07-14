@@ -1,3 +1,4 @@
+import {isString} from "../core/types";
 import {wrap} from "../core/wrap";
 
 import {NotBoundedError} from "../errors/NotBoundedError";
@@ -10,6 +11,7 @@ export const string = wrap({
         one: wrap.expecting.iterable
     },
     implementation: (source) => {
+        if(isString(source)) return source;
         NotBoundedError.enforce(source, {
             message: "Failed to create string",
         });

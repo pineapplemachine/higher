@@ -8,6 +8,9 @@ export const ObjectSequence = Sequence.extend({
     supportsAlways: [
         "length", "left", "has", "get", "copy", "reset"
     ],
+    overrides: [
+        "object", "newObject"
+    ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         methods: {
             "keys": {
@@ -41,6 +44,16 @@ export const ObjectSequence = Sequence.extend({
             this.objectKeys = [];
             for(const key in source) this.objectKeys.push(key);
         }
+    },
+    object: function(){
+        return this.source;
+    },
+    newObject: function(){
+        const result = {};
+        for(const key of this.objectKeys){
+            result[key] = this.source[key];
+        }
+        return result;
     },
     keys: function(){
         // TODO: It might be cleaner to return a more specialized sequence type
