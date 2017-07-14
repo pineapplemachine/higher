@@ -1,15 +1,13 @@
 export const hi = (source) => {
     return hi.asSequence(source);
-}
+};
 
 export default hi;
 
 Object.assign(hi, {
     version: "0.1.0",
-    
     // Registered functions will be placed here.
     functions: [],
-    
     // Receives an object or objects returned by the wrap function.
     register: function(...fancyFunctions){
         for(const fancy of fancyFunctions){
@@ -23,7 +21,7 @@ Object.assign(hi, {
         }
         return fancyFunctions[0];
     },
-    
+    // Run function unit tests
     testFunctions: process.env.NODE_ENV !== "development" ? undefined : function(){
         const result = {
             functions: {},
@@ -38,6 +36,7 @@ Object.assign(hi, {
         }
         return result;
     },
+    // Run sequence contract tests
     testSequences: process.env.NODE_ENV !== "development" ? undefined : function(){
         const result = {
             sequences: {},
@@ -53,7 +52,6 @@ Object.assign(hi, {
         }
         return result;
     },
-    
     // Run all tests
     test: process.env.NODE_ENV !== "development" ? undefined : function(){
         const functions = this.testFunctions();
@@ -75,7 +73,7 @@ hi.args = args;
 
 import {
     asSequence, validAsSequence, validAsImplicitSequence,
-    validAsBoundedSequence, validAsUnboundedSequence
+    validAsBoundedSequence, validAsUnboundedSequence,
 } from "./core/asSequence";
 hi.asSequence = asSequence;
 hi.validAsSequence = validAsSequence;
@@ -111,7 +109,7 @@ hi.sequences = Sequence.types; // This attribute will contain all sequence types
 
 import {
     isUndefined, isBoolean, isNumber, isInteger, isString, isArray,
-    isObject, isFunction, isIterable
+    isObject, isFunction, isIterable,
 } from "./core/types";
 hi.isUndefined = isUndefined;
 hi.isBoolean = isBoolean;
