@@ -1,6 +1,15 @@
 import {hi} from "../higher.js";
 
-console.log(`Running tests for higher@${hi.version}.`);
+const red = text => '\u001b[31m' + text + '\u001b[39m';
+const green = text => '\u001b[32m' + text + '\u001b[39m';
+
+const version = green(`higher@${hi.version}`);
+console.log(`Running tests for ${version}.`);
+
+const ofText = (passed, failed) => {
+    const text = `${passed} of ${passed + failed}`;
+    return failed === 0 ? green(text) : red(text);
+};
 
 const results = hi.test();
 
@@ -12,34 +21,45 @@ const sequenceNames = [];
 for(const sequenceName in results.sequences) sequenceNames.push(sequenceName);
 sequenceNames.sort();
 
+let totalPassed = 0;
+let totalFailed = 0;
+
 for(const name of functionNames){
     const passed = results.functions[name].pass.length;
     const failed = results.functions[name].fail.length;
-    const total = passed + failed;
-    console.log(`Function ${name}: passed ${passed} of ${total}`);
+    totalPassed += passed;
+    totalFailed += failed;
+    console.log(
+        `Function ${name}: passed ${ofText(passed, failed)} tests.`
+    );
 }
 
 for(const name of sequenceNames){
     const passed = results.sequences[name].pass.length;
     const failed = results.sequences[name].fail.length;
-    const total = passed + failed;
-    console.log(`Sequence ${name}: passed ${passed} of ${total}`);
+    totalPassed += passed;
+    totalFailed += failed;
+    console.log(
+        `Sequence ${name}: passed ${ofText(passed, failed)} tests.`
+    );
 }
-
-let failures = 0;
 
 for(const name of functionNames){
     for(const failure of results.functions[name].fail){
-        console.error(`Function ${name}.${failure.name} failed: ${failure.error.stack}`);
-        failures++;
+        console.error(red(
+            `Function ${name}.${failure.name} test failed: ${failure.error.stack}`
+        ));
     }
 }
 
 for(const name of sequenceNames){
     for(const failure of results.sequences[name].fail){
-        console.error(`Sequence ${name}.${failure.name} failed: ${failure.error.stack}`);
-        failures++;
+        console.error(red(
+            `Sequence ${name}.${failure.name} test failed: ${failure.error.stack}`
+        ));
     }
 }
 
-process.exit(failures !== 0);
+console.log(`Finished running tests: passed ${ofText(totalPassed, totalFailed)} tests.`);
+
+process.exit(totalFailed !== 0);
