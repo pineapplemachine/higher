@@ -3,6 +3,10 @@ import {wrap} from "../core/wrap";
 
 // A chronically empty sequence.
 export const EmptySequence = Sequence.extend({
+    summary: "An absolutely empty sequence",
+    getSequence: process.env.NODE_ENV !== "development" ? undefined : [
+        hi => new EmptySequence(),
+    ],
     constructor: function EmptySequence(){},
     repeat: function(repetitions){
         return this;
@@ -36,6 +40,15 @@ export const EmptySequence = Sequence.extend({
 
 export const emptySequence = wrap({
     name: "emptySequence",
+    summary: "Get an empty sequence.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        returns: (`
+            The function returns an empty sequence.
+        `),
+        examples: [
+            "basicUsage"
+        ],
+    },
     attachSequence: false,
     async: false,
     arguments: {
@@ -46,6 +59,15 @@ export const emptySequence = wrap({
     ],
     implementation: () => {
         return new EmptySequence();
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": hi => {
+            const seq = hi.emptySequence();
+            hi.assert(seq.bounded());
+            hi.assert(seq.done());
+            hi.assert(seq.length() === 0);
+            hi.assert(seq.left() === 0);
+        },
     },
 });
 
