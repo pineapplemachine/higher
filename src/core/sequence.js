@@ -33,7 +33,6 @@ Sequence.extend = function(methods){
     Sequence.types[constructor.name] = constructor;
     if(process.env.NODE_ENV === "development"){
         constructor.test = !methods.getSequence ? undefined : hi => {
-            console.log("Testing a sequence!", constructor.name);
             const result = {
                 pass: [],
                 fail: [],

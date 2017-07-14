@@ -2,7 +2,7 @@ import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 import {copyable} from "./copyable";
-import {EmptySequence} from "./empty";
+import {EmptySequence} from "./emptySequence";
 
 export const FiniteRepeatSequence = Sequence.extend({
     constructor: function FiniteRepeatSequence(

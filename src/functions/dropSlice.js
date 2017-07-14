@@ -2,7 +2,7 @@ import {Sequence} from "../core/sequence";
 import {ConcatSequence} from "./concat";
 import {DropHeadSequence} from "./dropHead";
 import {DropTailSequence} from "./dropTail";
-import {EmptySequence} from "./empty";
+import {EmptySequence} from "./emptySequence";
 import {wrap} from "../core/wrap";
 
 export const DropSliceSequence = Sequence.extend({

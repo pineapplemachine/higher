@@ -2,7 +2,7 @@ import {constants} from "../core/constants";
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
-import {EmptySequence} from "./empty";
+import {EmptySequence} from "./emptySequence";
 import {OneElementSequence} from "./one";
 
 export const FiniteRepeatElementSequence = Sequence.extend({

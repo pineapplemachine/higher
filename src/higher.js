@@ -72,10 +72,12 @@ import {args} from "./core/arguments";
 hi.args = args;
 
 import {
-    asSequence, validAsSequence, validAsImplicitSequence,
+    asSequence, asImplicitSequence,
+    validAsSequence, validAsImplicitSequence,
     validAsBoundedSequence, validAsUnboundedSequence,
 } from "./core/asSequence";
 hi.asSequence = asSequence;
+hi.asImplicitSequence = asImplicitSequence;
 hi.validAsSequence = validAsSequence;
 hi.validAsImplicitSequence = validAsImplicitSequence;
 hi.validAsBoundedSequence = validAsBoundedSequence;
@@ -124,10 +126,16 @@ hi.isIterable = isIterable;
 import {wrap} from "./core/wrap";
 hi.wrap = wrap;
 
-// Test modules
+// Tests and documentation modules
+import {coreDocs} from "./docs/coreDocs";
+import {glossary} from "./docs/glossary";
 import {contract} from "./test/contracts";
-hi.contract = contract;
-hi.contracts = contract.contracts;
+if(process.env.NODE_ENV === "development"){
+    hi.coreDocs = coreDocs;
+    hi.glossary = glossary;
+    hi.contract = contract;
+    hi.contracts = contract.contracts;
+}
 
 // Core sequence types
 import {arrayAsSequence} from "./core/arrayAsSequence"; hi.register(arrayAsSequence);
@@ -152,12 +160,13 @@ import {consume} from "./functions/consume"; hi.register(consume);
 import {containsElement} from "./functions/containsElement"; hi.register(containsElement);
 import {copyable} from "./functions/copyable"; hi.register(copyable);
 import {count} from "./functions/count"; hi.register(count);
+import {counter} from "./functions/counter"; hi.register(counter);
 import {distinct} from "./functions/distinct"; hi.register(distinct);
 import {dropHead} from "./functions/dropHead"; hi.register(dropHead);
 import {dropTail} from "./functions/dropTail"; hi.register(dropTail);
 import {each} from "./functions/each"; hi.register(each);
 import {eager} from "./functions/eager"; hi.register(eager);
-import {empty} from "./functions/empty"; hi.register(empty);
+import {emptySequence} from "./functions/emptySequence"; hi.register(emptySequence);
 import {endsWith} from "./functions/endsWith"; hi.register(endsWith);
 import {enumerate} from "./functions/enumerate"; hi.register(enumerate);
 import {equals} from "./functions/equals"; hi.register(equals);

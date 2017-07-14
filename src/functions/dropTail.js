@@ -4,7 +4,7 @@ import {wrap} from "../core/wrap";
 
 import {BoundsUnknownError} from "../errors/BoundsUnknownError";
 
-import {EmptySequence} from "./empty";
+import {EmptySequence} from "./emptySequence";
 
 export const DropTailSequence = Sequence.extend({
     constructor: function DropTailSequence(dropElements, source, frontIndex = 0){
