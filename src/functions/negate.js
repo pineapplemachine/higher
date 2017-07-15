@@ -4,6 +4,7 @@ export const negate = wrap({
     name: "negate",
     summary: "Get the logical negation of a predicate function.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
         expects: (`
             The function expects a single predicate function as its input.
         `),
@@ -13,11 +14,11 @@ export const negate = wrap({
             inputted predicate and returning false for all inputs producing
             a truthy value when passed to that predicate.
         `),
-        related: [
-            "allPass", "anyPass", "nonePass"
-        ],
         examples: [
             "basicUsage"
+        ],
+        related: [
+            "allPass", "anyPass", "nonePass"
         ],
     },
     attachSequence: false,

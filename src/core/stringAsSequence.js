@@ -12,6 +12,7 @@ export const StringSequence = Sequence.extend({
         "string"
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
         methods: {},
     },
     constructor: function StringSequence(

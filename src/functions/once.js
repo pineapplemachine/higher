@@ -7,6 +7,7 @@ export const once = wrap({
     name: "once",
     summary: "Wrap a function with one that only ever calls it once.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
         detail: (`
             Get a function that invokes a callback the first time the
             function is called and returns its output, then returns the same

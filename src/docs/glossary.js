@@ -345,7 +345,10 @@ export const glossary = [
             "plural map"
         ],
         links: [
-            "https://en.wikipedia.org/wiki/Map_(higher-order_function)",
+            {
+                description: "Map higher-order function on Wikipedia",
+                url: "https://en.wikipedia.org/wiki/Map_(higher-order_function)",
+            },
         ],
     },
     {
@@ -363,6 +366,12 @@ export const glossary = [
         `),
         relatedTerms: [
             "singular map"
+        ],
+        links: [
+            {
+                description: "Clojure's similarly-peculiar map function",
+                url: "https://clojuredocs.org/clojure.core/map",
+            },
         ],
     },
 ];
