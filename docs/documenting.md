@@ -5,7 +5,7 @@ documentation and tests for various higher objects.
 
 ## Documentation strings
 
-With the exception of summaries which are meant, in general, to be no longer than 100 characters, higher replaces any uninterrupted series of whitespace that includes a newline character with one space.
+With the exception of summaries which are meant, in general, to be no longer than 100 characters, in documentation strings higher replaces any uninterrupted series of whitespace that includes a newline character with one space.
 
 For example, this `returns` documentation string:
 
