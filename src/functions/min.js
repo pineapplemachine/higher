@@ -1,20 +1,44 @@
 import {constants} from "../core/constants";
 import {wrap} from "../core/wrap";
 
-// Get the minimum value in a sequence as judged by a relational function.
-// If no relational function is provided, then (a, b) => (a < b) is used.
+import {NotBoundedError} from "../errors/NotBoundedError";
+
 export const min = wrap({
     name: "min",
+    summary: "Get the minimum element in a sequence.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        expects: (`
+            The function expects a sequence as input an an optional
+            [relational function].
+            If no relational function was passed, the default relational
+            function \`(a, b) => (a < b)\` is used.
+        `),
+        returns: (`
+            The function returns the minimum element in the sequence according
+            to the relational function. Functionally, this would be the same
+            as [stable-sorting](stable sort) the sequence according to that
+            function and taking its front element.
+        `),
+        related: [
+            "max"
+        ],
+        examples: [
+            "basicUsage", "withRelationalFunction"
+        ],
+    },
     attachSequence: true,
     async: true,
     arguments: {
         unordered: {
-            functions: 1,
+            functions: "?",
             sequences: 1,
-            allowIterables: true
-        }
+            allowIterables: true,
+        },
     },
     implementation: (relate, source) => {
+        NotBoundedError.enforce(source, {
+            message: "Failed to find a minimum element"
+        });
         const relateFunc = relate || constants.defaults.relationalFunction;
         let min = undefined;
         let first = true;
@@ -27,6 +51,31 @@ export const min = wrap({
             }
         }
         return min;
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": hi => {
+            hi.assert(hi.min([5, 4, 3, 2, 1]) === 1);
+        },
+        "withRelationalFunction": hi => {
+            const strings = ["hello", "how", "goes", "it"];
+            const byLength = (a, b) => (a.length < b.length);
+            hi.assert(hi.min(strings, byLength) === "it");
+        },
+        "emptyInput": hi => {
+            hi.assertUndefined(hi.emptySequence().min());
+        },
+        "notKnownBoundedInput": hi => {
+            hi.assertFail(
+                (error) => (error.type === "NotBoundedError"),
+                () => hi.recur(i => i + 1).seed(0).until(i => i === 20).min()
+            );
+        },
+        "unboundedInput": hi => {
+            hi.assertFail(
+                (error) => (error.type === "NotBoundedError"),
+                () => hi.counter().min()
+            );
+        },
     },
 });
 
