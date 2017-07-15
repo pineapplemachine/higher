@@ -321,7 +321,7 @@ Object.assign(wrap, {
     fancyAsync: function(fancy){
         return function(...callArgs){
             return new constants.Promise((resolve, reject) => {
-                callAsync(() => resolve(fancy(callArgs)));
+                callAsync(() => resolve(fancy(...callArgs)));
             });
         };
     },
