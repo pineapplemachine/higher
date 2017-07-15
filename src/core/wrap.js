@@ -321,6 +321,7 @@ Object.assign(wrap, {
         info.docs.detail = cleanString(info.docs.detail || "");
         info.docs.expects = cleanString(info.docs.expects || "");
         info.docs.returns = cleanString(info.docs.returns || "");
+        info.docs.throws = cleanString(info.docs.throws || "");
         info.docs.warnings = cleanString(info.docs.warnings || "");
         info.docs.trivia = cleanString(info.docs.trivia || "");
         return info.docs;

@@ -84,12 +84,13 @@ hi.validAsBoundedSequence = validAsBoundedSequence;
 hi.validAsUnboundedSequence = validAsUnboundedSequence;
 
 import {
-    assert, assertNot, assertUndefined,
+    assert, assertNot, assertUndefined, assertNaN,
     assertEqual, assertNotEqual, assertEmpty, assertFail
 } from "./core/assert";
 hi.assert = assert;
 hi.assertNot = assertNot;
 hi.assertUndefined = assertUndefined;
+hi.assertNaN = assertNaN;
 hi.assertEqual = assertEqual;
 hi.assertNotEqual = assertNotEqual;
 hi.assertEmpty = assertEmpty;
@@ -113,13 +114,14 @@ hi.Sequence = Sequence;
 hi.sequences = Sequence.types; // This attribute will contain all sequence types
 
 import {
-    isUndefined, isBoolean, isNumber, isInteger, isString, isArray,
+    isUndefined, isBoolean, isNumber, isInteger, isNaN, isString, isArray,
     isObject, isFunction, isIterable,
 } from "./core/types";
 hi.isUndefined = isUndefined;
 hi.isBoolean = isBoolean;
 hi.isNumber = isNumber;
 hi.isInteger = isInteger;
+hi.isNaN = isNaN;
 hi.isString = isString;
 hi.isArray = isArray;
 hi.isObject = isObject;

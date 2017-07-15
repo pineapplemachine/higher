@@ -84,6 +84,11 @@ export const coreDocs = {
         introduced: "higher@1.0.0",
         summary: "Throw an @AssertError when a value is not undefined.",
     },
+    "assertNaN": {
+        location: "core/assert",
+        introduced: "1.0.0",
+        summary: "Throw an @AssertError when a value is NaN.",
+    },
     "assertEqual": {
         location: "core/assert",
         introduced: "higher@1.0.0",
@@ -166,6 +171,11 @@ export const coreDocs = {
         location: "core/types",
         introduced: "higher@1.0.0",
         summary: "Get whether an input is an integer.",
+    },
+    "isNaN": {
+        location: "core/types",
+        introduced: "1.0.0",
+        summary: "Get whether an input is NaN.",
     },
     "isString": {
         location: "core/types",

@@ -2,12 +2,12 @@ import {asSequence} from "./asSequence";
 import {error} from "./error";
 import {isEqual} from "./isEqual";
 import {isSequence} from "./sequence";
-import {isArray, isFunction, isUndefined} from "./types";
+import {isArray, isFunction, isNaN, isUndefined} from "./types";
 
 import {equals} from "../functions/equals";
 
 const assertMessage = (message, value) => (isFunction(message) ?
-    message(value) : (message || "Assertion error")
+    message(value) : (message || "Assertion error.")
 );
 
 export const AssertError = error({
@@ -37,7 +37,14 @@ export const assertNot = function(condition, message = undefined){
 // Throw an error if the input value isn't undefined.
 export const assertUndefined = function(value, message = undefined){
     if(!isUndefined(value)) throw AssertError(
-        assertMessage(message, value), value
+        assertMessage(message || "Value must be undefined.", value), value
+    );
+    return value;
+};
+
+export const assertNaN = function(value, message = undefined){
+    if(!isNaN(value)) throw AssertError(
+        assertMessage(message || "Value must be NaN.", value), value
     );
     return value;
 };
