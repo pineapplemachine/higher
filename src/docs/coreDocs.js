@@ -117,6 +117,26 @@ export const coreDocs = {
         location: "core/error",
         introduced: "1.0.0",
     },
+    "isEqual": {
+        location: "core/isEqual",
+        introduced: "1.0.0",
+        summary: "Compare objects, sequences, or other values for deep equality.",
+    },
+    "sequencesEqual": {
+        location: "core/isEqual",
+        introduced: "1.0.0",
+        internal: true,
+    },
+    "objectsEqual": {
+        location: "core/isEqual",
+        introduced: "1.0.0",
+        internal: true,
+    },
+    "valuesEqual": {
+        location: "core/isEqual",
+        introduced: "1.0.0",
+        internal: true,
+    },
     "isSequence": {
         location: "core/sequence",
         introduced: "1.0.0",

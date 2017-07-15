@@ -104,6 +104,9 @@ hi.constants = constants;
 import {error} from "./core/error";
 hi.errors = error; // This attribute will contain all error types
 
+import {isEqual} from "./core/isEqual";
+hi.isEqual = isEqual;
+
 import {isSequence, Sequence} from "./core/sequence";
 hi.isSequence = isSequence;
 hi.Sequence = Sequence;

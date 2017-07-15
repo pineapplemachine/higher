@@ -28,7 +28,7 @@ export const objectsEqual = (...objects) => {
                 if(!visited[key]){
                     visited.key = true;
                     const compare = [];
-                    for(let j = 0; i < objects.length; j++){
+                    for(let j = 0; j < objects.length; j++){
                         compare.push(objects[j][key]);
                     }
                     if(!isEqual(...compare)) return false;
@@ -55,8 +55,8 @@ export const isEqual = (...values) => {
     let noObject = false;
     let noSequence = false;
     for(const value of values){
-        if(!isObject(value)) noObject = true;
-        if(!validAsImplicitSequence(value)) noSequence = true;
+        if(!value || !isObject(value)) noObject = true;
+        if(!value || !validAsImplicitSequence(value)) noSequence = true;
     }
     if(!noSequence){
         return sequencesEqual(...values);
