@@ -152,6 +152,11 @@ export const coreDocs = {
         introduced: "1.0.0",
         summary: "Get whether an input is an integer.",
     },
+    "isNaN": {
+        location: "core/types",
+        introduced: "1.0.0",
+        summary: "Get whether an input is NaN.",
+    },
     "isString": {
         location: "core/types",
         introduced: "1.0.0",

@@ -14,6 +14,12 @@ export const isInteger = (value) => {
     return Number.isInteger(value);
 };
 
+export const isNaN = (value) => {
+    // EMCA spec says value !== value is true if and only if value is NaN.
+    // https://tc39.github.io/ecma262/#sec-isnan-number
+    return value !== value;
+};
+
 export const isString = (value) => {
     return typeof(value) === "string";
 };

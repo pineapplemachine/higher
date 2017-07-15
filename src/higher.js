@@ -111,13 +111,14 @@ hi.Sequence = Sequence;
 hi.sequences = Sequence.types; // This attribute will contain all sequence types
 
 import {
-    isUndefined, isBoolean, isNumber, isInteger, isString, isArray,
+    isUndefined, isBoolean, isNumber, isInteger, isNaN, isString, isArray,
     isObject, isFunction, isIterable,
 } from "./core/types";
 hi.isUndefined = isUndefined;
 hi.isBoolean = isBoolean;
 hi.isNumber = isNumber;
 hi.isInteger = isInteger;
+hi.isNaN = isNaN;
 hi.isString = isString;
 hi.isArray = isArray;
 hi.isObject = isObject;

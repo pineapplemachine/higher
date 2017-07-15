@@ -2,7 +2,7 @@ import {asSequence} from "./asSequence";
 import {error} from "./error";
 import {isEqual} from "./isEqual";
 import {isSequence} from "./sequence";
-import {isArray, isFunction, isUndefined} from "./types";
+import {isArray, isFunction, isNaN, isUndefined} from "./types";
 
 import {equals} from "../functions/equals";
 
@@ -43,9 +43,7 @@ export const assertUndefined = function(value, message = undefined){
 };
 
 export const assertNaN = function(value, message = undefined){
-    // EMCA spec says value !== value is true if and only if value is NaN.
-    // https://tc39.github.io/ecma262/#sec-isnan-number
-    if(value === value) throw AssertError(
+    if(!hi.isNaN(value)) throw AssertError(
         assertMessage(message || "Value must be NaN.", value), value
     );
     return value;
