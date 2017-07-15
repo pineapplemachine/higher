@@ -29,26 +29,43 @@ export const all = wrap({
         unordered: {
             functions: "?",
             sequences: 1,
-            allowIterables: true
-        }
+            allowIterables: true,
+        },
     },
     implementation: (predicate, source) => {
         if(predicate){
             NotBoundedError.enforce(source, {
-                message: "Failed to determine whether all elements satisfied the predicate"
+                message: "Failed to determine whether all elements satisfied the predicate",
             });
             for(const element of source){
                 if(!predicate(element)) return false;
             }
         }else{
             NotBoundedError.enforce(source, {
-                message: "Failed to determine whether all elements were truthy"
+                message: "Failed to determine whether all elements were truthy",
             });
             for(const element of source){
                 if(element) return element;
             }
         }
         return true;
+    },
+    tests: {
+        "truthyOnly": (hi) => {
+            const truthy = [true, {}, [], "someValue", 42, new Date(), -42, 3.14, -3.14, Infinity, -Infinity];
+            const result = hi.all(truthy);
+            hi.assertEqual(result, true);
+        },
+        "withPredicate": (hi) => {
+            const evensOnly = [2, 4, 6, 8, 10];
+            const result = hi.all((n) => n % 2 === 0, evensOnly);
+            hi.assertEqual(result, true);
+        },
+        "sequenceWithPredicate": (hi) => {
+            const evensOnly = [2, 4, 6, 8, 10];
+            const result = hi(evensOnly).all((n) => n % 2 === 0);
+            hi.assertEqual(result, true);
+        },
     },
 });
 
