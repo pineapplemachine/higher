@@ -1,5 +1,7 @@
 import {wrap} from "../core/wrap";
 
+import {NotBoundedError} from "../errors/NotBoundedError";
+
 export const any = wrap({
     name: "any",
     summary: "Get whether any elements in a sequence satisfy a predicate.",
@@ -26,26 +28,74 @@ export const any = wrap({
         unordered: {
             functions: "?",
             sequences: 1,
-            allowIterables: true
-        }
+            allowIterables: true,
+        },
     },
     implementation: (predicate, source) => {
         if(predicate){
             NotBoundedError.enforce(source, {
-                message: "Failed to determine whether any elements satisfied the predicate"
+                message: "Failed to determine whether any elements satisfied the predicate",
             });
             for(const element of source){
                 if(predicate(element)) return true;
             }
         }else{
             NotBoundedError.enforce(source, {
-                message: "Failed to determine whether any elements were truthy"
+                message: "Failed to determine whether any elements were truthy",
             });
             for(const element of source){
-                if(element) return element;
+                if(element){
+                    return element;
+                }
             }
         }
         return false;
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": (hi) => {
+            const mixed = [true, true, false, false];
+            const result = hi.any(mixed);
+            hi.assertEqual(result, true);
+        },
+        "truthyOnly": (hi) => {
+            const truthy = [true, {}, [], "someValue", 42, new Date(), -42, 3.14, -3.14, Infinity, -Infinity];
+            const result = hi.any(truthy);
+            hi.assertEqual(result, true);
+        },
+        "falsyOnly": (hi) => {
+            const falsy = [false, 0, "", null, undefined, NaN];
+            const result = hi.any(falsy);
+            hi.assertEqual(result, false);
+        },
+        "withPredicate": (hi) => {
+            // ensure that when one even value is present in the provided
+            // input array, that the "evens only" predicate returns true.
+            const evenAndOdd = [1, 3, 5, 7, 9, 10, 11];
+            const result = hi.any((n) => n % 2 === 0, evenAndOdd);
+            hi.assertEqual(result, true);
+        },
+        "withPredicateFailureMode": (hi) => {
+            // provide an "equals only" predicate, but providing an array
+            // with only odd values should fail.
+            const oddOnly = [1, 3, 5];
+            const result = hi.any((n) => n % 2 === 0, oddOnly);
+            hi.assertEqual(result, false);
+        },
+        "sequenceWithPredicate": (hi) => {
+            const evenAndOdd = [1, 3, 5, 7, 9, 10, 11];
+            const result = hi(evenAndOdd).any((n) => n % 2 === 0);
+            hi.assertEqual(result, true);
+        },
+        "predicateAndSourceReversed": (hi) => {
+            const evenAndOdd = [1, 3, 5, 7, 9, 10, 11];
+            const result = hi.any(evenAndOdd, (n) => n % 2 === 0);
+            hi.assertEqual(result, true);
+        },
+        "predicateAndSourceReversedFailureMode": (hi) => {
+            const oddOnly = [1, 3, 5];
+            const result = hi.any(oddOnly, (n) => n % 2 === 0);
+            hi.assertEqual(result, false);
+        },
     },
 });
 
