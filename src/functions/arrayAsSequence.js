@@ -1,4 +1,4 @@
-import {Sequence} from "./sequence";
+import {Sequence} from "../core/sequence";
 import {isArray, isInteger} from "../core/types";
 import {wrap} from "../core/wrap";
 
