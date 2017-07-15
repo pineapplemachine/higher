@@ -300,6 +300,17 @@ export const map = wrap({
             hi.assertEqual(hi.map(sum, [1], [2, 3, 4], [4, 5]), [7]);
             hi.assertEqual(hi.map(sum, [1, 2], [3], [3, 4, 5]), [7]);
         },
+        "noInputs": hi => {
+            hi.assertEmpty(hi.map(i => i));
+        },
+        "notKnownBoundedInputs": hi => {
+            const a = hi.recur(i => i + 1).seed(0).until(i => i === 100).map(i => i);
+            hi.assertNot(a.bounded());
+            hi.assertNot(a.unbounded());
+            const b = hi.counter().map(i => i);
+            hi.assertNot(b.bounded());
+            hi.assert(b.unbounded());
+        },
     },
 });
 
