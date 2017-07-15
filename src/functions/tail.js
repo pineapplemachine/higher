@@ -1,7 +1,7 @@
-import {ArraySequence} from "../core/arrayAsSequence";
 import {error} from "../core/error";
 import {wrap} from "../core/wrap";
 
+import {ArraySequence} from "./arrayAsSequence";
 import {EmptySequence} from "./emptySequence";
 
 export const TailError = error({

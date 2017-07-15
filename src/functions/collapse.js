@@ -1,4 +1,3 @@
-import {ArraySequence} from "../core/arrayAsSequence";
 import {error} from "../core/error";
 import {isSequence} from "../core/sequence";
 import {isArray} from "../core/types";
@@ -6,6 +5,8 @@ import {wrap} from "../core/wrap";
 
 import {NotBoundedError} from "../errors/NotBoundedError";
 import {OperationError} from "../errors/OperationError";
+
+import {ArraySequence} from "./arrayAsSequence";
 
 // Used internally by collapse function
 const write = function(sequence, root, limit){
@@ -25,6 +26,13 @@ const write = function(sequence, root, limit){
 
 export const CollapseRootError = error({
     summary: "Failed to collapse a sequence due to not having an array at its root.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The error function expects as an argument the sequence for which
+            collapsing failed.
+        `),
+    },
     constructor: function CollapseRootError(sequence){
         this.sequence = sequence;
         this.message = (

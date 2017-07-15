@@ -4,14 +4,22 @@ import {isEqual} from "./isEqual";
 import {isSequence} from "./sequence";
 import {isArray, isFunction, isUndefined} from "./types";
 
-import {equals} from "../functions/equals";
-
+// Helper function used by asserts to get a default message string.
 const assertMessage = (message, value) => (isFunction(message) ?
-    message(value) : (message || "Assertion error")
+    message(value) : (message || "Assertion error.")
 );
 
 export const AssertError = error({
-    url: "", // TODO
+    summary: "An assertion failed.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The error function expects a message string and an optional value
+            to attach to the produced error object; the value object should
+            indicate what argument or arguments were passed such that the
+            assertion was made to fail.
+        `),
+    },
     constructor: function(message, value = undefined){
         this.message = message;
         this.value = value;
@@ -51,6 +59,7 @@ export const assertEqual = function(...values){
     return values;
 };
 
+// Throw an error if all the given values are equal.
 export const assertNotEqual = function(...values){
     if(values.length === 0) return undefined;
     if(isEqual(...values)) throw AssertError(
@@ -59,6 +68,7 @@ export const assertNotEqual = function(...values){
     return values;
 };
 
+// Throw an error if the sequence wasn't empty.
 export const assertEmpty = function(source, message = undefined){
     const sequence = asSequence(source);
     if(sequence.done() &&
@@ -70,6 +80,8 @@ export const assertEmpty = function(source, message = undefined){
     );
 };
 
+// Throw an error if all the callback didn't throw some error satisfying
+// the predicate.
 export const assertFail = function(predicate, callback){
     try{
         callback();

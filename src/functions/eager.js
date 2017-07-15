@@ -1,8 +1,9 @@
-import {ArraySequence} from "../core/arrayAsSequence";
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 import {NotBoundedError} from "../errors/NotBoundedError";
+
+import {ArraySequence} from "./arrayAsSequence";
 
 export const EagerSequence = Sequence.extend({
     summary: "Wrap a sequence with one supporting all sequence operations.",

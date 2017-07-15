@@ -1,9 +1,9 @@
-import {ArraySequence} from "../core/arrayAsSequence";
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 import {BoundsUnknownError} from "../errors/BoundsUnknownError";
 
+import {ArraySequence} from "./arrayAsSequence";
 import {EmptySequence} from "./emptySequence";
 
 export const DropTailSequence = Sequence.extend({

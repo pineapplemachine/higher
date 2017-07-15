@@ -141,10 +141,10 @@ if(process.env.NODE_ENV === "development"){
 }
 
 // Core sequence types
-import {arrayAsSequence} from "./core/arrayAsSequence"; hi.register(arrayAsSequence);
-import {stringAsSequence} from "./core/stringAsSequence"; hi.register(stringAsSequence);
-import {iterableAsSequence} from "./core/iterableAsSequence"; hi.register(iterableAsSequence);
-import {objectAsSequence} from "./core/objectAsSequence"; hi.register(objectAsSequence);
+import {arrayAsSequence} from "./functions/arrayAsSequence"; hi.register(arrayAsSequence);
+import {stringAsSequence} from "./functions/stringAsSequence"; hi.register(stringAsSequence);
+import {iterableAsSequence} from "./functions/iterableAsSequence"; hi.register(iterableAsSequence);
+import {objectAsSequence} from "./functions/objectAsSequence"; hi.register(objectAsSequence);
 
 // Function registry
 import {any} from "./functions/any"; hi.register(any);

@@ -6,6 +6,13 @@ import {NotBoundedError} from "../errors/NotBoundedError";
 
 export const WriteTargetError = error({
     summary: "Write failed because the target was not an array.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The error function expects as an argument the write target that was
+            required to be an array, but was not.
+        `),
+    },
     constructor: function WriteTargetError(target){
         this.target = target;
         this.message = (

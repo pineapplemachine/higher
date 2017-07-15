@@ -22,6 +22,13 @@ export const asObject = (pairs) => {
 
 export const ObjectError = error({
     summary: "Failed to create object because the input was not a sequence nor object.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The error function expects as an argument the value which was
+            required to be a sequence or an object, but was not.
+        `),
+    },
     constructor: function ObjectError(source){
         this.source = source;
         this.message = (
