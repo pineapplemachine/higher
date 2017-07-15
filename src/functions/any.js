@@ -53,9 +53,26 @@ export const any = wrap({
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": (hi) => {
-            const mixed = [true, true, false, false];
-            const result = hi.any(mixed);
-            hi.assertEqual(result, true);
+            const pets = [
+                {
+                    name: "Barley",
+                    age: 8,
+                    vaccinated: true,
+                },
+                {
+                    name: "Boots",
+                    age: 4,
+                    vaccinated: false,
+                },
+                {
+                    name: "Whiskers",
+                    age: 1,
+                    vaccinated: false,
+                },
+            ];
+
+            const anyUnvaccinated = hi.any(pets, (p) => p.age > 1 && p.vaccinated === false);
+            hi.assertEqual(anyUnvaccinated, true);
         },
         "truthyOnly": (hi) => {
             const truthy = [true, {}, [], "someValue", 42, new Date(), -42, 3.14, -3.14, Infinity, -Infinity];
@@ -69,13 +86,13 @@ export const any = wrap({
         },
         "withPredicate": (hi) => {
             // ensure that when one even value is present in the provided
-            // input array, that the "evens only" predicate returns true.
+            // input array, that the "even only" predicate returns true.
             const evenAndOdd = [1, 3, 5, 7, 9, 10, 11];
             const result = hi.any((n) => n % 2 === 0, evenAndOdd);
             hi.assertEqual(result, true);
         },
         "withPredicateFailureMode": (hi) => {
-            // provide an "equals only" predicate, but providing an array
+            // provide an "even only" predicate, but providing an array
             // with only odd values should fail.
             const oddOnly = [1, 3, 5];
             const result = hi.any((n) => n % 2 === 0, oddOnly);
@@ -95,6 +112,21 @@ export const any = wrap({
             const oddOnly = [1, 3, 5];
             const result = hi.any(oddOnly, (n) => n % 2 === 0);
             hi.assertEqual(result, false);
+        },
+        "noInputs": (hi) => {
+            hi.assertEqual(hi.emptySequence().any(), false);
+        },
+        "notKnownBoundedInput": (hi) => {
+            hi.assertFail(
+                (error) => (error.type === "NotBoundedError"),
+                () => hi.recur((i) => i + 1).seed(0).until(100).any()
+            );
+        },
+        "unboundedInput": (hi) => {
+            hi.assertFail(
+                (error) => (error.type === "NotBoundedError"),
+                () => hi.repeatElement(0).any()
+            );
         },
     },
 });
