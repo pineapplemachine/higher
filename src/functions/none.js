@@ -4,6 +4,7 @@ export const none = wrap({
     name: "none",
     summary: "Get whether none of the elements in a sequence satisfy a predicate.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
         detail: (`
             Get whether none of the elements in an input sequence satisfy an
             optional predicate or, if no predicate was provided, whether all

@@ -121,8 +121,12 @@ export const ReduceSequence = Sequence.extend({
 export const reduce = wrap({
     names: ["reduce", "fold"],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
         links: [
-            "https://en.wikipedia.org/wiki/Fold_(higher-order_function)",
+            {
+                description: "Fold higher-order function on Wikipedia",
+                url: "https://en.wikipedia.org/wiki/Fold_(higher-order_function)",
+            },
         ],
     },
     attachSequence: true,

@@ -12,6 +12,7 @@ export const ArraySequence = Sequence.extend({
         "array", "newArray"
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
         methods: {},
     },
     getSequence: process.env.NODE_ENV !== "development" ? undefined : [

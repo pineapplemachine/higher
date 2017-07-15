@@ -7,6 +7,7 @@ export const min = wrap({
     name: "min",
     summary: "Get the minimum element in a sequence.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
         expects: (`
             The function expects a sequence as input and an optional
             [relational function].

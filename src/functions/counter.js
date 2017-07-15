@@ -55,6 +55,7 @@ export const counter = wrap({
     name: "counter",
     summary: "Get a sequence counting up from a given number.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
         detail: (`
             Get a sequence counting up by one from a given number, or from zero
             if no number was given.

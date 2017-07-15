@@ -7,6 +7,7 @@ export const max = wrap({
     name: "max",
     summary: "Get the maximum element in a sequence.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
         expects: (`
             The function expects a sequence as input and an optional
             [relational function].

@@ -42,6 +42,7 @@ export const emptySequence = wrap({
     name: "emptySequence",
     summary: "Get an empty sequence.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
         returns: (`
             The function returns an empty sequence.
         `),

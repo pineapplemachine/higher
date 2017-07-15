@@ -6,6 +6,7 @@ export const any = wrap({
     name: "any",
     summary: "Get whether any elements in a sequence satisfy a predicate.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
         detail: (`
             Get whether any of the elements in an input sequence satisfy an
             optional predicate or, if no predicate was provided, whether any

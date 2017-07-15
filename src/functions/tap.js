@@ -7,6 +7,7 @@ export const TapSequence = Sequence.extend({
         "length", "left", "back", "index", "slice", "has", "get", "copy", "reset"
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
         detail: (`
             Enumerates the elements of the source sequence and invokes a callback
             every time an element is popped from the front or back, passing the
@@ -76,6 +77,7 @@ export const tap = wrap({
     name: "tap",
     summary: "Get a sequence invoking a callback for each element of the input.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
         expects: (`
             The function expects a sequence and a callback as input.
             The callback will be invoked once for every element in the input
