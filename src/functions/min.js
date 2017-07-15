@@ -61,6 +61,12 @@ export const min = wrap({
             const byLength = (a, b) => (a.length < b.length);
             hi.assert(hi.min(strings, byLength) === "it");
         },
+        "stability": hi => {
+            const strings = ["abc", "hello", "xyz", "world"];
+            const byLength = (a, b) => (a.length < b.length);
+            hi.assert(hi.min(strings, byLength) === "abc");
+            hi.assert(hi.reverse(strings).min(byLength) === "xyz");
+        },
         "emptyInput": hi => {
             hi.assertUndefined(hi.emptySequence().min());
         },

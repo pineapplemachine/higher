@@ -61,6 +61,12 @@ export const max = wrap({
             const byLength = (a, b) => (a.length < b.length);
             hi.assert(hi.max(strings, byLength) === "hello");
         },
+        "stability": hi => {
+            const strings = ["abc", "hello", "xyz", "world"];
+            const byLength = (a, b) => (a.length < b.length);
+            hi.assert(hi.max(strings, byLength) === "hello");
+            hi.assert(hi.reverse(strings).max(byLength) === "world");
+        },
         "emptyInput": hi => {
             hi.assertUndefined(hi.emptySequence().max());
         },
