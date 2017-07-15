@@ -53,26 +53,9 @@ export const any = wrap({
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": (hi) => {
-            const pets = [
-                {
-                    name: "Barley",
-                    age: 8,
-                    vaccinated: true,
-                },
-                {
-                    name: "Boots",
-                    age: 4,
-                    vaccinated: false,
-                },
-                {
-                    name: "Whiskers",
-                    age: 1,
-                    vaccinated: false,
-                },
-            ];
-
-            const anyUnvaccinated = hi.any(pets, (p) => p.age > 1 && p.vaccinated === false);
-            hi.assertEqual(anyUnvaccinated, true);
+            const strings = ["hello", "world", "how", "are", "you"];
+            hi.assert(hi.any(strings, (i) => i.startsWith("h"))); // "hello" starts with "h"
+            hi.assertNot(hi.any(strings, (i) => i.startsWith("x"))); // None start with "x"
         },
         "truthyOnly": (hi) => {
             const truthy = [true, {}, [], "someValue", 42, new Date(), -42, 3.14, -3.14, Infinity, -Infinity];
