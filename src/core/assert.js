@@ -43,7 +43,7 @@ export const assertUndefined = function(value, message = undefined){
 };
 
 export const assertNaN = function(value, message = undefined){
-    if(!hi.isNaN(value)) throw AssertError(
+    if(!isNaN(value)) throw AssertError(
         assertMessage(message || "Value must be NaN.", value), value
     );
     return value;
