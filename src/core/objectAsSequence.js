@@ -15,6 +15,7 @@ export const ObjectSequence = Sequence.extend({
         introduced: "higher@1.0.0",
         methods: {
             "keys": {
+                introduced: "higher@1.0.0",
                 summary: "Get a sequence enumerating only the keys of the object.",
                 returns: (`
                     This function returns a sequence enumerating the keys of
@@ -24,6 +25,7 @@ export const ObjectSequence = Sequence.extend({
                 `),
             },
             "values": {
+                introduced: "higher@1.0.0",
                 summary: "Get a sequence enumerating only the values of the object.",
                 returns: (`
                     This function returns a sequence enumerating the values of

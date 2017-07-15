@@ -252,7 +252,14 @@ export const map = wrap({
             "basicSingularUsage", "basicPluralUsage"
         ],
         links: [
-            "https://en.wikipedia.org/wiki/Map_(higher-order_function)",
+            {
+                description: "Map higher-order function on Wikipedia",
+                url: "https://en.wikipedia.org/wiki/Map_(higher-order_function)",
+            },
+            {
+                description: "Clojure's similarly-peculiar map function",
+                url: "https://clojuredocs.org/clojure.core/map",
+            },
         ],
     },
     attachSequence: true,

@@ -14,11 +14,11 @@ export const negate = wrap({
             inputted predicate and returning false for all inputs producing
             a truthy value when passed to that predicate.
         `),
-        related: [
-            "allPass", "anyPass", "nonePass"
-        ],
         examples: [
             "basicUsage"
+        ],
+        related: [
+            "allPass", "anyPass", "nonePass"
         ],
     },
     attachSequence: false,
