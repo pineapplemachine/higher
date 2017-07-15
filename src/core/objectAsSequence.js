@@ -2,6 +2,37 @@ import {Sequence} from "./sequence";
 import {isArray, isObject} from "../core/types";
 import {wrap} from "../core/wrap";
 
+// Helper function used to do an out-of-place insertion sort of object keys
+const pushSorted = (value, array) => {
+    if(array.length < 8){
+        // Use linear insertion sort while the array is small
+        for(let i = 0; i < array.length; i++){
+            if(value < array[i]){
+                array.splice(i, 0, value);
+                return;
+            }
+        }
+        array.push(value);
+    }else{
+        // Use binary insertion sort once the array is larger
+        let low = 0;
+        let high = array.length;
+        let mid = Math.floor(high / 2);
+        while(true){
+            if(array[mid] < value){
+                low = mid + 1;
+            }else{
+                high = mid;
+            }
+            if(low >= high){
+                array.splice(low, 0, value);
+                break;
+            }
+            mid = low + (Math.floor((high - low) / 2));
+        }
+    }
+};
+
 export const ObjectSequence = Sequence.extend({
     summary: "Enumerate the key, value pairs of an object.",
     supportsWith: [],
@@ -12,6 +43,13 @@ export const ObjectSequence = Sequence.extend({
         "object", "newObject"
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        detail: (`
+            Enumerate the key, value pairs of an object in a deterministic order.
+            Sequences produced from different objects having the same keys will
+            always have the keys in their key, value pairs appear in the same
+            order.
+        `),
         methods: {
             "keys": {
                 summary: "Get a sequence enumerating only the keys of the object.",
@@ -33,6 +71,12 @@ export const ObjectSequence = Sequence.extend({
             },
         },
     },
+    getSequence: process.env.NODE_ENV !== "development" ? undefined : [
+        hi => new ObjectSequence({}),
+        hi => new ObjectSequence({a: 0}),
+        hi => new ObjectSequence({a: 0, b: 1}),
+        hi => new ObjectSequence({x: "hello", y: "world", z: "how", w: "do"}),
+    ],
     constructor: function ObjectSequence(
         source, objectKeys = undefined
     ){
@@ -42,7 +86,7 @@ export const ObjectSequence = Sequence.extend({
             this.objectKeys = objectKeys;
         }else{
             this.objectKeys = [];
-            for(const key in source) this.objectKeys.push(key);
+            for(const key in source) pushSorted(key, this.objectKeys);
         }
     },
     object: function(){
