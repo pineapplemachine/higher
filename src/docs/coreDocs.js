@@ -284,12 +284,6 @@ export const coreDocs = {
         introduced: "higher@1.0.0",
         type: "function",
     },
-    "contract": {
-        location: "test/contracts",
-        introduced: "higher@1.0.0",
-        developmentOnly: true,
-        type: "function",
-    },
     "coreDocs": {
         location: "docs/coreDocs",
         introduced: "higher@1.0.0",
@@ -302,6 +296,25 @@ export const coreDocs = {
         introduced: "higher@1.0.0",
         developmentOnly: true,
         type: "array",
+    },
+    "contract": {
+        location: "test/contracts",
+        introduced: "higher@1.0.0",
+        developmentOnly: true,
+        type: "function",
+    },
+    "coreTests": {
+        location: "test/coreTests",
+        introduced: "higher@1.0.0",
+        developmentOnly: true,
+        type: "object",
+    },
+    "coreTestRunner": {
+        location: "test/coreTests",
+        introduced: "higher@1.0.0",
+        internal: true,
+        developmentOnly: true,
+        type: "function",
     },
 };
 

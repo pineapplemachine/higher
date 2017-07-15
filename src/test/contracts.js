@@ -41,9 +41,7 @@ export const contract = (info) => {
         const sequence = getSequence();
         if(this.predicate(sequence)){
             try{
-                for(const test of this.tests){
-                    if(!test(getSequence)) throw ContractError(sequence, this);
-                }
+                if(!this.test(getSequence)) throw ContractError(sequence, this);
             }catch(error){
                 throw (error.type === "ContractError" ? error :
                     ContractError(sequence, this, {error: error})

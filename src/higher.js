@@ -21,6 +21,19 @@ Object.assign(hi, {
         }
         return fancyFunctions[0];
     },
+    // Run core tests
+    testCore: process.env.NODE_ENV !== "development" ? undefined : function(){
+        const result = {
+            core: {},
+            failures: [],
+        };
+        for(const coreName in this.coreTests){
+            const status = this.coreTestRunner(this, this.coreTests[coreName]);
+            result.core[coreName] = status;
+            for(const failure of status.fail) result.failures.push(failure);
+        }
+        return result;
+    },
     // Run function unit tests
     testFunctions: process.env.NODE_ENV !== "development" ? undefined : function(){
         const result = {
@@ -54,13 +67,16 @@ Object.assign(hi, {
     },
     // Run all tests
     test: process.env.NODE_ENV !== "development" ? undefined : function(){
+        const core = this.testCore();
         const functions = this.testFunctions();
         const sequences = this.testSequences();
         const result = {
+            core: core.core,
             functions: functions.functions,
             sequences: sequences.sequences,
             failures: [],
         };
+        result.failures.push(...core.failures);
         result.failures.push(...functions.failures);
         result.failures.push(...sequences.failures);
         return result;
@@ -133,11 +149,14 @@ hi.wrap = wrap;
 import {coreDocs} from "./docs/coreDocs";
 import {glossary} from "./docs/glossary";
 import {contract} from "./test/contracts";
+import {coreTests, coreTestRunner} from "./test/coreTests";
 if(process.env.NODE_ENV === "development"){
     hi.coreDocs = coreDocs;
     hi.glossary = glossary;
     hi.contract = contract;
     hi.contracts = contract.contracts;
+    hi.coreTests = coreTests;
+    hi.coreTestRunner = coreTestRunner;
 }
 
 // Core sequence types

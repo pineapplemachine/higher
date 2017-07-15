@@ -85,7 +85,7 @@ The `docs` and `tests` attributes must be assigned to `undefined` when `process.
 
 `summary` is a string briefly describing the function. It should be no longer than 100 characters, though this is a guideline and not a strict limit.
 
-`tests` is an object associating keys with test functions, where every test function must accept a single parameter passing a complete `hi` object. When a test function throws any error it indicates a failure, otherwise it indicates that the test has passed. Test functions do not return a value.
+`tests` is an object associating keys with test functions, where every test function must accept a single parameter passing a complete `hi` object. When a test function throws any error it indicates a failure, otherwise it indicates that the test has passed. Test functions do not return a value or, if they do, that value is ignored.
 
 `docs` is an object having these attributes:
 
@@ -94,9 +94,9 @@ which it was first added. This attribute must be present always. An example of s
 - `detail`: For functions whose brief `summary` attribute may not be adequately descriptive, a `detail` attribute may be included which is a more complete description of the function.
 - `expects`: For functions that expect arguments, a statement such as "The function expects..." describing what arguments the function expects and what purpose each of those functions serves. This attribute must be present when the function accepts any arguments and must be absent otherwise.
 - `returns`: For functions that return a value, a statement such as "The function returns..." describing what the function returns and under what conditions. This attribute must be present when the function returns any value and must be absent otherwise.
-- `throws`: For functions that may throw an error, a statement such as "The function throws..." describing what errors the function may throw and under what conditions. This applies only to errors thrown within the `implementation` of a wrapped function; it does not apply to things like externally-enforced argument validation errors. This attribute must be present when the function would throw an error under any circumstances and must be absent otherwise. Every error type that the function could throw should be identified with a link, for example `The function throws a @NotBoundedError when...`.
+- `throws`: For functions that may throw an error, a statement such as "The function throws..." describing what errors the function may throw and under what conditions. This applies only to errors thrown within the `implementation` of a wrapped function; it does not apply to things like externally-enforced argument validation errors. This attribute must be present when the function would throw an error under any circumstances and must be absent otherwise. Every error type that the function could throw should be identified with a link, for example "The function throws a @NotBoundedError when...".
 - `warnings`: For functions that may have dangerous or unexpected behavior in certain cases, a `warnings` attribute must be present describing those cases. An example of dangeous or unexpected behavior would be a function producing an infinite loop for some inputs.
-- `developers`: For information that may be important to those who are extending some functionality or interacting with it in an advanced way.
+- `developers`: A documentating string stating information that may be important to those who are extending some functionality or interacting with it in an advanced way.
 - `examples`: An array of strings where each string is the key associated with some test in the function's `tests` object. These indicate which tests are useful as usage examples for someone trying to learn how and why to use the function. This attribute must be present always, and must refer to at least one existing test.
 - `related`: An array of strings where each string is an identifier registered with the global `hi` object. Each identifier must refer to an object that is somehow related to this one. For example, the `first` and `last` functions are both related to each other because they solve conceptually similar problems. This attribute is never absolutely required to be present.
 - `links`: An array of objects containing hyperlinks to external resources and brief descriptions of these links. An example of such an object might be `{description: "Map higher-order function on Wikipedia", url: "https://en.wikipedia.org/wiki/Map_(higher-order_function)"}`. This attribute is never absolutely required to be present.
@@ -153,7 +153,7 @@ The `docs` and `getSequence` attributes must be assigned to `undefined` when `pr
 which it was first added. This attribute must be present always. An example of such a package and version string would be `higher@1.0.0`.
 - `detail`: For sequence types whose brief `summary` attribute may not be adequately descriptive, a `detail` attribute may be included which is a more complete description of the sequence type.
 - `warnings`: For sequences that may have dangerous or unexpected behavior in certain cases, a `warnings` attribute must be present describing those cases. An example of dangeous or unexpected behavior would be a sequence's `front` or `popFront` entering an infinite loop in some cases.
-- `developers`: For information that may be important to those who are extending some functionality or interacting with it in an advanced way.
+- `developers`: A documentating string stating information that may be important to those who are extending some functionality or interacting with it in an advanced way.
 - `methods`: An object where each key corresponds to a nonstandard method that the sequence type exposes; the contents of every object mapped to such a key must be as though describing a wrapped function, with the addition of a `summary` attribute following the `introduced` attribute serving the same purpose as a normal function summary.
 
 Here is an example showing what the `summary`, `docs`, and `tests` attributes may look like for a sequence type:
@@ -345,6 +345,49 @@ Here is an example showing what a `coreDocs` entry might look like:
                 The function returns its input.
             `),
         },
+    },
+},
+```
+
+Core tests must be implemented in `test/coreTests.js`. The module exports a `coreTests` object which associates symbol keys with an object containing tests. Just like the tests of a wrapped function, the tests must be named so that they may can be identified, for example when indicating which tests should be given as usage examples, and they must accept a complete `hi` object as their single argument. Test functions do not return values; if they do return a value, that value is ignored.
+
+Here is an example showing what a core function test might look like:
+
+``` js
+"asSequence": {
+    "basicUsageArray": hi => {
+        const seq = hi.asSequence([1, 2, 3]);
+        hi.assert(seq.nextFront() == 1);
+        hi.assert(seq.nextFront() == 2);
+        hi.assert(seq.nextFront() == 3);
+        hi.assert(seq.done());
+    },
+    "basicUsageString": hi => {
+        const seq = hi.asSequence("hi!");
+        hi.assert(seq.nextFront() == "h");
+        hi.assert(seq.nextFront() == "i");
+        hi.assert(seq.nextFront() == "!");
+        hi.assert(seq.done());
+    },
+    "basicUsageObject": hi => {
+        const obj = {hello: "world"};
+        const seq = hi.asSequence(obj);
+        hi.assertEqual(seq.nextFront(), {
+            key: "hello", value: "world"
+        });
+        hi.assert(seq.done());
+    },
+    "basicUsageIterable": hi => {
+        const countdown = function*(n){
+            while(n > 0) yield n--;
+            yield 0;
+        };
+        const seq = hi.asSequence(countdown(3));
+        hi.assert(seq.nextFront() == 3);
+        hi.assert(seq.nextFront() == 2);
+        hi.assert(seq.nextFront() == 1);
+        hi.assert(seq.nextFront() == 0);
+        hi.assert(seq.done());
     },
 },
 ```
