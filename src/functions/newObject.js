@@ -8,6 +8,7 @@ export const newObject = wrap({
     name: "newObject",
     summary: "Get a new object from key, value pairs.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
         expects: (`
             The function expects either an object or a known-bounded sequence
             of key, value pairs.

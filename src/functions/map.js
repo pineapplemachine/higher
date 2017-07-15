@@ -223,6 +223,7 @@ export const map = wrap({
     name: "map",
     summary: "Get a sequence enumerating elements with a transformation applied to each.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
         detail: (`
             Get a sequence enumerating the result of applying a transformation
             function to each corresponding set of elements of the input

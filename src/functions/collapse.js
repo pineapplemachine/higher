@@ -40,6 +40,7 @@ export const collapse = wrap({
     name: "collapse",
     summary: "Write the contents of a sequence to the array at its root.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
         detail: (`
             Given a sequence with an array at its root, the function consumes
             that sequence and writes its contents to that array.

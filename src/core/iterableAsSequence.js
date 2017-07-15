@@ -7,6 +7,7 @@ export const IterableSequence = Sequence.extend({
     supportsWith: [],
     supportsAlways: [],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
         detail: (`
             An IterableSequence is a light wrapper around any object with a
             "next" method returning objects with "item" and "done" attributes.

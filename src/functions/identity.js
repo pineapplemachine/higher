@@ -4,6 +4,7 @@ export const identity = wrap({
     name: "identity",
     summary: "A function accepting a single argument that always returns its input.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
         expects: (`
             The function expects a single argument of any kind.
         `),

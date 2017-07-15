@@ -5,6 +5,7 @@ export const allPass = wrap({
     name: "allPass",
     summary: "Get a predicate that is the logical AND of its input functions.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
         detail: (`
             Combines any number of predicate functions to produce a predicate
             which is satisfied only by those inputs which satisfy all

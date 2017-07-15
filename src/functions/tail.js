@@ -24,6 +24,7 @@ export const tail = wrap({
     name: "tail",
     summary: "Get the trailing elements of a sequence.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
         expects: (`
             The function expects a sequence as input and the number of trailing
             elements to acquire. To acquire one or more elements, the input

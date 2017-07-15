@@ -4,6 +4,7 @@ export const negate = wrap({
     name: "negate",
     summary: "Get the logical negation of a predicate function.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
         expects: (`
             The function expects a single predicate function as its input.
         `),

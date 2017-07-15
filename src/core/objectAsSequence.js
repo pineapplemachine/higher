@@ -12,6 +12,7 @@ export const ObjectSequence = Sequence.extend({
         "object", "newObject"
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
         methods: {
             "keys": {
                 summary: "Get a sequence enumerating only the keys of the object.",
@@ -111,6 +112,7 @@ export const ObjectValuesSequence = Sequence.extend({
         "length", "left", "has", "get", "copy", "reset"
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
         methods: {},
     },
     constructor: function ObjectValuesSequence(

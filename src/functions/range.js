@@ -232,6 +232,7 @@ export const range = wrap({
     name: "range",
     summary: "Enumerate numbers from a beginning value until an ending value.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
         expects: (`
             The function expects either one, two, or three numbers as arguments.
             When the function receives three numbers, they represent the

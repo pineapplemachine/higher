@@ -132,6 +132,7 @@ export const filter = wrap({
     name: "filter",
     summary: "Get a sequence enumerating only those elements satisfying a predicate.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
         expects: (`
             The function expects a sequence and a predicate function as input.
             The predicate will be applied to each element of the input sequence

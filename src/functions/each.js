@@ -4,6 +4,7 @@ export const each = wrap({
     names: ["each", "forEach"],
     summary: "Invoke a callback for every element in a sequence.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
         links: [
             "https://en.wikipedia.org/wiki/Foreach_loop",
         ],
