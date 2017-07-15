@@ -357,16 +357,16 @@ Here is an example showing what a core function test might look like:
 "asSequence": {
     "basicUsageArray": hi => {
         const seq = hi.asSequence([1, 2, 3]);
-        hi.assert(seq.nextFront() == 1);
-        hi.assert(seq.nextFront() == 2);
-        hi.assert(seq.nextFront() == 3);
+        hi.assert(seq.nextFront() === 1);
+        hi.assert(seq.nextFront() === 2);
+        hi.assert(seq.nextFront() === 3);
         hi.assert(seq.done());
     },
     "basicUsageString": hi => {
         const seq = hi.asSequence("hi!");
-        hi.assert(seq.nextFront() == "h");
-        hi.assert(seq.nextFront() == "i");
-        hi.assert(seq.nextFront() == "!");
+        hi.assert(seq.nextFront() === "h");
+        hi.assert(seq.nextFront() === "i");
+        hi.assert(seq.nextFront() === "!");
         hi.assert(seq.done());
     },
     "basicUsageObject": hi => {
@@ -383,10 +383,10 @@ Here is an example showing what a core function test might look like:
             yield 0;
         };
         const seq = hi.asSequence(countdown(3));
-        hi.assert(seq.nextFront() == 3);
-        hi.assert(seq.nextFront() == 2);
-        hi.assert(seq.nextFront() == 1);
-        hi.assert(seq.nextFront() == 0);
+        hi.assert(seq.nextFront() === 3);
+        hi.assert(seq.nextFront() === 2);
+        hi.assert(seq.nextFront() === 1);
+        hi.assert(seq.nextFront() === 0);
         hi.assert(seq.done());
     },
 },
