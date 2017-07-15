@@ -3,6 +3,81 @@
 Here is an exhaustive specification of what information is expected for
 documentation and tests for various higher objects.
 
+## Documentation strings
+
+With the exception of summaries which are meant, in general, to be no longer than 100 characters, higher omits empty lines and ignores newlines in documentation strings and substitutes single spaces for them instead.
+
+For example, this `returns` documentation string:
+
+``` js
+export const filter = wrap({
+    name: "filter",
+    summary: "Get a sequence enumerating only those elements satisfying a predicate.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        returns: (`
+            The function returns a sequence enumerating only those elements of
+            the input which satisfy the predicate.
+        `),
+    },
+});
+```
+
+Will be processed and replaced with this result as far as anyone interfacing with the wrapped function's documentation is concerned:
+
+``` js
+export const filter = wrap({
+    name: "filter",
+    summary: "Get a sequence enumerating only those elements satisfying a predicate.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        returns: "The function returns a sequence enumerating only those elements of the input which satisfy the predicate.",
+    },
+});
+```
+
+To force a newline to be present in the outputted documentation, begin the first line of a new paragraph with the `/` character.
+
+For example, this `developers` documentation string:
+
+``` js
+export const collapse = wrap({
+    name: "collapse",
+    summary: "Write the contents of a sequence to the array at its root.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        developers: (`
+            Sequence types with a collapseBreak method necessitate writing their
+            contents fully to the array before continuing up the sequence chain,
+            and may cause a substantial performance impact for very long
+            sequences. For long sequences or sequences with many breaks in their
+            chain, it may be preferable to produce an out-of-place array.
+            /Collapsing is not possible if any sequence in the chain that follows
+            one with a collapseBreak method does not support a rebase operation,
+            or if a sequence itself having a collapseBreak method does not
+            support a rebase operation.
+            /Note that this failure would indicate an issue with a sequence
+            implementation, not a usage error.
+        `),
+    },
+});
+```
+
+Will be processed and replaced with this result:
+
+``` js
+export const collapse = wrap({
+    name: "collapse",
+    summary: "Write the contents of a sequence to the array at its root.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        developers: "Sequence types with a collapseBreak method necessitate writing their contents fully to the array before continuing up the sequence chain, and may cause a substantial performance impact for very long sequences. For long sequences or sequences with many breaks in their chain, it may be preferable to produce an out-of-place array.\nCollapsing is not possible if any sequence in the chain that follows one with a collapseBreak method does not support a rebase operation, or if a sequence itself having a collapseBreak method does not support a rebase operation.\nNote that this failure would indicate an issue with a sequence implementation, not a usage error.",
+    },
+});
+```
+
+## Links
+
+A link is a string of the format `@target`, `[target]`, or `[alias](target)` which may appear within documentation strings. A link indicates that the text is referring to some specific symbol or glossary term that higher defines. The `@target` syntax must be used to refer to identifiers such as function names or sequence type names. The `[target]` syntax must be used for things such as glossary terms that are not necessarily identifiers, and which may contain punctuation. The `[alias](target)` syntax must be used if the text appearing in the documentation string is not exactly identical to the glossary term being linked to, or if it is desireable to name an identifier but in a plural form, for example `[FilterSequences](FilterSequence)`.
+
+The `[alias](target)` syntax may also be used to represent a hyperlink, i.e. the target is a URL rather than an identifier or a glossary term. However, placing the link in a documentation object's `links` attribute with an explanatory description should be preferred over this usage.
+
 ## Documenting wrapped functions
 
 A wrapped function has `summary`, `docs`, and `tests` attributes.
@@ -275,6 +350,12 @@ Here is an example showing what a `coreDocs` entry might look like:
 ```
 
 ## Other topics
+
+A good docstring:
+
+- Uses clear and unambiguous language to the greatest extent possible.
+- Uses links to help readers quickly navigate to and understand the role of objects or terms that are related to the function.
+- Uses a minimum of jargon and obscure terms and, when such terms are necessary to make the explanation, are elaborated by links to the glossary.
 
 A good usage example:
 
