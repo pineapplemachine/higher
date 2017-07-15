@@ -84,12 +84,13 @@ hi.validAsBoundedSequence = validAsBoundedSequence;
 hi.validAsUnboundedSequence = validAsUnboundedSequence;
 
 import {
-    assert, assertNot, assertUndefined,
+    assert, assertNot, assertUndefined, assertNaN,
     assertEqual, assertNotEqual, assertEmpty, assertFail
 } from "./core/assert";
 hi.assert = assert;
 hi.assertNot = assertNot;
 hi.assertUndefined = assertUndefined;
+hi.assertNaN = assertNaN;
 hi.assertEqual = assertEqual;
 hi.assertNotEqual = assertNotEqual;
 hi.assertEmpty = assertEmpty;

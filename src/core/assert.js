@@ -7,7 +7,7 @@ import {isArray, isFunction, isUndefined} from "./types";
 import {equals} from "../functions/equals";
 
 const assertMessage = (message, value) => (isFunction(message) ?
-    message(value) : (message || "Assertion error")
+    message(value) : (message || "Assertion error.")
 );
 
 export const AssertError = error({
@@ -37,7 +37,16 @@ export const assertNot = function(condition, message = undefined){
 // Throw an error if the input value isn't undefined.
 export const assertUndefined = function(value, message = undefined){
     if(!isUndefined(value)) throw AssertError(
-        assertMessage(message, value), value
+        assertMessage(message || "Value must be undefined.", value), value
+    );
+    return value;
+};
+
+export const assertNaN = function(value, message = undefined){
+    // EMCA spec says value !== value is true if and only if value is NaN.
+    // https://tc39.github.io/ecma262/#sec-isnan-number
+    if(value === value) throw AssertError(
+        assertMessage(message || "Value must be NaN.", value), value
     );
     return value;
 };

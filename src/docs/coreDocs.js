@@ -84,6 +84,11 @@ export const coreDocs = {
         introduced: "1.0.0",
         summary: "Throw an @AssertError when a value is not undefined.",
     },
+    "assertNaN": {
+        location: "core/assert",
+        introduced: "1.0.0",
+        summary: "Throw an @AssertError when a value is NaN.",
+    },
     "assertEqual": {
         location: "core/assert",
         introduced: "1.0.0",
