@@ -8,7 +8,7 @@ export const max = wrap({
     summary: "Get the maximum element in a sequence.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         expects: (`
-            The function expects a sequence as input an an optional
+            The function expects a sequence as input and an optional
             [relational function].
             If no relational function was passed, the default relational
             function \`(a, b) => (a < b)\` is used.
