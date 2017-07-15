@@ -1,1 +1,0 @@
-import hi from "./higher";
