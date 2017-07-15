@@ -1,4 +1,4 @@
-import {asSequence} from "../core/asSequence";
+import {sequenceConverters} from "../core/asSequence";
 import {error} from "../core/error";
 import {isSequence} from "../core/sequence";
 import {isArray, isString} from "../core/types";
@@ -46,7 +46,7 @@ export const NotBoundedError = error({
         ){
             return source;
         }
-        for(const converter of asSequence.converters){
+        for(const converter of sequenceConverters){
             if(converter.predicate(source)){
                 if(converter.bounded(source)){
                     return source;

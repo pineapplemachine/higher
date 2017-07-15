@@ -13,10 +13,6 @@ const ofText = (passed, failed) => {
 
 const results = hi.test();
 
-const coreNames = [];
-for(const coreName in results.core) coreNames.push(coreName);
-coreNames.sort();
-
 const functionNames = [];
 for(const functionName in results.functions) functionNames.push(functionName);
 functionNames.sort();
@@ -27,16 +23,6 @@ sequenceNames.sort();
 
 let totalPassed = 0;
 let totalFailed = 0;
-
-for(const name of coreNames){
-    const passed = results.core[name].pass.length;
-    const failed = results.core[name].fail.length;
-    totalPassed += passed;
-    totalFailed += failed;
-    console.log(
-        `Core ${name}: passed ${ofText(passed, failed)} tests.`
-    );
-}
 
 for(const name of functionNames){
     const passed = results.functions[name].pass.length;
@@ -56,14 +42,6 @@ for(const name of sequenceNames){
     console.log(
         `Sequence ${name}: passed ${ofText(passed, failed)} tests.`
     );
-}
-
-for(const name of coreNames){
-    for(const failure of results.core[name].fail){
-        console.error(red(
-            `Core ${name}.${failure.name} test failed: ${failure.error.stack}`
-        ));
-    }
 }
 
 for(const name of functionNames){

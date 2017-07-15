@@ -5,7 +5,7 @@ documentation and tests for various higher objects.
 
 ## Documentation strings
 
-With the exception of summaries which are meant, in general, to be no longer than 100 characters, in documentation strings higher replaces any uninterrupted series of whitespace that includes a newline character with one space.
+With the exception of summaries which are meant, in general, to be no longer than 80 characters, in documentation strings higher replaces any uninterrupted series of whitespace that includes a newline character with one space.
 
 For example, this `returns` documentation string:
 
@@ -83,7 +83,7 @@ The `[alias](target)` syntax may also be used to represent a hyperlink, i.e. the
 A wrapped function has `summary`, `docs`, and `tests` attributes.
 The `docs` and `tests` attributes must be assigned to `undefined` when `process.env.NODE_ENV !== "development"` so that they will be omitted from minified production builds.
 
-`summary` is a string briefly describing the function. It should be no longer than 100 characters, though this is a guideline and not a strict limit.
+`summary` is a string briefly describing the function. It should be no longer than 80 characters, though this is a guideline and not a strict limit.
 
 `tests` is an object associating keys with test functions, where every test function must accept a single parameter passing a complete `hi` object. When a test function throws any error it indicates a failure, otherwise it indicates that the test has passed. Test functions do not return a value or, if they do, that value is ignored.
 
@@ -91,6 +91,7 @@ The `docs` and `tests` attributes must be assigned to `undefined` when `process.
 
 - `introduced`: The package which defines this function and the version in
 which it was first added. This attribute must be present always. An example of such a package and version string would be `higher@1.0.0`.
+- `deprecated`: If the function has been deprecated, it must be indicated with a version string describing which version the function was deprecated in. For example, `higher@1.1.0`.
 - `detail`: For functions whose brief `summary` attribute may not be adequately descriptive, a `detail` attribute may be included which is a more complete description of the function.
 - `expects`: For functions that expect arguments, a statement such as "The function expects..." describing what arguments the function expects and what purpose each of those functions serves. This attribute must be present when the function accepts any arguments and must be absent otherwise.
 - `returns`: For functions that return a value, a statement such as "The function returns..." describing what the function returns and under what conditions. This attribute must be present when the function returns any value and must be absent otherwise.
@@ -143,7 +144,7 @@ export const negate = wrap({
 A `Sequence` type has `summary`, `docs`, and `getSequence` attributes.
 The `docs` and `getSequence` attributes must be assigned to `undefined` when `process.env.NODE_ENV !== "development"` so that they will be omitted from minified production builds.
 
-`summary` is a string briefly describing the sequence type. It should be no longer than 100 characters, though this is a guideline and not a strict limit.
+`summary` is a string briefly describing the sequence type. It should be no longer than 80 characters, though this is a guideline and not a strict limit.
 
 `getSequence` is a list of functions where each function accepts a complete `hi` object as its single argument and returns a sequence of the type the attribute belongs to. An example of such a function might be `hi => new FilterSequence(i => i % 2, hi.range(0, 10))`. Every function in the list is used to test the sample sequences against sequence contracts; sequence contracts enforce the correctness of properties such as bidirectionality and random access.
 
@@ -151,6 +152,7 @@ The `docs` and `getSequence` attributes must be assigned to `undefined` when `pr
 
 - `introduced`: The package which defines this function and the version in
 which it was first added. This attribute must be present always. An example of such a package and version string would be `higher@1.0.0`.
+- `deprecated`: If the sequence has been deprecated, it must be indicated with a version string describing which version the sequence was deprecated in. For example, `higher@1.1.0`.
 - `detail`: For sequence types whose brief `summary` attribute may not be adequately descriptive, a `detail` attribute may be included which is a more complete description of the sequence type.
 - `warnings`: For sequences that may have dangerous or unexpected behavior in certain cases, a `warnings` attribute must be present describing those cases. An example of dangeous or unexpected behavior would be a sequence's `front` or `popFront` entering an infinite loop in some cases.
 - `developers`: A documentating string stating information that may be important to those who are extending some functionality or interacting with it in an advanced way.
@@ -206,7 +208,7 @@ export const ObjectSequence = Sequence.extend({
 An error type has `summary` and `docs` attributes.
 The `docs` attribute must be assigned to `undefined` when `process.env.NODE_ENV !== "development"` so that it will be omitted from minified production builds.
 
-`summary` is a string briefly describing the sequence type. It should be no longer than 100 characters, though this is a guideline and not a strict limit.
+`summary` is a string briefly describing the sequence type. It should be no longer than 80 characters, though this is a guideline and not a strict limit.
 
 `docs` is an object having the same attributes as a wrapped function except that the `returns` attribute must always be omitted; it is assumed that an error function returns an error object of the specified type.
 Note that rather than associating functions that may throw the error type via a `related` attribute it is preferable to relate them by indicating that the function may throw an error of this type in that function's own `throws` documentation.
@@ -232,7 +234,7 @@ export const BoundsUnknownError = error({
 
 A sequence contract has `summary` and `docs` attributes.
 
-`summary` is a string briefly describing the sequence type. It should be no longer than 100 characters, though this is a guideline and not a strict limit.
+`summary` is a string briefly describing the sequence type. It should be no longer than 80 characters, though this is a guideline and not a strict limit.
 
 `docs` is an object having these attributes in this order:
 
@@ -265,6 +267,8 @@ export const CopyingContract = contract({
 
 ## Documenting core functions
 
+Core modules must export a `coreDocs` object that is `undefined` when `process.env.NODE_ENV !== "development"` and otherwise associates function names implemented in that module with an object containing tests and documentation.
+
 Core functions must be documented in `src/docs/coreDocs.js` and must be tested in `src/test/coreTests.js`. The `coreDocs` module exports a dictionary where every externally-exposed attribute of the `hi` object implemented in the `src/core/` directory is associated by name with an object which documents it. It has the same attributes as a wrapped function with a few added.
 
 Every such object is one having these attributes in this order:
@@ -276,7 +280,7 @@ which it was first added. This attribute must be present always. An example of s
 - `internal`: Symbols that are not part of the `hi` object may optionally be documented in `coreDocs` as well, but they must be marked as intended only for internal use by including an `internal: true` attribute. It is preferred that internal functions be documented in `coreDocs` as well as externally-exposed ones.
 - `developmentOnly`: Symbols of the `hi` object which are defined only in development environments and not in production builds must be marked as such with a `developmentOnly: true` attribute.
 - `type`: A string such as `array`, `object`, `function`, `constructor`, `number`, `string`, etc. describing for documentation purposes the type of the attribute.
-- `summary`: A string briefly describing the function. It should be no longer than 100 characters, though this is a guideline and not a strict limit.
+- `summary`: A string briefly describing the function. It should be no longer than 80 characters, though this is a guideline and not a strict limit.
 - `detail`: Same as for wrapped functions.
 - `expects`: Same as for wrapped functions. If the symbol is not a function, it should not have an `expects` attribute.
 - `returns`: Same as for wrapped functions. If the symbol is not a function, it should not have a `returns` attribute.

@@ -1,79 +1,94 @@
 import {args} from "./arguments";
-import {asSequence, validAsSequence} from "./asSequence";
+import {addSequenceConverter, asSequence, validAsSequence} from "./asSequence";
 import {callAsync} from "./callAsync";
 import {constants} from "./constants";
-import {Sequence} from "./sequence";
+import {lightWrap, wrappedTestRunner} from "./lightWrap";
+import {attachSequenceMethods} from "./sequence";
 import {isFunction, isIterable, isObject, isString} from "./types";
 
-import {cleanString} from "../docs/cleanString";
+import {cleanDocs} from "../docs/cleanString";
 
-export const wrap = function(info){
-    // TODO: Better errors
-    if(!info.implementation) throw "No implementation!";
-    if(!info.arguments) throw "No argument information!";
-    if(!info.name && !info.names) throw "No names!";
-    const fancy = wrap.fancy(info);
-    fancy.names = info.names || [info.name];
-    Object.defineProperty(fancy, "name", {
-        value: info.name || info.names[0], writable: false
-    });
-    fancy.sequences = info.sequences;
-    fancy.errors = info.errors;
-    fancy.args = info.arguments;
-    fancy.implementation = info.implementation;
-    fancy.summary = info.summary;
-    fancy.docs = wrap.cleanDocs(info);
-    fancy.tests = info.tests;
-    fancy.test = wrap.testRunner(fancy.name, info);
-    fancy.method = wrap.method(info);
-    if(fancy.method){
-        fancy.method.implementation = info.methodImplementation || info.implementation;
-    }
-    if(info.async){
-        fancy.async = wrap.fancyAsync(fancy);
-        if(fancy.method){
-            fancy.method.async = wrap.methodAsync(fancy.method);
+export const wrap = lightWrap({
+    summary: "Get a wrapped function from a function descriptor.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+    },
+    implementation: function wrap(info){
+        if(!info.implementation){
+            throw new Error("Missing implementation for wrapped function.");
         }
-    }
-    if(info.attachSequence){
-        Sequence.attach(fancy);
-    }
-    if(info.asSequence){
-        const converter = Object.assign(
-            {transform: info.implementation}, info.asSequence
-        );
-        asSequence.addConverter(converter);
-    }
-    return fancy;
-};
+        if(!info.arguments){
+            throw new Error("Missing arguments information for wrapped function.");
+        }
+        if(!info.name && !info.names){
+            throw new Error("Missing name or names for wrapped function.");
+        }
+        const fancy = wrap.fancy(info);
+        fancy.names = info.names || [info.name];
+        Object.defineProperty(fancy, "name", {
+            value: info.name || info.names[0], writable: false
+        });
+        fancy.sequences = info.sequences;
+        fancy.errors = info.errors;
+        fancy.args = info.arguments;
+        fancy.implementation = info.implementation;
+        fancy.summary = info.summary;
+        fancy.method = wrap.method(info);
+        if(fancy.method){
+            fancy.method.implementation = info.methodImplementation || info.implementation;
+        }
+        if(info.async){
+            fancy.async = wrap.fancyAsync(fancy);
+            if(fancy.method){
+                fancy.method.async = wrap.methodAsync(fancy.method);
+            }
+        }
+        if(info.attachSequence){
+            attachSequenceMethods(fancy);
+        }
+        if(info.asSequence){
+            const converter = Object.assign(
+                {transform: info.implementation}, info.asSequence
+            );
+            addSequenceConverter(converter);
+        }
+        if(process.env.NODE_ENV === "development"){
+            fancy.docs = cleanDocs(info.docs);
+            fancy.tests = info.tests;
+            fancy.test = wrappedTestRunner(fancy.name, info.tests);
+        }
+        return fancy;
+    },
+});
 
+// TODO: Move most of this out of the wrap object
 Object.assign(wrap, {
     expecting: {
         anything: (value) => value,
         number: (value) => {
             if(isNaN(value)){
-                throw "Expecting a number."; // TODO: Better error messages
+                throw new Error("Expecting a number."); // TODO: Better error messages
             }else{
                 return +value;
             }
         },
         function: (value) => {
             if(!isFunction(value)){
-                throw "Expecting a function.";
+                throw new Error("Expecting a function.");
             }else{
                 return value;
             }
         },
         object: (value) => {
             if(!isObject(value)){
-                throw "Expecting an object.";
+                throw new Error("Expecting an object.");
             }else{
                 return value;
             }
         },
         array: (value) => {
             if(!isArray(value)){
-                throw "Expecting an array.";
+                throw new Error("Expecting an array.");
             }else{
                 return value;
             }
@@ -83,14 +98,14 @@ Object.assign(wrap, {
         },
         iterable: (value) => {
             if(!isIterable(value)){
-                throw "Expecting an iterable.";
+                throw new Error("Expecting an iterable.");
             }else{
                 return value;
             }
         },
         sequence: (value) => {
             if(!validAsSequence(value)){
-                throw "Expecting a sequence.";
+                throw new Error("Expecting a sequence.");
             }else{
                 return asSequence(value);
             }
@@ -99,11 +114,11 @@ Object.assign(wrap, {
             for(const option of options){
                 if(value === option) return option;
             }
-            throw `Expecting one of ${options.join(", ")}.`;
+            throw new Error(`Expecting one of ${options.join(", ")}.`);
         }),
         arrayOf: (each) => ((value) => {
             if(!isArray(value)){
-                throw "Expecting an array."
+                throw new Error("Expecting an array.")
             }
             for(let i = 0; i < value.length; i++){
                 value[i] = each(value[i]);
@@ -304,49 +319,17 @@ Object.assign(wrap, {
         }
     },
     fancyAsync: function(fancy){
-        return wrap.async((caller, callArgs) => fancy.apply(caller, callArgs));
-    },
-    methodAsync: function(method){
-        return wrap.async((caller, callArgs) => method.apply(caller, callArgs));
-    },
-    async: function(callback){
         return function(...callArgs){
             return new constants.Promise((resolve, reject) => {
-                callAsync(() => resolve(callback(this, callArgs)));
+                callAsync(() => resolve(fancy(callArgs)));
             });
         };
     },
-    cleanDocs: function(info){
-        if(!info.docs) return undefined;
-        info.docs.detail = cleanString(info.docs.detail || "");
-        info.docs.expects = cleanString(info.docs.expects || "");
-        info.docs.returns = cleanString(info.docs.returns || "");
-        info.docs.throws = cleanString(info.docs.throws || "");
-        info.docs.warnings = cleanString(info.docs.warnings || "");
-        info.docs.developers = cleanString(info.docs.developers || "");
-        return info.docs;
-    },
-    testRunner: function(name, info){
-        if(!info.tests) return undefined;
-        return hi => {
-            const result = {
-                pass: [],
-                fail: [],
-            };
-            for(const testName in info.tests){
-                const test = info.tests[testName];
-                let success = true;
-                try{
-                    test(hi);
-                }catch(error){
-                    success = false;
-                    result.fail.push({name: testName, error: error});
-                }
-                if(success){
-                    result.pass.push({name: testName});
-                }
-            }
-            return result;
+    methodAsync: function(method){
+        return function(...callArgs){
+            return new constants.Promise((resolve, reject) => {
+                callAsync(() => resolve(method.apply(this, callArgs)));
+            });
         };
     },
 });

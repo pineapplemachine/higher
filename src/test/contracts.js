@@ -1,5 +1,6 @@
 import {error} from "../core/error";
 import {isEqual} from "../core/isEqual";
+import {lightWrap} from "../core/lightWrap";
 
 export const ContractError = error({
     summary: "A sequence failed to compy with a contract.",
@@ -35,26 +36,37 @@ export const ContractError = error({
     },
 });
 
-// TODO: Make a Contract class
-export const contract = (info) => {
-    info.enforce = function(getSequence){
-        const sequence = getSequence();
-        if(this.predicate(sequence)){
-            try{
-                if(!this.test(getSequence)) throw ContractError(sequence, this);
-            }catch(error){
-                throw (error.type === "ContractError" ? error :
-                    ContractError(sequence, this, {error: error})
-                );
-            }
-        }
-    };
-    info.name = info.test.name;
-    contract.contracts.push(info);
-};
-contract.contracts = [];
+export const contractTypes = {};
 
-export const BidirectionalityContract = contract({
+// TODO: Make a Contract class
+export const defineContract = lightWrap({
+    summary: "Define a sequence contract.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+    },
+    implementation: function defineContract(info){
+        if(process.env.NODE_ENV !== "development") return undefined;
+        info.enforce = function(getSequence){
+            const sequence = getSequence();
+            if(this.predicate(sequence)){
+                try{
+                    if(!this.test(getSequence)) throw ContractError(sequence, this);
+                }catch(error){
+                    throw (error.type === "ContractError" ? error :
+                        ContractError(sequence, this, {error: error})
+                    );
+                }
+            }
+        };
+        info.name = info.test.name;
+        contractTypes[info.name] = info;
+    },
+});
+
+// Convenience alias
+export const contract = defineContract;
+
+export const BidirectionalityContract = defineContract({
     summary: "The sequence must be consistent forwards and backwards.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
@@ -80,7 +92,7 @@ export const BidirectionalityContract = contract({
     },
 });
 
-export const CopyingContract = contract({
+export const CopyingContract = defineContract({
     summary: "The sequence must produce correct and independent copies.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
@@ -121,7 +133,7 @@ export const CopyingContract = contract({
     },
 });
 
-export const LengthContract = contract({
+export const LengthContract = defineContract({
     summary: "The sequence must report a correct length.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
@@ -159,3 +171,4 @@ export const LengthContract = contract({
     },
 });
 
+export default defineContract;

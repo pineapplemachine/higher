@@ -69,14 +69,14 @@ export const any = wrap({
             hi.assertEqual(result, false);
         },
         "withPredicate": (hi) => {
-            // ensure that when one even value is present in the provided
+            // Ensure that when one even value is present in the provided
             // input array, that the "even only" predicate returns true.
             const evenAndOdd = [1, 3, 5, 7, 9, 10, 11];
             const result = hi.any((n) => n % 2 === 0, evenAndOdd);
             hi.assertEqual(result, true);
         },
         "withPredicateFailureMode": (hi) => {
-            // provide an "even only" predicate, but providing an array
+            // Provide an "even only" predicate, but providing an array
             // with only odd values should fail.
             const oddOnly = [1, 3, 5];
             const result = hi.any((n) => n % 2 === 0, oddOnly);

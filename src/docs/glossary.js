@@ -1,5 +1,5 @@
 // Define jargony terms used throughout higher and its documentation.
-export const glossary = [
+export const glossary = process.env.NODE_ENV !== "development" ? undefined : [
     // Types of functions
     {
         term: "higher-order function",

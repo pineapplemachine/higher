@@ -1,3 +1,5 @@
+import {lightWrap} from "./core/lightWrap";
+
 export const hi = (source) => {
     return hi.asSequence(source);
 };
@@ -6,41 +8,44 @@ export default hi;
 
 Object.assign(hi, {
     version: "0.1.0",
-    // Registered functions will be placed here.
-    functions: [],
-    // Receives an object or objects returned by the wrap function.
-    register: function(...fancyFunctions){
-        for(const fancy of fancyFunctions){
-            this.functions.push(fancy);
-            for(const name of fancy.names){
-                this[name] = fancy;
-                if(fancy.async){
-                    this[name + "Async"] = fancy.async;
+    "function": {},
+});
+
+hi.register = lightWrap({
+    summary: "Register a wrapped function with the @hi object.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+    },
+    implementation: function register(...functions){
+        for(const wrapped of functions){
+            this.function[wrapped.name] = wrapped;
+            if(wrapped.internal){
+                // Do nothing
+            }else if(wrapped.names){
+                for(const name of wrapped.names){
+                    this[name] = wrapped;
+                    if(wrapped.async) this[name + "Async"] = wrapped.async;
                 }
+            }else{
+                this[wrapped.name] = wrapped;
             }
         }
-        return fancyFunctions[0];
+        return functions[0];
     },
-    // Run core tests
-    testCore: process.env.NODE_ENV !== "development" ? undefined : function(){
-        const result = {
-            core: {},
-            failures: [],
-        };
-        for(const coreName in this.coreTests){
-            const status = this.coreTestRunner(this, this.coreTests[coreName]);
-            result.core[coreName] = status;
-            for(const failure of status.fail) result.failures.push(failure);
-        }
-        return result;
+});
+
+if(process.env.NODE_ENV === "development") hi.testFunctions = lightWrap({
+    summary: "Run function tests.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
     },
-    // Run function unit tests
-    testFunctions: process.env.NODE_ENV !== "development" ? undefined : function(){
+    implementation: function testFunctions(){
         const result = {
             functions: {},
             failures: [],
         };
-        for(const func of this.functions){
+        for(const functionName in this.function){
+            const func = this.function[functionName];
             if(func.test){
                 const status = func.test(this);
                 result.functions[func.name] = status;
@@ -49,14 +54,20 @@ Object.assign(hi, {
         }
         return result;
     },
-    // Run sequence contract tests
-    testSequences: process.env.NODE_ENV !== "development" ? undefined : function(){
+});
+    
+if(process.env.NODE_ENV === "development") hi.testSequences = lightWrap({
+    summary: "Run sequence tests.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+    },
+    implementation: function testSequences(){
         const result = {
             sequences: {},
             failures: [],
         };
-        for(const sequenceName in this.sequences){
-            const sequence = this.sequences[sequenceName];
+        for(const sequenceName in this.sequence){
+            const sequence = this.sequence[sequenceName];
             if(sequence.test){
                 const status = sequence.test(this);
                 result.sequences[sequenceName] = status;
@@ -65,99 +76,85 @@ Object.assign(hi, {
         }
         return result;
     },
-    // Run all tests
-    test: process.env.NODE_ENV !== "development" ? undefined : function(){
-        const core = this.testCore();
+});
+    
+if(process.env.NODE_ENV === "development") hi.test = lightWrap({
+    summary: "Run all tests.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+    },
+    implementation: function test(){
         const functions = this.testFunctions();
         const sequences = this.testSequences();
         const result = {
-            core: core.core,
             functions: functions.functions,
             sequences: sequences.sequences,
             failures: [],
         };
-        result.failures.push(...core.failures);
         result.failures.push(...functions.failures);
         result.failures.push(...sequences.failures);
         return result;
     },
 });
 
-// Core modules
-import {args} from "./core/arguments";
-hi.args = args;
-
-import {
-    asSequence, asImplicitSequence,
-    validAsSequence, validAsImplicitSequence,
-    validAsBoundedSequence, validAsUnboundedSequence,
-} from "./core/asSequence";
-hi.asSequence = asSequence;
-hi.asImplicitSequence = asImplicitSequence;
-hi.validAsSequence = validAsSequence;
-hi.validAsImplicitSequence = validAsImplicitSequence;
-hi.validAsBoundedSequence = validAsBoundedSequence;
-hi.validAsUnboundedSequence = validAsUnboundedSequence;
-
-import {
-    assert, assertNot, assertUndefined,
-    assertEqual, assertNotEqual, assertEmpty, assertFail
-} from "./core/assert";
-hi.assert = assert;
-hi.assertNot = assertNot;
-hi.assertUndefined = assertUndefined;
-hi.assertEqual = assertEqual;
-hi.assertNotEqual = assertNotEqual;
-hi.assertEmpty = assertEmpty;
-hi.assertFail = assertFail;
-
-import {callAsync} from "./core/callAsync";
-hi.callAsync = callAsync;
-
-import {constants} from "./core/constants";
-hi.constants = constants;
-
-import {error} from "./core/error";
-hi.errors = error; // This attribute will contain all error types
-
-import {isEqual} from "./core/isEqual";
-hi.isEqual = isEqual;
-
-import {isSequence, Sequence} from "./core/sequence";
-hi.isSequence = isSequence;
-hi.Sequence = Sequence;
-hi.sequences = Sequence.types; // This attribute will contain all sequence types
-
-import {
-    isUndefined, isBoolean, isNumber, isInteger, isString, isArray,
-    isObject, isFunction, isIterable,
-} from "./core/types";
-hi.isUndefined = isUndefined;
-hi.isBoolean = isBoolean;
-hi.isNumber = isNumber;
-hi.isInteger = isInteger;
-hi.isString = isString;
-hi.isArray = isArray;
-hi.isObject = isObject;
-hi.isFunction = isFunction;
-hi.isIterable = isIterable;
-
-import {wrap} from "./core/wrap";
-hi.wrap = wrap;
-
-// Tests and documentation modules
-import {coreDocs} from "./docs/coreDocs";
-import {glossary} from "./docs/glossary";
-import {contract} from "./test/contracts";
-import {coreTests, coreTestRunner} from "./test/coreTests";
-if(process.env.NODE_ENV === "development"){
-    hi.coreDocs = coreDocs;
-    hi.glossary = glossary;
-    hi.contract = contract;
-    hi.contracts = contract.contracts;
-    hi.coreTests = coreTests;
-    hi.coreTestRunner = coreTestRunner;
-}
+// core/args
+import {args} from "./core/arguments"; hi.args = args;
+// core/asSequence
+import {asSequence} from "./core/asSequence"; hi.register(asSequence);
+import {asImplicitSequence} from "./core/asSequence"; hi.register(asImplicitSequence);
+import {addSequenceConverter} from "./core/asSequence"; hi.register(addSequenceConverter);
+import {validAsSequence} from "./core/asSequence"; hi.register(validAsSequence);
+import {validAsImplicitSequence} from "./core/asSequence"; hi.register(validAsImplicitSequence);
+import {validAsBoundedSequence} from "./core/asSequence"; hi.register(validAsBoundedSequence);
+import {validAsUnboundedSequence} from "./core/asSequence"; hi.register(validAsUnboundedSequence);
+// core/assert
+import {assert} from "./core/assert"; hi.register(assert);
+import {assertNot} from "./core/assert"; hi.register(assertNot);
+import {assertUndefined} from "./core/assert"; hi.register(assertUndefined);
+import {assertEqual} from "./core/assert"; hi.register(assertEqual);
+import {assertNotEqual} from "./core/assert"; hi.register(assertNotEqual);
+import {assertEmpty} from "./core/assert"; hi.register(assertEmpty);
+import {assertFail} from "./core/assert"; hi.register(assertFail);
+// core/callAsync
+import {callAsync} from "./core/callAsync"; hi.register(callAsync);
+// core/constants
+import {constants} from "./core/constants"; hi.constants = constants;
+// core/error
+import {errorTypes} from "./core/error"; hi.error = errorTypes;
+import {defineError} from "./core/error"; hi.register(defineError);
+// core/isEqual
+import {isEqual} from "./core/isEqual"; hi.register(isEqual);
+import {sequencesEqual} from "./core/isEqual"; hi.register(sequencesEqual);
+import {objectsEqual} from "./core/isEqual"; hi.register(objectsEqual);
+import {valuesEqual} from "./core/isEqual"; hi.register(valuesEqual);
+// core/lightWrap
+/* (imported above) */ hi.register(lightWrap);
+// core/sequence
+import {sequenceTypes} from "./core/sequence"; hi.sequence = sequenceTypes;
+import {Sequence} from "./core/sequence"; hi.Sequence = Sequence;
+import {attachSequenceMethods} from "./core/sequence"; hi.register(attachSequenceMethods);
+import {isSequence} from "./core/sequence"; hi.register(isSequence);
+import {defineSequence} from "./core/sequence"; hi.register(defineSequence);
+// core/types
+import {isUndefined} from "./core/types"; hi.register(isUndefined);
+import {isNull} from "./core/types"; hi.register(isNull);
+import {isNil} from "./core/types"; hi.register(isNil);
+import {isBoolean} from "./core/types"; hi.register(isBoolean);
+import {isNumber} from "./core/types"; hi.register(isNumber);
+import {isInteger} from "./core/types"; hi.register(isInteger);
+import {isNaN} from "./core/types"; hi.register(isNaN);
+import {isString} from "./core/types"; hi.register(isString);
+import {isArray} from "./core/types"; hi.register(isArray);
+import {isObject} from "./core/types"; hi.register(isObject);
+import {isFunction} from "./core/types"; hi.register(isFunction);
+import {isIterable} from "./core/types"; hi.register(isIterable);
+// core/wrap
+import {wrap} from "./core/wrap"; hi.register(wrap);
+// docs/glossary
+import {glossary} from "./docs/glossary"; hi.glossary = glossary;
+// test/contracts
+import {contractTypes} from "./test/contracts"; hi.contract = contractTypes;
+import {defineContract} from "./test/contracts"; hi.register(defineContract);
 
 // Core sequence types
 import {arrayAsSequence} from "./functions/arrayAsSequence"; hi.register(arrayAsSequence);
