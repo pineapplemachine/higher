@@ -3,7 +3,7 @@ import {error} from "./error";
 import {isEqual} from "./isEqual";
 import {lightWrap} from "./lightWrap";
 import {isSequence} from "./sequence";
-import {isArray, isFunction, isNaN} from "./types";
+import {isArray, isFunction, isNaN, isString} from "./types";
 
 export const AssertError = error({
     summary: "An assertion failed.",
@@ -156,6 +156,40 @@ export const assertFail = lightWrap({
         }
         throw AssertError(
             "Function must throw an error satisfying the predicate.", callback
+        );
+    },
+});
+
+export const assertFailWith = lightWrap({
+    summary: "Throw an @AssertError if a callback doesn't throw an error of a given type.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The function expects a higher error type or a string as its first
+            argument and a callback function as its second argument.
+        `),
+        returns: (`
+            The function returns the error that was thrown by the callback.
+            The function always produces an @AssertError if the callback didn't
+            throw an error.
+        `),
+        throws: (`
+            Throws an @AssertError when either the callback does not itself
+            throw an error when invoked or the callback does throw an error but
+            the error is not of the correct type, i.e. its \`type\` attribute
+            does not match the type string if a string was passed, or does not
+            match the error type if an error type was passed.
+        `),
+    },
+    implementation: function assertFailWith(errorType, callback){
+        const type = isString(errorType) ? errorType : errorType.type;
+        try{
+            callback();
+        }catch(error){
+            if(error.type !== type) return error;
+        }
+        throw AssertError(
+            `Function must throw an error of type "${type}".`, callback
         );
     },
 });

@@ -105,14 +105,12 @@ export const any = wrap({
             hi.assertEqual(hi.emptySequence().any(), false);
         },
         "notKnownBoundedInput": (hi) => {
-            hi.assertFail(
-                (error) => (error.type === "NotBoundedError"),
+            hi.assertFailWith(NotBoundedError,
                 () => hi.recur((i) => i + 1).seed(0).until((i) => i === 100).any()
             );
         },
         "unboundedInput": (hi) => {
-            hi.assertFail(
-                (error) => (error.type === "NotBoundedError"),
+            hi.assertFailWith(NotBoundedError,
                 () => hi.repeatElement(0).any()
             );
         },

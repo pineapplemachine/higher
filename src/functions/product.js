@@ -71,14 +71,12 @@ export const product = wrap({
             hi.assertNaN(hi.product([1, 2, 3, "?"]));
         },
         "notKnownBoundedInput": hi => {
-            hi.assertFail(
-                (error) => (error.type === "NotBoundedError"),
+            hi.assertFailWith(NotBoundedError,
                 () => hi.recur(i => i + 1).seed(0).until(i => i === 10).product()
             );
         },
         "unboundedInput": hi => {
-            hi.assertFail(
-                (error) => (error.type === "NotBoundedError"),
+            hi.assertFailWith(NotBoundedError,
                 () => hi.counter().product()
             );
         },

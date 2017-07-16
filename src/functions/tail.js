@@ -130,8 +130,7 @@ export const tail = wrap({
             hi.assertEqual(seq().tail(20), [0, 1, 2, 3, 4, 5, 6, 7]);
         },
         "illegalInput": hi => {
-            hi.assertFail(
-                error => error.type === "TailError",
+            hi.assertFailWith(TailError,
                 () => hi.recur(i => i + 1).tail(10)
             );
         },

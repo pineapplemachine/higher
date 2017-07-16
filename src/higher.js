@@ -116,6 +116,7 @@ import {assertEqual} from "./core/assert"; hi.register(assertEqual);
 import {assertNotEqual} from "./core/assert"; hi.register(assertNotEqual);
 import {assertEmpty} from "./core/assert"; hi.register(assertEmpty);
 import {assertFail} from "./core/assert"; hi.register(assertFail);
+import {assertFailWith} from "./core/assert"; hi.register(assertFailWith);
 // core/callAsync
 import {callAsync} from "./core/callAsync"; hi.register(callAsync);
 // core/constants

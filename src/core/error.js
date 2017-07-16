@@ -9,13 +9,16 @@ export const defineError = lightWrap({
     },
     implementation: function defineError(methods){
         const name = methods.constructor.name;
+        const baseType = methods.baseType || Error;
         const wrapped = (...args) => {
-            const err = new Error();
+            const err = new baseType();
             methods.constructor.apply(err, args);
             err.type = name;
             return err;
         };
-        Object.defineProperty(wrapped, "name", {value: name, writable: false});
+        Object.defineProperty(
+            wrapped, "name", {value: name, writable: false}
+        );
         wrapped.enforce = methods.enforce;
         errorTypes[name] = wrapped;
         return wrapped;
