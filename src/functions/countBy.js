@@ -2,9 +2,9 @@ import {wrap} from "../core/wrap";
 
 import {NotBoundedError} from "../errors/NotBoundedError";
 
-export const groupBy = wrap({
-    name: "groupBy",
-    summary: "Get an object associating keys with lists of elements.",
+export const countBy = wrap({
+    name: "countBy",
+    summary: "Get an object associating keys with the number of corresponding elements.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         expects: (`
@@ -14,11 +14,11 @@ export const groupBy = wrap({
         returns: (`
             The function constructs and returns an object whose keys are the
             values returned by applying the transformation function to the
-            elements of the input and whose values are lists of those elements
-            which produced the corresponding key.
+            elements of the input and whose values are integer counts of those
+            elements which produced the corresponding key.
         `),
         related: [
-            "countBy"
+            "groupBy"
         ],
         examples: [
             "basicUsage"
@@ -40,8 +40,7 @@ export const groupBy = wrap({
         const object = {};
         for(const element of source){
             const key = transform(element);
-            if(object[key]) object[key].push(element);
-            else object[key] = [element];
+            object[key] = (object[key] || 0) + 1;
         }
         return object;
     },
@@ -49,20 +48,20 @@ export const groupBy = wrap({
         "basicUsage": hi => {
             const firstLetter = (i) => (i[0]);
             const strings = ["hello", "and", "how", "are", "you"];
-            hi.assertEqual(hi.groupBy(strings, firstLetter),
-                {"h": ["hello", "how"], "a": ["and", "are"], "y": ["you"]}
+            hi.assertEqual(hi.countBy(strings, firstLetter),
+                {"h": 2, "a": 2, "y": 1}
             );
         },
         "emptyInput": hi => {
-            hi.assertEqual(hi.emptySequence().groupBy(i => i), {});
+            hi.assertEqual(hi.emptySequence().countBy(i => i), {});
         },
         "unboundedInput": hi => {
             hi.assertFail(
                 (error) => (error.type === "NotBoundedError"),
-                () => hi.counter().groupBy(i => i)
+                () => hi.counter().countBy(i => i)
             );
         },
     },
 });
 
-export default groupBy;
+export default countBy;
