@@ -3,7 +3,7 @@ import {error} from "./error";
 import {isEqual} from "./isEqual";
 import {lightWrap} from "./lightWrap";
 import {isSequence} from "./sequence";
-import {isArray, isFunction, isUndefined} from "./types";
+import {isArray, isFunction, isNaN} from "./types";
 
 export const AssertError = error({
     summary: "An assertion failed.",
@@ -64,6 +64,19 @@ export const assertUndefined = lightWrap({
             message || "Value must be undefined.", value
         );
         return undefined;
+    },
+});
+
+export const assertNaN = lightWrap({
+    summary: "Throw an @AssertError if a value is not `NaN`.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+    },
+    implementation: function assertNaN(value, message = undefined){
+        if(!isNaN(value)) throw AssertError(
+            message || "Value must be NaN.", value
+        );
+        return value;
     },
 });
 

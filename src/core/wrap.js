@@ -332,6 +332,29 @@ Object.assign(wrap, {
             });
         };
     },
+    testRunner: function(name, info){
+        if(!info.tests) return undefined;
+        return hi => {
+            const result = {
+                pass: [],
+                fail: [],
+            };
+            for(const testName in info.tests){
+                const test = info.tests[testName];
+                let success = true;
+                try{
+                    test(hi);
+                }catch(error){
+                    success = false;
+                    result.fail.push({name: testName, error: error});
+                }
+                if(success){
+                    result.pass.push({name: testName});
+                }
+            }
+            return result;
+        };
+    },
 });
 
 export default wrap;

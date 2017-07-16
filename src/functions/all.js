@@ -23,6 +23,10 @@ export const all = wrap({
             It also returns @true if the sequence was empty.
             The function returns @false otherwise.
         `),
+        throws: (`
+            The function throws a @NotBoundedError when the input sequence was
+            not known to be bounded.
+        `),
     },
     attachSequence: true,
     async: true,

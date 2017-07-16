@@ -1,5 +1,7 @@
 import {wrap} from "../core/wrap";
 
+import {NotBoundedError} from "../errors/NotBoundedError";
+
 export const none = wrap({
     name: "none",
     summary: "Get whether none of the elements in a sequence satisfy a predicate.",
@@ -20,6 +22,10 @@ export const none = wrap({
             the elements were truthy.
             It also returns @true if the sequence was empty.
             The function returns @false otherwise.
+        `),
+        throws: (`
+            The function throws a @NotBoundedError when the input sequence was
+            not known to be bounded.
         `),
     },
     attachSequence: true,

@@ -111,6 +111,7 @@ import {validAsUnboundedSequence} from "./core/asSequence"; hi.register(validAsU
 import {assert} from "./core/assert"; hi.register(assert);
 import {assertNot} from "./core/assert"; hi.register(assertNot);
 import {assertUndefined} from "./core/assert"; hi.register(assertUndefined);
+import {assertNaN} from "./core/assert"; hi.register(assertNaN);
 import {assertEqual} from "./core/assert"; hi.register(assertEqual);
 import {assertNotEqual} from "./core/assert"; hi.register(assertNotEqual);
 import {assertEmpty} from "./core/assert"; hi.register(assertEmpty);
@@ -179,6 +180,7 @@ import {consume} from "./functions/consume"; hi.register(consume);
 import {containsElement} from "./functions/containsElement"; hi.register(containsElement);
 import {copyable} from "./functions/copyable"; hi.register(copyable);
 import {count} from "./functions/count"; hi.register(count);
+import {countBy} from "./functions/countBy"; hi.register(countBy);
 import {counter} from "./functions/counter"; hi.register(counter);
 import {distinct} from "./functions/distinct"; hi.register(distinct);
 import {dropHead} from "./functions/dropHead"; hi.register(dropHead);

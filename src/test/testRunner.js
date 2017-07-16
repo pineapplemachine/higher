@@ -62,4 +62,18 @@ for(const name of sequenceNames){
 
 console.log(`Finished running tests: passed ${ofText(totalPassed, totalFailed)} tests.`);
 
+// Once a release is ready, these should become warnings rather than encouragements.
+for(const functionName in hi.function){
+    if(!(functionName in results.functions)){
+        console.log(`Next function without any tests: ${green(functionName)}.`);
+        break;
+    }
+}
+for(const sequenceName in hi.sequence){
+    if(!(sequenceName in results.sequences)){
+        console.log(`Next sequence without any tests: ${green(sequenceName)}.`);
+        break;
+    }
+}
+
 process.exit(totalFailed !== 0);

@@ -87,7 +87,8 @@ export const tail = wrap({
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {
-            hi.assertEqual(hi.tail(3, [0, 1, 2, 3, 4, 5]), [3, 4, 5]);
+            const array = [0, 1, 2, 3, 4, 5];
+            hi.assertEqual(hi.tail(3, array), [3, 4, 5]);
         },
         "zeroLength": hi => {
             hi.assertEmpty(hi.tail(0, []));
