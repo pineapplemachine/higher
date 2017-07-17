@@ -9,6 +9,19 @@ export const FilterSequence = Sequence.extend({
     overrides: [
         "filter"
     ],
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The constructor expects a predicate function and an input sequence.
+        `),
+        warnings: (`
+            Use caution in filtering potentially unbounded sequences.
+            Providing as input an unbounded sequence and a predicate that is
+            satisfied by no elements in that sequence, or no elements past a
+            certain point, will cause an infinite loop as soon as any
+            information is requested from the sequence.
+        `),
+    },
     getSequence: process.env.NODE_ENV !== "development" ? undefined : [
         hi => new FilterSequence(() => true, hi([0, 1, 2, 3, 4, 5])),
         hi => new FilterSequence(() => false, hi([0, 1, 2, 3, 4, 5])),
