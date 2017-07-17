@@ -22,7 +22,7 @@ export const callAsync = lightWrap({
     ),
     // TODO: Write an asynchronous tests runner I guess
     testsAsync: process.env.NODE_ENV !== "development" ? undefined : {
-        "basicUsage": hi => new hi.constants.Promise((resolve, reject) => {
+        "basicUsage": hi => new hi.constant.Promise((resolve, reject) => {
             hi.callAsync(resolve);
         }),
     },

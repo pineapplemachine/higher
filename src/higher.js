@@ -120,7 +120,7 @@ import {assertFailWith} from "./core/assert"; hi.register(assertFailWith);
 // core/callAsync
 import {callAsync} from "./core/callAsync"; hi.register(callAsync);
 // core/constants
-import {constants} from "./core/constants"; hi.constants = constants;
+import {constants} from "./core/constants"; hi.constant = constants;
 // core/error
 import {errorTypes} from "./core/error"; hi.error = errorTypes;
 import {defineError} from "./core/error"; hi.register(defineError);
@@ -130,7 +130,7 @@ import {sequencesEqual} from "./core/isEqual"; hi.register(sequencesEqual);
 import {objectsEqual} from "./core/isEqual"; hi.register(objectsEqual);
 import {valuesEqual} from "./core/isEqual"; hi.register(valuesEqual);
 // core/lightWrap
-/* (imported above) */ hi.register(lightWrap);
+/* imported above */ hi.register(lightWrap);
 // core/sequence
 import {sequenceTypes} from "./core/sequence"; hi.sequence = sequenceTypes;
 import {Sequence} from "./core/sequence"; hi.Sequence = Sequence;
