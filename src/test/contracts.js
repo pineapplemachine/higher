@@ -150,8 +150,11 @@ export const LengthContract = defineContract({
             });
             return true;
         }
-        let aCount = 0;
         const length = a.length();
+        if(!Number.isInteger(length)) throw ContractError(sequence(), {
+            message: "Sequence length must be an integer.."
+        });
+        let aCount = 0;
         while(!a.done()){
             a.popFront();
             aCount++;
