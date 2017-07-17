@@ -127,6 +127,7 @@ import {defineError} from "./core/error"; hi.register(defineError);
 // core/isEqual
 import {isEqual} from "./core/isEqual"; hi.register(isEqual);
 import {sequencesEqual} from "./core/isEqual"; hi.register(sequencesEqual);
+import {stringsEqual} from "./core/isEqual"; hi.register(stringsEqual);
 import {objectsEqual} from "./core/isEqual"; hi.register(objectsEqual);
 import {valuesEqual} from "./core/isEqual"; hi.register(valuesEqual);
 // core/lightWrap
