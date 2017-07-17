@@ -1,6 +1,6 @@
-import {asSequence, validAsImplicitSequence} from "./asSequence";
+import {asSequence, validAsSequence, validAsImplicitSequence} from "./asSequence";
 import {lightWrap} from "./lightWrap";
-import {isObject} from "./types";
+import {isObject, isString} from "./types";
 
 import {NotBoundedError} from "../errors/NotBoundedError";
 
@@ -16,11 +16,14 @@ export const isEqual = lightWrap({
         expects: (`
             The function accepts any number of arguments of any kind.
             If all the the inputs are implicitly valid as sequences, then
-            they are compared as sequences. Otherwise, if all the inputs are
-            objects, then they are compare as objects.
-            If any of the inputs are neither an object nor valid as a
-            sequence, then they are compared as values using the \`===\`
-            comparison operator.
+            they are compared as sequences.
+            If not compared as sequences, if at least one of the inputs is a
+            string literal and all the inputs are valid as sequences, then they
+            are compared as strings.
+            If not compared as sequences or strings, if all the inputs are
+            objects, then they are compared as objects.
+            If not compared as sequences, strings, or objects, then the inputs
+            are compared as values using the \`===\` comparison operator.
         `),
         returns: (`
             The function returns true when all the inputs were equal and
@@ -28,9 +31,10 @@ export const isEqual = lightWrap({
             or when there were no inputs.
         `),
         throws: (`
-            The function throws a @NotBoundedError if all of the inputs were
-            implicitly valid as sequences and none of those inputs were
-            known to be bounded.
+            The function throws a @NotBoundedError if the inputs were compared
+            as sequences and none of those sequences were known to be bounded,
+            or if the inputs were compared as strings and any of those inputs
+            were not known to be bounded.
         `),
         examples: [
             "basicUsageSequences", "basicUsageObjects", "basicUsageValues",
@@ -40,12 +44,18 @@ export const isEqual = lightWrap({
         if(values.length <= 1) return true;
         let noObject = false;
         let noSequence = false;
+        let noString = false;
+        let anyString = false;
         for(const value of values){
-            if(!value || !isObject(value)) noObject = true;
-            if(!value || !validAsImplicitSequence(value)) noSequence = true;
+            if(!isObject(value)) noObject = true;
+            if(!validAsImplicitSequence(value)) noSequence = true
+            if(!isString(value) && !validAsSequence(value)) noString = true;
+            if(isString(value)) anyString = true;
         }
         if(!noSequence){
             return sequencesEqual(...values);
+        }else if(anyString && !noString){
+            return stringsEqual(...values);
         }else if(!noObject){
             return objectsEqual(...values);
         }else{
@@ -123,6 +133,64 @@ export const sequencesEqual = lightWrap({
             hi.assert(sequencesEqual([0, 1, 2], [0, 1, 2]));
             hi.assert(sequencesEqual(["x", "y"], ["x", "y"]));
             hi.assert(sequencesEqual([4, 3], [4, 3], [4, 3], [4, 3]));
+        },
+    },
+});
+
+export const stringsEqual = lightWrap({
+    summary: "Get whether some strings and input sequences are equal.",
+    internal: true,
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        throws: (`
+            The function throws a @NotBoundedError if any of the inputs
+            were not known to be bounded.
+        `),
+        examples: [
+            "basicUsage"
+        ],
+    },
+    implementation: function stringsEqual(...sources){
+        // TODO: It should be possible to do these comparisons lazily and
+        // with potentially unbounded sequences, just kind of tedious to
+        // implement.
+        if(sources.length <= 1) return true;
+        const strings = [];
+        for(const source of sources){
+            if(isString(source)){
+                strings.push(source);
+            }else{
+                NotBoundedError.enforce(source, {
+                    message: "Failed to compare strings",
+                });
+                let sequenceString = "";
+                for(const element of source) sequenceString += element;
+                strings.push(sequenceString);
+            }
+        }
+        for(let i = 1; i < strings.length; i++){
+            if(strings[i] !== strings[0]) return false;
+        }
+        return true;
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": hi => {
+            hi.assert(stringsEqual("hello", "hello"));
+            hi.assertNot(stringsEqual("hello", "world"));
+        },
+        "sequenceInputs": hi => {
+            hi.assert(stringsEqual("hello", hi("hello")));
+            hi.assert(stringsEqual(hi("hello"), hi("hello")));
+            hi.assert(stringsEqual("hello", "hello", hi("hello")));
+            hi.assert(stringsEqual("hello", hi("hello"), hi("hello")));
+            hi.assert(stringsEqual(hi("hello"), hi("hello"), hi("hello")));
+        },
+        "noInputs": hi => {
+            hi.assert(stringsEqual());
+        },
+        "oneInput": hi => {
+            hi.assert(stringsEqual("?"));
+            hi.assert(stringsEqual(hi("!")));
         },
     },
 });
