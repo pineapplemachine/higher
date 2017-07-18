@@ -1,7 +1,7 @@
-import {ArraySequence} from "../core/arrayAsSequence";
 import {error} from "../core/error";
 import {wrap} from "../core/wrap";
 
+import {ArraySequence} from "./arrayAsSequence";
 import {EmptySequence} from "./emptySequence";
 
 export const TailError = error({
@@ -130,8 +130,7 @@ export const tail = wrap({
             hi.assertEqual(seq().tail(20), [0, 1, 2, 3, 4, 5, 6, 7]);
         },
         "illegalInput": hi => {
-            hi.assertFail(
-                error => error.type === "TailError",
+            hi.assertFailWith(TailError,
                 () => hi.recur(i => i + 1).tail(10)
             );
         },

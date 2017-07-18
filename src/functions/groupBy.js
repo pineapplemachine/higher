@@ -57,8 +57,7 @@ export const groupBy = wrap({
             hi.assertEqual(hi.emptySequence().groupBy(i => i), {});
         },
         "unboundedInput": hi => {
-            hi.assertFail(
-                (error) => (error.type === "NotBoundedError"),
+            hi.assertFailWith(NotBoundedError,
                 () => hi.counter().groupBy(i => i)
             );
         },

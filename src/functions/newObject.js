@@ -2,6 +2,8 @@ import {asImplicitSequence} from "../core/asSequence";
 import {isArray, isObject} from "../core/types";
 import {wrap} from "../core/wrap";
 
+import {NotBoundedError} from "../errors/NotBoundedError";
+
 import {asObject, ObjectError} from "./object";
 
 export const newObject = wrap({
@@ -59,8 +61,7 @@ export const newObject = wrap({
             hi.assert(hi.newObject(obj) !== obj);
         },
         "unboundedInput": hi => {
-            hi.assertFail(
-                error => error.type === "NotBoundedError",
+            hi.assertFailWith(NotBoundedError,
                 () => hi.newObject(hi.repeatElement({key: "hello", value: "world"}))
             );
         },

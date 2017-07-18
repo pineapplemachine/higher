@@ -56,8 +56,7 @@ export const countBy = wrap({
             hi.assertEqual(hi.emptySequence().countBy(i => i), {});
         },
         "unboundedInput": hi => {
-            hi.assertFail(
-                (error) => (error.type === "NotBoundedError"),
+            hi.assertFailWith(NotBoundedError,
                 () => hi.counter().countBy(i => i)
             );
         },

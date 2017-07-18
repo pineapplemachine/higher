@@ -1,7 +1,7 @@
-import {ArraySequence} from "../core/arrayAsSequence";
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
+import {ArraySequence} from "./arrayAsSequence";
 import {InfiniteRepeatElementSequence} from "./repeatElement";
 
 export const SlicingNgramSequence = Sequence.extend({

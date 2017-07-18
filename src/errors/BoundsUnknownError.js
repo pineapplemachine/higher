@@ -1,10 +1,19 @@
-import {asSequence} from "../core/asSequence";
+import {sequenceConverters} from "../core/asSequence";
 import {error} from "../core/error";
 import {isSequence} from "../core/sequence";
 import {isArray, isString} from "../core/types";
 
 export const BoundsUnknownError = error({
     summary: "Failed because a sequence must be known to be bounded or unbounded.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The error function expects as an argument the sequence which was
+            required to be known to be bounded or unbounded, but was not.
+            The function also accepts an options object which may have a message
+            attribute providing additional error information.
+        `),
+    },
     constructor: function BoundsUnknownError(source, options){
         this.source = source;
         this.options = options || {};
@@ -28,7 +37,7 @@ export const BoundsUnknownError = error({
         ){
             return source;
         }
-        for(const converter of asSequence.converters){
+        for(const converter of sequenceConverters){
             if(converter.predicate(source)){
                 if(converter.bounded(source) || converter.unbounded(source)){
                     return source;

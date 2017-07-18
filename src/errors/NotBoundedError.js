@@ -1,11 +1,22 @@
-import {asSequence} from "../core/asSequence";
+import {sequenceConverters} from "../core/asSequence";
 import {error} from "../core/error";
 import {isSequence} from "../core/sequence";
 import {isArray, isString} from "../core/types";
 
 export const NotBoundedError = error({
     summary: "Action would require fully consuming a sequence not known to be bounded.",
-    constructor: function NotBoundedError(source, options){
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The error function expects as an argument the sequence which was
+            required to be known to be bounded, but was not.
+            The function also accepts an options object which may have a message
+            attribute providing additional error information, and an optional
+            limitArgument which, when true, causes the error message to include
+            passing a limit argument as a possible way to resolve the issue.
+        `),
+    },
+    constructor: function NotBoundedError(source, options = undefined){
         this.source = source;
         this.options = options || {};
         const knownBounded = (isSequence(source) && source.unbounded() ?
@@ -35,7 +46,7 @@ export const NotBoundedError = error({
         ){
             return source;
         }
-        for(const converter of asSequence.converters){
+        for(const converter of sequenceConverters){
             if(converter.predicate(source)){
                 if(converter.bounded(source)){
                     return source;

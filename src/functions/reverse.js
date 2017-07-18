@@ -6,6 +6,14 @@ import {mustSupport} from "./mustSupport";
 
 export const ReverseError = error({
     summary: "Failed to reverse sequence because it was not bidirectional nor known to be bounded.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The error function expects as an argument the sequence which was
+            required to be either known to be bounded or bidirectional, but
+            was not.
+        `),
+    },
     constructor: function ReverseError(sequence){
         this.sequence = sequence;
         this.message = (
@@ -115,6 +123,8 @@ export const reverse = wrap({
         }else if(source.bounded()){
             return new ReverseSequence(mustSupport(source, "back"));
         }else{
+            // TODO: This should be described by the expected arguments object,
+            // not a special error type
             throw ReverseError(source);
         }
     },

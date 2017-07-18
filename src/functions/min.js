@@ -72,14 +72,12 @@ export const min = wrap({
             hi.assertUndefined(hi.emptySequence().min());
         },
         "notKnownBoundedInput": hi => {
-            hi.assertFail(
-                (error) => (error.type === "NotBoundedError"),
+            hi.assertFailWith(NotBoundedError,
                 () => hi.recur(i => i + 1).seed(0).until(i => i === 20).min()
             );
         },
         "unboundedInput": hi => {
-            hi.assertFail(
-                (error) => (error.type === "NotBoundedError"),
+            hi.assertFailWith(NotBoundedError,
                 () => hi.counter().min()
             );
         },

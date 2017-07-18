@@ -1,4 +1,3 @@
-import {ArraySequence} from "../core/arrayAsSequence";
 import {error} from "../core/error";
 import {isSequence} from "../core/sequence";
 import {isArray} from "../core/types";
@@ -6,6 +5,8 @@ import {wrap} from "../core/wrap";
 
 import {NotBoundedError} from "../errors/NotBoundedError";
 import {OperationError} from "../errors/OperationError";
+
+import {ArraySequence} from "./arrayAsSequence";
 
 // Used internally by collapse function
 const write = function(sequence, root, limit){
@@ -25,6 +26,13 @@ const write = function(sequence, root, limit){
 
 export const CollapseRootError = error({
     summary: "Failed to collapse a sequence due to not having an array at its root.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The error function expects as an argument the sequence for which
+            collapsing failed.
+        `),
+    },
     constructor: function CollapseRootError(sequence){
         this.sequence = sequence;
         this.message = (
@@ -66,19 +74,18 @@ export const collapse = wrap({
             contains many breaks, it may be more efficient to produce a new
             array out-of-place instead using the @array function.
         `),
-        trivia: (`
+        developers: (`
             Sequence types with a collapseBreak method necessitate writing their
             contents fully to the array before continuing up the sequence chain,
             and may cause a substantial performance impact for very long
             sequences. For long sequences or sequences with many breaks in their
             chain, it may be preferable to produce an out-of-place array.
-            
-            Collapsing is not possible if any sequence in the chain that follows
+            /Collapsing is not possible if any sequence in the chain that follows
             one with a collapseBreak method does not support a rebase operation,
             or if a sequence itself having a collapseBreak method does not
             support a rebase operation.
-            This failure would indicate an issue with a sequence implementation,
-            not a usage error.
+            /Note that this failure would indicate an issue with a sequence
+            implementation, not a usage error.
         `),
         examples: [
             "basicUsage"

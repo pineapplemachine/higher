@@ -1,21 +1,28 @@
-import {Sequence} from "./sequence";
-import {isInteger, isString} from "../core/types";
+import {Sequence} from "../core/sequence";
+import {isArray, isInteger} from "../core/types";
 import {wrap} from "../core/wrap";
 
-export const StringSequence = Sequence.extend({
-    summary: "Enumerate the characters in a string.",
+export const ArraySequence = Sequence.extend({
+    summary: "Enumerate the contents of an array.",
     supportsWith: [],
     supportsAlways: [
         "length", "left", "back", "index", "slice", "has", "get", "copy", "reset"
     ],
     overrides: [
-        "string"
+        "array", "newArray"
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         methods: {},
     },
-    constructor: function StringSequence(
+    getSequence: process.env.NODE_ENV !== "development" ? undefined : [
+        hi => new ArraySequence([]),
+        hi => new ArraySequence([0]),
+        hi => new ArraySequence(["hello", "world"]),
+        hi => new ArraySequence([0, 1, 2, 3, 4, 5, 6]),
+        hi => new ArraySequence([[0, 1], [1, 2]]),
+    ],
+    constructor: function ArraySequence(
         source, lowIndex = undefined, highIndex = undefined,
         frontIndex = undefined, backIndex = undefined
     ){
@@ -25,15 +32,38 @@ export const StringSequence = Sequence.extend({
         this.frontIndex = frontIndex === undefined ? this.lowIndex : frontIndex;
         this.backIndex = backIndex === undefined ? this.highIndex : backIndex;
     },
-    string: function(){
-        if(this.lowIndex === 0 && this.highIndex === this.source.length){
+    array: function(limit){
+        if(limit <= 0){
+            return [];
+        }else if(this.lowIndex !== 0 || this.highIndex !== this.source.length){
+            if(!limit){
+                return this.source.slice(this.lowIndex, this.highIndex);
+            }else{
+                const length = this.source.length - this.lowIndex;
+                return this.source.slice(this.lowIndex, this.lowIndex + (
+                    limit < length ? limit : length
+                ));
+            }
+        }else if(!limit || limit >= this.source.length){
             return this.source;
         }else{
-            return this.source.slice(this.lowIndex, this.highIndex);
+            return this.source.slice(limit);
         }
     },
-    stringAsync: function(){
-        return new constants.Promise((resolve, reject) => resolve(this.string()));
+    arrayAsync: function(limit){
+        return new constants.Promise((resolve, reject) => resolve(this.array(limit)));
+    },
+    newArray: function(limit){
+        if(limit <= 0){
+            return [];
+        }else if(!limit || limit >= this.source.length){
+            return this.source.slice();
+        }else{
+            return this.source.slice(limit);
+        }
+    },
+    newArrayAsync: function(limit){
+        return new constants.Promise((resolve, reject) => resolve(this.newArray(limit)));
     },
     bounded: () => true,
     unbounded: () => false,
@@ -41,7 +71,7 @@ export const StringSequence = Sequence.extend({
         return this.frontIndex >= this.backIndex;
     },
     length: function(){
-        return this.source.length;
+        return this.highIndex - this.lowIndex;
     },
     left: function(){
         return this.backIndex - this.frontIndex;
@@ -62,7 +92,7 @@ export const StringSequence = Sequence.extend({
         return this.source[this.lowIndex + i];
     },
     slice: function(i, j){
-        return new StringSequence(
+        return new ArraySequence(
             this.source, this.lowIndex + i, this.lowIndex + j
         );
     },
@@ -73,7 +103,7 @@ export const StringSequence = Sequence.extend({
         return this.source[i - this.lowIndex];
     },
     copy: function(){
-        return new StringSequence(
+        return new ArraySequence(
             this.source, this.lowIndex, this.highIndex,
             this.frontIndex, this.backIndex
         );
@@ -86,25 +116,25 @@ export const StringSequence = Sequence.extend({
     rebase: null,
 });
 
-export const stringAsSequence = wrap({
-    name: "stringAsSequence",
-    summary: "Get a sequence for enumerating the characters in a string.",
+export const arrayAsSequence = wrap({
+    name: "arrayAsSequence",
+    summary: "Get a sequence for enumerating the contents of an array.",
     attachSequence: false,
     async: false,
     asSequence: {
-        // Comes after only array conversion and before generic iterable conversion.
-        implicit: false,
-        priority: -800,
-        predicate: isString,
+        // First priority core converter
+        implicit: true,
+        priority: -1000,
+        predicate: isArray,
         bounded: () => true,
         unbounded: () => false,
     },
     arguments: {
-        one: wrap.expecting.string
+        one: wrap.expecting.array
     },
     implementation: (source) => {
-        return new StringSequence(source);
+        return new ArraySequence(source);
     },
 });
 
-export default stringAsSequence;
+export default arrayAsSequence;

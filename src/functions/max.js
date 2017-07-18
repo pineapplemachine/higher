@@ -72,14 +72,12 @@ export const max = wrap({
             hi.assertUndefined(hi.emptySequence().max());
         },
         "notKnownBoundedInput": hi => {
-            hi.assertFail(
-                (error) => (error.type === "NotBoundedError"),
+            hi.assertFailWith(NotBoundedError,
                 () => hi.recur(i => i + 1).seed(0).until(i => i === 20).max()
             );
         },
         "unboundedInput": hi => {
-            hi.assertFail(
-                (error) => (error.type === "NotBoundedError"),
+            hi.assertFailWith(NotBoundedError,
                 () => hi.counter().max()
             );
         },
