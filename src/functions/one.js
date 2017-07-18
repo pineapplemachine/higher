@@ -3,6 +3,28 @@ import {FiniteRepeatElementSequence, InfiniteRepeatElementSequence} from "./repe
 import {wrap} from "../core/wrap";
 
 export const OneElementSequence = Sequence.extend({
+    summary: "A sequence containing exactly one element.",
+    supportsAlways: [
+        "length", "left", "back", "index", "slice", "copy", "reset",
+    ],
+    overrides: [
+        "reverse", "filter", "reject",
+    ],
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The constructor expects as its argument the one element that the
+            sequence should enumerate.
+        `),
+    },
+    getSequence: process.env.NODE_ENV !== "development" ? undefined : [
+        hi => new OneElementSequence(0),
+        hi => new OneElementSequence(100),
+        hi => new OneElementSequence(null),
+        hi => new OneElementSequence(undefined),
+        hi => new OneElementSequence("!"),
+        hi => new OneElementSequence("hello"),
+    ],
     constructor: function OneElementSequence(element, isDone = false){
         this.element = element;
         this.isDone = isDone;
@@ -23,6 +45,12 @@ export const OneElementSequence = Sequence.extend({
     },
     reverse: function(){
         return this;
+    },
+    filter: function(predicate){
+        return predicate(this.element) ? this : new EmptySequence();
+    },
+    reject: function(predicate){
+        return predicate(this.element) ? new EmptySequence() : this;
     },
     bounded: () => true,
     unbounded: () => false,
@@ -48,8 +76,8 @@ export const OneElementSequence = Sequence.extend({
     index: function(i){
         return this.element;
     },
-    has: (i) => false,
-    get: (i) => undefined,
+    has: null,
+    get: null,
     slice: function(i, j){
         return new OneElementSequence(this.element, i >= j);
     },
@@ -65,6 +93,23 @@ export const OneElementSequence = Sequence.extend({
 
 export const one = wrap({
     name: "one",
+    summary: "Get a sequence enumerating a single element.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The function expects as its single argument the one element that the
+            sequence should contain.
+        `),
+        returns: (`
+            The function returns a sequence enumerating only the given element.
+        `),
+        related: [
+            "repeatElement", "emptySequence"
+        ],
+        examples: [
+            "basicUsage",
+        ],
+    },
     attachSequence: false,
     async: false,
     sequences: [
@@ -75,6 +120,15 @@ export const one = wrap({
     },
     implementation: (element) => {
         return new OneElementSequence(element);
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": hi => {
+            hi.assertEqual(hi.one(100), [100]);
+        },
+        "nilInput": hi => {
+            hi.assertEqual(hi.one(null), [null]);
+            hi.assertEqual(hi.one(undefined), [undefined]);
+        },
     },
 });
 
