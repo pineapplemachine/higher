@@ -3,6 +3,7 @@ import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 import {copyable} from "./copyable";
+import {ForwardFlattenSequence} from "./flatten";
 
 export const ForwardJoinSequence = Sequence.extend({
     constructor: function ForwardJoinSequence(
@@ -212,7 +213,13 @@ export const join = wrap({
         ordered: [wrap.expecting.sequence, wrap.expecting.sequence]
     },
     implementation: (source, delimiter) => {
-        return new ForwardJoinSequence(source, copyable.implementation(delimiter));
+        if(delimiter && !delimiter.done()){
+            return new ForwardJoinSequence(source, copyable.implementation(delimiter));
+        }else{
+            // Optimized implementation for when there is no delimiter
+            // or when the delimiter is an empty sequence.
+            return new ForwardFlattenSequence(source);
+        }
     },
 });
 

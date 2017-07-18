@@ -186,7 +186,7 @@ export const assertFailWith = lightWrap({
         try{
             callback();
         }catch(error){
-            if(error.type !== type) return error;
+            if(error.type === type) return error;
         }
         throw AssertError(
             `Function must throw an error of type "${type}".`, callback

@@ -20,6 +20,7 @@ export const defineError = lightWrap({
             wrapped, "name", {value: name, writable: false}
         );
         wrapped.enforce = methods.enforce;
+        wrapped.type = name;
         errorTypes[name] = wrapped;
         return wrapped;
     },
