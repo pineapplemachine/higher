@@ -1,7 +1,12 @@
-import {isFunction, isString} from "./types";
+import {isSequence} from "./sequence";
+import {isArray, isFunction, isString} from "./types";
 
 export const canGetLength = (source) => {
-    return isString(source) || "length" in source;
+    return (
+        isString(source) || isArray(source) || (
+            isSequence(source) && source.length
+        )
+    );
 };
 
 export const getLength = (source) => {
