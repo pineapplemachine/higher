@@ -1,7 +1,8 @@
 import {cleanDocs} from "../docs/cleanString";
 
 // Get a test runner function for a wrapped function
-export const wrappedTestRunner = (name, tests) => {
+export const wrappedTestRunner = (wrapped, tests) => {
+    if(process.env.NODE_ENV !== "development") return undefined;
     if(!tests) return undefined;
     return hi => {
         const result = {
@@ -15,10 +16,19 @@ export const wrappedTestRunner = (name, tests) => {
                 test(hi);
             }catch(error){
                 success = false;
-                result.fail.push({name: testName, error: error});
+                result.fail.push({
+                    name: `${wrapped.name}.${testName}`,
+                    function: wrapped,
+                    test: test,
+                    error: error
+                });
             }
             if(success){
-                result.pass.push({name: testName});
+                result.pass.push({
+                    name: `${wrapped.name}.${testName}`,
+                    function: wrapped,
+                    test: test,
+                });
             }
         }
         return result;
@@ -35,7 +45,7 @@ export const lightWrap = function lightWrap(info){
     wrapped.internal = info.internal;
     if(process.env.NODE_ENV === "development"){
         wrapped.docs = cleanDocs(info.docs);
-        wrapped.test = wrappedTestRunner(wrapped.name, info.tests);
+        wrapped.test = wrappedTestRunner(wrapped, info.tests);
     }
     return wrapped;
 };

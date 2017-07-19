@@ -4,6 +4,8 @@ import {error} from "./error";
 import {lightWrap} from "./lightWrap";
 import {isArray, isObject, isString} from "./types";
 
+import {cleanDocs} from "../docs/cleanString";
+
 export const defineSequence = lightWrap({
     summary: "Extend the @Sequence prototype.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
@@ -15,32 +17,80 @@ export const defineSequence = lightWrap({
         Object.assign(constructor.prototype, methods);
         sequenceTypes[constructor.name] = constructor;
         if(process.env.NODE_ENV === "development"){
-            constructor.test = !methods.getSequence ? undefined : hi => {
-                const result = {
-                    pass: [],
-                    fail: [],
-                }
-                for(const contractName in hi.contract){
-                    const contract = hi.contract[contractName];
-                    let success = true;
-                    try{
-                        for(const getter of methods.getSequence){
-                            contract.enforce(() => getter(hi));
-                        }
-                    }catch(error){
-                        success = false;
-                        result.fail.push({name: contract.name, error: error});
-                    }
-                    if(success){
-                        result.pass.push({name: contract.name});
-                    }
-                }
-                return result;
-            };
+            constructor.docs = cleanDocs(constructor.docs);
+            constructor.test = sequenceTestRunner(methods, constructor);
         }
         return constructor;
     },
 });
+
+export const sequenceTestRunner = (methods, sequenceType) => {
+    // console.log(methods.docs ? methods.docs.methods : "");
+    if(!methods.getSequence && (
+        !methods.docs || !methods.docs.methods || !methods.docs.methods.length
+    )) return undefined;
+    if(process.env.NODE_ENV !== "development") return undefined;
+    return hi => {
+        const result = {
+            pass: [],
+            fail: [],
+        }
+        if(methods.getSequence) for(const sequenceGetter of methods.getSequence){
+            for(const contractName in hi.contract){
+                const contract = hi.contract[contractName];
+                let success = true;
+                try{
+                    contract.enforce(() => sequenceGetter(hi));
+                }catch(error){
+                    success = false;
+                    result.fail.push({
+                        name: `${sequenceType.name}.contract.${contractName}`,
+                        sequence: sequenceType,
+                        contract: contract,
+                        error: error
+                    });
+                }
+                if(success){
+                    result.pass.push({
+                        name: `${sequenceType.name}.contract.${contractName}`,
+                        sequence: sequenceType,
+                        contract: contract,
+                    });
+                }
+            }
+        }
+        if(methods.docs && methods.docs.methods){
+            for(const methodName in methods.docs.methods){
+                const method = methods.docs.methods[methodName];
+                if(method.tests) for(const testName in method.tests){
+                    const test = method.tests[testName];
+                    let success = true;
+                    try{
+                        test(hi);
+                    }catch(error){
+                        success = false;
+                        result.fail.push({
+                            name: `${sequenceType.name}.method.${methodName}`,
+                            sequence: sequenceType,
+                            method: method,
+                            test: test,
+                            error: error,
+                        });
+                    }
+                    if(success){
+                        result.pass.push({
+                            name: `${sequenceType.name}.method.${methodName}`,
+                            sequence: sequenceType,
+                            method: method,
+                            test: test,
+                        });
+                    }
+                }
+            }
+        }
+        return result;
+    };
+};
 
 export const attachSequenceMethods = lightWrap({
     summary: "Attach methods to the @Sequence prototype.",

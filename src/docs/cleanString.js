@@ -14,7 +14,7 @@ export const cleanString = function(string){
     return result;
 };
 
-export const cleanDocs = function(docs){
+export const cleanDocs = function(docs, noMethods = undefined){
     if(!docs) return undefined;
     docs.detail = cleanString(docs.detail || "");
     docs.expects = cleanString(docs.expects || "");
@@ -22,6 +22,13 @@ export const cleanDocs = function(docs){
     docs.throws = cleanString(docs.throws || "");
     docs.warnings = cleanString(docs.warnings || "");
     docs.developers = cleanString(docs.developers || "");
+    if(docs.methods && !noMethods){
+        for(const methodName in docs.method){
+            docs.methods[methodName] = cleanDocs(
+                docs.methods[methodName], true
+            );
+        }
+    }
     return docs;
 };
 
