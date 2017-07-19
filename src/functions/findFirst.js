@@ -7,12 +7,27 @@ import {copyable} from "./copyable";
 import {equals} from "./equals";
 import {FindSequenceResult, ForwardFindSequenceThread, stepFindThreads} from "./findAll";
 
-// Find the first occurrence of a substring as judged by a comparison function.
-// Finding the first instance of a substring is overwhelmingly the most
-// common use case for substring searching, so alias "find" to "findFirst"
-// for maximum user convenience and minimum user confusion.
 export const findFirst = wrap({
     names: ["findFirst", "find"],
+    summary: "Finds the first occurrance of a substring as judged by a comparison function.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        detail: (`
+
+        `),
+        expects: (`
+            The function expects as input a comparison function and a sequence array
+            which should contain a source sequence and a bounded search sequence.
+
+            The function expects as input a sequence known to be bounded and
+            an optional predicate function to apply to each element.
+        `),
+        returns: (`
+            The function returns a @FindSequenceResult if an occurrance of the
+            provided substring can be found. If none can be found, or the sequence
+            is empty, returns @undefined.
+        `),
+    },
     attachSequence: true,
     async: true,
     arguments: {
@@ -77,6 +92,32 @@ export const findFirst = wrap({
             findObject.index++;
         }
         return undefined;
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": (hi) => {
+            const seq = hi("a string to be searched").findFirst("to be");
+            hi.assert(seq, (r) => r.index === 9);
+        },
+        "onlyFindsFirstOccurrance": (hi) => {
+            const result = hi("hi higher higher higher higher").findFirst("higher");
+            hi.assert(result, (r) => r.index === 3);
+        },
+        "undefinedWhenSubstringNotPresent": (hi) => {
+            const seq = hi("not gonna find this").findFirst("hello?");
+            hi.assertUndefined(seq);
+        },
+        "undefinedWhenSearchIsEmpty": (hi) => {
+            const seq = hi([]).findFirst("missing");
+            hi.assertUndefined(seq);
+        },
+        "indexesCorrect": (hi) => {
+            const result = hi("lorem ipsum dolar sit amet").findFirst("ipsum");
+            hi.assert(result, (r) => r.low === 6 && r.high === 11);
+        },
+        "searchLengthCorrect": (hi) => {
+            const result = hi("a string to be searched").findFirst("string");
+            hi.assert(result, (r) => r.length === 6);
+        }
     },
 });
 
