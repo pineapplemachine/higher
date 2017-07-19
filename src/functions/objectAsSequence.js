@@ -2,6 +2,8 @@ import {Sequence} from "../core/sequence";
 import {isArray, isObject} from "../core/types";
 import {wrap} from "../core/wrap";
 
+import {ArraySequence} from "./arrayAsSequence";
+
 // Helper function used to do an out-of-place insertion sort of object keys
 const pushSorted = (value, array) => {
     if(array.length < 8){
@@ -60,6 +62,15 @@ export const ObjectSequence = Sequence.extend({
                     same order that the sequence would have enumerated those
                     keys as part of key, value pairs.
                 `),
+                examples: [
+                    "basicUsage",
+                ],
+                tests: {
+                    "basicUsage": hi => {
+                        const object = {hello: 100, world: 300};
+                        hi.assertEqual(hi(object).keys(), ["hello", "world"]);
+                    },
+                },
             },
             "values": {
                 introduced: "higher@1.0.0",
@@ -70,6 +81,15 @@ export const ObjectSequence = Sequence.extend({
                     same order that the sequence would have enumerated those
                     values as part of key, value pairs.
                 `),
+                examples: [
+                    "basicUsage",
+                ],
+                tests: {
+                    "basicUsage": hi => {
+                        const object = {hello: 100, world: 300};
+                        hi.assertEqual(hi(object).values(), [100, 300]);
+                    },
+                },
             },
         },
     },
@@ -103,7 +123,7 @@ export const ObjectSequence = Sequence.extend({
     },
     keys: function(){
         // TODO: It might be cleaner to return a more specialized sequence type
-        return new ArraySequence(this.keys);
+        return new ArraySequence(this.objectKeys);
     },
     values: function(){
         return new ObjectValuesSequence(this.source, this.objectKeys);

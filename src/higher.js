@@ -8,7 +8,7 @@ export default hi;
 
 Object.assign(hi, {
     version: "0.1.0",
-    "function": {},
+    function: {},
 });
 
 hi.register = lightWrap({

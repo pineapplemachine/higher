@@ -55,7 +55,7 @@ export const wrap = lightWrap({
         if(process.env.NODE_ENV === "development"){
             fancy.docs = cleanDocs(info.docs);
             fancy.tests = info.tests;
-            fancy.test = wrappedTestRunner(fancy.name, info.tests);
+            fancy.test = wrappedTestRunner(fancy, info.tests);
         }
         return fancy;
     },

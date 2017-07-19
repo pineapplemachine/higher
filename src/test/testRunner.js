@@ -47,7 +47,7 @@ for(const name of sequenceNames){
 for(const name of functionNames){
     for(const failure of results.functions[name].fail){
         console.error(red(
-            `Function ${name}.${failure.name} test failed: ${failure.error.stack}`
+            `Function test ${failure.name} failed: ${failure.error.stack}`
         ));
     }
 }
@@ -55,7 +55,7 @@ for(const name of functionNames){
 for(const name of sequenceNames){
     for(const failure of results.sequences[name].fail){
         console.error(red(
-            `Sequence ${name}.${failure.name} test failed: ${failure.error.stack}`
+            `Sequence test ${failure.name} failed: ${failure.error.stack}`
         ));
     }
 }
