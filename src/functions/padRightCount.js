@@ -29,6 +29,18 @@ export const FinitePadRightSequence = Sequence.extend({
             }
         },
     },
+    getSequence: process.env.NODE_ENV !== "development" ? undefined : [
+        hi => new FinitePadRightSequence(hi.emptySequence(), "!", 0),
+        hi => new FinitePadRightSequence(hi.emptySequence(), "!", 5),
+        hi => new FinitePadRightSequence(hi("hello"), "!", 0),
+        hi => new FinitePadRightSequence(hi("hello"), "!", 5),
+        hi => new FinitePadRightSequence(hi("hello"), "!", 8),
+        hi => new FinitePadRightSequence(hi("hello"), "!", 16),
+        hi => new FinitePadRightSequence(hi([1, 2, 3, 4]), 0, 0),
+        hi => new FinitePadRightSequence(hi([1, 2, 3, 4]), 0, 4),
+        hi => new FinitePadRightSequence(hi([1, 2, 3, 4]), 0, 8),
+        hi => new FinitePadRightSequence(hi.repeat("hello"), "!", 4)
+    ],
     constructor: function FinitePadRightSequence(
         source, padElement, padTotal, padCount = undefined
     ){
@@ -140,6 +152,11 @@ export const InfinitePadRightSequence = Sequence.extend({
     ],
     supportsWith: [
         "index", "slice", "copy", "reset",
+    ],
+    getSequence: process.env.NODE_ENV !== "development" ? undefined : [
+        hi => new InfinitePadRightSequence(hi.emptySequence(), "!"),
+        hi => new InfinitePadRightSequence(hi("hello"), "!"),
+        hi => new InfinitePadRightSequence(hi.repeat("abc"), "!"),
     ],
     constructor: function InfinitePadRightSequence(
         source, padElement
