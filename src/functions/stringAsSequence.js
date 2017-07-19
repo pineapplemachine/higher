@@ -4,7 +4,6 @@ import {wrap} from "../core/wrap";
 
 export const StringSequence = Sequence.extend({
     summary: "Enumerate the characters in a string.",
-    supportsWith: [],
     supportsAlways: [
         "length", "left", "back", "index", "slice", "has", "get", "copy", "reset"
     ],
@@ -13,8 +12,20 @@ export const StringSequence = Sequence.extend({
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
-        methods: {},
+        expects: (`
+            The constructor expects a string as input.
+        `),
     },
+    getSequence: process.env.NODE_ENV !== "development" ? undefined : [
+        hi => new StringSequence(""),
+        hi => new StringSequence("0"),
+        hi => new StringSequence("hi"),
+        hi => new StringSequence("xyz"),
+        hi => new StringSequence("hello"),
+        hi => new StringSequence("null"),
+        hi => new StringSequence("undefined"),
+        hi => new StringSequence("once upon a midnight dreary"),
+    ],
     constructor: function StringSequence(
         source, lowIndex = undefined, highIndex = undefined,
         frontIndex = undefined, backIndex = undefined
@@ -89,6 +100,22 @@ export const StringSequence = Sequence.extend({
 export const stringAsSequence = wrap({
     name: "stringAsSequence",
     summary: "Get a sequence for enumerating the characters in a string.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The function expects a string as its single argument.
+        `),
+        returns: (`
+            The function returns a sequence for enumerating the characters of
+            the input string.
+        `),
+        examples: [
+            "basicUsage",
+        ],
+        related: [
+            "array", "object",
+        ],
+    },
     attachSequence: false,
     async: false,
     asSequence: {
@@ -104,6 +131,20 @@ export const stringAsSequence = wrap({
     },
     implementation: (source) => {
         return new StringSequence(source);
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": hi => {
+            const seq = hi.stringAsSequence("yo");
+            hi.assert(seq.nextFront() === "y");
+            hi.assert(seq.nextFront() === "o");
+            hi.assert(seq.done());
+        },
+        "emptyInput": hi => {
+            hi.assertEmpty(hi.stringAsSequence(""));
+        },
+        "asSequence": hi => {
+            hi.assertEqual(hi.asSequence("some string"), "some string");
+        },
     },
 });
 
