@@ -20,7 +20,7 @@ export const AssumeBoundedSequence = Sequence.extend({
         hi => new AssumeBoundedSequence(hi.counter().until(i => i >= 10)),
         hi => new AssumeBoundedSequence(hi.repeat("hello").until(i => i === "o")),
     ],
-    constructor: function AssumeBoundedSequences(source){
+    constructor: function AssumeBoundedSequence(source){
         this.source = source;
         this.maskAbsentMethods(source);
     },
