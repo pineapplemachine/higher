@@ -7,9 +7,13 @@ import {copyable} from "./copyable";
 import {equals} from "./equals";
 import {FindSequenceResult, ForwardFindSequenceThread, stepFindThreads} from "./findAll";
 
+// Find the first occurrence of a substring as judged by a comparison function.
+// Finding the first instance of a substring is overwhelmingly the most
+// common use case for substring searching, so alias "find" to "findFirst"
+// for maximum user convenience and minimum user confusion.
 export const findFirst = wrap({
     names: ["findFirst", "find"],
-    summary: "Finds the first occurrance of a substring as judged by a comparison function.",
+    summary: "Finds the first occurrence of a substring as judged by a comparison function.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         detail: (`
@@ -18,12 +22,11 @@ export const findFirst = wrap({
         expects: (`
             The function expects as input a comparison function and a sequence array
             which should contain a source sequence and a bounded search sequence.
-
-            The function expects as input a sequence known to be bounded and
+            /The function expects as input a sequence known to be bounded and
             an optional predicate function to apply to each element.
         `),
         returns: (`
-            The function returns a @FindSequenceResult if an occurrance of the
+            The function returns a @FindSequenceResult if an occurrence of the
             provided substring can be found. If none can be found, or the sequence
             is empty, returns @undefined.
         `),
@@ -95,10 +98,10 @@ export const findFirst = wrap({
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": (hi) => {
-            const seq = hi("a string to be searched").findFirst("to be");
-            hi.assert(seq, (r) => r.index === 9);
+            hi.assert(hi("hello world").findFirst("world").index === 6);
+            hi.assertUndefined(hi("hello again").findFirst("nope"));
         },
-        "onlyFindsFirstOccurrance": (hi) => {
+        "onlyFindsFirstOccurrence": (hi) => {
             const result = hi("hi higher higher higher higher").findFirst("higher");
             hi.assert(result, (r) => r.index === 3);
         },
@@ -117,6 +120,22 @@ export const findFirst = wrap({
         "searchLengthCorrect": (hi) => {
             const result = hi("a string to be searched").findFirst("string");
             hi.assert(result, (r) => r.length === 6);
+        },
+        "caseSensitiveSearch": (hi) => {
+            const asciiCaseInsensitive = (a, b) => (a.toUpperCase() === b.toUpperCase());
+            const found = hi("hello world").findFirst("World", asciiCaseInsensitive);
+            hi.assert(found.index === 6);
+            hi.assert(found.string() === "world");
+        },
+        "singleLength": (hi) => {
+            const result = hi("abcabc").findFirst("a");
+            hi.assert(result.index === 0);
+            hi.assert(result.high === 1);
+        },
+        "overlapping": (hi) => {
+            const result = hi("etetet").findFirst("etet");
+            hi.assert(result.index === 0);
+            hi.assert(result.high === 4);
         }
     },
 });
