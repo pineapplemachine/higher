@@ -7,6 +7,8 @@ import {copyable} from "./copyable";
 import {equals} from "./equals";
 import {FindSequenceResult, ForwardFindSequenceThread, stepFindThreads} from "./findAll";
 
+import {NotBoundedError} from "../errors/NotBoundedError";
+
 // Find the first occurrence of a substring as judged by a comparison function.
 // Finding the first instance of a substring is overwhelmingly the most
 // common use case for substring searching, so alias "find" to "findFirst"
@@ -16,9 +18,6 @@ export const findFirst = wrap({
     summary: "Finds the first occurrence of a substring as judged by a comparison function.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
-        detail: (`
-
-        `),
         expects: (`
             The function expects as input a comparison function and a sequence array
             which should contain a source sequence and a bounded search sequence.
@@ -29,6 +28,10 @@ export const findFirst = wrap({
             The function returns a @FindSequenceResult if an occurrence of the
             provided substring can be found. If none can be found, or the sequence
             is empty, returns @undefined.
+        `),
+        throws: (`
+            The function throws a @NotBoundedError when the input sequence was
+            not known to be bounded or when the search sequence is empty.
         `),
     },
     attachSequence: true,
@@ -44,9 +47,12 @@ export const findFirst = wrap({
         const source = sequences[0];
         let search = asSequence(sequences[1]);
         const compareFunc = compare || constants.defaults.comparisonFunction;
+
         // Handle empty or unbounded search subject
         if(search.done() || search.unbounded()){
-            return undefined;
+            throw NotBoundedError(search, {
+                message: "Search sequence is either empty or unbounded"
+            });
         }
         // Handle case where search length is known to be at least source length
         if(search.length && canGetLength(source)){
@@ -110,8 +116,13 @@ export const findFirst = wrap({
             hi.assertUndefined(seq);
         },
         "undefinedWhenSearchIsEmpty": (hi) => {
-            const seq = hi([]).findFirst("missing");
+            const seq = hi("").findFirst("missing");
             hi.assertUndefined(seq);
+        },
+        "throwsWhenInputIsEmpty": (hi) => {
+            hi.assertFailWith(NotBoundedError, () => {
+                return hi("test").findFirst("");
+            });
         },
         "indexesCorrect": (hi) => {
             const result = hi("lorem ipsum dolar sit amet").findFirst("ipsum");
@@ -136,6 +147,22 @@ export const findFirst = wrap({
             const result = hi("etetet").findFirst("etet");
             hi.assert(result.index === 0);
             hi.assert(result.high === 4);
+        },
+        "emptySearchString": (hi) => {
+            hi.assertFailWith(NotBoundedError, () => {
+                return hi("test").findFirst("");
+            });
+        },
+        "nonStringSearchSequence": (hi) => {
+            hi.assertFailWith(NotBoundedError, () => {
+                return hi(true, false, {}).findFirst({});
+            });
+            hi.assertUndefined(NotBoundedError, () => {
+                return hi(true, false, {}).findFirst("true");
+            });
+            hi.assertFailWith(NotBoundedError, () => {
+                return hi("test").findFirst([]);
+            });
         }
     },
 });
