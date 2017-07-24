@@ -111,6 +111,8 @@ import {validAsUnboundedSequence} from "./core/asSequence"; hi.register(validAsU
 import {assert} from "./core/assert"; hi.register(assert);
 import {assertNot} from "./core/assert"; hi.register(assertNot);
 import {assertUndefined} from "./core/assert"; hi.register(assertUndefined);
+import {assertNull} from "./core/assert"; hi.register(assertNull);
+import {assertNil} from "./core/assert"; hi.register(assertNil);
 import {assertNaN} from "./core/assert"; hi.register(assertNaN);
 import {assertEqual} from "./core/assert"; hi.register(assertEqual);
 import {assertNotEqual} from "./core/assert"; hi.register(assertNotEqual);
