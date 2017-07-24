@@ -128,7 +128,7 @@ export const isNumber = lightWrap({
         `),
         returns: (`
             The function returns true when the input value was any number,
-            including \`NaN\`, and it returns false otherwise.
+            including @NaN, and it returns false otherwise.
         `),
         related: [
             "isInteger", "isNaN",
