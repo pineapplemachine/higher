@@ -48,12 +48,18 @@ export const findFirst = wrap({
         let search = asSequence(sequences[1]);
         const compareFunc = compare || constants.defaults.comparisonFunction;
 
-        // Handle empty or unbounded search subject
-        if(search.done() || search.unbounded()){
+        // simply return undefined if the search input is empty
+        if (search.done()){
+            return undefined;
+        }
+
+        // ... however throw a NotBoundedError if the search input is unbounded
+        if(search.unbounded()){
             throw NotBoundedError(search, {
                 message: "Search sequence is either empty or unbounded"
             });
         }
+
         // Handle case where search length is known to be at least source length
         if(search.length && canGetLength(source)){
             const searchLength = search.length();
@@ -115,14 +121,9 @@ export const findFirst = wrap({
             const seq = hi("not gonna find this").findFirst("hello?");
             hi.assertUndefined(seq);
         },
-        "undefinedWhenSearchIsEmpty": (hi) => {
+        "undefinedWhenSequenceIsEmpty": (hi) => {
             const seq = hi("").findFirst("missing");
             hi.assertUndefined(seq);
-        },
-        "throwsWhenInputIsEmpty": (hi) => {
-            hi.assertFailWith(NotBoundedError, () => {
-                return hi("test").findFirst("");
-            });
         },
         "indexesCorrect": (hi) => {
             const result = hi("lorem ipsum dolar sit amet").findFirst("ipsum");
@@ -132,7 +133,7 @@ export const findFirst = wrap({
             const result = hi("a string to be searched").findFirst("string");
             hi.assert(result, (r) => r.length === 6);
         },
-        "caseSensitiveSearch": (hi) => {
+        "caseInsensitiveSearch": (hi) => {
             const asciiCaseInsensitive = (a, b) => (a.toUpperCase() === b.toUpperCase());
             const found = hi("hello world").findFirst("World", asciiCaseInsensitive);
             hi.assert(found.index === 6);
@@ -149,20 +150,19 @@ export const findFirst = wrap({
             hi.assert(result.high === 4);
         },
         "emptySearchString": (hi) => {
+            hi.assertUndefined(hi("test").findFirst(""));
+        },
+        "unboundedSearchInput": (hi) => {
             hi.assertFailWith(NotBoundedError, () => {
-                return hi("test").findFirst("");
+                return hi("test").findFirst(hi.repeatElement({
+                    key: "hello",
+                    value: "world"
+                }));
             });
         },
         "nonStringSearchSequence": (hi) => {
-            hi.assertFailWith(NotBoundedError, () => {
-                return hi(true, false, {}).findFirst({});
-            });
-            hi.assertUndefined(NotBoundedError, () => {
-                return hi(true, false, {}).findFirst("true");
-            });
-            hi.assertFailWith(NotBoundedError, () => {
-                return hi("test").findFirst([]);
-            });
+            hi.assertUndefined(hi("test").findFirst({}));
+            hi.assertUndefined(hi("test").findFirst([]));
         }
     },
 });
