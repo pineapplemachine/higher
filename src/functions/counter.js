@@ -16,8 +16,8 @@ export const CounterSequence = Sequence.extend({
         hi => new CounterSequence(-0.5),
     ],
     constructor: function CounterSequence(startValue, currentValue = undefined){
-        this.startValue = startValue;
-        this.currentValue = currentValue === undefined ? startValue : currentValue;
+        this.startValue = startValue || 0;
+        this.currentValue = currentValue === undefined ? this.startValue : currentValue;
     },
     bounded: () => false,
     unbounded: () => true,
