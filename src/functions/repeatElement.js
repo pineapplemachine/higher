@@ -176,8 +176,9 @@ export const repeatElement = wrap({
         }else if(!repetitions || !isFinite(repetitions)){
             return new InfiniteRepeatElementSequence(element);
         }else{
-            const repetitions = Math.floor(+repetitions);
-            return new FiniteRepeatElementSequence(repetitions, element);
+            return new FiniteRepeatElementSequence(
+                Math.floor(+repetitions), element
+            );
         }
     },
 });
