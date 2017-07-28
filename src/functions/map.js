@@ -78,9 +78,10 @@ export const SingularMapSequence = Sequence.extend({
 // Map sequence for any number of input sequences.
 export const PluralMapSequence = Sequence.extend({
     summary: "Enumerate transformed elements of any number of source sequences.",
-    supportsWithAll: [
-        "length", "left", "index", "slice", "has", "get", "copy", "reset"
-    ],
+    supportsWith: {
+        "length": "all", "left": "all", "index": "all", "slice": "all",
+        "has": "all", "get": "all", "copy": "all", "reset": "all",
+    },
     getSequence: process.env.NODE_ENV !== "development" ? undefined : [
         // No sources
         hi => new PluralMapSequence(i => i, []),

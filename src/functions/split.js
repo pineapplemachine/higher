@@ -218,8 +218,7 @@ export const split = wrap({
         const source = sequences[0];
         const delimiter = sequences[1];
         return new ForwardSplitSequence(
-            compareFunc, source.mustSupport("slice", "length"),
-            copyable.implementation(delimiter)
+            compareFunc, source.mustSupport("slice", "length"), copyable(delimiter)
         );
     },
 });

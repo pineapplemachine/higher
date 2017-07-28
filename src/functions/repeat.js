@@ -265,11 +265,9 @@ export const repeat = wrap({
         }else if(source.unbounded()){
             return source;
         }else if(repetitions && isFinite(repetitions)){
-            return new FiniteRepeatSequence(
-                repetitions, copyable.implementation(source)
-            );
+            return new FiniteRepeatSequence(repetitions, copyable(source));
         }else{
-            return new InfiniteRepeatSequence(copyable.implementation(source));
+            return new InfiniteRepeatSequence(copyable(source));
         }
     },
 });

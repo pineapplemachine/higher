@@ -41,7 +41,7 @@ export const findFirst = wrap({
             }
         }
         // Search sequence absolutely must be copyable
-        search = copyable.implementation(search);
+        search = copyable(search);
         const searchElement = search.nextFront();
         // Handle single-element search subject
         if(search.done()){

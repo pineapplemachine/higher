@@ -214,7 +214,7 @@ export const join = wrap({
     },
     implementation: (source, delimiter) => {
         if(delimiter && !delimiter.done()){
-            return new ForwardJoinSequence(source, copyable.implementation(delimiter));
+            return new ForwardJoinSequence(source, copyable(delimiter));
         }else{
             // Optimized implementation for when there is no delimiter
             // or when the delimiter is an empty sequence.
