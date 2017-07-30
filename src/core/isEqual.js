@@ -76,6 +76,14 @@ export const isEqual = lightWrap({
             hi.assert(hi.isEqual(20, 20));
             hi.assert(hi.isEqual(true, true));
         },
+        "emptyIterablesEqual": hi => {
+            hi.assert(hi.isEqual([], []));
+            hi.assert(hi.isEqual([], ""));
+            hi.assert(hi.isEqual("", ""));
+            hi.assert(hi.isEqual([], hi.emptySequence()));
+            hi.assert(hi.isEqual("", hi.emptySequence()));
+            hi.assert(hi.isEqual(hi.emptySequence(), hi.emptySequence()));
+        },
     },
 });
 
