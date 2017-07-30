@@ -61,12 +61,14 @@ export const HeadSequence = Sequence.extend({
     },
     back: null,
     popBack: null,
-    index: null,
-    slice: null,
-    has: null,
-    get: function(i){
-        return this.source.get(i);
+    index: function(i){
+        return this.source.index(i);
     },
+    slice: function(i, j){
+        return this.source.slice(i, j);
+    },
+    has: null,
+    get: null,
     copy: function(){
         return new HeadSequence(
             this.headLength, this.source.copy(), this.frontIndex
