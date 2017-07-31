@@ -107,7 +107,7 @@ export const isBoolean = lightWrap({
         ],
     },
     implementation: function isBoolean(value){
-        return typeof(value) === "boolean";
+        return typeof(value) === "boolean" || value instanceof Boolean;
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {
@@ -115,6 +115,10 @@ export const isBoolean = lightWrap({
             hi.assert(hi.isBoolean(false));
             hi.assertNot(hi.isBoolean(1));
             hi.assertNot(hi.isBoolean(null));
+        },
+        "newBooleanInput": hi => {
+            hi.assert(hi.isBoolean(new Boolean(true)));
+            hi.assert(hi.isBoolean(new Boolean(false)));
         },
     },
 });
@@ -138,7 +142,7 @@ export const isNumber = lightWrap({
         ],
     },
     implementation: function isNumber(value){
-        return typeof(value) === "number";
+        return typeof(value) === "number" || value instanceof Number;
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {
@@ -156,6 +160,9 @@ export const isNumber = lightWrap({
             hi.assertNot(hi.isNumber([]));
             hi.assertNot(hi.isNumber([1]));
             hi.assertNot(hi.isNumber([0, 1, 2]));
+        },
+        "newNumberInput": hi => {
+            hi.assert(hi.isNumber(new Number(2)));
         },
     },
 });
@@ -258,7 +265,7 @@ export const isString = lightWrap({
         ],
     },
     implementation: function isString(value){
-        return typeof(value) === "string";
+        return typeof(value) === "string" || value instanceof String;
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {
@@ -272,6 +279,9 @@ export const isString = lightWrap({
         },
         "undefinedInput": hi => {
             hi.assertNot(hi.isString(undefined));
+        },
+        "newStringInput": hi => {
+            hi.assert(hi.isString(new String("hello")));
         },
     },
 });
@@ -308,10 +318,126 @@ export const isArray = lightWrap({
     },
 });
 
+export const isSymbol = lightWrap({
+    summary: "Get whether an input is a symbol primitive.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The function expects a single argument of any type as input.
+        `),
+        returns: (`
+            The function returns true when the input value was a symbol and
+            false otherwise.
+        `),
+        examples: [
+            "basicUsage"
+        ],
+        links: {
+            "description": "Exploring ES6 chapter regarding symbols",
+            "url": "http://exploringjs.com/es6/ch_symbols.html"
+        },
+    },
+    implementation: function isSymbol(value){
+        return typeof(value) === "symbol";
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": hi => {
+            hi.assert(hi.isSymbol(Symbol.iterator));
+            hi.assert(hi.isSymbol(Symbol("hello!")));
+        },
+        "nilInputs": hi => {
+            hi.assertNot(hi.isSymbol(null));
+            hi.assertNot(hi.isSymbol(undefined));
+        },
+        "stringInputs": hi => {
+            hi.assertNot(hi.isSymbol(""));
+            hi.assertNot(hi.isSymbol("xyz"));
+        },
+    },
+});
+
+export const isPrimitive = lightWrap({
+    summary: "Get whether an input is a primitive value.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        detail: (`
+            Get whether an input is a primitive value.
+            Numbers, smybols, booleans, strings, @null, and @undefined are all
+            primitive values.
+        `),
+        expects: (`
+            The function expects a single argument of any type as input.
+        `),
+        returns: (`
+            The function returns true when the input value was a primitive value
+            and false otherwise.
+        `),
+        examples: [
+            "basicUsage"
+        ],
+        links: {
+            "description": "JavaScript data types and data structures",
+            "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Primitive_values"
+        },
+    },
+    implementation: function isPrimitive(value){
+        if(
+            value === null || value === undefined || value instanceof Boolean ||
+            value instanceof Number || value instanceof String
+        ){
+            return true;
+        }
+        const type = typeof(value);
+        return type === "boolean" || type === "number" || type === "string" || type === "symbol";
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": hi => {
+            hi.assert(hi.isPrimitive(null));
+            hi.assert(hi.isPrimitive(true));
+            hi.assert(hi.isPrimitive(1000));
+            hi.assertNot(hi.isPrimitive([1, 2, 3]));
+            hi.assertNot(hi.isPrimitive({hello: "world"}));
+        },
+        "undefinedInput": hi => {
+            hi.assert(hi.isPrimitive(undefined));
+        },
+        "booleanInputs": hi => {
+            hi.assert(hi.isPrimitive(true));
+            hi.assert(hi.isPrimitive(false));
+        },
+        "numericInputs": hi => {
+            hi.assert(hi.isPrimitive(0));
+            hi.assert(hi.isPrimitive(+1));
+            hi.assert(hi.isPrimitive(-1));
+            hi.assert(hi.isPrimitive(2.5));
+            hi.assert(hi.isPrimitive(+Infinity));
+            hi.assert(hi.isPrimitive(-Infinity));
+            hi.assert(hi.isPrimitive(NaN));
+        },
+        "symbolInputs": hi => {
+            hi.assert(hi.isPrimitive(Symbol.iterator));
+            hi.assert(hi.isPrimitive(Symbol.replace));
+        },
+        "functionInputs": hi => {
+            hi.assertNot(hi.isPrimitive(i => i));
+            hi.assertNot(hi.isPrimitive(hi.identity));
+            hi.assertNot(hi.isPrimitive(hi.range));
+        },
+        "newPrimitiveInput": hi => {
+            hi.assert(hi.isPrimitive(new Boolean(true)));
+            hi.assert(hi.isPrimitive(new Number(1)));
+        },
+    },
+});
+
 export const isObject = lightWrap({
     summary: "Get whether an input is an object.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
+        detail: (`
+            Get whether the input is an object.
+            An object is any value that is not a [primitive](isPrimitive).
+        `),
         expects: (`
             The function expects a single argument of any type as input.
         `),
@@ -324,18 +450,38 @@ export const isObject = lightWrap({
         ],
     },
     implementation: function isObject(value){
-        return Object.prototype.toString.call(value) === "[object Object]";
+        if(
+            value === null || value === undefined || value instanceof Boolean ||
+            value instanceof Number || value instanceof String
+        ){
+            return false;
+        }
+        const type = typeof(value);
+        return type !== "boolean" && type !== "number" && type !== "string" && type !== "symbol";
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {
             hi.assert(hi.isObject({x: 0, y: 1}));
         },
-        "emptyInput": hi => {
+        "emptyObjectInput": hi => {
             hi.assert(hi.isObject({}));
+        },
+        "arrayInput": hi => {
+            hi.assert(hi.isObject([]));
+            hi.assert(hi.isObject([1, 2, 3]));
+        },
+        "functionInput": hi => {
+            hi.assert(hi.isObject(i => i));
+            hi.assert(hi.isObject(hi.identity));
+            hi.assert(hi.isObject(hi.range));
         },
         "nilInput": hi => {
             hi.assertNot(hi.isObject(null));
             hi.assertNot(hi.isObject(undefined));
+        },
+        "newPrimitiveInput": hi => {
+            hi.assertNot(hi.isObject(new Boolean(true)));
+            hi.assertNot(hi.isObject(new Number(1)));
         },
     },
 });
