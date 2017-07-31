@@ -150,6 +150,7 @@ import {isInteger} from "./core/types"; hi.register(isInteger);
 import {isNaN} from "./core/types"; hi.register(isNaN);
 import {isString} from "./core/types"; hi.register(isString);
 import {isArray} from "./core/types"; hi.register(isArray);
+import {isPrimitive} from "./core/types"; hi.register(isPrimitive);
 import {isObject} from "./core/types"; hi.register(isObject);
 import {isFunction} from "./core/types"; hi.register(isFunction);
 import {isIterable} from "./core/types"; hi.register(isIterable);
