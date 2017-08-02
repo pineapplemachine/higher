@@ -21,55 +21,64 @@ export const all = wrap({
             satisfied the predicate or, if no predicate was given, if all the
             elements were truthy.
             It also returns @true if the sequence was empty.
-            The function returns @false otherwise.
+            The function returns the first falsey element otherwise.
         `),
-        throws: (`
-            The function throws a @NotBoundedError when the input sequence was
-            not known to be bounded.
-        `),
+        examples: [
+            "basicUsage", "basicUsagePredicate",
+        ],
+        related: [
+            "any", "none",
+        ],
     },
     attachSequence: true,
     async: true,
     arguments: {
         unordered: {
-            functions: "?",
-            sequences: 1,
-            allowIterables: true,
+            functions: {optional: wrap.expecting.predicate},
+            sequences: {one: wrap.expecting.boundedSequence},
         },
     },
     implementation: (predicate, source) => {
         if(predicate){
-            NotBoundedError.enforce(source, {
-                message: "Failed to determine whether all elements satisfied the predicate",
-            });
             for(const element of source){
                 if(!predicate(element)) return false;
             }
         }else{
-            NotBoundedError.enforce(source, {
-                message: "Failed to determine whether all elements were truthy",
-            });
             for(const element of source){
-                if(element) return element;
+                if(!element) return element;
             }
         }
         return true;
     },
     tests: {
-        "truthyOnly": (hi) => {
-            const truthy = [true, {}, [], "someValue", 42, new Date(), -42, 3.14, -3.14, Infinity, -Infinity];
-            const result = hi.all(truthy);
-            hi.assertEqual(result, true);
+        "basicUsage": hi => {
+            hi.assert(hi.all([true, true, true]));
+            hi.assertNot(hi.all([true, false]));
         },
-        "withPredicate": (hi) => {
-            const evensOnly = [2, 4, 6, 8, 10];
-            const result = hi.all((n) => n % 2 === 0, evensOnly);
-            hi.assertEqual(result, true);
+        "basicUsagePredicate": hi => {
+            const even = i => i % 2 === 0;
+            hi.assert(hi.all(even, [2, 4, 6, 8, 10]));
+            hi.assertNot(hi.all(even, [1, 2, 3, 4, 5]));
         },
-        "sequenceWithPredicate": (hi) => {
-            const evensOnly = [2, 4, 6, 8, 10];
-            const result = hi(evensOnly).all((n) => n % 2 === 0);
-            hi.assertEqual(result, true);
+        "allSatisfy": hi => {
+            hi.assert(hi.all([1, true, "yes"]));
+            hi.assert(hi.all(i => i % 2 === 0, [0, 0, 0, 2]));
+        },
+        "someSatisfy": hi => {
+            hi.assertNot(hi.all([1, 2, false]));
+            hi.assertNot(hi.all(i => i % 2 === 0, [0, 2, 3, 4, 5]));
+        },
+        "noneSatisfy": hi => {
+            hi.assertNot(hi.all([0, null, false]));
+            hi.assertNot(hi.all(i => i % 2 === 0, [1, 3, 9, 11]));
+        },
+        "emptyInput": hi => {
+            hi.assert(hi.all([]));
+            hi.assert(hi.all(i => true, []));
+            hi.assert(hi.all(i => false, []));
+        },
+        "unboundedInput": hi => {
+            hi.assertFail(() => hi.counter().all(i => i < 100));
         },
     },
 });

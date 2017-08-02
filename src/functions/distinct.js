@@ -65,14 +65,28 @@ export const distinct = wrap({
     ],
     arguments: {
         unordered: {
-            functions: "?",
-            sequences: 1
-        }
+            functions: {optional: wrap.expecting.transformation},
+            sequences: 1,
+        },
     },
     implementation: (transform, source) => {
         return new DistinctSequence(
             transform || (element => element), source
         );
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": hi => {
+            const array = [1, 2, 3, 2, 4, 1];
+            hi.assertEqual(hi.distinct(array), [1, 2, 3, 4]);
+        },
+        "basicUsageTransform": hi => {
+            const strings = ["hello", "how", "are", "you", "?"];
+            const byLength = i => i.length;
+            hi.assertEqual(hi.distinct(strings, byLength), ["hello", "how", "?"]);
+        },
+        "emptyInput": hi => {
+            hi.assertEmpty(hi.emptySequence().distinct());
+        },
     },
 });
 

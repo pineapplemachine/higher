@@ -89,9 +89,7 @@ export const padRight = wrap({
             hi.assert(inf.startsWith([0, 1, 2, 3, 4, "!", "!", "!"]));
             hi.assert(inf.endsWith(["!", "!", "!"]));
             // Error to pad with any other number of elements
-            hi.assertFailWith(BoundsUnknownError,
-                () => seq().padRight(10, "!")
-            );
+            hi.assertFail(() => seq().padRight(10, "!"));
         },
     },
 });

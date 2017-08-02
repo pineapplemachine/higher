@@ -562,13 +562,18 @@ export const assertFail = lightWrap({
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         expects: (`
-            The function expects two functions as input, a predicate and a
-            callback.
+            The function expects either one or two functions as input.
+            If two functions were provided, then the first function is must be
+            a predicate accepting a thrown object as input, and the second
+            function must be a callback.
+            If only one function was provided, then that function must be a
+            callback, and the function is evaluated as though it was invoked
+            with a predicate that is satisfied by any input.
         `),
         returns: (`
             The function returns the error that was thrown by the callback.
             The function always produces an @AssertError if the callback didn't
-            throw an error.
+            throw an error, or if the error did not satisfy the predicate.
         `),
         throws: (`
             Throws an @AssertError when either the callback does not itself
@@ -582,11 +587,22 @@ export const assertFail = lightWrap({
             "assertFailWith",
         ],
     },
-    implementation: function assertFail(predicate, callback){
-        try{
-            callback();
-        }catch(error){
-            if(predicate(error)) return error;
+    implementation: function assertFail(first, second = undefined){
+        if(second){
+            const predicate = first;
+            const callback = second;
+            try{
+                callback();
+            }catch(error){
+                if(predicate(error)) return error;
+            }
+        }else{
+            const callback = first;
+            try{
+                callback();
+            }catch(error){
+                return error;
+            }
         }
         throw AssertError(
             "Function must throw an error satisfying the predicate.", callback

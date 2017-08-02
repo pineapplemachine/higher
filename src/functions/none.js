@@ -23,37 +23,66 @@ export const none = wrap({
             It also returns @true if the sequence was empty.
             The function returns @false otherwise.
         `),
-        throws: (`
-            The function throws a @NotBoundedError when the input sequence was
-            not known to be bounded.
-        `),
+        examples: [
+            "basicUsage", "basicUsagePredicate",
+        ],
+        related: [
+            "all", "none",
+        ],
     },
     attachSequence: true,
     async: true,
     arguments: {
         unordered: {
-            functions: "?",
-            sequences: 1,
-            allowIterables: true
-        }
+            functions: {optional: wrap.expecting.predicate},
+            sequences: {one: wrap.expecting.boundedSequence},
+        },
     },
     implementation: (predicate, source) => {
         if(predicate){
-            NotBoundedError.enforce(source, {
-                message: "Failed to determine whether any elements satisfied the predicate"
-            });
             for(const element of source){
                 if(predicate(element)) return false;
             }
         }else{
-            NotBoundedError.enforce(source, {
-                message: "Failed to determine whether any elements were truthy"
-            });
             for(const element of source){
-                if(element) return element;
+                if(element) return false;
             }
         }
         return true;
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": hi => {
+            hi.assert(hi.none([false, false, false]));
+            hi.assertNot(hi.none([false, false, true]));
+        },
+        "basicUsagePredicate": (hi) => {
+            const odd = i => i % 2 === 1;
+            hi.assert(hi.none(odd, [2, 4, 6, 8, 10]));
+            hi.assertNot(hi.none(odd, [1, 2, 3, 4, 5]));
+        },
+        "allSatisfy": hi => {
+            hi.assertNot(hi.none([1, true, "yes"]));
+            hi.assertNot(hi.none(i => i % 2 === 0, [0, 0, 0, 2]));
+        },
+        "someSatisfy": hi => {
+            hi.assertNot(hi.none([1, 2, false]));
+            hi.assertNot(hi.none(i => i % 2 === 0, [0, 2, 3, 4, 5]));
+        },
+        "noneSatisfy": hi => {
+            hi.assert(hi.none([0, null, false]));
+            hi.assert(hi.none(i => i % 2 === 0, [1, 3, 9, 11]));
+        },
+        "emptyInput": hi => {
+            hi.assert(hi.none([]));
+            hi.assert(hi.none(i => true, []));
+            hi.assert(hi.none(i => false, []));
+        },
+        "notKnownBoundedInput": (hi) => {
+            hi.assertFail(() => hi.counter().until((i) => i === 100).none());
+        },
+        "unboundedInput": (hi) => {
+            hi.assertFail(() => hi.repeatElement(0).none());
+        },
     },
 });
 

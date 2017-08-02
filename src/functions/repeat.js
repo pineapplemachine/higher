@@ -256,8 +256,8 @@ export const repeat = wrap({
     arguments: {
         unordered: {
             numbers: "?",
-            sequences: 1
-        }
+            sequences: 1,
+        },
     },
     implementation: (repetitions, source) => {
         if(repetitions <= 0){
@@ -269,6 +269,16 @@ export const repeat = wrap({
         }else{
             return new InfiniteRepeatSequence(copyable(source));
         }
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsageFinite": hi => {
+            hi.assertEqual(hi.repeat([0, 1, 2], 2), [0, 1, 2, 0, 1, 2]);
+        },
+        "basicUsageInfinite": hi => {
+            const seq = hi.repeat("abc");
+            hi.assert(seq.unbounded());
+            hi.assert(seq.startsWith("abcabcabcabc"));
+        },
     },
 });
 

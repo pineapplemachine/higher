@@ -1,21 +1,11 @@
 import {error} from "../core/error";
+import {Expecting} from "../core/expecting";
 import {wrap} from "../core/wrap";
+
+import {ArgumentsError} from "../errors/ArgumentsError";
 
 import {ArraySequence} from "./arrayAsSequence";
 import {EmptySequence} from "./emptySequence";
-
-export const TailError = error({
-    summary: "Failed to get tail of sequence.",
-    constructor: function TailError(source){
-        this.source = source;
-        this.message = (
-            "The tail operation is supported only for sequences that are either " +
-            "empty, bidirectional, or known to be bounded. If the input sequence is " +
-            "surely bounded then this error can be fixed using the 'assumeBounded' " +
-            "function."
-        );
-    },
-});
 
 // Get a sequence for enumerating the last so many elements of the input.
 // The resulting sequence may be shorter than the length specified, but
@@ -56,6 +46,8 @@ export const tail = wrap({
         if(elements <= 0 || source.done()){
             // The input is empty or 0 elements were requested
             return new EmptySequence();
+        }else if(!isFinite(elements)){
+            return source;
         }else if(source.length && source.slice){
             // The input has length and slicing
             const sourceLength = source.length();
@@ -82,7 +74,10 @@ export const tail = wrap({
                 array.length - slice, array.length
             );
         }else{
-            throw TailError(source);
+            throw ArgumentsError({message: (
+                "The tail length must be zero or Infinity, or the input " +
+                "sequence must be either known-bounded or bidirectional."
+            )});
         }
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
@@ -95,6 +90,13 @@ export const tail = wrap({
             hi.assertEmpty(hi.tail(0, [1]));
             hi.assertEmpty(hi.tail(0, [1, 2, 3]));
             hi.assertEmpty(hi.tail(0, hi.recur(i => i)));
+        },
+        "infiniteLength": hi => {
+            // Bounded sequence
+            hi.assertEqual(hi.tail(Infinity, [0, 1, 2]), [0, 1, 2]);
+            // Unbounded sequence
+            const seq = hi.counter();
+            hi.assert(seq.tail(Infinity) === seq);
         },
         "emptyInput": hi => {
             hi.assertEmpty(hi.tail(0, []));
@@ -130,9 +132,7 @@ export const tail = wrap({
             hi.assertEqual(seq().tail(20), [0, 1, 2, 3, 4, 5, 6, 7]);
         },
         "illegalInput": hi => {
-            hi.assertFailWith(TailError,
-                () => hi.recur(i => i + 1).tail(10)
-            );
+            hi.assertFail(() => hi.recur(i => i + 1).seed(0).tail(10));
         },
     },
 });

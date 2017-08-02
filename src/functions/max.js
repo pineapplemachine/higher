@@ -31,15 +31,11 @@ export const max = wrap({
     async: true,
     arguments: {
         unordered: {
-            functions: "?",
-            sequences: 1,
-            allowIterables: true,
+            functions: {optional: wrap.expecting.relation},
+            sequences: {one: wrap.expecting.boundedSequence},
         },
     },
     implementation: (relate, source) => {
-        NotBoundedError.enforce(source, {
-            message: "Failed to find a maximum element"
-        });
         const relateFunc = relate || constants.defaults.relationalFunction;
         let max = undefined;
         let first = true;
@@ -72,14 +68,10 @@ export const max = wrap({
             hi.assertUndefined(hi.emptySequence().max());
         },
         "notKnownBoundedInput": hi => {
-            hi.assertFailWith(NotBoundedError,
-                () => hi.recur(i => i + 1).seed(0).until(i => i === 20).max()
-            );
+            hi.assertFail(() => hi.counter().until(i => i === 20).max());
         },
         "unboundedInput": hi => {
-            hi.assertFailWith(NotBoundedError,
-                () => hi.counter().max()
-            );
+            hi.assertFail(() => hi.counter().max());
         },
     },
 });

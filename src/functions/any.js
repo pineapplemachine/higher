@@ -22,32 +22,27 @@ export const any = wrap({
             elements were truthy. The function returns @false otherwise, or
             if the sequence was empty.
         `),
-        throws: (`
-            The function throws a @NotBoundedError when the input sequence was
-            not known to be bounded.
-        `),
+        examples: [
+            "basicUsage", "basicUsagePredicate",
+        ],
+        related: [
+            "all", "none",
+        ],
     },
     attachSequence: true,
     async: true,
     arguments: {
         unordered: {
-            functions: "?",
-            sequences: 1,
-            allowIterables: true,
+            functions: {optional: wrap.expecting.predicate},
+            sequences: {one: wrap.expecting.boundedSequence},
         },
     },
     implementation: (predicate, source) => {
         if(predicate){
-            NotBoundedError.enforce(source, {
-                message: "Failed to determine whether any elements satisfied the predicate",
-            });
             for(const element of source){
                 if(predicate(element)) return true;
             }
         }else{
-            NotBoundedError.enforce(source, {
-                message: "Failed to determine whether any elements were truthy",
-            });
             for(const element of source){
                 if(element){
                     return element;
@@ -57,62 +52,37 @@ export const any = wrap({
         return false;
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
-        "basicUsage": (hi) => {
+        "basicUsage": hi => {
+            hi.assert(hi.any([true, false, true, false]));
+            hi.assertNot(hi.any([false, 0, null]));
+        },
+        "basicUsagePredicate": (hi) => {
             const strings = ["hello", "world", "how", "are", "you"];
             hi.assert(hi.any(strings, (i) => i.startsWith("h"))); // "hello" starts with "h"
             hi.assertNot(hi.any(strings, (i) => i.startsWith("x"))); // None start with "x"
         },
-        "truthyOnly": (hi) => {
-            const truthy = [true, {}, [], "someValue", 42, new Date(), -42, 3.14, -3.14, Infinity, -Infinity];
-            const result = hi.any(truthy);
-            hi.assertEqual(result, true);
+        "allSatisfy": hi => {
+            hi.assert(hi.any([1, true, "yes"]));
+            hi.assert(hi.any(i => i % 2 === 0, [0, 0, 0, 2]));
         },
-        "falsyOnly": (hi) => {
-            const falsy = [false, 0, "", null, undefined, NaN];
-            const result = hi.any(falsy);
-            hi.assertEqual(result, false);
+        "someSatisfy": hi => {
+            hi.assert(hi.any([1, 2, false]));
+            hi.assert(hi.any(i => i % 2 === 0, [0, 2, 3, 4, 5]));
         },
-        "withPredicate": (hi) => {
-            // Ensure that when one even value is present in the provided
-            // input array, that the "even only" predicate returns true.
-            const evenAndOdd = [1, 3, 5, 7, 9, 10, 11];
-            const result = hi.any((n) => n % 2 === 0, evenAndOdd);
-            hi.assertEqual(result, true);
+        "noneSatisfy": hi => {
+            hi.assertNot(hi.any([0, null, false]));
+            hi.assertNot(hi.any(i => i % 2 === 0, [1, 3, 9, 11]));
         },
-        "withPredicateFailureMode": (hi) => {
-            // Provide an "even only" predicate, but providing an array
-            // with only odd values should fail.
-            const oddOnly = [1, 3, 5];
-            const result = hi.any((n) => n % 2 === 0, oddOnly);
-            hi.assertEqual(result, false);
-        },
-        "sequenceWithPredicate": (hi) => {
-            const evenAndOdd = [1, 3, 5, 7, 9, 10, 11];
-            const result = hi(evenAndOdd).any((n) => n % 2 === 0);
-            hi.assertEqual(result, true);
-        },
-        "predicateAndSourceReversed": (hi) => {
-            const evenAndOdd = [1, 3, 5, 7, 9, 10, 11];
-            const result = hi.any(evenAndOdd, (n) => n % 2 === 0);
-            hi.assertEqual(result, true);
-        },
-        "predicateAndSourceReversedFailureMode": (hi) => {
-            const oddOnly = [1, 3, 5];
-            const result = hi.any(oddOnly, (n) => n % 2 === 0);
-            hi.assertEqual(result, false);
-        },
-        "noInputs": (hi) => {
-            hi.assertEqual(hi.emptySequence().any(), false);
+        "emptyInput": hi => {
+            hi.assertNot(hi.any([]));
+            hi.assertNot(hi.any(i => true, []));
+            hi.assertNot(hi.any(i => false, []));
         },
         "notKnownBoundedInput": (hi) => {
-            hi.assertFailWith(NotBoundedError,
-                () => hi.recur((i) => i + 1).seed(0).until((i) => i === 100).any()
-            );
+            hi.assertFail(() => hi.counter().until((i) => i === 100).any());
         },
         "unboundedInput": (hi) => {
-            hi.assertFailWith(NotBoundedError,
-                () => hi.repeatElement(0).any()
-            );
+            hi.assertFail(() => hi.repeatElement(0).any());
         },
     },
 });

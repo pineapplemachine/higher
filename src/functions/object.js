@@ -90,7 +90,7 @@ export const object = wrap({
             hi.assert(hi.object(obj) === obj);
         },
         "unboundedInput": hi => {
-            hi.assertFailWith(NotBoundedError,
+            hi.assertFail(
                 () => hi.object(hi.repeatElement({key: "hello", value: "world"}))
             );
         },

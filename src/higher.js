@@ -97,8 +97,6 @@ if(process.env.NODE_ENV === "development") hi.test = lightWrap({
     },
 });
 
-// core/args
-import {args} from "./core/arguments"; hi.args = args;
 // core/asSequence
 import {asSequence} from "./core/asSequence"; hi.register(asSequence);
 import {asImplicitSequence} from "./core/asSequence"; hi.register(asImplicitSequence);
@@ -150,8 +148,10 @@ import {isInteger} from "./core/types"; hi.register(isInteger);
 import {isNaN} from "./core/types"; hi.register(isNaN);
 import {isString} from "./core/types"; hi.register(isString);
 import {isArray} from "./core/types"; hi.register(isArray);
+import {isSymbol} from "./core/types"; hi.register(isSymbol);
 import {isPrimitive} from "./core/types"; hi.register(isPrimitive);
 import {isObject} from "./core/types"; hi.register(isObject);
+import {isPlainObject} from "./core/types"; hi.register(isPlainObject);
 import {isFunction} from "./core/types"; hi.register(isFunction);
 import {isIterable} from "./core/types"; hi.register(isIterable);
 // core/wrap

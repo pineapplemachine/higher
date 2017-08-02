@@ -1,5 +1,5 @@
 import {Sequence} from "../core/sequence";
-import {isArray, isObject} from "../core/types";
+import {isPlainObject} from "../core/types";
 import {wrap} from "../core/wrap";
 
 import {ArraySequence} from "./arrayAsSequence";
@@ -100,30 +100,42 @@ export const ObjectSequence = Sequence.extend({
         hi => new ObjectSequence({x: "hello", y: "world", z: "how", w: "do"}),
     ],
     constructor: function ObjectSequence(
-        source, objectKeys = undefined
+        source, objectKeys = undefined, lowIndex = undefined,
+        highIndex = undefined, frontIndex = undefined, backIndex = undefined
     ){
         this.source = source;
-        this.keyIndex = 0;
         if(objectKeys){
             this.objectKeys = objectKeys;
         }else{
             this.objectKeys = [];
             for(const key in source) pushSorted(key, this.objectKeys);
         }
+        this.lowIndex = lowIndex || 0;
+        this.highIndex = highIndex === undefined ? this.objectKeys.length : highIndex;
+        this.frontIndex = frontIndex === undefined ? this.lowIndex : frontIndex;
+        this.backIndex = backIndex === undefined ? this.highIndex : backIndex;
     },
     object: function(){
-        return this.source;
+        if(this.lowIndex === 0 && this.highIndex === this.objectKeys.length){
+            return this.source;
+        }else{
+            const result = {};
+            for(let i = this.lowIndex; i < this.highIndex; i++){
+                result[this.objectKeys[i]] = this.source[this.objectKeys[i]];
+            }
+            return result;
+        }
     },
     newObject: function(){
         const result = {};
-        for(const key of this.objectKeys){
-            result[key] = this.source[key];
+        for(let i = this.lowIndex; i < this.highIndex; i++){
+            result[this.objectKeys[i]] = this.source[this.objectKeys[i]];
         }
         return result;
     },
     keys: function(){
         // TODO: It might be cleaner to return a more specialized sequence type
-        return new ArraySequence(this.objectKeys);
+        return new ArraySequence(this.objectKeys, this.lowIndex, this.highIndex);
     },
     values: function(){
         return new ObjectValuesSequence(this.source, this.objectKeys);
@@ -131,27 +143,40 @@ export const ObjectSequence = Sequence.extend({
     bounded: () => true,
     unbounded: () => false,
     done: function(){
-        return this.keyIndex >= this.objectKeys.length;
+        return this.frontIndex >= this.backIndex;
     },
     length: function(){
-        return this.objectKeys.length;
+        return this.highIndex - this.lowIndex;
     },
     left: function(){
-        return this.objectKeys.length - this.keyIndex;
+        return this.backIndex - this.frontIndex;
     },
     front: function(){
-        const key = this.objectKeys[this.keyIndex];
+        const key = this.objectKeys[this.frontIndex];
         return {key: key, value: this.source[key]};
     },
     popFront: function(){
-        return this.keyIndex++;
+        return this.frontIndex++;
     },
-    // These operations are technically possible but conceptually dodgy
-    // TODO: Should they be supported anyway?
-    back: null,
-    popBack: null,
-    index: null,
-    slice: null,
+    back: function(){
+        const key = this.objectKeys[this.backIndex - 1];
+        return {key: key, value: this.source[key]};
+    },
+    popBack: function(){
+        return this.backIndex--;
+    },
+    index: function(i){
+        const key = this.objectKeys[i + this.lowIndex];
+        return {key: key, value: this.source[key]};
+    },
+    slice: function(i, j){
+        const sequence = new ObjectSequence(
+            this.source, this.objectKeys, this.lowIndex + i, this.lowIndex + j
+        );
+        sequence.has = undefined;
+        sequence.get = undefined;
+        return sequence;
+    },
     has: function(i){
         return i in this.source;
     },
@@ -159,12 +184,14 @@ export const ObjectSequence = Sequence.extend({
         return this.source[i];
     },
     copy: function(){
-        const copy = new ObjectSequence(this.source, this.objectKeys);
-        copy.keyIndex = this.keyIndex;
-        return copy;
+        return new ObjectSequence(
+            this.source, this.objectKeys, this.lowIndex,
+            this.highIndex, this.frontIndex, this.backIndex
+        );
     },
     reset: function(){
-        this.keyIndex = 0;
+        this.frontIndex = this.lowIndex;
+        this.backIndex = this.highIndex;
         return this;
     },
     rebase: null,
@@ -178,51 +205,65 @@ export const ObjectValuesSequence = Sequence.extend({
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
-        methods: {},
     },
-    constructor: function ObjectValuesSequence(
-        source, objectKeys = undefined
+    constructor: function ObjectSequence(
+        source, objectKeys = undefined, lowIndex = undefined,
+        highIndex = undefined, frontIndex = undefined, backIndex = undefined
     ){
         this.source = source;
-        this.objectKeys = objectKeys || Object.objectKeys(source);
-        this.keyIndex = 0;
+        if(objectKeys){
+            this.objectKeys = objectKeys;
+        }else{
+            this.objectKeys = [];
+            for(const key in source) pushSorted(key, this.objectKeys);
+        }
+        this.lowIndex = lowIndex || 0;
+        this.highIndex = highIndex === undefined ? this.objectKeys.length : highIndex;
+        this.frontIndex = frontIndex === undefined ? this.lowIndex : frontIndex;
+        this.backIndex = backIndex === undefined ? this.highIndex : backIndex;
     },
     bounded: () => true,
     unbounded: () => false,
     done: function(){
-        return this.keyIndex >= this.objectKeys.length;
+        return this.frontIndex >= this.backIndex;
     },
     length: function(){
-        return this.objectKeys.length;
+        return this.highIndex - this.lowIndex;
     },
     left: function(){
-        return this.objectKeys.length - this.keyIndex;
+        return this.backIndex - this.frontIndex;
     },
     front: function(){
-        return this.source[this.objectKeys[this.keyIndex]];
+        return this.source[this.objectKeys[this.frontIndex]];
     },
     popFront: function(){
-        return this.keyIndex++;
+        return this.frontIndex++;
     },
-    // These operations are technically possible but conceptually dodgy
-    // TODO: Should they be supported anyway?
-    back: null,
-    popBack: null,
-    index: null,
-    slice: null,
-    has: function(i){
-        return i in this.source;
+    back: function(){
+        return this.source[this.objectKeys[this.backIndex - 1]];
     },
-    get: function(i){
-        return this.source[i];
+    popBack: function(){
+        return this.backIndex--;
     },
+    index: function(i){
+        return this.source[this.objectKeys[i + this.lowIndex]];
+    },
+    slice: function(i, j){
+        return new ObjectValuesSequence(
+            this.source, this.objectKeys, this.lowIndex + i, this.lowIndex + j
+        );
+    },
+    has: undefined,
+    get: undefined,
     copy: function(){
-        const copy = new ObjectSequence(this.source, this.objectKeys);
-        copy.keyIndex = this.keyIndex;
-        return copy;
+        return new ObjectValuesSequence(
+            this.source, this.objectKeys, this.lowIndex,
+            this.highIndex, this.frontIndex, this.backIndex
+        );
     },
     reset: function(){
-        this.keyIndex = 0;
+        this.frontIndex = this.lowIndex;
+        this.backIndex = this.highIndex;
         return this;
     },
     rebase: null,
@@ -238,7 +279,7 @@ export const objectAsSequence = wrap({
         // Last priority of all core converters.
         implicit: false,
         priority: 1000,
-        predicate: isObject,
+        predicate: value => isPlainObject(value),
         bounded: () => true,
         unbounded: () => false,
     },

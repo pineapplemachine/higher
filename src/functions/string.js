@@ -63,14 +63,12 @@ export const string = wrap({
             hi.assert(hi.string([10, 0, " bottles"]) === "100 bottles");
         },
         "notKnownBoundedInput": hi => {
-            hi.assertFailWith(NotBoundedError,
+            hi.assertFail(
                 () => hi.recur(i => i + "!").seed("hello").until(i => i.length >= 10).string()
             );
         },
         "unboundedInput": hi => {
-            hi.assertFailWith(NotBoundedError,
-                () => hi.repeatElement("hi").string()
-            );
+            hi.assertFail(() => hi.repeatElement("hi").string());
         },
     },
 });

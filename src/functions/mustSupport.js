@@ -9,7 +9,8 @@ export const mustSupport = wrap({
     attachSequence: true,
     async: false,
     arguments: {
-        ordered: [wrap.expecting.sequence] // + ...args
+        ordered: [wrap.expecting.sequence],
+        plusVariadic: true,
     },
     implementation: (source, ...operations) => {
         for(const operation of operations){
