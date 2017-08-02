@@ -23,6 +23,9 @@ export const IterableSequence = Sequence.extend({
         this.source = source;
         this.item = undefined;
     },
+    [Symbol.iterator]: function(){
+        return this.source[Symbol.iterator]();
+    },
     initialize: function(){
         this.item = this.source.next();
         this.done = function(){

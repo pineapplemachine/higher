@@ -79,9 +79,7 @@ export const homogeneous = wrap({
             hi.assert(hi.homogeneous([[0, 1], [0, 1]], hi.isEqual));
         },
         "unboundedInput": hi => {
-            hi.assertFailWith(NotBoundedError,
-                () => hi.counter().homogeneous()
-            );
+            hi.assertFail(() => hi.counter().homogeneous());
         },
     },
 });

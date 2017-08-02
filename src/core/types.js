@@ -431,23 +431,27 @@ export const isPrimitive = lightWrap({
 });
 
 export const isObject = lightWrap({
-    summary: "Get whether an input is an object.",
+    summary: "Get whether an input is any object.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         detail: (`
-            Get whether the input is an object.
-            An object is any value that is not a [primitive](isPrimitive).
+            Get whether the input is any object, that is, any value that is
+            not a [primitive](isPrimitive).
         `),
         expects: (`
             The function expects a single argument of any type as input.
         `),
         returns: (`
-            The function returns true when the input value was an object and
+            The function returns true when the input value was any object and
             false otherwise.
         `),
         examples: [
-            "basicUsage"
+            "basicUsage", "basicUsageArray", "basicUsageFunction",
         ],
+        links: {
+            "description": "JavaScript data types and data structures",
+            "url": "https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Primitive_values"
+        },
     },
     implementation: function isObject(value){
         if(
@@ -462,6 +466,13 @@ export const isObject = lightWrap({
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {
             hi.assert(hi.isObject({x: 0, y: 1}));
+        },
+        "basicUsageArray": hi => {
+            hi.assert(hi.isObject([1, 2, 3, 4, 5]));
+        },
+        "basicUsageFunction": hi => {
+            const square = i => i * i;
+            hi.assert(hi.isObject(square));
         },
         "emptyObjectInput": hi => {
             hi.assert(hi.isObject({}));
@@ -482,6 +493,61 @@ export const isObject = lightWrap({
         "newPrimitiveInput": hi => {
             hi.assertNot(hi.isObject(new Boolean(true)));
             hi.assertNot(hi.isObject(new Number(1)));
+        },
+    },
+});
+
+export const isPlainObject = lightWrap({
+    summary: "Get whether an input is a plain object.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        detail: (`
+            Get whether the input is an object, that is, any value that inherits
+            the @Object prototype or that does not have any prototype.
+        `),
+        expects: (`
+            The function expects a single argument of any type as input.
+        `),
+        returns: (`
+            The function returns true when the input value was a plain object and
+            false otherwise.
+        `),
+        examples: [
+            "basicUsage"
+        ],
+    },
+    implementation: function isPlainObject(value){
+        if(!value) return false;
+        const prototype = Object.getPrototypeOf(value);
+        return !prototype || prototype.constructor === Object;
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": hi => {
+            hi.assert(hi.isPlainObject({x: 0, y: 1}));
+        },
+        "basicUsageArray": hi => {
+            hi.assertNot(hi.isPlainObject([1, 2, 3, 4, 5]));
+        },
+        "basicUsageFunction": hi => {
+            const square = i => i * i;
+            hi.assertNot(hi.isPlainObject(square));
+        },
+        "emptyObjectInput": hi => {
+            hi.assert(hi.isPlainObject({}));
+        },
+        "nilInput": hi => {
+            hi.assertNot(hi.isPlainObject(null));
+            hi.assertNot(hi.isPlainObject(undefined));
+        },
+        "primitiveInputs": hi => {
+            hi.assertNot(hi.isPlainObject(0));
+            hi.assertNot(hi.isPlainObject(10));
+            hi.assertNot(hi.isPlainObject(true));
+            hi.assertNot(hi.isPlainObject("hello"));
+        },
+        "newPrimitiveInput": hi => {
+            hi.assertNot(hi.isPlainObject(new Boolean(true)));
+            hi.assertNot(hi.isPlainObject(new Number(1)));
         },
     },
 });

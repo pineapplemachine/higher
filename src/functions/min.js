@@ -31,15 +31,11 @@ export const min = wrap({
     async: true,
     arguments: {
         unordered: {
-            functions: "?",
-            sequences: 1,
-            allowIterables: true,
+            functions: {optional: wrap.expecting.relation},
+            sequences: {one: wrap.expecting.boundedSequence},
         },
     },
     implementation: (relate, source) => {
-        NotBoundedError.enforce(source, {
-            message: "Failed to find a minimum element"
-        });
         const relateFunc = relate || constants.defaults.relationalFunction;
         let min = undefined;
         let first = true;
@@ -72,14 +68,10 @@ export const min = wrap({
             hi.assertUndefined(hi.emptySequence().min());
         },
         "notKnownBoundedInput": hi => {
-            hi.assertFailWith(NotBoundedError,
-                () => hi.recur(i => i + 1).seed(0).until(i => i === 20).min()
-            );
+            hi.assertFail(() => hi.counter().until(i => i === 20).min());
         },
         "unboundedInput": hi => {
-            hi.assertFailWith(NotBoundedError,
-                () => hi.counter().min()
-            );
+            hi.assertFail(() => hi.counter().min());
         },
     },
 });

@@ -53,6 +53,7 @@ export const FromSequence = Sequence.extend({
         return this.source.unbounded();
     },
     done: function(){
+        this.initialize();
         return this.source.done();
     },
     length: null,
@@ -113,6 +114,20 @@ export const from = wrap({
     },
     implementation: (predicate, source) => {
         return new FromSequence(predicate, source);
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": hi => {
+            const even = i => i % 2 === 0;
+            const array = [1, 3, 9, 7, 5, 2, 1, 3, 4];
+            hi.assertEqual(hi.from(array, even), [2, 1, 3, 4]);
+        },
+        "emptyInput": hi => {
+            hi.assertEmpty(hi.emptySequence().from(i => true));
+            hi.assertEmpty(hi.emptySequence().from(i => false));
+        },
+        "noElementsSatisfy": hi => {
+            hi.assertEmpty(hi.from([1, 2, 3], i => false));
+        },
     },
 });
 

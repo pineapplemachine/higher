@@ -84,14 +84,10 @@ export const isSorted = wrap({
             hi.assertNot(hi.isSorted(desc, [2, 3, 0]));
         },
         "notKnownBoundedInput": hi => {
-            hi.assertFailWith(NotBoundedError,
-                () => hi.recur(i => -i).seed(1).until(i => i < 0).isSorted()
-            );
+            hi.assertFail(() => hi.counter().until(i => i < 0).isSorted());
         },
         "unboundedInput": hi => {
-            hi.assertFailWith(NotBoundedError,
-                () => hi.recur(i => -i).seed(1).isSorted()
-            );
+            hi.assertFail(() => hi.recur(i => -i).seed(1).isSorted());
         },
     },
 });

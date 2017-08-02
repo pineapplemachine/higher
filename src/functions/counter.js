@@ -103,6 +103,10 @@ export const counter = wrap({
             const seq = hi.counter(0.5);
             hi.assertEqual(seq.head(5), [0.5, 1.5, 2.5, 3.5, 4.5]);
         },
+        "bidirectionality": hi => {
+            hi.assert(hi.counter().startsWith([0, 1, 2]));
+            hi.assert(hi.counter().endsWith([Infinity, Infinity, Infinity]));
+        },
     },
 });
 

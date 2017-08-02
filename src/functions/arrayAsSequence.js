@@ -32,6 +32,13 @@ export const ArraySequence = Sequence.extend({
         this.frontIndex = frontIndex === undefined ? this.lowIndex : frontIndex;
         this.backIndex = backIndex === undefined ? this.highIndex : backIndex;
     },
+    [Symbol.iterator]: function(){
+        if(this.lowIndex === 0 && this.highIndex === this.source.length){
+            return this.source[Symbol.iterator]();
+        }else{
+            return this;
+        }
+    },
     array: function(limit){
         if(limit <= 0){
             return [];

@@ -161,16 +161,13 @@ export const repeatElement = wrap({
     name: "repeatElement",
     attachSequence: false,
     async: false,
-    sequences: [
-        FiniteRepeatElementSequence,
-        InfiniteRepeatElementSequence
-    ],
     arguments: {
-        ordered: [wrap.expecting.anything, wrap.expecting.number]
+        ordered: [
+            wrap.expecting.anything,
+            wrap.expecting.optional(wrap.expecting.number),
+        ],
     },
-    implementation: (...args) => {
-        const element = args[0];
-        const repetitions = args[1];
+    implementation: (element, repetitions) => {
         if(repetitions <= 0){
             return new EmptySequence();
         }else if(!repetitions || !isFinite(repetitions)){
@@ -180,6 +177,16 @@ export const repeatElement = wrap({
                 Math.floor(+repetitions), element
             );
         }
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsageFinite": hi => {
+            hi.assertEqual(hi.repeatElement("?", 3), "???");
+        },
+        "basicUsageInfinite": hi => {
+            const seq = hi.repeatElement(8);
+            hi.assert(seq.unbounded());
+            hi.assert(seq.startsWith([8, 8, 8, 8, 8, 8, 8]));
+        },
     },
 });
 
