@@ -239,10 +239,7 @@ export const InfiniteRepeatSequence = Sequence.extend({
         this.backSource = null;
         return this;
     },
-    collapseBreak: function(target, length){
-        // TODO: Can this possibly be fixed?
-        throw "Cannot collapse infinitely repeated sequence.";
-    },
+    collapseOutOfPlace: true,
 });
 
 export const repeat = wrap({
