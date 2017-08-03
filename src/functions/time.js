@@ -40,7 +40,7 @@ export const time = wrap({
         "basicUsage": hi => {
             const call = () => 10 + 10;
             const millisecs = hi.time(call);
-            hi.assert(millisecs < 10);
+            hi.assert(millisecs < 1000);
         },
     },
 });

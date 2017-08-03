@@ -37,7 +37,7 @@ export const benchmark = wrap({
         "basicUsage": hi => {
             const call = () => 5 + 5;
             const millisecs = hi.benchmark(100, call);
-            hi.assert(millisecs < 100);
+            hi.assert(millisecs < 1000);
         },
     },
 });
