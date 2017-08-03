@@ -21,6 +21,21 @@ export const trigrams = wrap({
             return new TrackingNgramSequence(3, source);
         }
     },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": hi => {
+            const words = ["hello", "world", "how", "do?"];
+            hi.assertEqual(hi.trigrams(words), [
+                ["hello", "world", "how"], ["world", "how", "do?"]
+            ]);
+        },
+        "emptyInput": hi => {
+            hi.assertEmpty(hi.emptySequence().trigrams());
+        },
+        "unboundedInput": hi => {
+            const seq = hi.counter().trigrams();
+            hi.assert(seq.startsWith(hi.isEqual, [[0, 1, 2], [1, 2, 3], [2, 3, 4]]));
+        },
+    },
 });
 
 export default trigrams;
