@@ -182,7 +182,6 @@ import {coalesce} from "./functions/coalesce"; hi.register(coalesce);
 import {chunk} from "./functions/chunk"; hi.register(chunk);
 import {collapse} from "./functions/collapse"; hi.register(collapse);
 import {concat} from "./functions/concat"; hi.register(concat);
-import {consume} from "./functions/consume"; hi.register(consume);
 import {containsElement} from "./functions/containsElement"; hi.register(containsElement);
 import {copyable} from "./functions/copyable"; hi.register(copyable);
 import {count} from "./functions/count"; hi.register(count);
