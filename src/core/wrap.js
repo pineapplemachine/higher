@@ -35,7 +35,7 @@ export const wrap = lightWrap({
                         unordered[type].order = [unordered[type].one];
                     }else if(unordered[type].optional){
                         unordered[type].amount = "?";
-                        unordered[type].order = [unordered[type].one];
+                        unordered[type].order = [unordered[type].optional];
                     }else{
                         unordered[type] = {amount: unordered[type]};
                     }

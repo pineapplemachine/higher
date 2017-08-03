@@ -397,8 +397,8 @@ export const describeExpecting = function(expecting, error = undefined){
                         suggestions[failedType] = expectingType.each;
                     };
                 }else if(expectingType.amount){
-                    if(expectingType.ordered && expectingType.ordered.length === 1){
-                        parts.push(describeUnordered(expectingType, expectingType.ordered[0]));
+                    if(expectingType.order && expectingType.order.length === 1){
+                        parts.push(describeUnordered(expectingType, expectingType.order[0]));
                     }else{
                         parts.push(describeUnordered(expectingType, type));
                     }
