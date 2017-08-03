@@ -411,12 +411,8 @@ export const describeExpecting = function(expecting, error = undefined){
                             expectingType.order[i].article + " " +
                             expectingType.order[i].singular
                         );
-                        if(expectingType.amount === 1){
+                        if(expectingType.amount === 1 || expectingType.amount === "?"){
                             // Do nothing (handled above)
-                        }else if(expectingType.amount === "?"){
-                            post.push(
-                                `The ${type.singular}, if specified, must be ${mustBe}.`
-                            );
                         }else if(unorderedAmountOptional(expectingType.amount)){
                             post.push(
                                 `The ${placeName(i + 1)} ${type.singular}, ` +
