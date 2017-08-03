@@ -40,7 +40,7 @@ export const ForwardChunkSequence = Sequence.extend({
     constructor: function ForwardChunkSequence(chunkLength, source){
         ArgumentsError.assert(chunkLength >= 1, {
             isConstructor: true,
-            message: "Failed to create sequence.",
+            message: "Failed to create sequence",
             detail: "Expected a numeric chunk length of at least 1.",
         });
         this.chunkLength = chunkLength;
@@ -127,7 +127,7 @@ export const BidirectionalChunkSequence = Sequence.extend({
     ){
         ArgumentsError.assert(chunkLength >= 1, {
             isConstructor: true,
-            message: "Failed to create sequence.",
+            message: "Failed to create sequence",
             detail: "Expected a numeric chunk length of at least 1.",
         });
         this.chunkLength = chunkLength;
