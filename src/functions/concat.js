@@ -1,21 +1,73 @@
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
+import {EmptySequence} from "./emptySequence";
+
 export const ConcatSequence = Sequence.extend({
-    constructor: function ConcatSequence(sources){
+    summary: "Concatenate the contents of some input sequences.",
+    supportsWith: {
+        "length": "all", "left": "all", "back": "all",
+        "index": "all", "slice": "all", "copy": "all", "reset": "all",
+    },
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The constructor expects an array of sequences as its single argument.
+        `),
+    },
+    getSequence: process.env.NODE_ENV !== "development" ? undefined : [
+        hi => new ConcatSequence([]),
+        hi => new ConcatSequence([hi.emptySequence()]),
+        hi => new ConcatSequence([hi.emptySequence(), hi.emptySequence()]),
+        hi => new ConcatSequence([hi.emptySequence(), hi([]), hi([])]),
+        hi => new ConcatSequence([hi([1, 2]), hi([])]),
+        hi => new ConcatSequence([hi([]), hi([3, 4])]),
+        hi => new ConcatSequence([hi([1, 2]), hi([3, 4])]),
+        hi => new ConcatSequence([hi([1, 2]), hi([]), hi([3, 4])]),
+        hi => new ConcatSequence([hi("abc"), hi("def"), hi("xyz"), hi("uvw")]),
+        hi => new ConcatSequence([hi.counter()]),
+        hi => new ConcatSequence([hi.repeat("hello")]),
+        hi => new ConcatSequence([hi.counter(), hi.counter()]),
+        hi => new ConcatSequence([hi([1, 2, 3]), hi.counter()]),
+        hi => new ConcatSequence([hi.counter(), hi([1, 2, 3])]),
+        hi => new ConcatSequence([hi([1, 2, 3]), hi.counter(), hi([1, 2, 3])]),
+        hi => new ConcatSequence([hi.counter(), hi([1, 2, 3]), hi.counter()]),
+    ],
+    constructor: function ConcatSequence(
+        sources, frontSourceIndex = undefined, backSourceIndex = undefined
+    ){
         this.sources = sources;
         this.source = sources[0];
-        this.frontSourceIndex = 0;
-        this.backSourceIndex = sources.length;
+        this.frontSourceIndex = frontSourceIndex || 0;
+        this.backSourceIndex = (backSourceIndex === undefined ?
+            sources.length : backSourceIndex
+        );
+        this.initializeSourceIndexes(
+            frontSourceIndex === undefined, backSourceIndex === undefined
+        );
         let noLength = false;
         for(const source of sources){
             this.maskAbsentMethods(source);
             noLength = noLength || !source.length;
         }
-        // All sources must have length for index and slice to be supported.
+        // All sources must have known length for index and slice to be supported.
         if(noLength){
             this.index = null;
             this.slice = null;
+        }
+    },
+    initializeSourceIndexes: function(front, back){
+        if(front) while(
+            this.frontSourceIndex < this.backSourceIndex &&
+            this.sources[this.frontSourceIndex].done()
+        ){
+            this.frontSourceIndex++;
+        }
+        if(back) while(
+            this.backSourceIndex > this.frontSourceIndex &&
+            this.sources[this.backSourceIndex - 1].done()
+        ){
+            this.backSourceIndex--;
         }
     },
     bounded: function(){
@@ -31,10 +83,7 @@ export const ConcatSequence = Sequence.extend({
         return true;
     },
     done: function(){
-        return this.frontSourceIndex > this.backSourceIndex || (
-            this.frontSourceIndex === this.backSourceIndex - 1 &&
-            this.sources[this.frontSourceIndex].done()
-        );
+        return this.frontSourceIndex >= this.backSourceIndex;
     },
     length: function(){
         let sum = 0;
@@ -54,7 +103,7 @@ export const ConcatSequence = Sequence.extend({
     popFront: function(){
         this.sources[this.frontSourceIndex].popFront();
         while(
-            this.frontSourceIndex < this.backSourceIndex - 1 &&
+            this.frontSourceIndex < this.backSourceIndex &&
             this.sources[this.frontSourceIndex].done()
         ){
             this.frontSourceIndex++;
@@ -66,7 +115,7 @@ export const ConcatSequence = Sequence.extend({
     popBack: function(){
         this.sources[this.backSourceIndex - 1].popBack();
         while(
-            this.frontSourceIndex < this.backSourceIndex - 1 &&
+            this.frontSourceIndex < this.backSourceIndex &&
             this.sources[this.backSourceIndex - 1].done()
         ){
             this.backSourceIndex--;
@@ -102,15 +151,18 @@ export const ConcatSequence = Sequence.extend({
     },
     copy: function(){
         const copies = [];
-        for(const source of this.sources) copies.push(source.copy());
-        const copy = new ConcatSequence(this.transform, copies);
-        copy.frontSourceIndex = this.frontSourceIndex;
-        copy.backSourceIndex = this.backSourceIndex;
+        for(const source of this.sources){
+            copies.push(source.copy());
+        }
+        return new ConcatSequence(
+            copies, this.frontSourceIndex, this.backSourceIndex
+        );
     },
     reset: function(){
         for(const source of this.sources) source.reset();
         this.frontSourceIndex = 0;
         this.backSourceIndex = this.sources.length;
+        this.initializeSourceIndexes(true, true);
         return this;
     },
     rebase: function(source){
@@ -122,18 +174,72 @@ export const ConcatSequence = Sequence.extend({
 
 export const concat = wrap({
     name: "concat",
+    summary: "Get a sequence that is the concatenation of some input sequences.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The function accepts any number of sequences of any kind as input.
+        `),
+        returns: (`
+            The function returns a sequence which enumerates the elements of
+            the first input sequence, followed by the elements of the second,
+            and so on.
+            If no input sequences were provided, then the function returns an
+            empty sequence.
+        `),
+        examples: [
+            "basicUsage", "basicUsageStrings",
+        ],
+        related: [
+            "flatten", "join", "roundRobin",
+        ],
+    },
     attachSequence: true,
     async: false,
-    sequences: [
-        ConcatSequence
-    ],
     arguments: {
         unordered: {
-            sequences: "*"
-        }
+            sequences: "*",
+        },
     },
     implementation: (sources) => {
-        return new ConcatSequence(sources);
+        if(sources.length <= 0){
+            return new EmptySequence();
+        }else if(sources.length === 1){
+            return sources[0];
+        }else{
+            return new ConcatSequence(sources);
+        }
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": hi => {
+            const seq = hi.concat([1, 2, 3], [4, 5, 6]);
+            hi.assertEqual(seq, [1, 2, 3, 4, 5, 6]);
+        },
+        "basicUsageStrings": hi => {
+            const seq = hi.concat("hello world!", " ", "how are you?");
+            hi.assertEqual(seq, "hello world! how are you?");
+        },
+        "noInputs": hi => {
+            hi.assertEmpty(hi.concat());
+        },
+        "oneInput": hi => {
+            hi.assertEqual(hi.concat([1, 2, 3]), [1, 2, 3]);
+            hi.assertEqual(hi.concat("hello"), "hello");
+        },
+        "emptyInputs": hi => {
+            hi.assertEmpty(hi.concat(hi.emptySequence()));
+            hi.assertEmpty(hi.concat(hi.emptySequence(), hi.emptySequence()));
+            hi.assertEmpty(hi.concat(hi.emptySequence(), hi.emptySequence(), [], []));
+            hi.assertEqual(hi.concat([], [1, 2, 3]), [1, 2, 3]);
+            hi.assertEqual(hi.concat([1, 2, 3], []), [1, 2, 3]);
+            hi.assertEqual(hi.concat([1, 2], [], [3, 4]), [1, 2, 3, 4]);
+        },
+        "unboundedInput": hi => {
+            const seq = hi.concat("abc", hi.repeat("def"), "ghi");
+            hi.assert(seq.unbounded());
+            hi.assert(seq.startsWith("abcdefdefdefdef"));
+            hi.assert(seq.endsWith("defdefdefdefghi"));
+        },
     },
 });
 
