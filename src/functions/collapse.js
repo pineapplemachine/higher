@@ -8,11 +8,10 @@ import {OperationError} from "../errors/OperationError";
 
 import {ArraySequence} from "./arrayAsSequence";
 
-// Used internally by collapse function
-const write = function(sequence, root, limit){
-    if(limit < 0 && !sequence.bounded()) throw NotBoundedError(sequence, {
+// Used internally by collapse function to write a sequence to an array.
+const write = function(sequence, root){
+    if(!sequence.bounded()) throw NotBoundedError(sequence, {
         message: "Failure handling intermediate sequence during collapse",
-        limitArgument: true,
     });
     let i = 0;
     while(!sequence.done()){
@@ -22,7 +21,19 @@ const write = function(sequence, root, limit){
         i++;
     }
     return i;
-}
+};
+
+// Used internally by collapse function to collapse out-of-place, i.e. when
+// there simply is no way to do the operation entirely in-place.
+const collapseOutOfPlace = function(sequence, traverse){
+    const root = traverse.root();
+    if(!isArray(root)) throw CollapseRootError(sequence);
+    const array = [];
+    for(const element of sequence) array.push(element);
+    root.length = array.length;
+    for(let i = 0; i < root.length; i++) root[i] = array[i];
+    return root;
+};
 
 export const CollapseRootError = error({
     summary: "Failed to collapse a sequence due to not having an array at its root.",
@@ -98,23 +109,10 @@ export const collapse = wrap({
     async: true,
     arguments: {
         unordered: {
-            numbers: "?",
-            sequences: 1
+            sequences: {one: wrap.expecting.boundedSequence},
         }
     },
-    implementation: (limit, sequence) => {
-        // If the limit was 0, empty the root array and don't bother with the rest
-        if(limit <= 0){
-            const root = sequence.root();
-            if(!isArray(root)) throw CollapseRootError(sequence);
-            root.length = 0;
-            return root;
-        }
-        // Error out when no limit is given and the sequence isn't known to be bounded
-        if(!limit && !sequence.bounded()) throw NotBoundedError(sequence, {
-            message: "Failed to collapse sequence",
-            limitArgument: true,
-        });
+    implementation: (sequence) => {
         // Get the sequence chain and keep track of any breaks found therein
         let traverse = sequence;
         const stack = [];
@@ -122,6 +120,7 @@ export const collapse = wrap({
         let i = 0;
         while(traverse && isSequence(traverse)){
             if(traverse.collapseBreak) breaks.push(stack.length);
+            if(traverse.collapseOutOfPlace) return collapseOutOfPlace(sequence, traverse);
             stack.push(traverse);
             traverse = traverse.source;
         }
@@ -130,11 +129,11 @@ export const collapse = wrap({
         if(!isArray(root)) throw CollapseRootError(sequence);
         // If no breaks were found in the chain, write all at once and be done with it
         if(!breaks.length){
-            write(sequence, root, limit);
+            root.length = write(sequence, root);
             return root;
         }
         // Get an ArraySequence with the root as its source
-        const frontSequence = stack[stach.length - 1]; // Front of sequence chain
+        const frontSequence = stack[stack.length - 1]; // Front of sequence chain
         const arraySequence = (frontSequence instanceof ArraySequence ?
             frontSequence : new ArraySequence(root)
         );
@@ -153,17 +152,17 @@ export const collapse = wrap({
                     message: "Failure collapsing sequence",
                 });
                 // Collapse the sequence up to the breaking sequence
-                i = write(prev, root, -1);
+                i = write(prev, root);
                 // Rebase the breaking sequence
                 arraySequence.backIndex = i;
                 breaking.rebase(arraySequence);
             }else{
                 // If this is the first sequence, the next step still needs to
                 // know how many elements of the array to read
-                i = source.length;
+                i = root.length;
             }
             // Do the break! This might involve reversing, repeating, shuffling...
-            i = breaking.collapseBreak(source, i);
+            i = breaking.collapseBreak(root, i);
             // If there's a following sequence in the chain, rebase it so that
             // it refers to the collapsed-thus-far array.
             if(next){
@@ -179,19 +178,55 @@ export const collapse = wrap({
         // If the last break isn't also the last sequence in the chain,
         // collapse everything following it.
         if(breaks[0] !== 0){
-            i = write(stack[0], root, limit);
+            i = write(stack[0], root);
         }
         // Set the final length of the array to however many elements ended
         // up being written there
-        source.length = i;
+        root.length = i;
         // All done!
-        return source;
+        return root;
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {
             const array = [1, 2, 3, 4, 5];
-            hi.map(array, n => n * n).collapse();
+            hi.map(array, i => i * i).collapse();
             hi.assertEqual(array, [1, 4, 9, 16, 25]);
+        },
+        "returnsRoot": hi => {
+            const array = [0, 1, 2];
+            const returned = hi.map(array, i => i + 1).collapse();
+            hi.assert(array === returned);
+            hi.assertEqual(array, [1, 2, 3]);
+        },
+        "emptyOutput": hi => {
+            const array = [1, 2, 3, 4, 5];
+            hi.filter(array, i => false).collapse();
+            hi.assertEmpty(array);
+        },
+        "collapseDistinct": hi => {
+            // Invovles collapseOutOfPlace
+            const array = [1, 2, 4, 3, 2, 4, 1, 6, 8, 7, 3, 4, 5];
+            hi.map(array, i => -i).distinct().map(array, i => -i).collapse();
+            hi.assertEqual(array, [1, 2, 4, 3, 6, 8, 7, 5]);
+        },
+        "collapseFiniteRepeat": hi => {
+            // Invovles collapseBreak
+            const array = [1, 2, 3];
+            hi.repeat(2, array).enumerate().map(i => i.index + i.value).collapse();
+            hi.assertEqual(array[1 + 0, 2 + 1, 3 + 2, 1 + 3, 2 + 4, 3 + 5]);
+        },
+        "collapseInfiniteRepeat": hi => {
+            // Invovles collapseBreak
+            const array = [1, 2, 3];
+            hi.repeat(array).enumerate().head(6).map(i => i.index + i.value).collapse();
+            hi.assertEqual(array[1 + 0, 2 + 1, 3 + 2, 1 + 3, 2 + 4, 3 + 5]);
+        },
+        "unboundedInput": hi => {
+            hi.assertFail(() => hi.repeat([1, 2, 3]).collapse());
+        },
+        "noArrayRoot": hi => {
+            hi.assertFailWith(CollapseRootError, () => hi.range(10).collapse());
+            hi.assertFailWith(CollapseRootError, () => hi.head("string", 3).collapse());
         },
     },
 });
