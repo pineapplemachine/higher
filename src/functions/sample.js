@@ -281,6 +281,9 @@ export const sample = wrap({
                 (samples[0] === 1 && samples[1] === 0 && samples[2] === 2)
             );
         },
+        "unboundedInput": hi => {
+            hi.assertFail(() => hi.counter().sample(10));
+        },
     },
 });
 
