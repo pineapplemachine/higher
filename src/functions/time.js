@@ -24,7 +24,7 @@ export const time = wrap({
     arguments: {
         ordered: [wrap.expecting.function]
     },
-    implementation: (typeof performance === "undefined" ?
+    implementation: (typeof performance !== "undefined" ?
         call => {
             const start = performance.now();
             call();
@@ -40,7 +40,7 @@ export const time = wrap({
         "basicUsage": hi => {
             const call = () => 10 + 10;
             const millisecs = hi.time(call);
-            hi.assert(millisecs < 1000);
+            hi.assert(millisecs < 100);
         },
     },
 });
