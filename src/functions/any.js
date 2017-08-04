@@ -22,6 +22,21 @@ export const any = wrap({
             elements were truthy. The function returns @false otherwise, or
             if the sequence was empty.
         `),
+        returnType: {
+            "typeof first truthy element": (`
+                When no predicate was given and any element of the input
+                sequence was truthy.
+            `),
+            "true": (`
+                When a predicate was given and any element of the input
+                sequence satisfied the predicate.
+            `),
+            "false": (`
+                When no predicate was given and no elements of the input
+                were truthy, or when a predicate was given and no elements
+                satisfied it, or when the input sequence was empty.
+            `),
+        },
         examples: [
             "basicUsage", "basicUsagePredicate",
         ],

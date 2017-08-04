@@ -23,6 +23,21 @@ export const all = wrap({
             It also returns @true if the sequence was empty.
             The function returns the first falsey element otherwise.
         `),
+        returnType: {
+            "typeof first falsey element": (`
+                When no predicate was given and any element of the input
+                sequence was falsey.
+            `),
+            "false": (`
+                When a predicate was given and any element of the input
+                sequence did not satisfy the predicate.
+            `),
+            "true": (`
+                When no predicate was given and all elements of the input
+                were truthy, or when a predicate was given and all elements
+                satisfied it, or when the input sequence was empty.
+            `),
+        },
         examples: [
             "basicUsage", "basicUsagePredicate",
         ],

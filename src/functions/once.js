@@ -24,6 +24,7 @@ export const once = wrap({
             Successive calls to the outputted function return the same value
             as the first call without ever invoking the inputted function again.
         `),
+        returnType: "function",
         examples: [
             "basicUsage", "notMemoization"
         ],

@@ -219,6 +219,23 @@ export const chunk = wrap({
             the provided chunk length. All sub-sequences preceding the final
             one will be of the provided length.
         `),
+        returnType: {
+            "InfiniteRepeatElementSequence": (`
+                When the chunk length was zero.
+            `),
+            "SingularMapSequence": (`
+                When the chunk length was one.
+            `),
+            "BidirectionalChunkSequence": (`
+                When the chunk length was greater than one, and the input
+                sequence allows slicing and has known length.
+            `),
+            "ForwardChunkSequence": (`
+                When the chunk length was greater than one, and the input
+                sequence either doesn't allow slicing or doesn't have
+                known length.
+            `),
+        },
         examples: [
             "basicUsage",
         ],
