@@ -123,7 +123,7 @@ export const assertNot = lightWrap({
 });
 
 export const assertUndefined = lightWrap({
-    summary: "Throw an @AssertError if a value is not @undefined.",
+    summary: "Throw an @AssertError if a value is not #undefined.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         expects: (`
@@ -132,11 +132,11 @@ export const assertUndefined = lightWrap({
             information about the condition being asserted.
         `),
         returns: (`
-            The function returns @undefined.
+            The function returns #undefined.
         `),
         throws: (`
             The function throws an @AssertError when the first argument was
-            not @undefined.
+            not #undefined.
             If a second argument was provided, then that string will be
             included in the message attached to the thrown error object.
         `),
@@ -247,7 +247,7 @@ export const assertNull = lightWrap({
 });
 
 export const assertNil = lightWrap({
-    summary: "Throw an @AssertError if a value is not @null or @undefined.",
+    summary: "Throw an @AssertError if a value is not @null or #undefined.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         expects: (`
@@ -260,7 +260,7 @@ export const assertNil = lightWrap({
         `),
         throws: (`
             The function throws an @AssertError when the first argument was
-            not either @null or @undefined.
+            not either @null or #undefined.
             If a second argument was provided, then that string will be
             included in the message attached to the thrown error object.
         `),
@@ -385,7 +385,7 @@ export const assertEqual = lightWrap({
             The function expects any number of arguments of any kind.
         `),
         returns: (`
-            The function returns its first argument, or @undefined when the
+            The function returns its first argument, or #undefined when the
             function was called without arguments.
         `),
         throws: (`
@@ -455,7 +455,7 @@ export const assertNotEqual = lightWrap({
             The function expects any number of arguments of any kind.
         `),
         returns: (`
-            The function returns its first argument, or @undefined when the
+            The function returns its first argument, or #undefined when the
             function was called without arguments.
         `),
         throws: (`

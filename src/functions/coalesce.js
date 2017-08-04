@@ -5,7 +5,7 @@ import {wrap} from "../core/wrap";
 // Returns undefined when the input sequence was empty.
 export const coalesce = wrap({
     name: "coalesce",
-    summary: "Get the first element in a sequence that isn't @null or @undefined.",
+    summary: "Get the first element in a sequence that isn't #null or #undefined.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         expects: (`
@@ -13,9 +13,9 @@ export const coalesce = wrap({
         `),
         returns: (`
             The function returns the first element in the input sequence that
-            wasn't either @null or @undefined. If the sequence was empty, the
-            function returns @undefined. If the sequence was not empty, but
-            all of its elements were either @null or @undefined, the last
+            wasn't either #null or #undefined. If the sequence was empty, the
+            function returns #undefined. If the sequence was not empty, but
+            all of its elements were either #null or #undefined, the last
             element in the sequence is returned.
         `),
         examples: [

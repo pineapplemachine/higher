@@ -187,6 +187,11 @@ export const concat = wrap({
             If no input sequences were provided, then the function returns an
             empty sequence.
         `),
+        returnTypes: {
+            "EmptySequence": "When no sequences were given as input",
+            "typeof first argument": "When exactly one sequence was given as input",
+            "ConcatSequence": "When more than one sequence was given as input",
+        },
         examples: [
             "basicUsage", "basicUsageStrings",
         ],

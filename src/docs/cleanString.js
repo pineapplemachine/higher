@@ -22,6 +22,11 @@ export const cleanDocs = function(docs, noMethods = undefined){
     docs.throws = cleanString(docs.throws || "");
     docs.warnings = cleanString(docs.warnings || "");
     docs.developers = cleanString(docs.developers || "");
+    if(docs.returnType && typeof(docs.returnType) === "object"){
+        for(const typeName in docs.returnType){
+            docs.returnType[typeName] = cleanString(docs.returnType[typeName] || "");
+        }
+    }
     if(docs.methods && !noMethods){
         for(const methodName in docs.method){
             docs.methods[methodName] = cleanDocs(

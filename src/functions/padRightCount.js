@@ -18,6 +18,7 @@ export const FinitePadRightSequence = Sequence.extend({
         methods: {
             "padWith": {
                 introduced: "higher@1.0.0",
+                arguments: {ordered: [wrap.expecting.anything, wrap.expecting.number]},
                 expects: (`
                     The function expects as its arguments the element to pad the
                     back of the source sequence with, and the number of times
@@ -137,6 +138,7 @@ export const InfinitePadRightSequence = Sequence.extend({
         methods: {
             "padWith": {
                 introduced: "higher@1.0.0",
+                arguments: {one: wrap.expecting.anything},
                 expects: (`
                     The function expects as its arguments the element to pad the
                     back of the source sequence with.

@@ -9,11 +9,13 @@ export const ArraySequence = Sequence.extend({
         "length", "left", "back", "index", "slice", "has", "get", "copy", "reset"
     ],
     overrides: [
-        "array", "newArray"
+        Symbol.iterator, "array", "newArray"
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
-        methods: {},
+        expects: (`
+            The constructor expects an array as its single argument.
+        `),
     },
     getSequence: process.env.NODE_ENV !== "development" ? undefined : [
         hi => new ArraySequence([]),
@@ -22,6 +24,29 @@ export const ArraySequence = Sequence.extend({
         hi => new ArraySequence([0, 1, 2, 3, 4, 5, 6]),
         hi => new ArraySequence([[0, 1], [1, 2]]),
     ],
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "iteratorOverride": hi => {
+            const seq = new hi.sequence.ArraySequence([1, 2, 3]);
+            let acc = [];
+            for(const ch of seq) acc.push(ch);
+            for(const ch of seq.slice(1, 3)) acc.push(ch);
+            hi.assertEqual(acc, [1, 2, 3, 2, 3]);
+        },
+        "arrayOverride": hi => {
+            const array = [1, 2, 3, 4];
+            const seq = new hi.sequence.ArraySequence(array);
+            hi.assert(seq.array() === array);
+            hi.assertEqual(seq.array(), [1, 2, 3, 4]);
+            hi.assertEqual(seq.slice(1, 3).array(), [2, 3]);
+        },
+        "newArrayOverride": hi => {
+            const array = [1, 2, 3, 4];
+            const seq = new hi.sequence.ArraySequence(array);
+            hi.assert(seq.newArray() !== array);
+            hi.assertEqual(seq.newArray(), [1, 2, 3, 4]);
+            hi.assertEqual(seq.slice(1, 3).newArray(), [2, 3]);
+        },
+    },
     constructor: function ArraySequence(
         source, lowIndex = undefined, highIndex = undefined,
         frontIndex = undefined, backIndex = undefined
@@ -39,38 +64,15 @@ export const ArraySequence = Sequence.extend({
             return this;
         }
     },
-    array: function(limit){
-        if(limit <= 0){
-            return [];
-        }else if(this.lowIndex !== 0 || this.highIndex !== this.source.length){
-            if(!limit){
-                return this.source.slice(this.lowIndex, this.highIndex);
-            }else{
-                const length = this.source.length - this.lowIndex;
-                return this.source.slice(this.lowIndex, this.lowIndex + (
-                    limit < length ? limit : length
-                ));
-            }
-        }else if(!limit || limit >= this.source.length){
+    array: function(){
+        if(this.lowIndex !== 0 || this.highIndex !== this.source.length){
+            return this.source.slice(this.lowIndex, this.highIndex);
+        }else{
             return this.source;
-        }else{
-            return this.source.slice(limit);
         }
     },
-    arrayAsync: function(limit){
-        return new constants.Promise((resolve, reject) => resolve(this.array(limit)));
-    },
-    newArray: function(limit){
-        if(limit <= 0){
-            return [];
-        }else if(!limit || limit >= this.source.length){
-            return this.source.slice();
-        }else{
-            return this.source.slice(limit);
-        }
-    },
-    newArrayAsync: function(limit){
-        return new constants.Promise((resolve, reject) => resolve(this.newArray(limit)));
+    newArray: function(){
+        return this.source.slice(this.lowIndex, this.highIndex);
     },
     bounded: () => true,
     unbounded: () => false,
@@ -126,6 +128,23 @@ export const ArraySequence = Sequence.extend({
 export const arrayAsSequence = wrap({
     name: "arrayAsSequence",
     summary: "Get a sequence for enumerating the contents of an array.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The function expects an array as its single argument.
+        `),
+        returns: (`
+            The function returns a sequence for enumerating the elements of
+            the input array.
+        `),
+        returnType: "ArraySequence",
+        examples: [
+            "basicUsage",
+        ],
+        related: [
+            "stringAsSequence", "iterableAsSequence",
+        ],
+    },
     attachSequence: false,
     async: false,
     asSequence: {
@@ -141,6 +160,21 @@ export const arrayAsSequence = wrap({
     },
     implementation: (source) => {
         return new ArraySequence(source);
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": hi => {
+            const seq = hi.arrayAsSequence([1, 2, 3]);
+            hi.assert(seq.nextFront() === 1);
+            hi.assert(seq.nextFront() === 2);
+            hi.assert(seq.nextFront() === 3);
+            hi.assert(seq.done());
+        },
+        "emptyInput": hi => {
+            hi.assertEmpty(hi.arrayAsSequence([]));
+        },
+        "asSequence": hi => {
+            hi.assertEqual(hi.asSequence([1, 2, 3]), [1, 2, 3]);
+        },
     },
 });
 
