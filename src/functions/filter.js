@@ -7,7 +7,7 @@ export const FilterSequence = Sequence.extend({
         "back", "has", "get", "copy", "reset"
     ],
     overrides: [
-        "filter"
+        "filter", "reject",
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
@@ -21,6 +21,22 @@ export const FilterSequence = Sequence.extend({
             certain point, will cause an infinite loop as soon as any
             information is requested from the sequence.
         `),
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "filterOverride": hi => {
+            const odd = i => i % 2 !== 0;
+            const positive = i => i > 0;
+            const array = hi([-3, -2, -1, 0, 1, 2, 3]);
+            const seq = new hi.sequence.FilterSequence(odd, array).filter(positive);
+            hi.assertEqual(seq, [1, 3]);
+        },
+        "rejectOverride": hi => {
+            const odd = i => i % 2 !== 0;
+            const positive = i => i > 0;
+            const array = hi([-3, -2, -1, 0, 1, 2, 3]);
+            const seq = new hi.sequence.FilterSequence(odd, array).reject(positive);
+            hi.assertEqual(seq, [-3, -1]);
+        },
     },
     getSequence: process.env.NODE_ENV !== "development" ? undefined : [
         hi => new FilterSequence(() => true, hi([0, 1, 2, 3, 4, 5])),
@@ -40,7 +56,14 @@ export const FilterSequence = Sequence.extend({
     },
     filter: function(predicate){
         return new FilterSequence(
-            (element) => (this.predicate(element) && predicate(element)), this.source
+            (element) => (this.predicate(element) && predicate(element)),
+            this.source
+        );
+    },
+    reject: function(predicate){
+        return new FilterSequence(
+            (element) => (this.predicate(element) && !predicate(element)),
+            this.source
         );
     },
     initializeFront: function(){
@@ -162,6 +185,7 @@ export const filter = wrap({
             certain point, will cause an infinite loop as soon as any
             information is requested from the outputted sequence.
         `),
+        returnType: "FilterSequence",
         examples: [
             "basicUsage"
         ],
