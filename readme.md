@@ -6,6 +6,8 @@ Higher is a functional programming library for JavaScript with a focus on provid
 
 Higher is released under a [zlib/libpng license](https://github.com/pineapplemachine/higher/blob/master/license). In summary, you may do anything you like with this software except misrepresent its origin.
 
+![Build status](https://travis-ci.org/pineapplemachine/higher.svg?branch=master)
+
 _Please be aware that this repo is still under construction!_
 
 ## What hi does
