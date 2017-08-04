@@ -69,6 +69,7 @@ export const counter = wrap({
             at the input value or zero, incrementing by one each for each
             element to acquire the next number.
         `),
+        returnType: "CounterSequence",
         related: [
             "range", "recur"
         ],

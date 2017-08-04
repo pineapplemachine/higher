@@ -5,10 +5,10 @@ import {wrap} from "../core/wrap";
 export const StringSequence = Sequence.extend({
     summary: "Enumerate the characters in a string.",
     supportsAlways: [
-        "length", "left", "back", "index", "slice", "has", "get", "copy", "reset"
+        "length", "left", "back", "index", "slice", "has", "get", "copy", "reset",
     ],
     overrides: [
-        "string"
+        Symbol.iterator, "string",
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
@@ -26,6 +26,20 @@ export const StringSequence = Sequence.extend({
         hi => new StringSequence("undefined"),
         hi => new StringSequence("once upon a midnight dreary"),
     ],
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "iteratorOverride": hi => {
+            const seq = new hi.sequence.StringSequence("xyz");
+            let acc = "";
+            for(const ch of seq) acc += ch;
+            for(const ch of seq.slice(1, 3)) acc += ch;
+            hi.assert(acc === "xyzyz");
+        },
+        "stringOverride": hi => {
+            const seq = new hi.sequence.StringSequence("hello world");
+            hi.assert(seq.string() === "hello world");
+            hi.assert(seq.slice(1, 5).string() === "ello");
+        },
+    },
     constructor: function StringSequence(
         source, lowIndex = undefined, highIndex = undefined,
         frontIndex = undefined, backIndex = undefined
@@ -49,9 +63,6 @@ export const StringSequence = Sequence.extend({
         }else{
             return this.source.slice(this.lowIndex, this.highIndex);
         }
-    },
-    stringAsync: function(){
-        return new constants.Promise((resolve, reject) => resolve(this.string()));
     },
     bounded: () => true,
     unbounded: () => false,
@@ -101,7 +112,6 @@ export const StringSequence = Sequence.extend({
         this.backIndex = this.highIndex;
         return this;
     },
-    rebase: null,
 });
 
 export const stringAsSequence = wrap({
@@ -110,17 +120,19 @@ export const stringAsSequence = wrap({
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         expects: (`
-            The function expects a string as its single argument.
+            The function accepts any value as its single argument, which is
+            then coerced to a string if was not already one.
         `),
         returns: (`
             The function returns a sequence for enumerating the characters of
             the input string.
         `),
+        returnType: "StringSequence",
         examples: [
             "basicUsage",
         ],
         related: [
-            "array", "object",
+            "arrayAsSequence", "iterableAsSequence",
         ],
     },
     attachSequence: false,
@@ -134,10 +146,10 @@ export const stringAsSequence = wrap({
         unbounded: () => false,
     },
     arguments: {
-        one: wrap.expecting.string
+        one: wrap.expecting.anything
     },
     implementation: (source) => {
-        return new StringSequence(source);
+        return new StringSequence(String(source));
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {

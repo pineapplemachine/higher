@@ -15,39 +15,35 @@ export const UntilSequence = Sequence.extend({
         methods: {
             "inclusive": {
                 introduced: "higher@1.0.0",
-                summary: "Cause the sequence to include the first element satisfying the predicate.",
-                returns: (`
-                    The function returns the sequence itself.
-                `),
+                summary: "Modify the sequence to include the first element satisfying the predicate.",
+                returns: "The function returns the sequence itself.",
+                returnType: "UntilSequence",
                 examples: [
-                    "basicUsage",
+                    "inclusiveBasicUsage",
                 ],
-                tests: {
-                    "basicUsage": hi => {
-                        const beeping = () => hi("beeping");
-                        hi.assertEqual(beeping().until(i => i === "p"), "bee");
-                        hi.assertEqual(beeping().until(i => i === "p").exclusive(), "bee");
-                        hi.assertEqual(beeping().until(i => i === "p").inclusive(), "beep");
-                    },
-                },
             },
             "exclusive": {
                 introduced: "higher@1.0.0",
-                summary: "Cause the sequence to exclude the first element satisfying the predicate.",
-                returns: (`
-                    The function returns the sequence itself.
-                `),
+                summary: "Modify the sequence to exclude the first element satisfying the predicate.",
+                returns: "The function returns the sequence itself.",
+                returnType: "UntilSequence",
                 examples: [
-                    "basicUsage",
+                    "exclusiveBasicUsage",
                 ],
-                tests: {
-                    "basicUsage": hi => {
-                        const beeping = () => hi("beeping");
-                        hi.assertEqual(beeping().until(i => i === "p").exclusive(), "bee");
-                        hi.assertEqual(beeping().until(i => i === "p").inclusive(), "beep");
-                    },
-                },
             },
+        },
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "inclusiveBasicUsage": hi => {
+            const beeping = () => hi("beeping");
+            hi.assertEqual(beeping().until(i => i === "p"), "bee");
+            hi.assertEqual(beeping().until(i => i === "p").exclusive(), "bee");
+            hi.assertEqual(beeping().until(i => i === "p").inclusive(), "beep");
+        },
+        "exclusiveBasicUsage": hi => {
+            const beeping = () => hi("beeping");
+            hi.assertEqual(beeping().until(i => i === "p").exclusive(), "bee");
+            hi.assertEqual(beeping().until(i => i === "p").inclusive(), "beep");
         },
     },
     getSequence: process.env.NODE_ENV !== "development" ? undefined : [

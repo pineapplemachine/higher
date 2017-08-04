@@ -56,6 +56,8 @@ export const ObjectSequence = Sequence.extend({
             "keys": {
                 introduced: "higher@1.0.0",
                 summary: "Get a sequence enumerating only the keys of the object.",
+                arguments: {none: true},
+                expects: "The function accepts no arguments.",
                 returns: (`
                     This function returns a sequence enumerating the keys of
                     the object that the ObjectSequence was created from in the
@@ -63,18 +65,14 @@ export const ObjectSequence = Sequence.extend({
                     keys as part of key, value pairs.
                 `),
                 examples: [
-                    "basicUsage",
+                    "keysBasicUsage",
                 ],
-                tests: {
-                    "basicUsage": hi => {
-                        const object = {hello: 100, world: 300};
-                        hi.assertEqual(hi(object).keys(), ["hello", "world"]);
-                    },
-                },
             },
             "values": {
                 introduced: "higher@1.0.0",
                 summary: "Get a sequence enumerating only the values of the object.",
+                arguments: {none: true},
+                expects: "The function accepts no arguments.",
                 returns: (`
                     This function returns a sequence enumerating the values of
                     the object that the ObjectSequence was created from in the
@@ -82,15 +80,19 @@ export const ObjectSequence = Sequence.extend({
                     values as part of key, value pairs.
                 `),
                 examples: [
-                    "basicUsage",
+                    "valuesBasicUsage",
                 ],
-                tests: {
-                    "basicUsage": hi => {
-                        const object = {hello: 100, world: 300};
-                        hi.assertEqual(hi(object).values(), [100, 300]);
-                    },
-                },
             },
+        },
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "keysBasicUsage": hi => {
+            const object = {hello: 100, world: 300};
+            hi.assertEqual(hi(object).keys(), ["hello", "world"]);
+        },
+        "valuesBasicUsage": hi => {
+            const object = {hello: 100, world: 300};
+            hi.assertEqual(hi(object).values(), [100, 300]);
         },
     },
     getSequence: process.env.NODE_ENV !== "development" ? undefined : [
@@ -206,7 +208,7 @@ export const ObjectValuesSequence = Sequence.extend({
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
     },
-    constructor: function ObjectSequence(
+    constructor: function ObjectValuesSequence(
         source, objectKeys = undefined, lowIndex = undefined,
         highIndex = undefined, frontIndex = undefined, backIndex = undefined
     ){

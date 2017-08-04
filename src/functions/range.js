@@ -1,12 +1,50 @@
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
-import {EmptySequence} from "./emptySequence";
 import {InfiniteRepeatElementSequence} from "./repeatElement";
 
 // Result of calling range with a step of exactly 1.
 export const NumberRangeSequence = Sequence.extend({
     summary: "Enumerate numbers from a low until a high bound, incrementing by one each step.",
+    supportsAlways: [
+        "length", "left", "back", "index", "slice", "copy", "reset",
+    ],
+    overrides: [
+        "reverse",
+    ],
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The constructor expects an inclusive lower bound and an exclusive
+            higher bound as its two arguments. Both arguments must be finite
+            numbers.
+        `),
+        methods: {
+            "step": {
+                introduced: "higher@1.0.0",
+                arguments: {none: true},
+                expects: "The function accepts no arguments.",
+                returns: (`
+                    The function returns the numeric interval between elements,
+                    which is always and forever @1.
+                `),
+                examples: [
+                    "stepBasicUsage",
+                ],
+            },
+        },
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "stepBasicUsage": hi => {
+            const seq = new hi.sequence.NumberRangeSequence(0, 3);
+            const interval = seq.index(1) - seq.index(0);
+            hi.assert(seq.step() === interval && interval === 1);
+        },
+        "reverseOverride": hi => {
+            const seq = new hi.sequence.NumberRangeSequence(0, 4);
+            hi.assertEqual(seq.reverse(), [3, 2, 1, 0]);
+        },
+    },
     getSequence: process.env.NODE_ENV !== "development" ? undefined : [
         hi => new NumberRangeSequence(0, 0),
         hi => new NumberRangeSequence(1, 1),
@@ -23,7 +61,7 @@ export const NumberRangeSequence = Sequence.extend({
         this.frontValue = start;
         this.backValue = this.end - 1;
     },
-    step: 1,
+    step: () => 1,
     reverse: function(){
         return new BackwardNumberRangeSequence(
             this.end - 1, this.start - 1, -1
@@ -69,12 +107,51 @@ export const NumberRangeSequence = Sequence.extend({
         this.backValue = this.end;
         return this;
     },
-    rebase: null,
 });
 
 // Result of calling range with a step of greater than 0.
 export const ForwardNumberRangeSequence = Sequence.extend({
     summary: "Enumerate numbers from a low until a high bound, incrementing by some positive step.",
+    supportsAlways: [
+        "length", "left", "back", "index", "slice", "copy", "reset",
+    ],
+    overrides: [
+        "reverse",
+    ],
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The constructor expects an inclusive lower bound, an exclusive
+            higher bound, and a numeric interval between elements as its two
+            arguments. Both bounds must be finite numbers, and the interval
+            must be a finite non-zero positive number.
+        `),
+        methods: {
+            "step": {
+                introduced: "higher@1.0.0",
+                arguments: {none: true},
+                expects: "The function accepts no arguments.",
+                returns: (`
+                    The function returns the numeric interval between elements,
+                    which is specified upon sequence instantiation.
+                `),
+                examples: [
+                    "stepBasicUsage",
+                ],
+            },
+        },
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "stepBasicUsage": hi => {
+            const seq = new hi.sequence.ForwardNumberRangeSequence(0, 8, 2);
+            const interval = seq.index(1) - seq.index(0);
+            hi.assert(seq.step() === interval && interval === 2);
+        },
+        "reverseOverride": hi => {
+            const seq = new hi.sequence.ForwardNumberRangeSequence(0, 8, 2);
+            hi.assertEqual(seq.reverse(), [6, 4, 2, 0]);
+        },
+    },
     getSequence: process.env.NODE_ENV !== "development" ? undefined : [
         hi => new ForwardNumberRangeSequence(0, 0, 1),
         hi => new ForwardNumberRangeSequence(1, 1, 1),
@@ -93,15 +170,18 @@ export const ForwardNumberRangeSequence = Sequence.extend({
         }
         this.start = start;
         this.end = end > start ? end : start;
-        this.step = step;
+        this.stepValue = step;
         this.frontValue = start;
         const delta = this.end - start;
         this.backValue = this.end - (delta % step || step);
     },
     reverse: function(){
         return new BackwardNumberRangeSequence(
-            this.end - this.step, this.start - this.step, -this.step
+            this.end - this.stepValue, this.start - this.stepValue, -this.stepValue
         );
+    },
+    step: function(){
+        return this.stepValue;
     },
     bounded: () => true,
     unbounded: () => false,
@@ -109,34 +189,34 @@ export const ForwardNumberRangeSequence = Sequence.extend({
         return this.frontValue > this.backValue;
     },
     length: function(){
-        return Math.ceil((this.end - this.start) / this.step);
+        return Math.ceil((this.end - this.start) / this.stepValue);
     },
     left: function(){
-        return Math.ceil((this.backValue - this.frontValue) / this.step);
+        return Math.ceil((this.backValue - this.frontValue) / this.stepValue);
     },
     front: function(){
         return this.frontValue;
     },
     popFront: function(){
-        this.frontValue += this.step;
+        this.frontValue += this.stepValue;
     },
     back: function(){
         return this.backValue;
     },
     popBack: function(){
-        this.backValue -= this.step;
+        this.backValue -= this.stepValue;
     },
     index: function(i){
-        return this.start + i * this.step;
+        return this.start + i * this.stepValue;
     },
     slice: function(i, j){
         return new ForwardNumberRangeSequence(
-            this.start + i * this.step, this.start + j * this.step, this.step
+            this.start + i * this.stepValue, this.start + j * this.stepValue, this.stepValue
         );
     },
     copy: function(){
         const copy = new ForwardNumberRangeSequence(
-            this.start, this.end, this.step
+            this.start, this.end, this.stepValue
         );
         copy.frontValue = this.frontValue;
         copy.backValue = this.backValue;
@@ -147,12 +227,51 @@ export const ForwardNumberRangeSequence = Sequence.extend({
         this.backValue = this.end;
         return this;
     },
-    rebase: null,
 });
 
 // Result of calling range with a step of less than 0.
 export const BackwardNumberRangeSequence = Sequence.extend({
     summary: "Enumerate numbers from a high until a low bound, incrementing by some negative step.",
+    supportsAlways: [
+        "length", "left", "back", "index", "slice", "copy", "reset",
+    ],
+    overrides: [
+        "reverse",
+    ],
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The constructor expects an inclusive higher bound, an exclusive
+            lower bound, and a numeric interval between elements as its two
+            arguments. Both bounds must be finite numbers, and the interval
+            must be a finite non-zero negative number.
+        `),
+        methods: {
+            "step": {
+                introduced: "higher@1.0.0",
+                arguments: {none: true},
+                expects: "The function accepts no arguments.",
+                returns: (`
+                    The function returns the numeric interval between elements,
+                    which is specified upon sequence instantiation.
+                `),
+                examples: [
+                    "stepBasicUsage",
+                ],
+            },
+        },
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "stepBasicUsage": hi => {
+            const seq = new hi.sequence.BackwardNumberRangeSequence(8, 0, -2);
+            const interval = seq.index(1) - seq.index(0);
+            hi.assert(seq.step() === interval && interval === -2);
+        },
+        "reverseOverride": hi => {
+            const seq = new hi.sequence.BackwardNumberRangeSequence(8, 0, -2);
+            hi.assertEqual(seq.reverse(), [2, 4, 6, 8]);
+        },
+    },
     getSequence: process.env.NODE_ENV !== "development" ? undefined : [
         hi => new BackwardNumberRangeSequence(0, 0, -1),
         hi => new BackwardNumberRangeSequence(1, 1, -1),
@@ -171,15 +290,18 @@ export const BackwardNumberRangeSequence = Sequence.extend({
         }
         this.start = start;
         this.end = end < start ? end : start;
-        this.step = step;
+        this.stepValue = step;
         this.frontValue = start;
         const delta = start - this.end;
         this.backValue = this.end + (delta % -step || -step);
     },
     reverse: function(){
         return new ForwardNumberRangeSequence(
-            this.end - this.step, this.start - this.step, -this.step
+            this.end - this.stepValue, this.start - this.stepValue, -this.stepValue
         );
+    },
+    step: function(){
+        return this.stepValue;
     },
     bounded: () => true,
     unbounded: () => false,
@@ -187,34 +309,34 @@ export const BackwardNumberRangeSequence = Sequence.extend({
         return this.frontValue < this.backValue;
     },
     length: function(){
-        return Math.ceil((this.end - this.start) / this.step);
+        return Math.ceil((this.end - this.start) / this.stepValue);
     },
     left: function(){
-        return 1 + Math.ceil((this.backValue - this.frontValue) / this.step);
+        return 1 + Math.ceil((this.backValue - this.frontValue) / this.stepValue);
     },
     front: function(){
         return this.frontValue;
     },
     popFront: function(){
-        this.frontValue += this.step;
+        this.frontValue += this.stepValue;
     },
     back: function(){
         return this.backValue;
     },
     popBack: function(){
-        this.backValue -= this.step;
+        this.backValue -= this.stepValue;
     },
     index: function(i){
-        return this.start + i * this.step;
+        return this.start + i * this.stepValue;
     },
     slice: function(i, j){
         return new BackwardNumberRangeSequence(
-            this.start + i * this.step, this.start + j * this.step, this.step
+            this.start + i * this.stepValue, this.start + j * this.stepValue, this.stepValue
         );
     },
     copy: function(){
         const copy = new BackwardNumberRangeSequence(
-            this.start, this.end, this.step
+            this.start, this.end, this.stepValue
         );
         copy.frontValue = this.frontValue;
         copy.backValue = this.backValue;
@@ -225,7 +347,6 @@ export const BackwardNumberRangeSequence = Sequence.extend({
         this.backValue = this.end;
         return this;
     },
-    rebase: null,
 });
 
 export const range = wrap({
@@ -253,6 +374,20 @@ export const range = wrap({
             exclusive ending bound; every element in the sequence is the result
             of summing the step value with its prior element.
         `),
+        returnType: {
+            "NumberRangeSequence": (`
+                When no interval argument was provided or, when the interval was 1.
+            `),
+            "ForwardNumberRangeSequence": (`
+                When the interval was greater than zero.
+            `),
+            "BackwardNumberRangeSequence": (`
+                When the interval was less than zero.
+            `),
+            "InfiniteRepeatElementSequence": (`
+                When the interval was zero.
+            `),
+        },
         related: [
             "counter"
         ],
@@ -262,11 +397,6 @@ export const range = wrap({
     },
     attachSequence: false,
     async: false,
-    sequences: [
-        NumberRangeSequence,
-        ForwardNumberRangeSequence,
-        BackwardNumberRangeSequence
-    ],
     arguments: {
         unordered: {
             numbers: [1, 3]
@@ -285,9 +415,6 @@ export const range = wrap({
         }else if(numbers[2] < 0){
             // Both bounds and a negative step; enumerate [x, y) with a negative step.
             return new BackwardNumberRangeSequence(numbers[0], numbers[1], numbers[2]);
-        }else if(numbers[1] <= numbers[0]){
-            // Both bounds and a zero step, but there are no elements anyway.
-            return new EmptySequence();
         }else{
             // Both bounds and a zero step; infinitely repeat the start value.
             return new InfiniteRepeatElementSequence(numbers[0]);
@@ -305,9 +432,6 @@ export const range = wrap({
         "basicUsageThreeInputs": hi => {
             const seq = hi.range(10, 20, 2);
             hi.assertEqual(seq, [10, 12, 14, 16, 18]);
-        },
-        "zeroStepEmpty": hi => {
-            hi.assertEmpty(hi.range(1, 1, 0));
         },
         "zeroStepUnbounded": hi => {
             const seq = hi.range(1, 2, 0);

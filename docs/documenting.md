@@ -78,6 +78,8 @@ A link is a string of the format `@target`, `[target]`, or `[alias](target)` whi
 
 The `[alias](target)` syntax may also be used to represent a hyperlink, i.e. the target is a URL rather than an identifier or a glossary term. However, placing the link in a documentation object's `links` attribute with an explanatory description should be preferred over this usage.
 
+A similar syntax may be used to refer to literal values or native JavaScript types, for example `#1234`, `[#"some string"]`, `#undefined`, or `#boolean`.
+
 ## Documenting wrapped functions
 
 A wrapped function has `summary`, `docs`, and `tests` attributes.
@@ -97,8 +99,9 @@ which it was first added. This attribute must be present always. An example of s
 - `returns`: For functions that return a value, a statement such as "The function returns..." describing what the function returns and under what conditions. This attribute must be present when the function returns any value and must be absent otherwise.
 - `throws`: For functions that may throw an error, a statement such as "The function throws..." describing what errors the function may throw and under what conditions. This applies only to errors thrown within the `implementation` of a wrapped function; it does not apply to things like externally-enforced argument validation errors. This attribute must be present when the function would throw an error under any circumstances and must be absent otherwise. Every error type that the function could throw should be identified with a link, for example "The function throws a @NotBoundedError when...".
 - `warnings`: For functions that may have dangerous or unexpected behavior in certain cases, a `warnings` attribute must be present describing those cases. An example of dangeous or unexpected behavior would be a function producing an infinite loop for some inputs.
-- `developers`: A documentating string stating information that may be important to those who are extending some functionality or interacting with it in an advanced way.
+- `developers`: A documentation string stating information that may be important to those who are extending some functionality or interacting with it in an advanced way.
 - `examples`: An array of strings where each string is the key associated with some test in the function's `tests` object. These indicate which tests are useful as usage examples for someone trying to learn how and why to use the function. This attribute must be present always, and must refer to at least one existing test.
+- `returnType`: An object mapping type names to strings describing the circumstances under which they are returned. If the function always returns the same type, then the attribute should instead be a string indicating the name of that type. Strings may be preceded by `typeof` to indicate that represent the result of some operation rather than some literal type, for example `#typeof input.slice()`.
 - `related`: An array of strings where each string is an identifier registered with the global `hi` object. Each identifier must refer to an object that is somehow related to this one. For example, the `first` and `last` functions are both related to each other because they solve conceptually similar problems. This attribute is never absolutely required to be present.
 - `links`: An array of objects containing hyperlinks to external resources and brief descriptions of these links. An example of such an object might be `{description: "Map higher-order function on Wikipedia", url: "https://en.wikipedia.org/wiki/Map_(higher-order_function)"}`. This attribute is never absolutely required to be present.
 

@@ -132,7 +132,7 @@ export const isNumber = lightWrap({
         `),
         returns: (`
             The function returns true when the input value was any number,
-            including @NaN, and it returns false otherwise.
+            including #NaN, and it returns false otherwise.
         `),
         related: [
             "isInteger", "isNaN",
@@ -362,7 +362,7 @@ export const isPrimitive = lightWrap({
         introduced: "higher@1.0.0",
         detail: (`
             Get whether an input is a primitive value.
-            Numbers, smybols, booleans, strings, @null, and @undefined are all
+            Numbers, smybols, booleans, strings, #null, and #undefined are all
             primitive values.
         `),
         expects: (`

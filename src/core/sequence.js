@@ -17,25 +17,24 @@ export const defineSequence = lightWrap({
         Object.assign(constructor.prototype, methods);
         sequenceTypes[constructor.name] = constructor;
         if(process.env.NODE_ENV === "development"){
+            constructor.getSequence = methods.getSequence;
             constructor.docs = cleanDocs(constructor.docs);
-            constructor.test = sequenceTestRunner(methods, constructor);
+            constructor.tests = methods.tests;
+            constructor.test = sequenceTestRunner(constructor);
         }
         return constructor;
     },
 });
 
-export const sequenceTestRunner = (methods, sequenceType) => {
-    // console.log(methods.docs ? methods.docs.methods : "");
-    if(!methods.getSequence && (
-        !methods.docs || !methods.docs.methods || !methods.docs.methods.length
-    )) return undefined;
+export const sequenceTestRunner = (sequence) => {
     if(process.env.NODE_ENV !== "development") return undefined;
+    if(!sequence.getSequence && !sequence.tests) return undefined;
     return hi => {
         const result = {
             pass: [],
             fail: [],
         }
-        if(methods.getSequence) for(const sequenceGetter of methods.getSequence){
+        if(sequence.getSequence) for(const sequenceGetter of sequence.getSequence){
             for(const contractName in hi.contract){
                 const contract = hi.contract[contractName];
                 let success = true;
@@ -44,48 +43,41 @@ export const sequenceTestRunner = (methods, sequenceType) => {
                 }catch(error){
                     success = false;
                     result.fail.push({
-                        name: `${sequenceType.name}.contract.${contractName}`,
-                        sequence: sequenceType,
+                        name: `${sequence.name}.contract.${contractName}`,
+                        sequence: sequence,
                         contract: contract,
                         error: error
                     });
                 }
                 if(success){
                     result.pass.push({
-                        name: `${sequenceType.name}.contract.${contractName}`,
-                        sequence: sequenceType,
+                        name: `${sequence.name}.contract.${contractName}`,
+                        sequence: sequence,
                         contract: contract,
                     });
                 }
             }
         }
-        if(methods.docs && methods.docs.methods){
-            for(const methodName in methods.docs.methods){
-                const method = methods.docs.methods[methodName];
-                if(method.tests) for(const testName in method.tests){
-                    const test = method.tests[testName];
-                    let success = true;
-                    try{
-                        test(hi);
-                    }catch(error){
-                        success = false;
-                        result.fail.push({
-                            name: `${sequenceType.name}.method.${methodName}`,
-                            sequence: sequenceType,
-                            method: method,
-                            test: test,
-                            error: error,
-                        });
-                    }
-                    if(success){
-                        result.pass.push({
-                            name: `${sequenceType.name}.method.${methodName}`,
-                            sequence: sequenceType,
-                            method: method,
-                            test: test,
-                        });
-                    }
-                }
+        if(sequence.tests) for(const testName in sequence.tests){
+            const test = sequence.tests[testName];
+            let success = true;
+            try{
+                test(hi);
+            }catch(error){
+                success = false;
+                result.fail.push({
+                    name: `${sequence.name}.test.${testName}`,
+                    sequence: sequence,
+                    test: test,
+                    error: error,
+                });
+            }
+            if(success){
+                result.pass.push({
+                    name: `${sequence.name}.test.${testName}`,
+                    sequence: sequence,
+                    test: test,
+                });
             }
         }
         return result;

@@ -36,6 +36,7 @@ export const isEqual = lightWrap({
             or if the inputs were compared as strings and any of those inputs
             were not known to be bounded.
         `),
+        returnType: "boolean",
         examples: [
             "basicUsageSequences", "basicUsageObjects", "basicUsageValues",
         ],
@@ -96,6 +97,7 @@ export const sequencesEqual = lightWrap({
             The function throws a @NotBoundedError if none of the inputs
             were known to be bounded.
         `),
+        returnType: "boolean",
         examples: [
             "basicUsage"
         ],
@@ -154,6 +156,7 @@ export const stringsEqual = lightWrap({
             The function throws a @NotBoundedError if any of the inputs
             were not known to be bounded.
         `),
+        returnType: "boolean",
         examples: [
             "basicUsage"
         ],
@@ -208,6 +211,7 @@ export const objectsEqual = lightWrap({
     internal: true,
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
+        returnType: "boolean",
         examples: [
             "basicUsage",
         ],
@@ -254,6 +258,7 @@ export const valuesEqual = lightWrap({
     internal: true,
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
+        returnType: "boolean",
         examples: [
             "basicUsage",
         ],
