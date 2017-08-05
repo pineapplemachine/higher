@@ -35,6 +35,7 @@ export const expecting = {
         article: "a",
         singular: "value of any type",
         plural: "values of any type",
+        adjective: "anything",
         anything: true,
         validate: value => value,
     }),
@@ -42,6 +43,7 @@ export const expecting = {
         article: "a",
         singular: "number",
         plural: "numbers",
+        adjective: "numeric",
         validate: value => {
             if(!isNumber(value)) throw new Error();
             return +value;
@@ -100,6 +102,7 @@ export const expecting = {
         singular: "callback function",
         plural: "callback functions",
         short: "callback",
+        adjective: "a callback",
         validate: value => {
             if(!isFunction(value)) throw new Error();
             return value;
@@ -110,6 +113,7 @@ export const expecting = {
         singular: "predicate function",
         plural: "predicate functions",
         short: "predicate",
+        adjective: "a predicate",
         validate: value => {
             if(!isFunction(value)) throw new Error();
             return value;
@@ -120,6 +124,7 @@ export const expecting = {
         singular: "transformation function",
         plural: "transformation functions",
         short: "transformation",
+        adjective: "a transformation function",
         validate: value => {
             if(!isFunction(value)) throw new Error();
             return value;
@@ -130,6 +135,7 @@ export const expecting = {
         singular: "comparison function",
         plural: "comparison functions",
         short: "comparison",
+        adjective: "a comparison function",
         validate: value => {
             if(!isFunction(value)) throw new Error();
             return value;
@@ -140,6 +146,7 @@ export const expecting = {
         singular: "relational function",
         plural: "relational functions",
         short: "relation",
+        adjective: "a relational function",
         validate: value => {
             if(!isFunction(value)) throw new Error();
             return value;
@@ -150,6 +157,7 @@ export const expecting = {
         singular: "ordering function",
         plural: "ordering functions",
         short: "ordering",
+        adjective: "an ordering function",
         validate: value => {
             if(!isFunction(value)) throw new Error();
             return value;
@@ -164,15 +172,16 @@ export const expecting = {
             return value;
         },
     }),
-    arrayOf: each => Expecting({
+    arrayOf: element => Expecting({
         article: "an",
-        singular: `array of ${each.plural}`,
-        plural: `arrays of ${each.plural}`,
+        singular: `array of ${element.plural}`,
+        plural: `arrays of ${element.plural}`,
         short: "array",
+        adjective: `an array of ${element.plural}`,
         validate: value => {
             if(!isArray(value)) throw new Error();
             const result = [];
-            for(const element of value) result.push(each.validate(element));
+            for(const element of value) result.push(element.validate(element));
             return result;
         },
     }),
@@ -180,6 +189,7 @@ export const expecting = {
         article: "an",
         singular: "iterable",
         plural: "iterables",
+        adjective: "iterable",
         validate: value => {
             if(!isIterable(value)) throw new Error();
             return value;
@@ -253,19 +263,33 @@ export const expecting = {
             return sequence;
         },
     }),
+    bidirectionalSequence: Expecting({
+        article: "a",
+        singular: "bidirectional sequence",
+        plural: "bidirectional sequences",
+        adjective: "bidirectional",
+        short: "sequence",
+        validate: value => {
+            const sequence = asSequence(value);
+            if(!sequence || !sequence.back) throw new Error();
+            return sequence;
+        },
+    }),
     exactly: option => Expecting({
         article: "exactly",
         singular: String(option),
         plural: String(option),
+        adjective: `exactly ${String(option)}`,
         validate: value => {
             if(value !== option) throw new Error();
             return value;
         },
     }),
-    any: options => Expecting({
+    either: (...options) => Expecting({
         article: options[0].article,
         singular: `${joinSeries(singularNames(options), "or")}`,
         plural: `${joinSeries(pluralNames(options), "or")}`,
+        adjective: `either ${joinSeries(singularNames(options), "or")}`,
         validate: value => {
             for(const option of options){
                 try{
@@ -390,11 +414,11 @@ export const describeExpecting = function(expecting, error = undefined){
         for(const type of unorderedTypes){
             if(expecting.unordered[type.plural]){
                 const expectingType = expecting.unordered[type.plural];
-                if(expectingType.each){
-                    parts.push(describeUnordered(expectingType, expectingType.each));
-                    if(expectingType.each.suggestion){
-                        const failedType = expectingType.each.singular;
-                        suggestions[failedType] = expectingType.each;
+                if(expectingType.all){
+                    parts.push(describeUnordered(expectingType, expectingType.all));
+                    if(error && expectingType.all.suggestion){
+                        const failedType = expectingType.all.singular;
+                        suggestions[failedType] = expectingType.all;
                     };
                 }else if(expectingType.amount){
                     if(expectingType.order && expectingType.order.length === 1){
@@ -402,6 +426,16 @@ export const describeExpecting = function(expecting, error = undefined){
                     }else{
                         parts.push(describeUnordered(expectingType, type));
                     }
+                }
+                if(expectingType.any){
+                    parts.push(
+                        `At least one of the ${type.plural} must be ` +
+                        `${expectingType.any.adjective}.`
+                    );
+                    if(error && expectingType.any.suggestion){
+                        const failedType = expectingType.any.singular;
+                        suggestions[failedType] = expectingType.any;
+                    };
                 }
                 if(expectingType.order){
                     for(let i = 0; i < expectingType.order.length; i++){
@@ -527,7 +561,7 @@ export const validateUnordered = function(args, expecting, extraSequence = undef
     if(extraSequence){
         found.sequences.splice(0, 0, extraSequence);
     }
-    // Check argument counts and apply "each" and "ordered" validators.
+    // Check argument counts and apply "any", "all", and "ordered" validators.
     for(const type of unorderedTypes){
         const pl = type.plural;
         if(!expect[pl] ? found[pl].length :
@@ -536,13 +570,28 @@ export const validateUnordered = function(args, expecting, extraSequence = undef
             throw ArgumentsError({expects: describeExpectingError(expecting)});
         }
         try{
-            if(expect[pl] && (expect[pl].each || expect[pl].order)){
-                if(expect[pl].each) for(let i = 0; i < found[pl].length; i++){
-                    expect[pl].each(found[pl][i]);
-                }
+            if(expect[pl] && (expect[pl].all || expect[pl].any || expect[pl].order)){
                 if(expect[pl].order) for(let i = 0; i < found[pl].length; i++){
                     if(expect[pl].order[i]){
                         expect[pl].order[i](found[pl][i]);
+                    }
+                }
+                if(expect[pl].all) for(let i = 0; i < found[pl].length; i++){
+                    expect[pl].all(found[pl][i]);
+                }
+                if(expect[pl].any){
+                    for(let i = 0; i < found[pl].length; i++){
+                        let success = true;
+                        if(i === found[pl].length - 1){
+                            expect[pl].any(found[pl][i]);
+                            break;
+                        }
+                        try{
+                            expect[pl].any(found[pl][i]);
+                        }catch(error){
+                            success = false;
+                        }
+                        if(success) break;
                     }
                 }
             }
