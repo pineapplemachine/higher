@@ -1,4 +1,3 @@
-import {constants} from "../core/constants";
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
