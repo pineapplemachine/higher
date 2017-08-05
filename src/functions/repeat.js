@@ -2,14 +2,35 @@ import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 import {copyable} from "./copyable";
+import {DistinctSequence, defaultDistinctTransform} from "./distinct";
 import {EmptySequence} from "./emptySequence";
 
 export const FiniteRepeatSequence = Sequence.extend({
+    overrides: [
+        "repeat", "distinct",
+    ],
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "repeatOverride": hi => {
+            const array = hi([1, 2, 3]);
+            const seq = new hi.sequence.FiniteRepeatSequence(2, array);
+            hi.assertEqual(seq.repeat(3), new hi.sequence.FiniteRepeatSequence(6, array));
+            hi.assertEmpty(seq.repeat(0));
+        },
+        "repeatInfiniteOverride": hi => {
+            const seq = new hi.sequence.FiniteRepeatSequence(2, hi("abc"));
+            hi.assert(seq.repeat().startsWith("abcabcabcabcabc"));
+            hi.assert(seq.repeat(Infinity).startsWith("abcabcabcabcabc"));
+        },
+        "distinctOverride": hi => {
+            const seq = new hi.sequence.FiniteRepeatSequence(3, hi("hello"));
+            hi.assertEqual(seq.distinct(), "helo");
+        },
+    },
     constructor: function FiniteRepeatSequence(
         repetitions, source, frontSource = undefined, backSource = undefined
     ){
         // Input sequence must be copyable.
-        this.repetitions = repetitions;
+        this.targetRepetitions = repetitions;
         this.source = source;
         this.frontSource = frontSource;
         this.backSource = backSource;
@@ -29,6 +50,25 @@ export const FiniteRepeatSequence = Sequence.extend({
         // Only needs to break a collapse if it repeats more than once
         if(repetitions <= 1) this.collapseBreak = null;
     },
+    repeat: function(repetitions){
+        if(repetitions <= 0){
+            return new EmptySequence();
+        }else if(!repetitions || !isFinite(repetitions)){
+            return new InfiniteRepeatSequence(this.source);
+        }else{
+            return new FiniteRepeatSequence(
+                repetitions * this.targetRepetitions, this.source
+            );
+        }
+    },
+    distinct: function(transform){
+        return new DistinctSequence(
+            transform || defaultDistinctTransform, this.source
+        );
+    },
+    repetitions: function(){
+        return this.targetRepetitions;
+    },
     finishedRepetitions: function(){
         return this.frontRepetitions + this.backRepetitions;
     },
@@ -42,17 +82,17 @@ export const FiniteRepeatSequence = Sequence.extend({
     done: function(){
         return (
             this.source.done() || (
-                this.finishedRepetitions() >= this.repetitions &&
+                this.finishedRepetitions() >= this.targetRepetitions &&
                 (this.frontSource && this.frontSource.done())
             )
         );
     },
     length: function(){
-        return this.source.length() * this.repetitions;
+        return this.source.length() * this.targetRepetitions;
     },
     left: function(){
         return this.source.left() + this.source.length() * (
-            this.repetitions - this.finishedRepetitions() - 1
+            this.targetRepetitions - this.finishedRepetitions() - 1
         );
     },
     front: function(){
@@ -66,10 +106,10 @@ export const FiniteRepeatSequence = Sequence.extend({
         if(this.frontSource.done()){
             this.frontRepetitions++;
             const finishedRepetitions = this.finishedRepetitions();
-            if(this.backSource && finishedRepetitions === this.repetitions - 1){
+            if(this.backSource && finishedRepetitions === this.targetRepetitions - 1){
                 if(!this.backSource) this.backSource = this.source.copy();
                 this.frontSource = this.backSource;
-            }else if(finishedRepetitions < this.repetitions){
+            }else if(finishedRepetitions < this.targetRepetitions){
                 this.frontSource = this.source.copy();
             }
         }
@@ -85,10 +125,10 @@ export const FiniteRepeatSequence = Sequence.extend({
         if(this.backSource.done()){
             this.backRepetitions++;
             const finishedRepetitions = this.finishedRepetitions();
-            if(finishedRepetitions === this.repetitions - 1){
+            if(finishedRepetitions === this.targetRepetitions - 1){
                 if(!this.frontSource) this.frontSource = this.source.copy();
                 this.backSource = this.frontSource;
-            }else if(finishedRepetitions < this.repetitions){
+            }else if(finishedRepetitions < this.targetRepetitions){
                 this.backSource = this.source.copy();
             }
         }
@@ -127,7 +167,7 @@ export const FiniteRepeatSequence = Sequence.extend({
     },
     copy: function(){
         return new FiniteRepeatSequence(
-            this.repetitions, this.source,
+            this.targetRepetitions, this.source,
             this.frontSource ? this.frontSource.copy() : null,
             this.backSource ? this.backSource.copy() : null
         );
@@ -148,27 +188,43 @@ export const FiniteRepeatSequence = Sequence.extend({
         return this;
     },
     collapseBreak: function(target, length){
-        if(this.repetitions === 0){
+        if(this.targetRepetitions === 0){
             return 0;
-        }else if(this.repetitions === 1){
+        }else if(this.targetRepetitions === 1){
             return length;
         }else{
             let i = 0;
             let j = length;
-            const writes = length * (this.repetitions - 1);
+            const writes = length * (this.targetRepetitions - 1);
             while(j < target.length && i < writes){
                 target[j++] = target[i++];
             }
             while(i < writes){
                 target.push(target[i++]);
             }
-            target.splice(length * this.repetitions);
-            return length * this.repetitions;
+            target.splice(length * this.targetRepetitions);
+            return length * this.targetRepetitions;
         }
     },
 });
 
 export const InfiniteRepeatSequence = Sequence.extend({
+    overrides: [
+        "repeat", "distinct",
+    ],
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "repeatOverride": hi => {
+            const seq = new hi.sequence.InfiniteRepeatSequence(hi.range(10));
+            hi.assert(seq.repeat() === seq);
+            hi.assert(seq.repeat(Infinity) === seq);
+            hi.assert(seq.repeat(5) === seq);
+            hi.assertEmpty(seq.repeat(0));
+        },
+        "distinctOverride": hi => {
+            const seq = new hi.sequence.InfiniteRepeatSequence(hi("hello"));
+            hi.assertEqual(seq.distinct(), "helo");
+        },
+    },
     constructor: function InfiniteRepeatSequence(source, frontSource = null, backSource = null){
         if(!source.copy){
             throw "Error repeating sequence: Only copyable sequences can be repeated.";
@@ -178,7 +234,19 @@ export const InfiniteRepeatSequence = Sequence.extend({
         this.backSource = backSource;
         this.maskAbsentMethods(source);
     },
-    repetitions: Infinity,
+    repeat: function(repetitions){
+        if(repetitions <= 0){
+            return new EmptySequence();
+        }else{
+            return this;
+        }
+    },
+    distinct: function(transform){
+        return new DistinctSequence(
+            transform || defaultDistinctTransform, this.source
+        );
+    },
+    repetitions: () => Infinity,
     bounded: () => false,
     unbounded: () => true,
     done: () => false,
