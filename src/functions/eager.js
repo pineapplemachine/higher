@@ -28,7 +28,7 @@ export const EagerSequence = Sequence.extend({
         });
         this.source = source;
         this.originalSource = originalSource || source;
-        this.initialized = intialized;
+        this.initialized = initialized;
         if(!source.has) this.has = null;
         if(!source.get) this.get = null;
     },
@@ -81,7 +81,7 @@ export const EagerSequence = Sequence.extend({
     },
     popBack: function(){
         if(!this.initialized) this.initialize();
-        return this.source.popFront();
+        return this.source.popBack();
     },
     index: function(i){
         if(!this.source.index) this.initialize();

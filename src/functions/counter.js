@@ -8,6 +8,13 @@ export const CounterSequence = Sequence.extend({
     supportsAlways: [
         "back", "index", "slice", "copy", "reset"
     ],
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The constructor expects an optional starting value.
+            When no starting value was specified, zero is used as a default.
+        `),
+    },
     getSequence: process.env.NODE_ENV !== "development" ? undefined : [
         hi => new CounterSequence(0),
         hi => new CounterSequence(1),
@@ -22,15 +29,12 @@ export const CounterSequence = Sequence.extend({
     bounded: () => false,
     unbounded: () => true,
     done: () => false,
-    length: null,
-    left: null,
     front: function(){
         return this.currentValue;
     },
     popFront: function(){
         return this.currentValue++;
     },
-    // TODO: Is this *really* a good idea?
     back: () => Infinity,
     popBack: () => {},
     index: function(i){
@@ -39,8 +43,6 @@ export const CounterSequence = Sequence.extend({
     slice: function(i, j){
         return new NumberRangeSequence(this.startValue + i, this.startValue + j);
     },
-    has: null,
-    get: null,
     copy: function(){
         return new CounterSequence(this.startValue, this.currentValue);
     },
@@ -48,7 +50,6 @@ export const CounterSequence = Sequence.extend({
         this.currentValue = this.startValue;
         return this;
     },
-    rebase: null,
 });
 
 export const counter = wrap({
