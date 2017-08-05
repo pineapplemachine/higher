@@ -3,6 +3,7 @@ import {wrap} from "../core/wrap";
 
 import {EmptySequence} from "./emptySequence";
 
+// TODO: Implement indexing and possibly slicing (this might be tricky)
 export const RoundRobinSequence = Sequence.extend({
     summary: "Enumerate elements of several input sequences in turn.",
     supportsWith: {
@@ -75,19 +76,15 @@ export const RoundRobinSequence = Sequence.extend({
         }
         if(this.sourceIndex >= this.activeSources.length) this.sourceIndex = 0;
     },
-    back: null,
-    popBack: null,
-    // TODO: Implement indexing and possibly slicing (this might be tricky)
-    index: null,
-    slice: null,
     copy: function(){
         const sourceCopies = [];
         const activeCopies = [];
         for(const source of this.sources){
-            sourceCopies.push(source.copy());
+            const copy = source.copy();
+            sourceCopies.push(copy);
             for(const active of this.activeSources){
                 if(active === source){
-                    activeCopies.push(active);
+                    activeCopies.push(copy);
                     break;
                 }
             }

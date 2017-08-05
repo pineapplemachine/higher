@@ -26,7 +26,7 @@ export const NumberRangeSequence = Sequence.extend({
                 expects: "The function accepts no arguments.",
                 returns: (`
                     The function returns the numeric interval between elements,
-                    which is always and forever @1.
+                    which is always and forever #1.
                 `),
                 examples: [
                     "stepBasicUsage",
@@ -55,11 +55,13 @@ export const NumberRangeSequence = Sequence.extend({
         hi => new NumberRangeSequence(-5, 0),
         hi => new NumberRangeSequence(5, -5),
     ],
-    constructor: function NumberRangeSequence(start, end){
+    constructor: function NumberRangeSequence(
+        start, end, frontValue = undefined, backValue = undefined
+    ){
         this.start = start;
         this.end = end > start ? end : start;
-        this.frontValue = start;
-        this.backValue = this.end - 1;
+        this.frontValue = frontValue === undefined ? start : frontValue;
+        this.backValue = backValue === undefined ? this.end - 1 : backValue;
     },
     step: () => 1,
     reverse: function(){
@@ -97,10 +99,9 @@ export const NumberRangeSequence = Sequence.extend({
         return new NumberRangeSequence(this.start + i, this.start + j);
     },
     copy: function(){
-        const copy = new NumberRangeSequence(this.start, this.end);
-        copy.frontValue = this.frontValue;
-        copy.backValue = this.backValue;
-        return copy;
+        return new NumberRangeSequence(
+            this.start, this.end, this.frontValue, this.backValue
+        );
     },
     reset: function(){
         this.frontValue = this.start;

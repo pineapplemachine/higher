@@ -26,7 +26,7 @@ export const ContractError = error({
             `the ${contract.name} contract.`
         );
         if(this.options.message){
-            this.message = this.options.message + ": " + this.message;
+            this.message += " " + this.options.message;
         }
         if(this.options.error){
             this.message += (
@@ -45,17 +45,10 @@ export const defineContract = lightWrap({
         introduced: "higher@1.0.0",
     },
     implementation: function defineContract(info){
-        if(process.env.NODE_ENV !== "development") return undefined;
         info.enforce = function(getSequence){
             const sequence = getSequence();
             if(this.predicate(sequence)){
-                try{
-                    if(!this.test(getSequence)) throw ContractError(sequence, this);
-                }catch(error){
-                    throw (error.type === "ContractError" ? error :
-                        ContractError(sequence, this, {error: error})
-                    );
-                }
+                if(!this.test(getSequence)) throw ContractError(sequence, this);
             }
         };
         info.name = info.test.name;
@@ -66,6 +59,16 @@ export const defineContract = lightWrap({
 // Convenience alias
 export const contract = defineContract;
 
+// TODO: Contract to test copying after partial consumption
+// TODO: Contract to test consuming the same sequence from both ends to the middle
+// TODO: Contract to test left attribute
+// TODO: Contract to test indexing
+// TODO: Contract to test length and contents of slices
+// TODO: Contract to test correct bidirectionality of slices
+// TODO: Contract to test indexing of slices
+// TODO: Contract to test resetting
+// TODO: Contract to test rebasing
+
 export const BidirectionalityContract = defineContract({
     summary: "The sequence must be consistent forwards and backwards.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
@@ -73,18 +76,29 @@ export const BidirectionalityContract = defineContract({
     },
     predicate: (sequence) => (sequence.back),
     test: function BidirectionalityContract(sequence){
+        const max = 100;
         const forward = [];
         const backward = [];
         const a = sequence();
         const b = sequence();
         if(!a.bounded()) return true;
-        while(!a.done()) forward.push(a.nextFront());
-        while(!b.done()) backward.push(b.nextBack());
-        if(a.length !== b.length) return false;
+        while(!a.done()){
+            forward.push(a.nextFront());
+            if(forward.length > max) throw ContractError(a, this, {
+                message: "Input sequence is too long to test.",
+            });
+        }
+        while(!b.done()){
+            backward.push(b.nextBack());
+            if(backward.length > max) throw ContractError(b, this, {
+                message: "Input sequence is too long to test.",
+            });
+        }
+        if(forward.length !== backward.length) return false;
         for(let i = 0; i < forward.length; i++){
             if(!isEqual(a[i], b[forward.length - i - 1])){
                 throw ContractError(sequence(), {
-                    message: `Elements at forward index ${i} were unequal.`
+                    message: `Elements at forward index ${i} were unequal.`,
                 });
             }
         }
@@ -114,22 +128,15 @@ export const CopyingContract = defineContract({
         const b = a.copy();
         const c = a.copy();
         const d = c.copy();
-        if(!isEqual(a.front(), b.front(), c.front(), d.front())) return false;
         const aArray = [];
         while(!a.done() && aArray.length < max) aArray.push(a.nextFront());
-        if(!isEqual(aArray[0], b.front(), c.front(), d.front())) return false;
         const bArray = [];
         while(!b.done() && bArray.length < max) bArray.push(b.nextFront());
-        if(!isEqual(aArray, bArray)) return false;
-        if(!isEqual(aArray[0], c.front(), d.front())) return false;
         const dArray = [];
         while(!d.done() && dArray.length < max) dArray.push(d.nextFront());
-        if(!isEqual(aArray, dArray)) return false;
-        if(!isEqual(aArray[0], c.front())) return false;
         const cArray = [];
         while(!c.done() && cArray.length < max) cArray.push(c.nextFront());
-        if(!isEqual(aArray, cArray)) return false;
-        return true;
+        return isEqual(aArray, bArray, cArray, dArray);
     },
 });
 
@@ -139,25 +146,26 @@ export const LengthContract = defineContract({
         introduced: "higher@1.0.0",
     },
     predicate: (sequence) => (sequence.length),
-    test: function CopyingContract(sequence){
+    test: function LengthContract(sequence){
         const a = sequence();
-        if(!a.bounded()) throw ContractError(sequence(), {
+        if(!a.bounded()) throw ContractError(sequence(), this, {
             message: "Unbounded sequences must not implement a length method."
         });
         if(a.done()){
-            if(a.length() !== 0) throw ContractError(sequence(), {
+            if(a.length() !== 0) throw ContractError(sequence(), this, {
                 message: "An empty sequence must have a length of zero."
             });
             return true;
         }
         const length = a.length();
-        if(!Number.isInteger(length)) throw ContractError(sequence(), {
-            message: "Sequence length must be an integer.."
+        if(!Number.isInteger(length)) throw ContractError(sequence(), this, {
+            message: "Sequence length must be an integer."
         });
         let aCount = 0;
         while(!a.done()){
             a.popFront();
             aCount++;
+            if(aCount > length) return false;
         }
         if(length !== aCount) return false;
         if(a.length() !== aCount) return false;
@@ -167,6 +175,7 @@ export const LengthContract = defineContract({
             let x = b.front();
             b.popFront();
             bCount++;
+            if(bCount > length) return false;
         }
         if(bCount !== aCount) return false;
         if(b.length() !== bCount) return false;
