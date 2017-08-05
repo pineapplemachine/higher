@@ -1,3 +1,4 @@
+import {isSequence} from "../core/sequence";
 import {isString} from "../core/types";
 import {wrap} from "../core/wrap";
 
@@ -16,13 +17,16 @@ export const string = wrap({
             The function returns a string produced by concatenating every
             element of the input sequence. If the input was itself a string,
             the function returns that string.
+            Elements that are themselves bounded sequences are flattened,
+            having their own contents recursively written as strings and
+            appended to the output string.
         `),
         throws: (`
             The function throws a @NotBoundedError when the input sequence
             was not known to be bounded.
         `),
         examples: [
-            "basicUsage",
+            "basicUsage", "flattenSubSequences",
         ],
         related: [
             "array", "object"
@@ -39,7 +43,13 @@ export const string = wrap({
             message: "Failed to create string",
         });
         let result = "";
-        for(const element of source) result += element;
+        for(const element of source){
+            if(isSequence(element) && element.bounded()){
+                result += string(element);
+            }else{
+                result += String(element);
+            }
+        }
         return result;
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
@@ -47,6 +57,11 @@ export const string = wrap({
             const strings = ["what", "lovely", "weather"];
             const joined = hi.join(strings, " ").assumeBounded();
             hi.assert(joined.string() === "what lovely weather"); 
+        },
+        "flattenSubSequences": hi => {
+            const sub = hi(["hello", " ", "world"]);
+            const seq = hi([sub, "!"]);
+            hi.assert(seq.string() === "hello world!");
         },
         "emptyInput": hi => {
             hi.assert(hi.emptySequence().string() === "");
