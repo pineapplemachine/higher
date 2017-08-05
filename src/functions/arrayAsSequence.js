@@ -17,17 +17,10 @@ export const ArraySequence = Sequence.extend({
             The constructor expects an array as its single argument.
         `),
     },
-    getSequence: process.env.NODE_ENV !== "development" ? undefined : [
-        hi => new ArraySequence([]),
-        hi => new ArraySequence([0]),
-        hi => new ArraySequence(["hello", "world"]),
-        hi => new ArraySequence([0, 1, 2, 3, 4, 5, 6]),
-        hi => new ArraySequence([[0, 1], [1, 2]]),
-    ],
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "iteratorOverride": hi => {
             const seq = new hi.sequence.ArraySequence([1, 2, 3]);
-            let acc = [];
+            const acc = [];
             for(const ch of seq) acc.push(ch);
             for(const ch of seq.slice(1, 3)) acc.push(ch);
             hi.assertEqual(acc, [1, 2, 3, 2, 3]);
@@ -47,6 +40,13 @@ export const ArraySequence = Sequence.extend({
             hi.assertEqual(seq.slice(1, 3).newArray(), [2, 3]);
         },
     },
+    getSequence: process.env.NODE_ENV !== "development" ? undefined : [
+        hi => new ArraySequence([]),
+        hi => new ArraySequence([0]),
+        hi => new ArraySequence(["hello", "world"]),
+        hi => new ArraySequence([0, 1, 2, 3, 4, 5, 6]),
+        hi => new ArraySequence([[0, 1], [1, 2]]),
+    ],
     constructor: function ArraySequence(
         source, lowIndex = undefined, highIndex = undefined,
         frontIndex = undefined, backIndex = undefined
