@@ -64,7 +64,7 @@ console.log(`Finished running tests: passed ${ofText(totalPassed, totalFailed)} 
 
 // Once a release is ready, these should become warnings rather than encouragements.
 for(const functionName in hi.function){
-    if(!(functionName in results.functions)){
+    if(!(functionName in results.functions) && !hi.function[functionName].internal){
         console.log(`Next function without any tests: ${green(functionName)}.`);
         break;
     }

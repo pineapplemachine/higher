@@ -85,7 +85,7 @@ export const sequenceTestRunner = (sequence) => {
 };
 
 export const attachSequenceMethods = lightWrap({
-    summary: "Attach methods to the @Sequence prototype.",
+    summary: "Attach a method from a wrapped function to the @Sequence prototype.",
     internal: true,
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
