@@ -6,9 +6,20 @@ import {DistinctSequence, defaultDistinctTransform} from "./distinct";
 import {EmptySequence} from "./emptySequence";
 
 export const FiniteRepeatSequence = Sequence.extend({
+    supportRequired: [
+        "copy",
+    ],
     overrides: [
         "repeat", "distinct",
     ],
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The constructor expects a number of repetitions and a sequence as
+            input. The number of repetitions must be a positive nonzero integer
+            and the sequence must be copyable.
+        `),
+    },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "repeatOverride": hi => {
             const array = hi([1, 2, 3]);
@@ -28,6 +39,17 @@ export const FiniteRepeatSequence = Sequence.extend({
             hi.assertEqual(seq.distinct(), "helo");
         },
     },
+    getSequence: process.env.NODE_ENV !== "development" ? undefined : [
+        hi => new FiniteRepeatSequence(1, hi.emptySequence()),
+        hi => new FiniteRepeatSequence(4, hi.emptySequence()),
+        hi => new FiniteRepeatSequence(1, hi([1, 2, 3])),
+        hi => new FiniteRepeatSequence(2, hi([1, 2, 3])),
+        hi => new FiniteRepeatSequence(6, hi([1, 2, 3])),
+        hi => new FiniteRepeatSequence(2, hi.range(8)),
+        hi => new FiniteRepeatSequence(3, hi("hello")),
+        hi => new FiniteRepeatSequence(1, hi.counter()),
+        hi => new FiniteRepeatSequence(8, hi.counter()),
+    ],
     constructor: function FiniteRepeatSequence(
         repetitions, source, frontSource = undefined, backSource = undefined
     ){
@@ -41,16 +63,18 @@ export const FiniteRepeatSequence = Sequence.extend({
         this.maskAbsentMethods(source);
         // Source must have known length to support left, index, slice operations.
         if(!source.length){
-            this.left = null;
-            this.index = null;
-            this.slice = null;
+            this.left = undefined;
+            this.index = undefined;
+            this.slice = undefined;
         }
         // Source must be bidirectional to support slicing
         if(!source.back){
-            this.slice = null;
+            this.slice = undefined;
         }
         // Only needs to break a collapse if it repeats more than once
-        if(repetitions <= 1) this.collapseBreak = null;
+        if(repetitions <= 1){
+            this.collapseBreak = undefined;
+        }
     },
     repeat: function(repetitions){
         if(repetitions <= 0){
@@ -77,7 +101,7 @@ export const FiniteRepeatSequence = Sequence.extend({
     bounded: function(){
         return this.source.bounded();
     },
-    // Please don't repeat an already unbounded sequence
+    // Please don't repeat an already unbounded sequence this way
     unbounded: function(){
         return this.source.unbounded();
     },
@@ -108,8 +132,10 @@ export const FiniteRepeatSequence = Sequence.extend({
         if(this.frontSource.done()){
             this.frontRepetitions++;
             const finishedRepetitions = this.finishedRepetitions();
-            if(this.backSource && finishedRepetitions === this.targetRepetitions - 1){
-                if(!this.backSource) this.backSource = this.source.copy();
+            if(finishedRepetitions >= this.targetRepetitions - 1){
+                if(!this.backSource) this.backSource = (
+                    this.targetRepetitions > 1 ? this.source.copy() : this.frontSource
+                );
                 this.frontSource = this.backSource;
             }else if(finishedRepetitions < this.targetRepetitions){
                 this.frontSource = this.source.copy();
@@ -127,8 +153,10 @@ export const FiniteRepeatSequence = Sequence.extend({
         if(this.backSource.done()){
             this.backRepetitions++;
             const finishedRepetitions = this.finishedRepetitions();
-            if(finishedRepetitions === this.targetRepetitions - 1){
-                if(!this.frontSource) this.frontSource = this.source.copy();
+            if(finishedRepetitions >= this.targetRepetitions - 1){
+                if(!this.frontSource) this.frontSource = (
+                    this.targetRepetitions > 1 ? this.source.copy() : this.backSource
+                );
                 this.backSource = this.frontSource;
             }else if(finishedRepetitions < this.targetRepetitions){
                 this.backSource = this.source.copy();
@@ -214,6 +242,9 @@ export const InfiniteRepeatSequence = Sequence.extend({
     overrides: [
         "repeat", "distinct",
     ],
+    supportRequired: [
+        "copy",
+    ],
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "repeatOverride": hi => {
             const seq = new hi.sequence.InfiniteRepeatSequence(hi.range(10));
@@ -227,10 +258,16 @@ export const InfiniteRepeatSequence = Sequence.extend({
             hi.assertEqual(seq.distinct(), "helo");
         },
     },
-    constructor: function InfiniteRepeatSequence(source, frontSource = null, backSource = null){
-        if(!source.copy){
-            throw "Error repeating sequence: Only copyable sequences can be repeated.";
-        }
+    getSequence: process.env.NODE_ENV !== "development" ? undefined : [
+        hi => new InfiniteRepeatSequence(hi([1])),
+        hi => new InfiniteRepeatSequence(hi("!")),
+        hi => new InfiniteRepeatSequence(hi("hello")),
+        hi => new InfiniteRepeatSequence(hi.range(20)),
+        hi => new InfiniteRepeatSequence(hi.counter()),
+    ],
+    constructor: function InfiniteRepeatSequence(
+        source, frontSource = undefined, backSource = undefined
+    ){
         this.source = source;
         this.frontSource = frontSource;
         this.backSource = backSource;
@@ -296,7 +333,8 @@ export const InfiniteRepeatSequence = Sequence.extend({
     },
     copy: function(){
         return new InfiniteRepeatSequence(
-            this.source, this.frontSource, this.backSource
+            this.source, this.frontSource ? this.frontSource.copy() : undefined,
+            this.backSource ? this.backSource.copy() : undefined
         );
     },
     reset: function(){

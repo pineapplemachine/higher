@@ -2,6 +2,7 @@ import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 import {ArraySequence} from "./arrayAsSequence";
+import {EmptySequence} from "./emptySequence";
 import {InfiniteRepeatElementSequence} from "./repeatElement";
 
 export const SlicingNgramSequence = Sequence.extend({
@@ -17,6 +18,7 @@ export const SlicingNgramSequence = Sequence.extend({
         expects: (`
             The constructor expects a number indicating ngram size and one
             sequence as input. Ngram size must be a positive integer.
+            The input sequence must have known length and support slicing.
         `),
     },
     getSequence: process.env.NODE_ENV !== "development" ? undefined : [
@@ -32,6 +34,7 @@ export const SlicingNgramSequence = Sequence.extend({
         hi => new SlicingNgramSequence(2, hi.range(3)),
         hi => new SlicingNgramSequence(3, hi.range(3)),
         hi => new SlicingNgramSequence(4, hi.range(3)),
+        hi => new SlicingNgramSequence(1, hi("?")),
         hi => new SlicingNgramSequence(3, hi("some string")),
     ],
     constructor: function SlicingNgramSequence(
@@ -39,10 +42,6 @@ export const SlicingNgramSequence = Sequence.extend({
         lowIndex = undefined, highIndex = undefined,
         frontIndex = undefined, backIndex = undefined
     ){
-        // TODO: Better arguments validation
-        if(!source.length) throw new Error("Source must have length.");
-        if(!source.slice) throw new Error("Source must allow slicing.");
-        if(ngramSize < 1) throw new Error("Ngram size must be at least 1.");
         this.ngramSize = ngramSize;
         this.source = source;
         this.lowIndex = lowIndex || 0;
@@ -119,25 +118,23 @@ export const TrackingNgramSequence = Sequence.extend({
         `),
     },
     getSequence: process.env.NODE_ENV !== "development" ? undefined : [
-        hi => new TrackingNgramSequence(1, hi.emptySequence()),
-        hi => new TrackingNgramSequence(3, hi.emptySequence()),
-        hi => new TrackingNgramSequence(1, hi.range(1)),
-        hi => new TrackingNgramSequence(3, hi.range(1)),
-        hi => new TrackingNgramSequence(1, hi.range(2)),
-        hi => new TrackingNgramSequence(2, hi.range(2)),
-        hi => new TrackingNgramSequence(3, hi.range(2)),
-        hi => new TrackingNgramSequence(2, hi.range(3)),
-        hi => new TrackingNgramSequence(3, hi.range(3)),
-        hi => new TrackingNgramSequence(4, hi.range(3)),
-        hi => new TrackingNgramSequence(3, hi("some string")),
+        // hi => new TrackingNgramSequence(1, hi.emptySequence()),
+        // hi => new TrackingNgramSequence(3, hi.emptySequence()),
+        // hi => new TrackingNgramSequence(1, hi.range(1)),
+        // hi => new TrackingNgramSequence(3, hi.range(1)),
+        // hi => new TrackingNgramSequence(1, hi.range(2)),
+        // hi => new TrackingNgramSequence(2, hi.range(2)),
+        // hi => new TrackingNgramSequence(3, hi.range(2)),
+        // hi => new TrackingNgramSequence(2, hi.range(3)),
+        // hi => new TrackingNgramSequence(3, hi.range(3)),
+        // hi => new TrackingNgramSequence(4, hi.range(3)),
+        // hi => new TrackingNgramSequence(3, hi("some string")),
         hi => new TrackingNgramSequence(2, hi.repeat("hello")),
-        hi => new TrackingNgramSequence(4, hi.counter()),
+        // hi => new TrackingNgramSequence(4, hi.counter()),
     ],
     constructor: function TrackingNgramSequence(
         ngramSize, source, currentNgram = undefined
     ){
-        // TODO: Better arguments validation
-        if(ngramSize < 1) throw new Error("Ngram size must be at least 1.");
         this.ngramSize = ngramSize;
         this.source = source;
         this.currentNgram = currentNgram;
@@ -176,11 +173,10 @@ export const TrackingNgramSequence = Sequence.extend({
         if(!this.currentNgram) this.initialize();
         this.currentNgram = this.currentNgram.slice(1);
         if(!this.source.done()){
+            if(this.source.front() === undefined) console.log(this.source.frontSource);
             this.currentNgram.push(this.source.nextFront());
         }
     },
-    back: null,
-    popBack: null,
     index: function(i){
         const ngram = [];
         for(let j = i; j < i + this.ngramSize; j++){
@@ -193,12 +189,11 @@ export const TrackingNgramSequence = Sequence.extend({
             this.ngramSize, this.source.slice(i, j + this.ngramSize)
         );
     },
-    has: null,
-    get: null,
     copy: function(){
-        const copy = new NgramSequence(this.ngramSize, this.source.copy());
-        if(this.currentNgram) copy.currentNgram = this.currentNgram.slice();
-        return copy;
+        return new TrackingNgramSequence(
+            this.ngramSize, this.source.copy(),
+            this.currentNgram ? this.currentNgram.slice() : undefined
+        );
     },
     reset: function(){
         this.source.reset();
@@ -207,7 +202,6 @@ export const TrackingNgramSequence = Sequence.extend({
     },
     rebase: function(source){
         this.source = source;
-        this.currentNgram = undefined;
         return this;
     },
 });
@@ -218,14 +212,14 @@ export const ngrams = wrap({
     async: false,
     arguments: {
         unordered: {
-            numbers: 1,
+            numbers: {one: wrap.expecting.nonNegativeInteger},
             sequences: 1
         }
     },
     implementation: (ngramSize, source) => {
         if(ngramSize < 1){
-            return new InfiniteRepeatElementSequence(new ArraySequence([]));
-        }else if(source.length && source.slice && source.bounded()){
+            return new InfiniteRepeatElementSequence(new EmptySequence());
+        }else if(source.length && source.slice){
             return new SlicingNgramSequence(ngramSize, source);
         }else{
             return new TrackingNgramSequence(ngramSize, source);
