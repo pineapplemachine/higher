@@ -2,6 +2,8 @@ import {isEqual} from "../core/isEqual";
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
+export const defaultUniqComparison = isEqual;
+
 export const UniqSequence = Sequence.extend({
     summary: "Enumerate only those elements of an input sequence not equivalent to their predecessor.",
     supportsWith: [
@@ -129,7 +131,7 @@ export const uniq = wrap({
         }
     },
     implementation: (compare, source) => {
-        return new UniqSequence(compare || isEqual, source);
+        return new UniqSequence(compare || defaultUniqComparison, source);
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {

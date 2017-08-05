@@ -4,22 +4,72 @@ import {wrap} from "../core/wrap";
 
 import {EmptySequence} from "./emptySequence";
 import {OneElementSequence} from "./one";
+import {defaultUniqComparison} from "./uniq";
+import {defaultDistinctTransform} from "./distinct";
 
 export const FiniteRepeatElementSequence = Sequence.extend({
+    overrides: [
+        "repeat", "distinct", "uniq",
+    ],
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "repeatOverride": hi => {
+            const seq = new hi.sequence.FiniteRepeatElementSequence(2, 0);
+            hi.assertEqual(seq.repeat(3), new hi.sequence.FiniteRepeatElementSequence(6, 0));
+            hi.assertEmpty(seq.repeat(0));
+        },
+        "repeatInfiniteOverride": hi => {
+            const seq = new hi.sequence.FiniteRepeatElementSequence(2, 0);
+            hi.assert(seq.repeat().unbounded());
+            hi.assert(seq.repeat(Infinity).unbounded());
+            hi.assert(seq.repeat().startsWith([0, 0, 0, 0, 0, 0, 0]));
+            hi.assert(seq.repeat(Infinity).startsWith([0, 0, 0, 0, 0, 0, 0]));
+        },
+        "distinctOverride": hi => {
+            const seq = new hi.sequence.FiniteRepeatElementSequence(10, 0);
+            hi.assertEqual(seq.distinct(), [0]);
+        },
+        "uniqOverride": hi => {
+            const seq = new hi.sequence.FiniteRepeatElementSequence(10, 0);
+            hi.assertEqual(seq.uniq(), [0]);
+        },
+        "nonIdentityUniqOverride": hi => {
+            const seq = new hi.sequence.FiniteRepeatElementSequence(4, 0);
+            hi.assertEqual(seq.uniq(), [0]);
+            const uniqSeq = seq.uniq((a, b) => false);
+            hi.assertEqual(uniqSeq, [0, 0, 0, 0]);
+        },
+    },
     constructor: function FiniteRepeatElementSequence(
         repetitions, element, finishedRepetitions = 0
     ){
-        this.repetitions = repetitions;
+        this.targetRepetitions = repetitions;
         this.finishedRepetitions = finishedRepetitions || 0;
         this.element = element;
     },
+    repeat: function(repetitions){
+        if(repetitions <= 0){
+            return new EmptySequence();
+        }else if(!repetitions || !isFinite(repetitions)){
+            return new InfiniteRepeatElementSequence(this.element);
+        }else{
+            return new FiniteRepeatElementSequence(
+                repetitions * this.targetRepetitions, this.element
+            );
+        }
+    },
+    distinct: function(transform){
+        return new OneElementSequence(this.element);
+    },
     uniq: function(compare){
-        const compareFunc = compare || constants.defaults.comparisonFunction;
+        const compareFunc = compare || defaultUniqComparison;
         if(compareFunc(this.element, this.element)){
             return new OneElementSequence(this.element);
         }else{
             return this;
         }
+    },
+    repetitions: function(){
+        return this.targetRepetitions();
     },
     seed: function(element){
         this.element = element;
@@ -27,39 +77,22 @@ export const FiniteRepeatElementSequence = Sequence.extend({
     },
     times: function(repetitions){
         if(isFinite(repetitions)){
-            this.repetitions = times;
+            this.targetRepetitions = times;
             return this;
         }else{
             return new InfiniteRepeatElementSequence(this.element);
         }
     },
-    repeat: function(repetitions = null){
-        if(repetitions === null || !isFinite(repetitions)){
-            return new InfiniteRepeatElementSequence(this.element);
-        }else if(repetitions <= 0){
-            return new NullRepeatElementSequence(this.element);
-        }else{
-            return new FiniteRepeatElementSequence(
-                this.element, this.repetitions * repetitions
-            );
-        }
-    },
-    reverse: function(){
-        return this;
-    },
-    shuffle: function(){
-        return this;
-    },
     bounded: () => true,
     unbounded: () => false,
     done: function(){
-        return this.finishedRepetitions >= this.repetitions;
+        return this.finishedRepetitions >= this.targetRepetitions;
     },
     length: function(){
-        return this.repetitions;
+        return this.targetRepetitions;
     },
     left: function(){
-        return this.finishedRepetitions - this.repetitions;
+        return this.finishedRepetitions - this.targetRepetitions;
     },
     front: function(){
         return this.element;
@@ -79,33 +112,67 @@ export const FiniteRepeatElementSequence = Sequence.extend({
     slice: function(i, j){
         return new FiniteRepeatElementSequence(this.element, j - i);
     },
-    has: null,
-    get: null,
     copy: function(){
         return new FiniteRepeatElementSequence(
-            this.element, this.repetitions, this.finishedRepetitions
+            this.element, this.targetRepetitions, this.finishedRepetitions
         );
     },
     reset: function(){
         this.finishedRepetitions = 0;
         return this;
     },
-    rebase: null,
 });
 
 export const InfiniteRepeatElementSequence = Sequence.extend({
+    overrides: [
+        "repeat", "distinct", "uniq",
+    ],
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "repeatOverride": hi => {
+            const seq = new hi.sequence.InfiniteRepeatElementSequence(0);
+            hi.assert(seq.repeat() === seq);
+            hi.assert(seq.repeat(Infinity) === seq);
+            hi.assert(seq.repeat(10) === seq);
+            hi.assertEmpty(seq.repeat(0));
+        },
+        "distinctOverride": hi => {
+            const seq = new hi.sequence.InfiniteRepeatElementSequence(0);
+            hi.assertEqual(seq.distinct(), [0]);
+        },
+        "uniqOverride": hi => {
+            const seq = new hi.sequence.InfiniteRepeatElementSequence(0);
+            hi.assertEqual(seq.uniq(), [0]);
+        },
+        "nonIdentityUniqOverride": hi => {
+            const seq = new hi.sequence.InfiniteRepeatElementSequence(0);
+            hi.assertEqual(seq.uniq(), [0]);
+            const uniqSeq = seq.uniq((a, b) => false);
+            hi.assert(uniqSeq.unbounded());
+            hi.assert(uniqSeq.startsWith([0, 0, 0, 0, 0]));
+        },
+    },
     constructor: function InfiniteRepeatElementSequence(element){
         this.element = element;
     },
+    repeat: function(repetitions){
+        if(repetitions <= 0){
+            return new EmptySequence();
+        }else{
+            return this;
+        }
+    },
+    distinct: function(transform){
+        return new OneElementSequence(this.element);
+    },
     uniq: function(compare){
-        const compareFunc = compare || constants.defaults.comparisonFunction;
+        const compareFunc = compare || defaultUniqComparison;
         if(compareFunc(this.element, this.element)){
             return new OneElementSequence(this.element);
         }else{
             return this;
         }
     },
-    repetitions: Infinity,
+    repetitions: () => Infinity,
     seed: function(element){
         this.element = element;
         return this;
@@ -117,20 +184,9 @@ export const InfiniteRepeatElementSequence = Sequence.extend({
             return this;
         }
     },
-    repeat: function(repetitions){
-        return this;
-    },
-    reverse: function(){
-        return this;
-    },
-    shuffle: function(){
-        return this;
-    },
     bounded: () => false,
     unbounded: () => true,
     done: () => false,
-    length: null,
-    left: null,
     front: function(){
         return this.element;
     },
@@ -142,8 +198,6 @@ export const InfiniteRepeatElementSequence = Sequence.extend({
     index: function(i){
         return this.element;
     },
-    has: null,
-    get: null,
     slice: function(i, j){
         return new FiniteRepeatElementSequence(this.element, j - i);
     },
@@ -153,7 +207,6 @@ export const InfiniteRepeatElementSequence = Sequence.extend({
     reset: function(){
         return this;
     },
-    rebase: null,
 });
 
 // Produce a sequence that repeats a single element.

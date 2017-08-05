@@ -18,6 +18,8 @@ export const FiniteRepeatSequence = Sequence.extend({
         },
         "repeatInfiniteOverride": hi => {
             const seq = new hi.sequence.FiniteRepeatSequence(2, hi("abc"));
+            hi.assert(seq.repeat().unbounded());
+            hi.assert(seq.repeat(Infinity).unbounded());
             hi.assert(seq.repeat().startsWith("abcabcabcabcabc"));
             hi.assert(seq.repeat(Infinity).startsWith("abcabcabcabcabc"));
         },
