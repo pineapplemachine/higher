@@ -49,6 +49,39 @@ export const expecting = {
             return +value;
         },
     }),
+    positiveNumber: Expecting({
+        article: "a",
+        singular: "positive number",
+        plural: "positive numbers",
+        short: "number",
+        adjective: "positive",
+        validate: value => {
+            if(!isNumber(value) || +value <= 0) throw new Error();
+            return +value;
+        },
+    }),
+    negativeNumber: Expecting({
+        article: "a",
+        singular: "negative number",
+        plural: "negative numbers",
+        short: "number",
+        adjective: "negative",
+        validate: value => {
+            if(!isNumber(value) || +value >= 0) throw new Error();
+            return +value;
+        },
+    }),
+    nonNegativeNumber: Expecting({
+        article: "a",
+        singular: "non-negative number",
+        plural: "non-negative numbers",
+        short: "number",
+        adjective: "non-negative",
+        validate: value => {
+            if(!isNumber(value) || +value < 0) throw new Error();
+            return +value;
+        },
+    }),
     integer: Expecting({
         article: "an",
         singular: "integer",
@@ -61,13 +94,23 @@ export const expecting = {
     }),
     index: Expecting({
         article: "a",
+        singular: "index",
+        plural: "indexes",
+        adjective: "non-negative and integral",
+        validate: value => {
+            if(!isNumber(value) || +value < 0) throw new Error();
+            return Math.floor(+value);
+        },
+    }),
+    nonNegativeInteger: Expecting({
+        article: "a",
         singular: "non-negative integer",
         plural: "non-negative integers",
-        adjective: "non-negative integral",
+        adjective: "non-negative and integral",
         shortArticle: "an",
-        short: "index",
+        short: "integer",
         validate: value => {
-            if(!isNumber(value) || value < 0) throw new Error();
+            if(!isNumber(value) || +value < 0) throw new Error();
             return Math.floor(+value);
         },
     }),

@@ -46,6 +46,7 @@ export const sequenceTestRunner = (sequence) => {
                         name: `${sequence.name}.contract.${contractName}`,
                         sequence: sequence,
                         contract: contract,
+                        sequenceGetter: sequenceGetter,
                         error: error
                     });
                 }
