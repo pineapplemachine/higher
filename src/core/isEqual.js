@@ -115,10 +115,13 @@ export const sequencesEqual = lightWrap({
             message: "Failed to compare sequences",
         });
         while(!sequences[0].done()){
-            const element = sequences[0].nextFront();
+            const elements = [sequences[0].nextFront()];
             for(let i = 1; i < sequences.length; i++){
                 if(sequences[i].done()) return false;
-                if(!isEqual(element, sequences[i].nextFront())) return false;
+                elements.push(sequences[i].nextFront());
+            }
+            if(!isEqual(...elements)){
+                return false;
             }
         }
         for(const sequence of sequences){
