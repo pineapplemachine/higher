@@ -243,6 +243,7 @@ import {recur} from "./functions/recur"; hi.register(recur);
 import {reject} from "./functions/reject"; hi.register(reject);
 import {relationalToOrdering} from "./functions/relationalToOrdering"; hi.register(relationalToOrdering);
 import {repeat} from "./functions/repeat"; hi.register(repeat);
+import {repeatEachElement} from "./functions/repeatEachElement"; hi.register(repeatEachElement);
 import {repeatElement} from "./functions/repeatElement"; hi.register(repeatElement);
 import {reverse} from "./functions/reverse"; hi.register(reverse);
 import {roundRobin} from "./functions/roundRobin"; hi.register(roundRobin);
