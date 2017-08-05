@@ -215,11 +215,11 @@ export const isNaN = lightWrap({
             The function expects a single argument of any type as input.
         `),
         returns: (`
-            The function returns true when the input value was \`NaN\` and
+            The function returns true when the input value was #NaN and
             false otherwise.
         `),
         related: [
-            "isInteger", "isNaN",
+            "isNumber", "isInfinity",
         ],
         examples: [
             "basicUsage",
@@ -245,6 +245,120 @@ export const isNaN = lightWrap({
         "nilInput": hi => {
             hi.assertNot(hi.isNaN(null));
             hi.assertNot(hi.isNaN(undefined));
+        },
+    },
+});
+
+export const isInfinity = lightWrap({
+    summary: "Get whether an input is either positive or negative #Infinity.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The function expects a single argument of any type as input.
+        `),
+        returns: (`
+            The function returns true when the input value was positive or
+            negative #Infinity and false otherwise.
+        `),
+        related: [
+            "isNumber", "isNaN",
+        ],
+        examples: [
+            "basicUsage",
+        ],
+    },
+    implementation: function isInfinity(value){
+        return value === Infinity || value === -Infinity;
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": hi => {
+            hi.assert(hi.isInfinity(+Infinity));
+            hi.assert(hi.isInfinity(-Infinity));
+        },
+        "numericInputs": hi => {
+            hi.assertNot(hi.isInfinity(NaN));
+            hi.assertNot(hi.isInfinity(0));
+            hi.assertNot(hi.isInfinity(1234));
+        },
+        "nilInput": hi => {
+            hi.assertNot(hi.isInfinity(null));
+            hi.assertNot(hi.isInfinity(undefined));
+        },
+    },
+});
+
+export const isPositiveInfinity = lightWrap({
+    summary: "Get whether an input is positive #Infinity.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The function expects a single argument of any type as input.
+        `),
+        returns: (`
+            The function returns true when the input value was positive
+            #Infinity and false otherwise.
+        `),
+        related: [
+            "isNumber", "isNaN",
+        ],
+        examples: [
+            "basicUsage",
+        ],
+    },
+    implementation: function isPositiveInfinity(value){
+        return value === Infinity;
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": hi => {
+            hi.assert(hi.isPositiveInfinity(+Infinity));
+            hi.assertNot(hi.isPositiveInfinity(-Infinity));
+        },
+        "numericInputs": hi => {
+            hi.assertNot(hi.isPositiveInfinity(NaN));
+            hi.assertNot(hi.isPositiveInfinity(0));
+            hi.assertNot(hi.isPositiveInfinity(1234));
+        },
+        "nilInput": hi => {
+            hi.assertNot(hi.isPositiveInfinity(null));
+            hi.assertNot(hi.isPositiveInfinity(undefined));
+        },
+    },
+});
+
+export const isNegativeInfinity = lightWrap({
+    summary: "Get whether an input is negative #Infinity.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The function expects a single argument of any type as input.
+        `),
+        returns: (`
+            The function returns true when the input value was negative
+            #Infinity and false otherwise.
+        `),
+        related: [
+            "isNumber", "isNaN",
+        ],
+        examples: [
+            "basicUsage",
+        ],
+    },
+    implementation: function isNegativeInfinity(value){
+        return value === -Infinity;
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": hi => {
+            hi.assertNot(hi.isNegativeInfinity(+Infinity));
+            hi.assert(hi.isNegativeInfinity(-Infinity));
+        },
+        "numericInputs": hi => {
+            hi.assertNot(hi.isNegativeInfinity(NaN));
+            hi.assertNot(hi.isNegativeInfinity(0));
+            hi.assertNot(hi.isNegativeInfinity(1234));
+        },
+        "nilInput": hi => {
+            hi.assertNot(hi.isNegativeInfinity(null));
+            hi.assertNot(hi.isNegativeInfinity(undefined));
         },
     },
 });
