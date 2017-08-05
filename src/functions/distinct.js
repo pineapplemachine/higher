@@ -41,7 +41,6 @@ export const DistinctSequence = Sequence.extend({
         hi => new DistinctSequence(i => i, hi([1, 2, 3, 4])),
         hi => new DistinctSequence(i => i, hi([1, 2, 3, 4, 1, 2, 3, 4])),
         hi => new DistinctSequence(i => i, hi.counter()),
-        hi => new DistinctSequence(i => i, hi.repeat("hello")),
     ],
     constructor: function DistinctSequence(
         transform, source, history = null
@@ -72,7 +71,7 @@ export const DistinctSequence = Sequence.extend({
     },
     copy: function(){
         return new DistinctSequence(
-            this.source.copy(), Object.assign({}, this.history)
+            this.transform, this.source.copy(), new Set(this.history)
         );
     },
     reset: function(){
