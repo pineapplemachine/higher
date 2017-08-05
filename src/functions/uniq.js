@@ -1,8 +1,38 @@
-import {constants} from "../core/constants";
+import {isEqual} from "../core/isEqual";
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
+export const defaultUniqComparison = isEqual;
+
 export const UniqSequence = Sequence.extend({
+    summary: "Enumerate only those elements of an input sequence not equivalent to their predecessor.",
+    supportsWith: [
+        "copy", "reset",
+    ], 
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The constructor expects a comparison function and a sequence as
+            input.
+        `),
+        warnings: (`
+            Take care when using this sequence with an unbounded input.
+            If at any point the sequence comes to enumerate an infinite series of
+            equivalent elements, then attempting to consume output sequence
+            will produce an infinite loop.
+        `),
+    },
+    getSequence: process.env.NODE_ENV !== "development" ? undefined : [
+        hi => new UniqSequence(isEqual, hi.emptySequence()),
+        hi => new UniqSequence(isEqual, hi([0])),
+        hi => new UniqSequence(isEqual, hi([0, 1, 2, 3, 4])),
+        hi => new UniqSequence(isEqual, hi([0, 0, 0, 0, 0])),
+        hi => new UniqSequence(isEqual, hi("!")),
+        hi => new UniqSequence(isEqual, hi("abcdefg")),
+        hi => new UniqSequence(isEqual, hi("aaaabcddefffg")),
+        hi => new UniqSequence(isEqual, hi.counter()),
+        hi => new UniqSequence(isEqual, hi.repeat([1, 2, 3, 3, 4, 5])),
+    ],
     constructor: function UniqSequence(
         compare, source, lastElement = undefined
     ){
@@ -24,37 +54,18 @@ export const UniqSequence = Sequence.extend({
     done: function(){
         return this.source.done();
     },
-    length: null,
-    left: null,
     front: function(){
         return this.source.front();
     },
     popFront: function(){
-        this.front = function(){
-            return this.lastElement;
-        }
-        this.popFront = function(){
-            this.source.popFront();
-            while(!this.source.done()){
-                const front = this.source.front();
-                const last = this.lastElement;
-                this.lastElement = front;
-                if(!this.compare(front, last)) break;
-                this.source.popFront();
-            }
-        };
         this.lastElement = this.source.nextFront();
-        this.popFront();
-    },
-    back: null,
-    popBack: null,
-    index: null,
-    slice: null,
-    has: function(i){
-        return this.source.has(i);
-    },
-    get: function(i){
-        return this.source.get(i);
+        while(!this.source.done()){
+            const front = this.source.front();
+            const last = this.lastElement;
+            this.lastElement = front;
+            if(!this.compare(last, front)) break;
+            this.source.popFront();
+        }
     },
     copy: function(){
         return new UniqSequence(
@@ -63,7 +74,6 @@ export const UniqSequence = Sequence.extend({
     },
     reset: function(){
         this.source.reset();
-        this.firstElement = true;
         return this;
     },
     rebase: function(source){
@@ -77,21 +87,79 @@ export const UniqSequence = Sequence.extend({
 // Like https://en.wikipedia.org/wiki/Uniq
 export const uniq = wrap({
     name: "uniq",
+    summary: "Get a sequence enumerating only the elements of an input not equivalent to their predecessor.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The function expects a sequence and an optional comparison
+            function as input.
+        `),
+        returns: (`
+            The function returns a sequence which enumerates only those elements
+            of the input sequence that were not equivalent to their predecessors,
+            as judged by a comparison function.
+            The first element of the input sequence is always included in the
+            output sequence.
+            /When no comparison function is given, @isEqual is used as a default.
+        `),
+        warnings: (`
+            Take care when using this function with an unbounded sequence.
+            If at any point the sequence comes to enumerate an infinite series of
+            equivalent elements, then attempting to consume output sequence
+            will produce an infinite loop.
+        `),
+        returnType: "UniqSequence",
+        examples: [
+            "basicUsage", "comparisonFunctionInput",
+        ],
+        related: [
+            "distinct",
+        ],
+        links: [
+            {
+                description: "Description of the uniq Unix utility.",
+                url: "https://en.wikipedia.org/wiki/Uniq",
+            },
+        ],
+    },
     attachSequence: true,
     async: false,
-    sequences: [
-        UniqSequence
-    ],
     arguments: {
         unordered: {
-            functions: "?",
+            functions: {optional: wrap.expecting.comparison},
             sequences: 1
         }
     },
     implementation: (compare, source) => {
-        return new UniqSequence(
-            compare || constants.defaults.comparisonFunction, source
-        );
+        return new UniqSequence(compare || defaultUniqComparison, source);
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": hi => {
+            const array = [1, 1, 2, 3, 3, 3, 4, 3, 2, 2, 1];
+            hi.assertEqual(hi.uniq(array), [1, 2, 3, 4, 3, 2, 1]);
+        },
+        "comparisonFunctionInput": hi => {
+            const absEqual = (a, b) => (a === b || a === -b);
+            const seq = hi.uniq(absEqual, [1, 1, -1, 2, 3, -4, 4, 5, -6, -6]);
+            hi.assertEqual(seq, [1, 2, 3, -4, 5, -6]);
+        },
+        "emptyInput": hi => {
+            hi.assertEmpty(hi.emptySequence().uniq());
+        },
+        "singleLengthInput": hi => {
+            hi.assertEqual(hi.uniq([1]), [1]);
+            hi.assertEqual(hi.uniq(["abc"]), ["abc"]);
+        },
+        "noDuplicatesInInput": hi => {
+            hi.assertEqual(hi.uniq([1, 2, 3, 4]), [1, 2, 3, 4]);
+        },
+        "allDuplicatesInInput": hi => {
+            hi.assertEqual(hi.uniq([0, 0, 0, 0, 0, 0]), [0]);
+        },
+        "unboundedInput": hi => {
+            const seq = hi.roundRobin(hi.range(5), hi.counter());
+            hi.assert(seq.uniq().startsWith([0, 1, 2, 3, 4, 5, 6, 7, 8]));
+        },
     },
 });
 
