@@ -273,7 +273,7 @@ export const repeatEachElement = wrap({
                 When the number of repetitions was zero, or the input sequence
                 was empty and the number of repetitions was #Infinity.
             `),
-            "typeof input sequence": (`
+            "typeof inputSequence": (`
                 When the number of repetitions was #1.
             `),
             "InfiniteRepeatEachElementSequence": (`
