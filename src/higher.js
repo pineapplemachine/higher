@@ -235,6 +235,7 @@ import {none} from "./functions/none"; hi.register(none);
 import {nonePass} from "./functions/nonePass"; hi.register(nonePass);
 import {object} from "./functions/object"; hi.register(object);
 import {once} from "./functions/once"; hi.register(once);
+import {onDemandSequence} from "./functions/onDemandSequence"; hi.register(onDemandSequence);
 import {one} from "./functions/one"; hi.register(one);
 import {orderingToRelational} from "./functions/orderingToRelational"; hi.register(orderingToRelational);
 import {padLeft} from "./functions/padLeft"; hi.register(padLeft);
