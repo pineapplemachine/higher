@@ -18,7 +18,6 @@ export const EagerSequence = Sequence.extend({
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
-        methods: {},
     },
     constructor: function EagerSequence(
         source, originalSource = undefined, initialized = undefined
@@ -38,17 +37,11 @@ export const EagerSequence = Sequence.extend({
         this.source = new ArraySequence(array);
         this.initialized = true;
     },
-    array: function(limit){
-        return this.source.array(limit);
+    array: function(){
+        return this.source.array();
     },
-    arrayAsync: function(limit){
-        return this.source.arrayAsync(limit);
-    },
-    newArray: function(limit){
-        return this.source.newArray(limit);
-    },
-    newArrayAsync: function(limit){
-        return this.source.newArrayAsync(limit);
+    newArray: function(){
+        return this.source.newArray();
     },
     bounded: () => true,
     unbounded: () => false,

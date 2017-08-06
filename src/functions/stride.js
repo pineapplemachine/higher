@@ -329,7 +329,7 @@ export const stride = wrap({
                 When the stride length was #Infinity and the input sequence was
                 not empty.
             `),
-            "typeof input sequence": (`
+            "typeof inputSequence": (`
                 When the stride length was exactly #1.
             `),
             "IndexStrideSequence": (`

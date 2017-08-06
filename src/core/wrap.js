@@ -1,7 +1,8 @@
 import {addSequenceConverter, asSequence, validAsSequence} from "./asSequence";
 import {callAsync} from "./callAsync";
 import {constants} from "./constants";
-import {expecting, validateOne, validateOrdered, categorizeUnordered} from "./expecting";
+import {expecting, Expecting} from "./expecting";
+import {validateOne, validateOrdered, categorizeUnordered} from "./expecting";
 import {validateUnordered, toUnorderedArguments} from "./expecting";
 import {lightWrap, wrappedTestRunner} from "./lightWrap";
 import {attachSequenceMethods} from "./sequence";
@@ -83,6 +84,7 @@ export const wrap = lightWrap({
 });
 
 wrap.expecting = expecting;
+wrap.Expecting = Expecting;
 
 export const getWrappedFunction = function(info){
     if(process.env.NODE_ENV !== "development"){

@@ -19,18 +19,12 @@ export const RecurSequence = Sequence.extend({
     bounded: () => false,
     unbounded: () => true,
     done: () => false,
-    length: null,
-    left: null,
     front: function(){
         return this.frontValue;
     },
     popFront: function(){
         this.frontValue = this.transform(this.frontValue);
     },
-    back: null,
-    popBack: null,
-    index: null,
-    slice: null,
     copy: function(){
         return new RecurSequence(
             this.transform, this.seedValue, this.frontValue
@@ -40,7 +34,6 @@ export const RecurSequence = Sequence.extend({
         this.frontValue = this.seedValue;
         return this;
     },
-    rebase: null,
 });
 
 // Produce a sequence via repeated application of a transformation function
