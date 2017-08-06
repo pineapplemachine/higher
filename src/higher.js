@@ -211,6 +211,7 @@ import {findLast} from "./functions/findLast"; hi.register(findLast);
 import {first} from "./functions/first"; hi.register(first);
 import {flatten} from "./functions/flatten"; hi.register(flatten);
 import {flattenDeep} from "./functions/flattenDeep"; hi.register(flattenDeep);
+import {forceUnidirectional} from "./functions/forceUnidirectional"; hi.register(forceUnidirectional);
 import {from} from "./functions/from"; hi.register(from);
 import {groupBy} from "./functions/groupBy"; hi.register(groupBy);
 import {head} from "./functions/head"; hi.register(head);
