@@ -1,9 +1,8 @@
 import {isSequence} from "../core/sequence";
+import {isArray} from "../core/types";
 import {wrap} from "../core/wrap";
 
-import {array} from "./array";
-
-import {NotBoundedError} from "../errors/NotBoundedError";
+import {newArray} from "./newArray";
 
 export const arrayDeep = wrap({
     name: "arrayDeep",
@@ -18,34 +17,32 @@ export const arrayDeep = wrap({
             sequence. Elements of that input sequence that were known-bounded
             arrays also recursively have the operation applied to them, such
             that a sequence of sequences becomes an array of arrays, and so on.
-            /Sequences which directly represent the contents of an in-memory
-            array will have that source array given as output.
-            To always acquire a new array object that is guaranteed to be safe
-            to modify, use @newArrayDeep.
+            The function always returns new arrays, never existing array objects.
         `),
+        returnType: "array",
         examples: [
             "basicUsage",
         ],
         related: [
-            "array", "newArray", "newArrayDeep",
+            "array", "newArray",
         ],
     },
     attachSequence: true,
     async: true,
     arguments: {
-        one: wrap.expecting.sequence,
+        one: wrap.expecting.boundedSequence,
     },
     implementation: (source) => {
-        NotBoundedError.enforce(source, {
-            message: "Failed to create array from sequence.",
-        });
-        const result = array(source);
-        for(let i = 0; i < result.length; i++){
-            if(isSequence(result[i]) && result[i].bounded()){
-                result[i] = arrayDeep(result[i]);
+        // TODO: Handle cyclic references
+        const array = [];
+        for(const element of source){
+            if(isArray(element) || (isSequence(element) && element.bounded())){
+                array.push(arrayDeep(element));
+            }else{
+                array.push(element);
             }
         }
-        return result;
+        return array;
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {
@@ -77,8 +74,8 @@ export const arrayDeep = wrap({
             const output = hi.arrayDeep(array);
             output[0][0] = 10;
             hi.assertEqual(output, [[10, 1, 2]]);
-            // Input is modified
-            hi.assertEqual(array, [[10, 1, 2]]);
+            // Input is not modified
+            hi.assertEqual(array, [[0, 1, 2]]);
         },
     },
 });

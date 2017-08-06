@@ -223,7 +223,6 @@ import {max} from "./functions/max"; hi.register(max);
 import {min} from "./functions/min"; hi.register(min);
 import {negate} from "./functions/negate"; hi.register(negate);
 import {newArray} from "./functions/newArray"; hi.register(newArray);
-import {newArrayDeep} from "./functions/newArrayDeep"; hi.register(newArrayDeep);
 import {newObject} from "./functions/newObject"; hi.register(newObject);
 import {ngrams} from "./functions/ngrams"; hi.register(ngrams);
 import {none} from "./functions/none"; hi.register(none);
