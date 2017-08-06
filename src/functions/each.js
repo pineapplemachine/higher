@@ -18,7 +18,7 @@ export const each = wrap({
         returns: (`
             The function returns the input sequence.
         `),
-        returnType: "typeof input sequence",
+        returnType: "typeof inputSequence",
         examples: [
             "basicUsage", "basicUsageNoCallback",
         ],
