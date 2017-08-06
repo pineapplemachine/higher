@@ -3,39 +3,38 @@ import {wrap} from "../core/wrap";
 // Get a predicate that passes when all the given predicates pass.
 export const allPass = wrap({
     name: "allPass",
-    summary: "Get a predicate that is the logical AND of its input functions.",
+    summary: "Get a predicate that passes when all of the input predicates pass.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
-        detail: (`
-            Combines any number of predicate functions to produce a predicate
-            which is satisfied only by those inputs which satisfy all
-            of those inputted functions.
-        `),
         expects: (`
-            The function expects any number of predicate functions.
+            The function expects any number of predicate functions as input.
         `),
         returns: (`
-            The function returns a predicate function returning true for
-            an input only when all of the inputted predicates are satisfied by
-            that input and returning false otherwise.
-            When exactly one predicate was passed, this function returns that
-            same predicate.
-            When no predicates were passed, this function returns a new
-            predicate that is satisfied by all inputs.
+            The function returns a predicate function which is satisfied by an
+            input when at least all of the input predicates were satisfied.
+            When there were no input predicates, the output predicate returns
+            #true for all inputs. Behaves like the \`&&\` operator.
         `),
+        developers: (`
+            The outputted predicate function evaluates the input predicates in
+            order from first to last and, the first time that any predicate
+            produces a falsey value, the function then returns that produced
+            value without evaluating any more predicates.
+        `),
+        returnType: "function",
         examples: [
-            "basicUsage"
+            "basicUsage",
         ],
         related: [
-            "negate", "anyPass", "nonePass"
+            "anyPass", "nonePass", "all",
         ],
     },
     attachSequence: false,
     async: false,
     arguments: {
         unordered: {
-            functions: "*"
-        }
+            functions: {anyNumberOf: wrap.expecting.predicate},
+        },
     },
     implementation: (predicates) => {
         if(predicates.length === 0){
@@ -48,61 +47,62 @@ export const allPass = wrap({
             return (...args) => (a(...args) && b(...args));
         }else{
             return (...args) => {
+                let result = true;
                 for(const predicate of predicates){
-                    if(!predicate(...args)) return false;
+                    result = predicate(...args);
+                    if(!result) return result;
                 }
-                return true;
+                return result;
             };
         }
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {
-            const gt0 = (i) => (i > 0);
-            const not2 = (i) => (i !== 2);
-            const both = hi.allPass(gt0, not2);
-            hi.assert(both(1));
-            hi.assert(both(100));
-            hi.assert(!both(-5));
-            hi.assert(!both(0));
-            hi.assert(!both(2));
+            const even = i => i % 2 === 0;
+            const positive = i => i > 0;
+            const evenAndPositive = hi.allPass(positive, even);
+            hi.assert(evenAndPositive(2));
+            hi.assertNot(evenAndPositive(3));
+            hi.assertNot(evenAndPositive(-4));
+            hi.assertNot(evenAndPositive(-5));
         },
         "noInputs": hi => {
             const pred = hi.allPass();
-            hi.assert(pred(0));
+            hi.assert(pred(true));
+            hi.assert(pred(false));
             hi.assert(pred(1));
-            hi.assert(pred("hello"));
+            hi.assert(pred(undefined));
         },
         "oneInput": hi => {
-            const gt0 = (i) => (i > 0);
-            const pred = hi.allPass(gt0);
-            hi.assert(pred(1));
-            hi.assert(!pred(-1));
-            hi.assert(pred === gt0);
+            const even = i => i % 2 === 0;
+            hi.assert(hi.allPass(even) === even);
         },
         "twoInputs": hi => {
-            const a = (i) => (i[0] === "h");
-            const b = (i) => (i[1] === "e");
-            const both = hi.allPass(a, b);
-            hi.assert(both("hello"));
-            hi.assert(both("helium"));
-            hi.assert(!both("hi"));
-            hi.assert(!both("me"));
+            const a = i => i[0] === "h";
+            const b = i => i[1] === "e";
+            const pred = hi.allPass(a, b);
+            hi.assert(pred("hello"));
+            hi.assert(pred("helium"));
+            hi.assertNot(pred("hi"));
+            hi.assertNot(pred("me"));
+            hi.assertNot(pred(""));
+            hi.assertNot(pred("boop"));
         },
         "threeInputs": hi => {
-            const a = (i) => (i[0] === "h");
-            const b = (i) => (i[1] === "e");
-            const c = (i) => (i[2] === "l");
-            const all = hi.allPass(a, b, c);
-            hi.assert(all("hello"));
-            hi.assert(all("help"));
-            hi.assert(all("helicopter"));
-            hi.assert(!all("yellow"));
-            hi.assert(!all("hill"));
-            hi.assert(!all("hero"));
-            hi.assert(!all("gill"));
-            hi.assert(!all("hint"));
-            hi.assert(!all("jelly"));
-            hi.assert(!all(""));
+            const a = i => i[0] === "h";
+            const b = i => i[1] === "e";
+            const c = i => i[2] === "l";
+            const pred = hi.allPass(a, b, c);
+            hi.assert(pred("hello"));
+            hi.assert(pred("help"));
+            hi.assert(pred("helicopter"));
+            hi.assertNot(pred("yellow"));
+            hi.assertNot(pred("hill"));
+            hi.assertNot(pred("hero"));
+            hi.assertNot(pred("gill"));
+            hi.assertNot(pred("hint"));
+            hi.assertNot(pred("jelly"));
+            hi.assertNot(pred(""));
         },
     },
 });

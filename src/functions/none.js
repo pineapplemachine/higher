@@ -13,15 +13,14 @@ export const none = wrap({
             the elements of the input are falsey.
         `),
         expects: (`
-            The function expects as input a sequence known to be bounded and
+            The function expects as input a known-bounded sequence and
             an optional predicate function to apply to each element.
         `),
         returns: (`
-            The function returns @true when no elements in the sequence
-            satisfied the predicate or, if no predicate was given, if none of
-            the elements were truthy.
-            It also returns @true if the sequence was empty.
-            The function returns @false otherwise.
+            The function returns #false when any element in the sequence
+            satisfied the predicate or, if no predicate was given, if any
+            of the elements were truthy. The function returns #true otherwise,
+            including if the input sequence was empty.
         `),
         returnType: {
             "false": (`
@@ -39,7 +38,7 @@ export const none = wrap({
             "basicUsage", "basicUsagePredicate",
         ],
         related: [
-            "all", "none",
+            "all", "none", "nonePass",
         ],
     },
     attachSequence: true,
