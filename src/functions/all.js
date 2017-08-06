@@ -78,7 +78,7 @@ export const all = wrap({
             return lastElement;
         }
     },
-    tests: {
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {
             hi.assert(hi.all([true, true, true]));
             hi.assertNot(hi.all([true, false]));
