@@ -198,8 +198,8 @@ import {countGreaterThan} from "./functions/countGreaterThan"; hi.register(count
 import {countLessThan} from "./functions/countLessThan"; hi.register(countLessThan);
 import {counter} from "./functions/counter"; hi.register(counter);
 import {distinct} from "./functions/distinct"; hi.register(distinct);
-import {dropHead} from "./functions/dropHead"; hi.register(dropHead);
-import {dropTail} from "./functions/dropTail"; hi.register(dropTail);
+import {dropFirst} from "./functions/dropFirst"; hi.register(dropFirst);
+import {dropLast} from "./functions/dropLast"; hi.register(dropLast);
 import {each} from "./functions/each"; hi.register(each);
 import {eager} from "./functions/eager"; hi.register(eager);
 import {emptySequence} from "./functions/emptySequence"; hi.register(emptySequence);
