@@ -192,10 +192,10 @@ export const onDemandSequence = wrap({
             // Real use cases won't be so simple!
             let hasBeenComputed = false;
             const seq = hi.onDemandSequence({
-                // Get the whole contents of the sequence as an array
+                // Get the whole contents as a sequence
                 dump: () => {
                     hasBeenComputed = true;
-                    return [1, 2, 3, 4, 5, 6, 7];
+                    return hi([1, 2, 3, 4, 5, 6, 7]);
                 },
                 // Get whether the sequence is initially empty
                 done: () => false,
