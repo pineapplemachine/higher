@@ -179,6 +179,8 @@ import {allPass} from "./functions/allPass"; hi.register(allPass);
 import {array} from "./functions/array"; hi.register(array);
 import {arrayDeep} from "./functions/arrayDeep"; hi.register(arrayDeep);
 import {assumeBounded} from "./functions/assumeBounded"; hi.register(assumeBounded);
+import {assumeLength} from "./functions/assumeLength"; hi.register(assumeLength);
+import {assumeUnbounded} from "./functions/assumeUnbounded"; hi.register(assumeUnbounded);
 import {benchmark} from "./functions/benchmark"; hi.register(benchmark);
 import {bigrams} from "./functions/bigrams"; hi.register(bigrams);
 import {coalesce} from "./functions/coalesce"; hi.register(coalesce);
