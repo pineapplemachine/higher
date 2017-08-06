@@ -172,18 +172,18 @@ Sequence.prototype.nextBack = function(){
 // TODO: Stop using this
 Sequence.prototype.maskAbsentMethods = function(source){
     if(!source.back){
-        this.back = null;
-        this.popBack = null;
-        this.nextBack = null;
+        this.back = undefined;
+        this.popBack = undefined;
+        this.nextBack = undefined;
     }
-    if(this.length && !source.length) this.length = null;
-    if(this.left && !source.left) this.left = null;
-    if(this.index && !source.index) this.index = null;
-    if(this.slice && !source.slice) this.slice = null;
-    if(this.has && !source.has) this.has = null;
-    if(this.get && !source.get) this.get = null;
-    if(this.copy && !source.copy) this.copy = null;
-    if(this.reset && !source.reset) this.reset = null;
+    if(this.length && !source.length) this.length = undefined;
+    if(this.left && !source.left) this.left = undefined;
+    if(this.index && !source.index) this.index = undefined;
+    if(this.slice && !source.slice) this.slice = undefined;
+    if(this.has && !source.has) this.has = undefined;
+    if(this.get && !source.get) this.get = undefined;
+    if(this.copy && !source.copy) this.copy = undefined;
+    if(this.reset && !source.reset) this.reset = undefined;
 };
 
 // Get the root of a sequence.
