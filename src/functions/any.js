@@ -11,37 +11,46 @@ export const any = wrap({
             Get whether any of the elements in an input sequence satisfy an
             optional predicate or, if no predicate was provided, whether any
             elements of the input are truthy.
+            Behaves like the \`||\` operator.
         `),
         expects: (`
-            The function expects as input a sequence known to be bounded and
+            The function expects as input a known-bounded sequence and
             an optional predicate function to apply to each element.
         `),
         returns: (`
-            The function returns @true when any element in the sequence
-            satisfied the predicate or, if no predicate was given, if any of the
-            elements were truthy. The function returns @false otherwise, or
-            if the sequence was empty.
+            The function returns the first truthy element or, if there was no
+            truthy element, the last falsey element when no predicate was given.
+            It returns the first truthy predicate return value or, if the
+            predicate was not satisfied by any element, the last falsey
+            return value when a predicate was specified.
+            The function returns #undefined when the input sequence was empty.
         `),
         returnType: {
             "typeof first truthy element": (`
                 When no predicate was given and any element of the input
                 sequence was truthy.
             `),
-            "true": (`
-                When a predicate was given and any element of the input
-                sequence satisfied the predicate.
+            "typeof last falsey element": (`
+                When no predicate was given and no element of the sequence
+                was truthy, but there was at least one element in the sequence.
             `),
-            "false": (`
-                When no predicate was given and no elements of the input
-                were truthy, or when a predicate was given and no elements
-                satisfied it, or when the input sequence was empty.
+            "typeof first truthy predicate return value": (`
+                When a predicate was given and any element of the input
+                satisfied the predicate.
+            `),
+            "typeof last falsey predicate return value": (`
+                When a predicate was given and no elements of the input
+                satisfied the predicate.
+            `),
+            "undefined": (`
+                When the input sequence was empty.
             `),
         },
         examples: [
             "basicUsage", "basicUsagePredicate",
         ],
         related: [
-            "all", "none",
+            "all", "none", "anyPass",
         ],
     },
     attachSequence: true,
@@ -54,24 +63,27 @@ export const any = wrap({
     },
     implementation: (predicate, source) => {
         if(predicate){
+            let result = undefined;
             for(const element of source){
-                if(predicate(element)) return true;
+                result = predicate(element);
+                if(result) return result;
             }
+            return result;
         }else{
+            let lastElement = undefined;
             for(const element of source){
-                if(element){
-                    return element;
-                }
+                if(element) return element;
+                lastElement = element;
             }
+            return lastElement;
         }
-        return false;
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {
             hi.assert(hi.any([true, false, true, false]));
             hi.assertNot(hi.any([false, 0, null]));
         },
-        "basicUsagePredicate": (hi) => {
+        "basicUsagePredicate": hi => {
             const strings = ["hello", "world", "how", "are", "you"];
             hi.assert(hi.any(strings, (i) => i.startsWith("h"))); // "hello" starts with "h"
             hi.assertNot(hi.any(strings, (i) => i.startsWith("x"))); // None start with "x"
@@ -93,11 +105,26 @@ export const any = wrap({
             hi.assertNot(hi.any(i => true, []));
             hi.assertNot(hi.any(i => false, []));
         },
-        "notKnownBoundedInput": (hi) => {
+        "notKnownBoundedInput": hi => {
             hi.assertFail(() => hi.counter().until((i) => i === 100).any());
         },
-        "unboundedInput": (hi) => {
+        "unboundedInput": hi => {
             hi.assertFail(() => hi.repeatElement(0).any());
+        },
+        "returnsFirstTruthy": hi => {
+            const firstElement = i => i && i[0];
+            hi.assert(hi.any([0, 0, 1, true]) === 1);
+            hi.assert(hi.any(["hello"]) === "hello");
+            hi.assert(hi.any([false, false, false, false, true]) === true);
+            hi.assert(hi.any(firstElement, [[false], [false], [1], [false]]) === 1);
+            hi.assert(hi.any(firstElement, [0, 0, 0, ["hello"]]) === "hello");
+        },
+        "returnsLastFalsey": hi => {
+            const firstElement = i => i && i[0];
+            hi.assert(hi.any([false, 0]) === 0);
+            hi.assert(hi.any([null, 0, undefined]) === undefined);
+            hi.assert(hi.any(firstElement, [[false], [false], [0]]) === 0);
+            hi.assert(hi.any(firstElement, [0, 0, 0, [""]]) === "");
         },
     },
 });
