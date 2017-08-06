@@ -83,8 +83,6 @@ export const UntilSequence = Sequence.extend({
             this.predicate(this.source.front()) && (this.included || !this.isInclusive)
         );
     },
-    length: null,
-    left: null,
     front: function(){
         return this.source.front();
     },
@@ -95,14 +93,9 @@ export const UntilSequence = Sequence.extend({
             this.source.popFront();
         }
     },
-    back: null,
-    popBack: null,
     index: function(i){
         return this.source.index(i);
     },
-    slice: null,
-    has: null,
-    get: null,
     copy: function(){
         return new UntilSequence(
             this.predicate, this.source.copy(),
