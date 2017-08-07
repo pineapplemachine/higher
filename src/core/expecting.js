@@ -156,7 +156,7 @@ export const expecting = {
         singular: "predicate function",
         plural: "predicate functions",
         short: "predicate",
-        adjective: "a predicate",
+        adjective: "a predicate function",
         validate: value => {
             if(!isFunction(value)) throw new Error();
             return value;
@@ -348,7 +348,6 @@ export const expecting = {
         article: "an",
         singular: `optional ${expect.singular}`,
         plural: `optional ${expect.plural}`,
-        adjective: expect.adjective ? `optional ${expect.adjective}` : "optional",
         shortArticle: expect.shortArticle,
         short: expect.short,
         validate: value => {
@@ -484,13 +483,14 @@ export const describeExpecting = function(expecting, error = undefined){
                     for(let i = 0; i < expectingType.order.length; i++){
                         if(!expectingType.order[i]) continue;
                         const mustBe = (expectingType.order[i].adjective ?
-                            expectingType.order[i].adjective :
-                            expectingType.order[i].article + " " +
-                            expectingType.order[i].singular
+                            expectingType.order[i].adjective : (
+                                expectingType.order[i].article + " " +
+                                expectingType.order[i].singular
+                            )
                         );
                         if(expectingType.amount === 1 || expectingType.amount === "?"){
                             // Do nothing (handled above)
-                        }else if(unorderedAmountOptional(expectingType.amount)){
+                        }else if(unorderedAmountOptional(expectingType.amount, i)){
                             post.push(
                                 `The ${placeName(i + 1)} ${type.singular}, ` +
                                 `if specified, must be ${mustBe}.`
@@ -587,10 +587,10 @@ export const unorderedAmountSingular = function(amount){
 export const unorderedAmountPlural = function(amount){
     return amount && amount !== 1 && amount !== "?";
 };
-export const unorderedAmountOptional = function(amount){
+export const unorderedAmountOptional = function(amount, index = undefined){
     return amount === "?" || amount === "+" || amount === "*" || (
-        isArray(amount) && amount[0] === 0
-    );
+        isArray(amount) && (amount[0] === 0 || index >= amount[0])
+    ) ;
 };
 
 export const validateUnordered = function(args, expecting, extraSequence = undefined){

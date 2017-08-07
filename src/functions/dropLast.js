@@ -226,7 +226,7 @@ const DropLastOnDemandSequence = (dropTarget, predicate, source) => {
 
 export const dropLast = wrap({
     name: "dropLast",
-    summary: "Get a sequence enumerating the contents of an input sequence, minus the last so many elements.",
+    summary: "Get a sequence minus the last so many elements.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         expects: (`
