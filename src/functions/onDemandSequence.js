@@ -192,11 +192,6 @@ export const onDemandSequence = wrap({
             // Real use cases won't be so simple!
             let hasBeenComputed = false;
             const seq = hi.onDemandSequence({
-                // Get the whole contents as a sequence
-                dump: () => {
-                    hasBeenComputed = true;
-                    return hi([1, 2, 3, 4, 5, 6, 7]);
-                },
                 // Get whether the sequence is initially empty
                 done: () => false,
                 // Get the length of the sequence
@@ -205,6 +200,11 @@ export const onDemandSequence = wrap({
                 front: () => 1,
                 // Get the initial back element of the sequence
                 back: () => 7,
+                // Get the whole contents as a sequence
+                dump: () => {
+                    hasBeenComputed = true;
+                    return hi([1, 2, 3, 4, 5, 6, 7]);
+                },
             });
             // The full contents aren't computed until really necessary.
             hi.assert(seq.front() === 1);

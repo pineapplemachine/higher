@@ -107,7 +107,7 @@ export const head = wrap({
             "basicUsage",
         ],
         related: [
-            "head", "last", "dropTail",
+            "first", "dropFirst", "tail",
         ],
     },
     attachSequence: true,
@@ -118,14 +118,14 @@ export const head = wrap({
             sequences: 1
         }
     },
-    implementation: (elements, source) => {
-        if(elements < 1){
+    implementation: (count, source) => {
+        if(count <= 0){
             return new EmptySequence();
         }else if(source.length && source.slice){
             const sourceLength = source.length();
-            return sourceLength <= elements ? source : source.slice(0, elements);
+            return sourceLength <= count ? source : source.slice(0, count);
         }else{
-            return new HeadSequence(elements, source);
+            return new HeadSequence(count, source);
         }
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
