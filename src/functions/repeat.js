@@ -1,6 +1,7 @@
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
+import {containsElement} from "./containsElement";
 import {copyable} from "./copyable";
 import {DistinctSequence, defaultDistinctTransform} from "./distinct";
 import {EmptySequence} from "./emptySequence";
@@ -10,7 +11,7 @@ export const FiniteRepeatSequence = Sequence.extend({
         "copy",
     ],
     overrides: [
-        "repeat", "distinct",
+        "repeat", "distinct", "containsElement",
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
@@ -37,6 +38,11 @@ export const FiniteRepeatSequence = Sequence.extend({
         "distinctOverride": hi => {
             const seq = new hi.sequence.FiniteRepeatSequence(3, hi("hello"));
             hi.assertEqual(seq.distinct(), "helo");
+        },
+        "containsElementOverride": hi => {
+            const seq = () => new hi.sequence.FiniteRepeatSequence(5, hi([1, 2, 3, 4]));
+            hi.assert(seq().containsElement(2));
+            hi.assertNot(seq().containsElement(NaN));
         },
     },
     getSequence: process.env.NODE_ENV !== "development" ? undefined : [
@@ -91,6 +97,9 @@ export const FiniteRepeatSequence = Sequence.extend({
         return new DistinctSequence(
             transform || defaultDistinctTransform, this.source
         );
+    },
+    containsElement: function(element){
+        return containsElement(this.source, element);
     },
     repetitions: function(){
         return this.targetRepetitions;
@@ -239,11 +248,11 @@ export const FiniteRepeatSequence = Sequence.extend({
 });
 
 export const InfiniteRepeatSequence = Sequence.extend({
-    overrides: [
-        "repeat", "distinct",
-    ],
     supportRequired: [
         "copy",
+    ],
+    overrides: [
+        "repeat", "distinct", "containsElement",
     ],
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "repeatOverride": hi => {
@@ -256,6 +265,11 @@ export const InfiniteRepeatSequence = Sequence.extend({
         "distinctOverride": hi => {
             const seq = new hi.sequence.InfiniteRepeatSequence(hi("hello"));
             hi.assertEqual(seq.distinct(), "helo");
+        },
+        "containsElementOverride": hi => {
+            const seq = () => new hi.sequence.InfiniteRepeatSequence(hi([1, 2, 3, 4]));
+            hi.assert(seq().containsElement(2));
+            hi.assertNot(seq().containsElement(NaN));
         },
     },
     getSequence: process.env.NODE_ENV !== "development" ? undefined : [
@@ -284,6 +298,9 @@ export const InfiniteRepeatSequence = Sequence.extend({
         return new DistinctSequence(
             transform || defaultDistinctTransform, this.source
         );
+    },
+    containsElement: function(element){
+        return containsElement(this.source, element);
     },
     repetitions: () => Infinity,
     bounded: () => false,
