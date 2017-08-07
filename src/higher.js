@@ -211,6 +211,8 @@ import {findAll} from "./functions/findAll"; hi.register(findAll);
 import {findFirst} from "./functions/findFirst"; hi.register(findFirst);
 import {findLast} from "./functions/findLast"; hi.register(findLast);
 import {first} from "./functions/first"; hi.register(first);
+import {firstElement} from "./functions/firstElement"; hi.register(firstElement);
+import {firstElementElse} from "./functions/firstElementElse"; hi.register(firstElementElse);
 import {flatten} from "./functions/flatten"; hi.register(flatten);
 import {flattenDeep} from "./functions/flattenDeep"; hi.register(flattenDeep);
 import {from} from "./functions/from"; hi.register(from);
