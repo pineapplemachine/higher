@@ -30,7 +30,7 @@ export const containsElement = wrap({
     },
     implementation: (source, element) => {
         for(const sourceElement of source){
-            if(isEqual(element, sourceElement)) return true;
+            if(isEqual(sourceElement, element)) return true;
         }
         return false;
     },
@@ -48,7 +48,8 @@ export const containsElement = wrap({
             hi.assertNot(hi.emptySequence().containsElement(null));
         },
         "unboundedInput": hi => {
-            hi.assertFail(() => hi.repeat("!?").containsElement("x"));
+            const seq = hi.recur(i => i + "!").seed("ok");
+            hi.assertFail(() => seq.containsElement("x"));
         },
     },
 });

@@ -1,3 +1,4 @@
+import {isEqual} from "../core/isEqual";
 import {Sequence} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
@@ -8,7 +9,7 @@ import {defaultDistinctTransform} from "./distinct";
 
 export const FiniteRepeatElementSequence = Sequence.extend({
     overrides: [
-        "repeat", "distinct", "uniq",
+        "repeat", "distinct", "uniq", "containsElement",
     ],
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "repeatOverride": hi => {
@@ -36,6 +37,11 @@ export const FiniteRepeatElementSequence = Sequence.extend({
             hi.assertEqual(seq.uniq(), [0]);
             const uniqSeq = seq.uniq((a, b) => false);
             hi.assertEqual(uniqSeq, [0, 0, 0, 0]);
+        },
+        "containsElementOverride": hi => {
+            const seq = new hi.sequence.FiniteRepeatElementSequence(3, "!");
+            hi.assert(seq.containsElement("!"));
+            hi.assertNot(seq.containsElement("."));
         },
     },
     constructor: function FiniteRepeatElementSequence(
@@ -66,6 +72,9 @@ export const FiniteRepeatElementSequence = Sequence.extend({
         }else{
             return this;
         }
+    },
+    containsElement: function(element){
+        return isEqual(element, this.element);
     },
     repetitions: function(){
         return this.targetRepetitions();
@@ -124,7 +133,7 @@ export const FiniteRepeatElementSequence = Sequence.extend({
 
 export const InfiniteRepeatElementSequence = Sequence.extend({
     overrides: [
-        "repeat", "distinct", "uniq",
+        "repeat", "distinct", "uniq", "containsElement",
     ],
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "repeatOverride": hi => {
@@ -149,6 +158,11 @@ export const InfiniteRepeatElementSequence = Sequence.extend({
             hi.assert(uniqSeq.unbounded());
             hi.assert(uniqSeq.startsWith([0, 0, 0, 0, 0]));
         },
+        "containsElementOverride": hi => {
+            const seq = new hi.sequence.FiniteRepeatElementSequence(3, "!");
+            hi.assert(seq.containsElement("!"));
+            hi.assertNot(seq.containsElement("."));
+        },
     },
     constructor: function InfiniteRepeatElementSequence(element){
         this.element = element;
@@ -170,6 +184,9 @@ export const InfiniteRepeatElementSequence = Sequence.extend({
         }else{
             return this;
         }
+    },
+    containsElement: function(element){
+        return isEqual(element, this.element);
     },
     repetitions: () => Infinity,
     seed: function(element){
