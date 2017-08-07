@@ -9,9 +9,19 @@ import {defaultDistinctTransform} from "./distinct";
 
 export const FiniteRepeatElementSequence = Sequence.extend({
     overrides: [
-        "repeat", "distinct", "uniq", "containsElement",
+        "filter", "reject", "repeat", "distinct", "uniq", "containsElement",
     ],
     tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "filterOverride": hi => {
+            const seq = new hi.sequence.FiniteRepeatElementSequence(2, 1);
+            hi.assertEmpty(seq.filter(i => i !== 1));
+            hi.assert(seq.filter(i => i === 1) === seq);
+        },
+        "rejectOverride": hi => {
+            const seq = new hi.sequence.FiniteRepeatElementSequence(2, 1);
+            hi.assertEmpty(seq.reject(i => i === 1));
+            hi.assert(seq.reject(i => i !== 1) === seq);
+        },
         "repeatOverride": hi => {
             const seq = new hi.sequence.FiniteRepeatElementSequence(2, 0);
             hi.assertEqual(seq.repeat(3), new hi.sequence.FiniteRepeatElementSequence(6, 0));
@@ -50,6 +60,12 @@ export const FiniteRepeatElementSequence = Sequence.extend({
         this.targetRepetitions = repetitions;
         this.finishedRepetitions = finishedRepetitions || 0;
         this.element = element;
+    },
+    filter: function(predicate){
+        return predicate(this.element) ? this : new EmptySequence();
+    },
+    reject: function(predicate){
+        return predicate(this.element) ? new EmptySequence() : this;
     },
     repeat: function(repetitions){
         if(repetitions <= 0){
@@ -133,9 +149,19 @@ export const FiniteRepeatElementSequence = Sequence.extend({
 
 export const InfiniteRepeatElementSequence = Sequence.extend({
     overrides: [
-        "repeat", "distinct", "uniq", "containsElement",
+        "filter", "reject", "repeat", "distinct", "uniq", "containsElement",
     ],
     tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "filterOverride": hi => {
+            const seq = new hi.sequence.InfiniteRepeatElementSequence(1);
+            hi.assertEmpty(seq.filter(i => i !== 1));
+            hi.assert(seq.filter(i => i === 1) === seq);
+        },
+        "rejectOverride": hi => {
+            const seq = new hi.sequence.InfiniteRepeatElementSequence(1);
+            hi.assertEmpty(seq.reject(i => i === 1));
+            hi.assert(seq.reject(i => i !== 1) === seq);
+        },
         "repeatOverride": hi => {
             const seq = new hi.sequence.InfiniteRepeatElementSequence(0);
             hi.assert(seq.repeat() === seq);
@@ -166,6 +192,12 @@ export const InfiniteRepeatElementSequence = Sequence.extend({
     },
     constructor: function InfiniteRepeatElementSequence(element){
         this.element = element;
+    },
+    filter: function(predicate){
+        return predicate(this.element) ? this : new EmptySequence();
+    },
+    reject: function(predicate){
+        return predicate(this.element) ? new EmptySequence() : this;
     },
     repeat: function(repetitions){
         if(repetitions <= 0){
