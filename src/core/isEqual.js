@@ -1,6 +1,6 @@
 import {asSequence, validAsSequence, validAsImplicitSequence} from "./asSequence";
 import {lightWrap} from "./lightWrap";
-import {isObject, isString} from "./types";
+import {isNaN, isObject, isString} from "./types";
 
 import {NotBoundedError} from "../errors/NotBoundedError";
 
@@ -47,13 +47,17 @@ export const isEqual = lightWrap({
         let noSequence = false;
         let noString = false;
         let anyString = false;
+        let noNaN = false;
         for(const value of values){
             if(!isObject(value)) noObject = true;
             if(!validAsImplicitSequence(value)) noSequence = true
-            if(!isString(value) && !validAsSequence(value)) noString = true;
+            if(!validAsSequence(value)) noString = true;
             if(isString(value)) anyString = true;
+            if(!isNaN(value)) noNaN = true;
         }
-        if(!noSequence){
+        if(!noNaN){
+            return true;
+        }else if(!noSequence){
             return sequencesEqual(...values);
         }else if(anyString && !noString){
             return stringsEqual(...values);
@@ -84,6 +88,26 @@ export const isEqual = lightWrap({
             hi.assert(hi.isEqual([], hi.emptySequence()));
             hi.assert(hi.isEqual("", hi.emptySequence()));
             hi.assert(hi.isEqual(hi.emptySequence(), hi.emptySequence()));
+        },
+        "NaNInputs": hi => {
+            hi.assert(hi.isEqual(NaN));
+            hi.assert(hi.isEqual(NaN, NaN));
+            hi.assert(hi.isEqual(NaN, NaN, NaN));
+            hi.assertNot(hi.isEqual(0, NaN, NaN, NaN));
+            hi.assertNot(hi.isEqual(null, NaN));
+            hi.assertNot(hi.isEqual(undefined, NaN));
+            hi.assertNot(hi.isEqual(NaN, Infinity));
+        },
+        "stringInputs": hi => {
+            hi.assert(hi.isEqual("abc"));
+            hi.assert(hi.isEqual("abc", "abc"));
+            hi.assert(hi.isEqual("abc", "abc", "abc"));
+            hi.assert(hi.isEqual(hi.repeat(2, "hello"), "hellohello"));
+            hi.assertNot(hi.isEqual("abc", ""));
+            hi.assertNot(hi.isEqual("abc", "xyz"));
+            hi.assertNot(hi.isEqual("abc", "ABC"));
+            hi.assertNot(hi.isEqual("abc", null));
+            hi.assertNot(hi.isEqual(hi.repeat(2, "ok"), hi.repeat(2, "yo")));
         },
     },
 });
