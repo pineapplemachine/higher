@@ -1,10 +1,91 @@
 import {addSequenceConverter, asSequence, validAsSequence} from "./asSequence";
 import {callAsync} from "./callAsync";
 import {constants} from "./constants";
-import {joinSeries} from "./joinSeries";
+import {joinSeries} from "./english";
 import {isArray, isFunction, isIterable, isNumber, isObject} from "./types";
 
-import {ArgumentsError} from "../errors/ArgumentsError";
+// True when an unordered amount descriptor indicates that no arguments
+// of a type are accepted.
+export const unorderedAmountNone = function(amount){
+    return !amount;
+};
+
+// True when an unordered amount descriptor indicates that either one or
+// zero arguments of a type are accepted.
+export const unorderedAmountSingular = function(amount){
+    return amount === 1 || amount === "?";
+};
+
+// True when an unordered amount descriptor indicates that two or more arguments
+// would be accepted.
+export const unorderedAmountPlural = function(amount){
+    return amount && amount !== 1 && amount !== "?";
+};
+
+// True when an unordered amount descriptor indicates that zero arguments of
+// a type would be accepted or, if an index was provided, when the argument
+// at that particular index is considered to be optional by the amount given.
+export const unorderedAmountOptional = function(amount, index = undefined){
+    return amount === "?" || amount === "+" || amount === "*" || (
+        isArray(amount) && (amount[0] === 0 || index >= amount[0])
+    ) ;
+};
+
+export const normalizeExpecting = (args) => {
+    if(args && args.unordered){
+        const unordered = args.unordered;
+        for(const type of ["numbers", "functions", "sequences"]){
+            if(unordered[type]){
+                if(!unordered[type].amount){
+                    if(unordered[type].one){
+                        unordered[type].amount = 1;
+                        unordered[type].order = [unordered[type].one];
+                    }else if(unordered[type].optional){
+                        unordered[type].amount = "?";
+                        unordered[type].order = [unordered[type].optional];
+                    }else if(unordered[type].anyNumberOf){
+                        unordered[type].amount = "*";
+                        unordered[type].all = unordered[type].anyNumberOf;
+                    }else if(unordered[type].atLeastOne){
+                        unordered[type].amount = "+";
+                        unordered[type].all = unordered[type].atLeastOne;
+                    }else if(unordered[type].order){
+                        unordered[type].amount = unordered[type].order.length;
+                    }else{
+                        unordered[type] = {amount: unordered[type]};
+                    }
+                }else if(isArray(unordered[type].amount)){
+                    // [0, 1] is the same as "?"
+                    if(unordered[type].amount[0] === 0 && unordered[type].amount[1] === 1){
+                        unordered[type].amount = "?";
+                    // [0, "+"] is the same as "+"
+                    }else if(unordered[type].amount[0] === 0 && unordered[type].amount[1] === "+"){
+                        unordered[type].amount = "+";
+                    // [n, n] is the same as n
+                    }else if(unordered[type].amount[0] === unordered[type].amount[1]){
+                        unordered[type].amount = unordered[type].amount[0];
+                    }
+                }
+                const places = [
+                    "first", "second", "third", "fourth", "fifth", "sixth"
+                ];
+                for(let i = 0; i < places.length; i++){
+                    if(places[i] in unordered[type]){
+                        if(!unordered[type].order) unordered[type].order = [];
+                        unordered[type].order[i] = unordered[type][places[i]];
+                        unordered[type].order.length = Math.max(
+                            i + 1, unordered[type].order.length
+                        );
+                    }
+                }
+            }
+        }
+    }
+    if(args && args.optional){
+        args.one = expecting.optional(args.optional);
+    }
+    return args;
+};
 
 const singularNames = function(expecting){
     const names = [];
@@ -356,311 +437,4 @@ export const expecting = {
             return expect(value);
         },
     }),
-};
-
-export const unorderedTypes = [
-    {singular: "number", plural: "numbers"},
-    {singular: "function", plural: "functions"},
-    {singular: "sequence", plural: "sequences"},
-];
-
-export const describeUnordered = function(expect, validator){
-    const amount = expect.amount;
-    const singular = validator.singular;
-    const plural = validator.plural;
-    if(!amount){
-        return `no ${plural}`;
-    }else if(isNumber(amount)){
-        return `${numberName(amount)} ${+amount === 1 ? singular : plural}`;
-    }else if(isArray(amount)){
-        if(amount[1] === "+"){
-            return `at least ${numberName(amount[0])} ${+amount[0] === 1 ? singular : plural}`;
-        }else{
-            return `between ${numberName(amount[0])} and ${numberName(amount[1])} ${plural}`;
-        }
-    }else if(amount === "*"){
-        return `any number of ${plural}`;
-    }else if(amount === "+"){
-        return `at least one ${plural}`;
-    }else if(amount === "?"){
-        return `either one or zero ${plural}`;
-    }else{
-        return "";
-    }
-};
-
-// TODO: Put this elsewhere
-export const numberName = function(n){
-    const strings = [
-        "zero", "one", "two", "three", "four", "five", "six", "seven", "eight",
-        "nine", "ten", "eleven", "twelve", "thirteen", "fourteen", "fifteen",
-        "sixteen", "seventeen", "eighteen", "nineteen", "twenty",
-    ];
-    if(Math.abs(n) <= strings.length){
-        return n >= 0 ? strings[n] : "negative " + strings[n];
-    }else{
-        return "" + n;
-    }
-};
-
-// TODO: Put this elsewhere
-export const placeName = function(n){
-    const strings = [
-        "zeroth", "first", "second", "third", "fourth",
-        "fifth", "sixth", "seventh", "eighth", "ninth",
-    ];
-    if(Math.abs(n) <= strings.length){
-        return n >= 0 ? strings[n] : "negative " + strings[n];
-    }else{
-        const lastDigit = Math.abs(n) % 10;
-        if(lastDigit === 1) return n + "st";
-        else if(lastDigit === 2) return n + "nd";
-        else if(lastDigit === 3) return n + "rd";
-        else return n + "th";
-    }
-};
-
-const describeExpectingError = function(expecting){
-    return describeExpecting(expecting, true);
-};
-
-// Get an English explanation of the arguments that a function expects.
-// When "error" is truthy, the function may helpfully suggest your options for
-// addressing an error.
-export const describeExpecting = function(expecting, error = undefined){
-    if(expecting.none){
-        return "The function accepts no arguments.";
-    }else if(expecting.anything){
-        return "The function accepts any number of arguments of any type.";
-    }else if(expecting.one){
-        return `The function expects one ${expecting.one.singular} as input.`;
-    }else if(expecting.ordered){
-        if(expecting.ordered.length === 1 && expecting.plusVariadic){
-            return (
-                `The function expects one ${expecting.ordered[0].singular} plus ` +
-                "any number of additional arguments of any type as input."
-            );
-        }else{
-            const parts = [];
-            for(const expect of expecting.ordered){
-                parts.push(`${expect.article} ${expect.singular}`);
-            }
-            const base = `The function expects, in this order, ${joinSeries(parts)} `;
-            return base + (!expecting.plusVariadic ? "" :
-                "plus any number of additional arguments of any type "
-            ) + "as input.";
-        }
-    }else if(expecting.unordered){
-        const parts = [];
-        const post = [];
-        const suggestions = {};
-        for(const type of unorderedTypes){
-            if(expecting.unordered[type.plural]){
-                const expectingType = expecting.unordered[type.plural];
-                if(expectingType.all){
-                    parts.push(describeUnordered(expectingType, expectingType.all));
-                    if(error && expectingType.all.suggestion){
-                        const failedType = expectingType.all.singular;
-                        suggestions[failedType] = expectingType.all;
-                    };
-                }else if(expectingType.amount){
-                    if(expectingType.order && expectingType.order.length === 1){
-                        parts.push(describeUnordered(expectingType, expectingType.order[0]));
-                    }else{
-                        parts.push(describeUnordered(expectingType, type));
-                    }
-                }
-                if(expectingType.any){
-                    parts.push(
-                        `At least one of the ${type.plural} must be ` +
-                        `${expectingType.any.adjective}.`
-                    );
-                    if(error && expectingType.any.suggestion){
-                        const failedType = expectingType.any.singular;
-                        suggestions[failedType] = expectingType.any;
-                    };
-                }
-                if(expectingType.order){
-                    for(let i = 0; i < expectingType.order.length; i++){
-                        if(!expectingType.order[i]) continue;
-                        const mustBe = (expectingType.order[i].adjective ?
-                            expectingType.order[i].adjective :
-                            expectingType.order[i].article + " " +
-                            expectingType.order[i].singular
-                        );
-                        if(expectingType.amount === 1 || expectingType.amount === "?"){
-                            // Do nothing (handled above)
-                        }else if(unorderedAmountOptional(expectingType.amount)){
-                            post.push(
-                                `The ${placeName(i + 1)} ${type.singular}, ` +
-                                `if specified, must be ${mustBe}.`
-                            );
-                        }else{
-                            post.push(
-                                `The ${placeName(i + 1)} ${type.singular} ` +
-                                `must be ${mustBe}.`
-                            );
-                        }
-                        if(expectingType.order[i].suggestion){
-                            const failedType = expectingType.order[i].singular;
-                            suggestions[failedType] = expectingType.order[i];
-                        };
-                    }
-                }
-            }
-        }
-        let result = (parts.length === 1 ?
-            `The function expects ${joinSeries(parts)} as input.` :
-            `The function expects, in any order, ${joinSeries(parts)} as input.`
-        );
-        if(post.length) result += ` ${post.join(" ")}`;
-        for(const failedType in suggestions){
-            result += ` ${suggestions[failedType].suggestion}`;
-        }
-        return result;
-    }
-};
-
-export const validateOne = function(arg, expecting){
-    try{
-        return expecting.one(arg);
-    }catch(error){
-        throw ArgumentsError({expects: describeExpectingError(expecting)});
-    }
-}
-
-export const validateOrdered = function(args, expecting){
-    try{
-        for(let i = 0; i < expecting.ordered.length; i++){
-            args[i] = expecting.ordered[i](args[i]);
-        }
-    }catch(error){
-        throw ArgumentsError({expects: describeExpectingError(expecting)});
-    }
-    return args;
-};
-
-export const categorizeUnordered = function(args, expecting){
-    const found = {
-        numbers: [],
-        functions: [],
-        sequences: [],
-    };
-    for(const arg of args){
-        if(isNumber(arg)){
-            found.numbers.push(arg);
-        }else{
-            const sequence = asSequence(arg);
-            if(sequence) found.sequences.push(sequence);
-            else if(isFunction(arg)) found.functions.push(arg);
-            else throw ArgumentsError({expects: describeExpectingError(expecting)});
-        }
-    }
-    return found;
-};
-
-export const satisfiesUnordered = function(found, amount){
-    if(!amount){
-        return found === 0;
-    }else if(isNumber(amount)){
-        return found === amount;
-    }else if(isArray(amount)){
-        if(amount[1] === "+") return found >= amount[0];
-        else return found >= amount[0] && found >= amount[0];
-    }else if(amount === "*"){
-        return true;
-    }else if(amount === "+"){
-        return found > 0;
-    }else if(amount === "?"){
-        return found <= 1;
-    }else{
-        throw new Error(`Invalid unordered argument amount "${amount}".`);
-    }
-};
-
-export const unorderedAmountNone = function(amount){
-    return !amount;
-};
-export const unorderedAmountSingular = function(amount){
-    return amount === 1 || amount === "?";
-};
-export const unorderedAmountPlural = function(amount){
-    return amount && amount !== 1 && amount !== "?";
-};
-export const unorderedAmountOptional = function(amount){
-    return amount === "?" || amount === "+" || amount === "*" || (
-        isArray(amount) && amount[0] === 0
-    );
-};
-
-export const validateUnordered = function(args, expecting, extraSequence = undefined){
-    const found = categorizeUnordered(args, expecting);
-    const expect = {
-        numbers: expecting.unordered.numbers,
-        functions: expecting.unordered.functions,
-        sequences: expecting.unordered.sequences,
-    };
-    // Prepend a sequence passed by a method wrapper
-    if(extraSequence){
-        found.sequences.splice(0, 0, extraSequence);
-    }
-    // Check argument counts and apply "any", "all", and "ordered" validators.
-    for(const type of unorderedTypes){
-        const pl = type.plural;
-        if(!expect[pl] ? found[pl].length :
-            !satisfiesUnordered(found[pl].length, expect[pl].amount)
-        ){
-            throw ArgumentsError({expects: describeExpectingError(expecting)});
-        }
-        try{
-            if(expect[pl] && (expect[pl].all || expect[pl].any || expect[pl].order)){
-                if(expect[pl].order) for(let i = 0; i < found[pl].length; i++){
-                    if(expect[pl].order[i]){
-                        expect[pl].order[i](found[pl][i]);
-                    }
-                }
-                if(expect[pl].all) for(let i = 0; i < found[pl].length; i++){
-                    expect[pl].all(found[pl][i]);
-                }
-                if(expect[pl].any){
-                    for(let i = 0; i < found[pl].length; i++){
-                        let success = true;
-                        if(i === found[pl].length - 1){
-                            expect[pl].any(found[pl][i]);
-                            break;
-                        }
-                        try{
-                            expect[pl].any(found[pl][i]);
-                        }catch(error){
-                            success = false;
-                        }
-                        if(success) break;
-                    }
-                }
-            }
-        }catch(error){
-            throw ArgumentsError({expects: describeExpectingError(expecting)});
-        }
-    }
-    return found;
-};
-
-export const toUnorderedArguments = function(found, expecting){
-    const args = [];
-    if(expecting.unordered.numbers && expecting.unordered.numbers.amount){
-        args.push(unorderedAmountPlural(expecting.unordered.numbers.amount) ?
-            found.numbers : found.numbers[0]
-        );
-    }
-    if(expecting.unordered.functions && expecting.unordered.functions.amount){
-        args.push(unorderedAmountPlural(expecting.unordered.functions.amount) ?
-            found.functions : found.functions[0]
-        );
-    }
-    if(expecting.unordered.sequences && expecting.unordered.sequences.amount){
-        args.push(unorderedAmountPlural(expecting.unordered.sequences.amount) ?
-            found.sequences : found.sequences[0]
-        );
-    }
-    return args;
 };

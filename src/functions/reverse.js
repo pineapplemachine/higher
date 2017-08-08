@@ -19,9 +19,9 @@ export const ReverseSequence = Sequence.extend({
         "index": ["index", "length"],
         "slice": ["slice", "length"],
     },
-    overrides: [
-        "reverse",
-    ],
+    overrides: {
+        "reverse": {none: true},
+    },
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         expects: (`
