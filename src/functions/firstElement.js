@@ -13,7 +13,8 @@ export const firstElement = wrap({
             The function returns the first element in the sequence satisfying
             the predicate or, if no predicate was given, the first element in
             the sequence.
-            If the input sequence was empty, the function returns @undefined.
+            When the input sequence was empty, or a predicate was given and no
+            element satisfied it, the function returns #undefined.
         `),
         warnings: (`
             This function will produce an infinite loop if the input sequence
@@ -34,10 +35,10 @@ export const firstElement = wrap({
             `),
         },
         examples: [
-            "basicUsage", "basicUsagePredicate",
+            "basicUsage", "basicUsagePredicate", "emptyInput",
         ],
         related: [
-            "first", "firstElementElse", "emptyInput",
+            "first", "firstElementElse", "lastElement",
         ],
     },
     attachSequence: true,
@@ -65,7 +66,7 @@ export const firstElement = wrap({
         },
         "basicUsagePredicate": hi => {
             const even = i => i % 2 === 0;
-            hi.assert(hi.firstElement(even, [1, 3, 5, 6, 7, 8]) === 6);
+            hi.assert(hi.firstElement(even, [1, 2, 3, 4, 5]) === 2);
         },
         "emptyInput": hi => {
             hi.assertUndefined(hi.emptySequence().firstElement());

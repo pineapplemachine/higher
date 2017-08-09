@@ -57,7 +57,7 @@ export const first = wrap({
             "basicUsage", "basicUsagePredicate",
         ],
         related: [
-            "head", "firstElement", "dropFirst",
+            "last", "head", "firstElement", "dropFirst",
         ],
     },
     attachSequence: true,
@@ -86,9 +86,11 @@ export const first = wrap({
             return source;
         }else if(source.length){
             const sourceLength = source.length();
-            return (sourceLength <= count ? source : (
-                source.slice ? source.slice(0, count) : new HeadSequence(count, source)
-            ));
+            if(sourceLength <= count) return source;
+            else return (source.slice ?
+                source.slice(0, count) :
+                new HeadSequence(count, source)
+            );
         }else{
             return new HeadSequence(count, source);
         }
@@ -101,7 +103,7 @@ export const first = wrap({
         },
         "basicUsagePredicate": hi => {
             const string = "once upon a midnight dreary";
-            const notVowel = i => !hi("aeiou").containsElement(i);
+            const notVowel = i => !hi("aeiouy").containsElement(i);
             hi.assertEqual(hi.first(12, string, notVowel), "nc pn  mdngh");
         },
         "zeroCount": hi => {
@@ -113,15 +115,15 @@ export const first = wrap({
         },
         "singleCount": hi => {
             const even = i => i % 2 === 0;
-            hi.assertEqual(hi([1, 2, 3]).first(1), [1]);
+            hi.assertEqual(hi([1, 2, 3, 4]).first(1), [1]);
             hi.assertEqual(hi(["hello", "world"]).first(1), ["hello"]);
-            hi.assertEqual(hi([1, 2, 3]).first(1, even), [2]);
+            hi.assertEqual(hi([1, 2, 3, 4]).first(1, even), [2]);
         },
         "unspecifiedCount": hi => {
             const even = i => i % 2 === 0;
-            hi.assertEqual(hi([1, 2, 3]).first(), [1]);
+            hi.assertEqual(hi([1, 2, 3, 4]).first(), [1]);
             hi.assertEqual(hi(["hello", "world"]).first(), ["hello"]);
-            hi.assertEqual(hi([1, 2, 3]).first(even), [2]);
+            hi.assertEqual(hi([1, 2, 3, 4]).first(even), [2]);
         },
         "finiteCount": hi => {
             hi.assertEqual(hi.range(12).first(4), [0, 1, 2, 3]);
@@ -139,8 +141,9 @@ export const first = wrap({
             hi.assert(seq.first(Infinity) === seq);
         },
         "lengthLessThanCountPredicate": hi => {
-            hi.assertEqual(hi.range(5).first(10, i => i % 2 === 0), [0, 2, 4]);
-            hi.assertEqual(hi.range(5).first(Infinity, i => i % 2 === 0), [0, 2, 4]);
+            const even = i => i % 2 === 0;
+            hi.assertEqual(hi.range(5).first(10, even), [0, 2, 4]);
+            hi.assertEqual(hi.range(5).first(Infinity, even), [0, 2, 4]);
         },
         "emptyInput": hi => {
             hi.assertEmpty(hi.emptySequence().first(10));

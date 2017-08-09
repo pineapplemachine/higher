@@ -229,6 +229,8 @@ import {identity} from "./functions/identity"; hi.register(identity);
 import {isSorted} from "./functions/isSorted"; hi.register(isSorted);
 import {join} from "./functions/join"; hi.register(join);
 import {last} from "./functions/last"; hi.register(last);
+import {lastElement} from "./functions/lastElement"; hi.register(lastElement);
+import {lastElementElse} from "./functions/lastElementElse"; hi.register(lastElementElse);
 import {lexOrder} from "./functions/lexOrder"; hi.register(lexOrder);
 import {limit} from "./functions/limit"; hi.register(limit);
 import {map} from "./functions/map"; hi.register(map);
