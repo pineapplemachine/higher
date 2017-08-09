@@ -1,7 +1,8 @@
-import {constants} from "../core/constants";
 import {wrap} from "../core/wrap";
 
 import {NotBoundedError} from "../errors/NotBoundedError";
+
+export const defaultMinRelation = (a, b) => (a < b);
 
 export const min = wrap({
     name: "min",
@@ -11,8 +12,7 @@ export const min = wrap({
         expects: (`
             The function expects a sequence as input and an optional
             [relational function].
-            If no relational function was passed, the default relational
-            function \`(a, b) => (a < b)\` is used.
+            If no relational function was passed, \`a < b\` is used as a default.
         `),
         returns: (`
             The function returns the minimum element in the sequence according
@@ -36,7 +36,7 @@ export const min = wrap({
         },
     },
     implementation: (relate, source) => {
-        const relateFunc = relate || constants.defaults.relationalFunction;
+        const relateFunc = relate || defaultMinRelation;
         let min = undefined;
         let first = true;
         for(const element of source){

@@ -3,6 +3,8 @@ import {wrap} from "../core/wrap";
 
 import {NotBoundedError} from "../errors/NotBoundedError";
 
+export const defaultMaxRelation = (a, b) => (a < b);
+
 export const max = wrap({
     name: "max",
     summary: "Get the maximum element in a sequence.",
@@ -11,8 +13,7 @@ export const max = wrap({
         expects: (`
             The function expects a sequence as input and an optional
             [relational function].
-            If no relational function was passed, the default relational
-            function \`(a, b) => (a < b)\` is used.
+            If no relational function was passed, \`a < b\` is used as a default.
         `),
         returns: (`
             The function returns the maximum element in the sequence according
@@ -36,7 +37,7 @@ export const max = wrap({
         },
     },
     implementation: (relate, source) => {
-        const relateFunc = relate || constants.defaults.relationalFunction;
+        const relateFunc = relate || defaultMaxRelation;
         let max = undefined;
         let first = true;
         for(const element of source){
