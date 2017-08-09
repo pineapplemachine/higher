@@ -13,16 +13,16 @@ export const FiniteRepeatElementSequence = defineSequence({
         "back", "index", "slice", "copy", "reset",
     ],
     overrides: {
-        "filter": {one: wrap.expecting.predicate},
-        "reject": {one: wrap.expecting.predicate},
-        "repeat": {optional: wrap.expecting.number},
-        "distinct": {optional: wrap.expecting.transformation},
-        "uniq": {none: true},
-        "uniform": {optional: wrap.expecting.comparison},
-        "containsElement": {one: wrap.expecting.anything},
-        "firstElement": {optional: wrap.expecting.predicate},
-        "lastElement": {optional: wrap.expecting.predicate},
-        "firstElementElse": {
+        filter: {one: wrap.expecting.predicate},
+        reject: {one: wrap.expecting.predicate},
+        repeat: {optional: wrap.expecting.number},
+        distinct: {optional: wrap.expecting.transformation},
+        uniq: {optional: wrap.expecting.comparison},
+        uniform: {optional: wrap.expecting.comparison},
+        containsElement: {one: wrap.expecting.anything},
+        firstElement: {optional: wrap.expecting.predicate},
+        lastElement: {optional: wrap.expecting.predicate},
+        firstElementElse: {
             unordered: {
                 functions: {
                     amount: [1, 2],
@@ -31,7 +31,7 @@ export const FiniteRepeatElementSequence = defineSequence({
                 },
             },
         },
-        "lastElementElse": {
+        lastElementElse: {
             unordered: {
                 functions: {
                     amount: [1, 2],
@@ -71,6 +71,7 @@ export const FiniteRepeatElementSequence = defineSequence({
         "uniqOverride": hi => {
             const seq = new hi.sequence.FiniteRepeatElementSequence(10, 0);
             hi.assertEqual(seq.uniq(), [0]);
+            hi.assert(seq.uniq((a, b) => false) === seq);
         },
         "uniformOverride": hi => {
             const seq = new hi.sequence.FiniteRepeatElementSequence(10, 0);
@@ -241,17 +242,16 @@ export const InfiniteRepeatElementSequence = defineSequence({
         "back", "index", "slice", "copy", "reset",
     ],
     overrides: {
-        "filter": {one: wrap.expecting.predicate},
-        "reject": {one: wrap.expecting.predicate},
-        "repeat": {optional: wrap.expecting.number},
-        "distinct": {optional: wrap.expecting.transformation},
-        "uniq": {none: true},
-        "uniform": {optional: wrap.expecting.comparison},
-        "containsElement": {async: true, one: wrap.expecting.anything},
-        "firstElement": {async: true, optional: wrap.expecting.predicate},
-        "lastElement": {async: true, optional: wrap.expecting.predicate},
-        "firstElementElse": {
-            async: true,
+        filter: {one: wrap.expecting.predicate},
+        reject: {one: wrap.expecting.predicate},
+        repeat: {optional: wrap.expecting.number},
+        distinct: {optional: wrap.expecting.transformation},
+        uniq: {optional: wrap.expecting.comparison},
+        uniform: {optional: wrap.expecting.comparison},
+        containsElement: {one: wrap.expecting.anything},
+        firstElement: {optional: wrap.expecting.predicate},
+        lastElement: {optional: wrap.expecting.predicate},
+        firstElementElse: {
             unordered: {
                 functions: {
                     amount: [1, 2],
@@ -260,8 +260,7 @@ export const InfiniteRepeatElementSequence = defineSequence({
                 },
             },
         },
-        "lastElementElse": {
-            async: true,
+        lastElementElse: {
             unordered: {
                 functions: {
                     amount: [1, 2],
@@ -295,6 +294,7 @@ export const InfiniteRepeatElementSequence = defineSequence({
         },
         "uniqOverride": hi => {
             const seq = new hi.sequence.InfiniteRepeatElementSequence(0);
+            hi.assert(seq.uniq((a, b) => false) === seq);
             hi.assertEqual(seq.uniq(), [0]);
         },
         "uniformOverride": hi => {

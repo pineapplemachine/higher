@@ -37,13 +37,13 @@ export const FiniteRepeatSequence = defineSequence({
         "length", "left", "back", "index", "slice", "copy", "reset",
     ],
     overrides: {
-        "repeat": {optional: wrap.expecting.number},
-        "distinct": {optional: wrap.expecting.transformation},
-        "uniform": {optional: wrap.expecting.comparison},
-        "containsElement": {one: wrap.expecting.anything},
-        "firstElement": {optional: wrap.expecting.predicate},
-        "lastElement": {optional: wrap.expecting.predicate},
-        "firstElementElse": {
+        repeat: {optional: wrap.expecting.number},
+        distinct: {optional: wrap.expecting.transformation},
+        uniform: {optional: wrap.expecting.comparison},
+        containsElement: {one: wrap.expecting.anything},
+        firstElement: {optional: wrap.expecting.predicate},
+        lastElement: {optional: wrap.expecting.predicate},
+        firstElementElse: {
             unordered: {
                 functions: {
                     amount: [1, 2],
@@ -52,7 +52,7 @@ export const FiniteRepeatSequence = defineSequence({
                 },
             },
         },
-        "lastElementElse": {
+        lastElementElse: {
             unordered: {
                 functions: {
                     amount: [1, 2],
@@ -351,13 +351,13 @@ export const InfiniteRepeatSequence = defineSequence({
         "back", "index", "slice", "copy", "reset",
     ],
     overrides: {
-        "repeat": {optional: wrap.expecting.number},
-        "distinct": {optional: wrap.expecting.transformation},
-        "uniform": {optional: wrap.expecting.comparison},
-        "containsElement": {one: wrap.expecting.anything},
-        "firstElement": {optional: wrap.expecting.predicate},
-        "lastElement": {optional: wrap.expecting.predicate},
-        "firstElementElse": {
+        repeat: {optional: wrap.expecting.number},
+        distinct: {optional: wrap.expecting.transformation},
+        uniform: {optional: wrap.expecting.comparison},
+        containsElement: {one: wrap.expecting.anything},
+        firstElement: {optional: wrap.expecting.predicate},
+        lastElement: {optional: wrap.expecting.predicate},
+        firstElementElse: {
             unordered: {
                 functions: {
                     amount: [1, 2],
@@ -366,7 +366,7 @@ export const InfiniteRepeatSequence = defineSequence({
                 },
             },
         },
-        "lastElementElse": {
+        lastElementElse: {
             unordered: {
                 functions: {
                     amount: [1, 2],
