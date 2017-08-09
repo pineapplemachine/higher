@@ -1,4 +1,4 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {containsElement} from "./containsElement";
@@ -6,7 +6,7 @@ import {copyable} from "./copyable";
 import {DistinctSequence, defaultDistinctTransform} from "./distinct";
 import {EmptySequence} from "./emptySequence";
 
-export const FiniteRepeatSequence = Sequence.extend({
+export const FiniteRepeatSequence = defineSequence({
     supportRequired: [
         "copy",
     ],
@@ -247,7 +247,7 @@ export const FiniteRepeatSequence = Sequence.extend({
     },
 });
 
-export const InfiniteRepeatSequence = Sequence.extend({
+export const InfiniteRepeatSequence = defineSequence({
     supportRequired: [
         "copy",
     ],

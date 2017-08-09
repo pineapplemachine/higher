@@ -1,10 +1,10 @@
 import {error} from "../core/error";
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {EagerSequence} from "./eager";
 
-export const ReverseSequence = Sequence.extend({
+export const ReverseSequence = defineSequence({
     summary: "Enumerate the elements of an input sequence in reverse order.",
     supportRequired: [
         "back",

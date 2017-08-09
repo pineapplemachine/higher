@@ -1,7 +1,7 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
-export const FilterSequence = Sequence.extend({
+export const FilterSequence = defineSequence({
     summary: "Enumerate the elements of a sequence matching a predicate.",
     supportsWith: [
         "back", "has", "get", "copy", "reset"

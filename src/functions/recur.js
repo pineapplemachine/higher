@@ -1,7 +1,7 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
-export const RecurSequence = Sequence.extend({
+export const RecurSequence = defineSequence({
     constructor: function RecurSequence(
         transform, seedValue = null, frontValue = null
     ){

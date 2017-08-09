@@ -6,40 +6,54 @@ import {ArgumentsError} from "../errors/ArgumentsError";
 
 // Validate arguments for a function expecting one argument.
 export const validateOne = function(arg, expecting){
-    if(process.env.NODE_ENV !== "development"){throw new Error(); return}
-    try{
+    if(process.env.NODE_ENV !== "development"){
         return expecting.one(arg);
-    }catch(error){
-        throw ArgumentsError({
-            expects: expecting, violation: {one: true, wasNot: expecting.one}
-        });
+    }else{
+        try{
+            return expecting.one(arg);
+        }catch(error){
+            throw ArgumentsError({
+                expects: expecting, violation: {one: true, wasNot: expecting.one}
+            });
+        }
     }
 }
 
 // Validate arguments for a function expecting ordered arguments.
 export const validateOrdered = function(args, expecting){
-    if(process.env.NODE_ENV !== "development"){throw new Error(); return}
-    let i;
-    try{
+    if(process.env.NODE_ENV !== "development"){
         for(i = 0; i < expecting.ordered.length; i++){
             args[i] = expecting.ordered[i](args[i]);
         }
-    }catch(error){
-        throw ArgumentsError({
-            expects: expecting, violation: {index: i, wasNot: expecting.ordered[i]}
-        });
+        return args;
+    }else{
+        let i;
+        try{
+            for(i = 0; i < expecting.ordered.length; i++){
+                args[i] = expecting.ordered[i](args[i]);
+            }
+        }catch(error){
+            throw ArgumentsError({
+                expects: expecting, violation: {index: i, wasNot: expecting.ordered[i]}
+            });
+        }
+        return args;
     }
-    return args;
 };
 
 // Validate arguments for a function expecting unordered arguments.
-export const validateUnordered = function(args, expecting, extraSequence = undefined){
-    if(process.env.NODE_ENV !== "development"){throw new Error(); return}
-    const found = categorizeUnordered(args, expecting);
+export const validateUnordered = function(
+    args, expecting, extraSequence = undefined, alreadyFound = undefined
+){
+    const found = alreadyFound || categorizeUnordered(args, expecting);
     const expect = expecting.unordered;
     // Prepend a sequence passed by a method wrapper prior to validation.
     if(extraSequence){
         found.sequences.splice(0, 0, extraSequence);
+    }
+    // Short-circuit remaining validation logic in production builds.
+    if(process.env.NODE_ENV !== "development"){
+        return found;
     }
     // Check argument counts and apply "any", "all", and "ordered" validators.
     for(const type of ["numbers", "functions", "sequences"]){

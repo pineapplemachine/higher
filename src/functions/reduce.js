@@ -1,10 +1,10 @@
 import {asSequence, validAsBoundedSequence} from "../core/asSequence";
 import {callAsync} from "../core/callAsync";
 import {constants} from "../core/constants";
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
-export const ReduceSequence = Sequence.extend({
+export const ReduceSequence = defineSequence({
     constructor: function ReduceSequence(
         combine, source, seedValue = null, hasSeed = false, initialize = true
     ){

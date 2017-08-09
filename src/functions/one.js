@@ -1,8 +1,8 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {FiniteRepeatElementSequence, InfiniteRepeatElementSequence} from "./repeatElement";
 import {wrap} from "../core/wrap";
 
-export const OneElementSequence = Sequence.extend({
+export const OneElementSequence = defineSequence({
     summary: "A sequence containing exactly one element.",
     supportsAlways: [
         "length", "left", "back", "index", "slice", "copy", "reset",

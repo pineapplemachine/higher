@@ -1,4 +1,4 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {ArgumentsError} from "../errors/ArgumentsError";
@@ -13,7 +13,7 @@ import {ShuffleSequence} from "./shuffle";
 // This algorithm is always less performant when shuffling an entire array,
 // but is often faster than acquiring the first few elements of a longer
 // shuffled sequence.
-export const DistinctRandomIndexSequence = Sequence.extend({
+export const DistinctRandomIndexSequence = defineSequence({
     summary: "Enumerate unique indexes in random order.",
     supportsAlways: [
         "length", "left",
@@ -117,7 +117,7 @@ export const DistinctRandomIndexSequence = Sequence.extend({
 
 // Input sequence must have length and indexing.
 // TODO: This sequence probably needs a collapseBreak method.
-const SampleSequence = Sequence.extend({
+const SampleSequence = defineSequence({
     summary: "Enumerate a random subset of the elements in a sequence.",
     supportRequired: [
         "index", "length",

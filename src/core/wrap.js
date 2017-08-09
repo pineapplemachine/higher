@@ -3,7 +3,7 @@ import {expecting, Expecting, normalizeExpecting} from "./expecting";
 import {lightWrap, wrappedTestRunner} from "./lightWrap";
 import {attachSequenceMethods} from "./sequence";
 import {getWrappedFunction, getWrappedMethod} from "./wrapFunction";
-import {getWrappedFunctionAsync, getWrappedMethodAsync} from "./wrapFunction";
+import {getWrappedFunctionAsync} from "./wrapFunction";
 
 import {cleanDocs} from "../docs/cleanString";
 
@@ -25,14 +25,14 @@ export const wrap = lightWrap({
             );
         }
         info.arguments = normalizeExpecting(info.arguments);
-        const fancy = getWrappedFunction(info);
+        const fancy = getWrappedFunction(info, false);
         fancy.names = info.names || [info.name];
         Object.defineProperty(fancy, "name", {
             value: info.name || info.names[0], writable: false
         });
         fancy.sequences = info.sequences;
         fancy.errors = info.errors;
-        fancy.expects = info.arguments;
+        fancy.expects = info.expects || info.arguments;
         fancy.implementation = info.implementation;
         fancy.summary = info.summary;
         if(info.async){
@@ -41,7 +41,7 @@ export const wrap = lightWrap({
         if(info.attachSequence){
             fancy.method = getWrappedMethod(info);
             fancy.method.implementation = info.methodImplementation || info.implementation;
-            if(info.async) fancy.method.async = getWrappedMethodAsync(fancy.method);
+            if(info.async) fancy.method.async = getWrappedFunctionAsync(fancy.method);
             attachSequenceMethods(fancy);
         }
         if(info.asSequence){

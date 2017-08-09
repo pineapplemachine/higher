@@ -1,8 +1,8 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {isInteger, isString} from "../core/types";
 import {wrap} from "../core/wrap";
 
-export const StringSequence = Sequence.extend({
+export const StringSequence = defineSequence({
     summary: "Enumerate the characters in a string.",
     supportsAlways: [
         "length", "left", "back", "index", "slice", "has", "get", "copy", "reset",

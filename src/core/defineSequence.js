@@ -1,9 +1,12 @@
 import {normalizeExpecting} from "./expecting";
 import {lightWrap} from "./lightWrap";
+import {Sequence} from "./sequence";
 import {isArray} from "./types";
-import {getWrappedFunction} from "./wrapFunction";
+import {getWrappedFunction, getWrappedFunctionAsync} from "./wrapFunction";
 
 import {cleanDocs} from "../docs/cleanString";
+
+export const sequenceTypes = {};
 
 export const defineSequence = lightWrap({
     summary: "Extend the @Sequence prototype.",
@@ -12,6 +15,7 @@ export const defineSequence = lightWrap({
     },
     implementation: function defineSequence(methods){
         const constructor = methods.constructor;
+        methods.overrides = methods.overrides || [];
         constructor.prototype = Object.create(Sequence.prototype);
         Object.assign(constructor.prototype, methods);
         wrapSequenceOverrides(constructor, methods.overrides);
@@ -33,7 +37,12 @@ export const wrapSequenceOverrides = (sequence, overrides) => {
             sequence.prototype[override] = getWrappedFunction({
                 arguments: normalizeExpecting(overrides[override]),
                 implementation: sequence.prototype[override]
-            });
+            }, true);
+            if(overrides[override].async){
+                sequence.prototype[override + "Async"] = getWrappedFunctionAsync(
+                    sequence.prototype[override]
+                );
+            }
         }
     }
 };

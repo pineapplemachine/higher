@@ -1,5 +1,5 @@
 import {constants} from "../core/constants";
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {copyable} from "./copyable";
@@ -7,7 +7,7 @@ import {ForwardFindSequence, BackwardFindSequence} from "./findAll";
 import {mustSupport} from "./mustSupport";
 
 // TODO: It may be feasible to support splitting for sequences without slicing
-export const ForwardSplitSequence = Sequence.extend({
+export const ForwardSplitSequence = defineSequence({
     constructor: function ForwardSplitSequence(
         compare, source, delimiter, beginDelimiter = undefined,
         endDelimiter = undefined, frontValue = undefined,
@@ -103,7 +103,7 @@ export const ForwardSplitSequence = Sequence.extend({
     },
 });
 
-export const BackwardSplitSequence = Sequence.extend({
+export const BackwardSplitSequence = defineSequence({
     constructor: function BackwardSplitSequence(
         compare, source, delimiter, beginDelimiter = undefined,
         endDelimiter = undefined, frontValue = undefined,

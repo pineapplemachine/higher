@@ -57,8 +57,6 @@ export const attachSequenceMethods = lightWrap({
     },
 });
 
-export const sequenceTypes = {};
-
 export const Sequence = function(){};
 
 // Make all sequences iterables

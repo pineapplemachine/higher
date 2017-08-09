@@ -1,11 +1,12 @@
+import {asSequence} from "../core/asSequence";
+import {defineSequence} from "../core/defineSequence";
 import {isSequence, Sequence} from "../core/sequence";
-import {asSequence, validAsSequence} from "../core/asSequence";
 import {isArray, isIterable, isString} from "../core/types";
 import {wrap} from "../core/wrap";
 
 // TODO: Also write a backwards version of this sequence
 // TODO: This sequence probably needs a collapseBreak method
-export const FlattenDeepSequence = Sequence.extend({
+export const FlattenDeepSequence = defineSequence({
     constructor: function FlattenDeepSequence(source){
         this.source = source;
         this.sourceStack = [source];

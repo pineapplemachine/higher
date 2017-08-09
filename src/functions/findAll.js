@@ -1,4 +1,4 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 export const FindSequenceResult = function(source, low, high){
@@ -145,7 +145,7 @@ export const stepFindThreads = function(element){
     return result;
 };
 
-export const ForwardFindSequence = Sequence.extend({
+export const ForwardFindSequence = defineSequence({
     constructor: function ForwardFindSequence(
         compare, source, search, searchThreads = undefined
     ){
@@ -292,7 +292,7 @@ export const ForwardFindSequence = Sequence.extend({
     },
 });
 
-export const BackwardFindSequence = Sequence.extend({
+export const BackwardFindSequence = defineSequence({
     constructor: function BackwardFindSequence(
         compare, source, search, searchThreads = undefined
     ){

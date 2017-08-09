@@ -1,11 +1,11 @@
 import {asSequence} from "../core/asSequence";
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {copyable} from "./copyable";
 import {ForwardFlattenSequence} from "./flatten";
 
-export const ForwardJoinSequence = Sequence.extend({
+export const ForwardJoinSequence = defineSequence({
     constructor: function ForwardJoinSequence(
         source, delimiter, frontSource = undefined,
         frontDelimiter = undefined, onDelimiter = undefined
@@ -87,23 +87,13 @@ export const ForwardJoinSequence = Sequence.extend({
         this.initialize();
         return this.popFront();
     },
-    back: null,
-    popBack: null,
-    index: null,
-    slice: null,
-    copy: null,
-    reset: null,
     rebase: function(source){
         this.source = source;
-        // Must uninitialize to rebase
-        delete this.done;
-        delete this.front;
-        delete this.popFront;
         return this;
     },
 });
 
-export const BackwardJoinSequence = Sequence.extend({
+export const BackwardJoinSequence = defineSequence({
     constructor: function BackwardJoinSequence(
         source, delimiter, frontSource = undefined,
         frontDelimiter = undefined, onDelimiter = undefined
@@ -185,18 +175,8 @@ export const BackwardJoinSequence = Sequence.extend({
         this.initialize();
         return this.popFront();
     },
-    back: null,
-    popBack: null,
-    index: null,
-    slice: null,
-    copy: null,
-    reset: null,
     rebase: function(source){
         this.source = source;
-        // Must uninitialize to rebase
-        delete this.done;
-        delete this.front;
-        delete this.popFront;
         return this;
     },
 });

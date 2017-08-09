@@ -1,9 +1,9 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 // Enumerate those elements of an input sequence starting from the first
 // element matching a predicate.
-export const FromSequence = Sequence.extend({
+export const FromSequence = defineSequence({
     constructor: function FromSequence(
         predicate, source, isInclusive = true, initialized = false
     ){

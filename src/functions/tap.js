@@ -1,7 +1,7 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
-export const TapSequence = Sequence.extend({
+export const TapSequence = defineSequence({
     summary: "Enumerate elements of the input, invoking a callback per element when consumed.",
     supportsWith: [
         "length", "left", "back", "index", "slice", "has", "get", "copy", "reset"

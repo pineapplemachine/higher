@@ -1,5 +1,5 @@
 import {isEqual} from "../core/isEqual";
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {EmptySequence} from "./emptySequence";
@@ -7,7 +7,7 @@ import {OneElementSequence} from "./one";
 import {defaultUniqComparison} from "./uniq";
 import {defaultDistinctTransform} from "./distinct";
 
-export const FiniteRepeatElementSequence = Sequence.extend({
+export const FiniteRepeatElementSequence = defineSequence({
     supportsAlways: [
         "back", "index", "slice", "copy", "reset",
     ],
@@ -217,7 +217,7 @@ export const FiniteRepeatElementSequence = Sequence.extend({
     },
 });
 
-export const InfiniteRepeatElementSequence = Sequence.extend({
+export const InfiniteRepeatElementSequence = defineSequence({
     supportsAlways: [
         "back", "index", "slice", "copy", "reset",
     ],
@@ -227,10 +227,11 @@ export const InfiniteRepeatElementSequence = Sequence.extend({
         "repeat": {optional: wrap.expecting.number},
         "distinct": {optional: wrap.expecting.transformation},
         "uniq": {none: true},
-        "containsElement": {one: wrap.expecting.anything},
-        "firstElement": {optional: wrap.expecting.predicate},
-        "lastElement": {optional: wrap.expecting.predicate},
+        "containsElement": {async: true, one: wrap.expecting.anything},
+        "firstElement": {async: true, optional: wrap.expecting.predicate},
+        "lastElement": {async: true, optional: wrap.expecting.predicate},
         "firstElementElse": {
+            async: true,
             unordered: {
                 functions: {
                     amount: [1, 2],
@@ -240,6 +241,7 @@ export const InfiniteRepeatElementSequence = Sequence.extend({
             },
         },
         "lastElementElse": {
+            async: true,
             unordered: {
                 functions: {
                     amount: [1, 2],

@@ -107,6 +107,7 @@ export const Expecting = function(options){
     func.adjective = options.adjective;
     func.shortArticle = options.shortArticle;
     func.short = options.short;
+    func.sequence = options.sequence;
     func.suggestion = options.suggestion;
     return func;
 };
@@ -117,7 +118,6 @@ export const expecting = {
         singular: "value of any type",
         plural: "values of any type",
         adjective: "anything",
-        anything: true,
         validate: value => value,
     }),
     number: Expecting({
@@ -323,6 +323,7 @@ export const expecting = {
         article: "a",
         singular: "sequence",
         plural: "sequences",
+        sequence: true,
         validate: value => {
             const sequence = asSequence(value);
             if(!sequence) throw new Error();
@@ -335,6 +336,7 @@ export const expecting = {
         plural: "implicit sequences",
         adjective: "implicit",
         short: "sequence",
+        sequence: true,
         validate: value => {
             const sequence = asImplicitSequence(value);
             if(!sequence) throw new Error();
@@ -347,6 +349,7 @@ export const expecting = {
         plural: "known-bounded sequences",
         adjective: "known-bounded",
         short: "sequence",
+        sequence: true,
         suggestion: (
             "Try using a method such as 'limit', 'head', or 'assumeBounded' " +
             "to get a known-bounded sequence from one not already known to be " +
@@ -364,6 +367,7 @@ export const expecting = {
         plural: "known-unbounded sequences",
         adjective: "known-unbounded",
         short: "sequence",
+        sequence: true,
         validate: value => {
             const sequence = asSequence(value);
             if(!sequence || !sequence.unbounded()) throw new Error();
@@ -376,6 +380,7 @@ export const expecting = {
         plural: "known-bounded or known-unbounded sequences",
         adjective: "known-bounded or known-unbounded",
         short: "sequence",
+        sequence: true,
         suggestion: (
             "Try using a method such as 'limit', 'head', 'assumeBounded', " +
             "or 'assumeUnbounded' to get a known-bounded or known-unbounded " +
@@ -393,6 +398,7 @@ export const expecting = {
         plural: "bidirectional sequences",
         adjective: "bidirectional",
         short: "sequence",
+        sequence: true,
         validate: value => {
             const sequence = asSequence(value);
             if(!sequence || !sequence.back) throw new Error();

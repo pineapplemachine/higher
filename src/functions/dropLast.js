@@ -1,4 +1,4 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {BoundsUnknownError} from "../errors/BoundsUnknownError";
@@ -10,7 +10,7 @@ import {HeadSequence} from "./head";
 import {OnDemandSequence} from "./onDemandSequence";
 import {ReverseSequence} from "./reverse";
 
-export const UnboundedDropLastSequence = Sequence.extend({
+export const UnboundedDropLastSequence = defineSequence({
     summary: "Enumerate the contents of an unbounded sequence, omitting the last so many elements.",
     supportRequired: [
         "back",
@@ -89,7 +89,7 @@ export const UnboundedDropLastSequence = Sequence.extend({
     },
 });
 
-export const UnboundedDropLastPredicateSequence = Sequence.extend({
+export const UnboundedDropLastPredicateSequence = defineSequence({
     summary: "Enumerate the contents of an unbounded sequence, omitting the last so many elements satisfying a predicate.",
     supportRequired: [
         "back",

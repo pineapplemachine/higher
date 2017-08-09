@@ -1,9 +1,9 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {AssumeUnboundedSequence} from "./assumeUnbounded";
 
-export const AssumeLengthSequence = Sequence.extend({
+export const AssumeLengthSequence = defineSequence({
     summary: "Wrap an input sequence so it behaves as though it were unidirectional.",
     supportsAlways: [
         "length", "left",
