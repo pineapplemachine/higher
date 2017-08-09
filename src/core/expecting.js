@@ -441,6 +441,21 @@ export const expecting = {
             return sequence;
         },
     }),
+    reversibleSequence: Expecting({
+        type: "sequence",
+        article: "a",
+        singular: "reversible sequence",
+        plural: "reversible sequences",
+        adjective: "reversible",
+        short: "sequence",
+        sequence: true,
+        validate: value => {
+            const sequence = asSequence(value);
+            if(!sequence) throw new Error();
+            if(!sequence.back && !sequence.overrides.reverse) throw new Error();
+            return sequence;
+        },
+    }),
     exactly: option => Expecting({
         article: "exactly",
         singular: String(option),

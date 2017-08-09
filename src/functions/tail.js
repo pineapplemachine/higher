@@ -9,6 +9,52 @@ import {EmptySequence} from "./emptySequence";
 import {OnDemandSequence} from "./onDemandSequence";
 import {ReverseSequence} from "./reverse";
 
+// Get an on-demand sequence for retrieving the tail of a bidirectional sequence.
+export const BidirectionalOnDemandTailSequence = (count, source) => {
+    return new OnDemandSequence({
+        done: () => source.done(),
+        back: () => source.back(),
+        dump: () => {
+            const array = [];
+            while(!source.done() && array.length < count){
+                array.push(source.nextBack());
+            }
+            return new ReverseSequence(new ArraySequence(array));
+        },
+    });
+};
+
+// Get an on-demand sequence for retrieving the tail of a reversible sequence.
+export const ReversibleOnDemandTailSequence = (count, source) => {
+    const reversed = source.reverse();
+    return new OnDemandSequence({
+        done: () => reversed.done(),
+        dump: () => {
+            const array = [];
+            while(array.length < count && !reversed.done()){
+                array.push(reversed.nextFront());
+            }
+            return new ReverseSequence(new ArraySequence(array));
+        },
+    });
+};
+
+// Get an on-demand sequence for retrieving the tail of a unidirectional 
+// but known-bounded sequence.
+export const UnidirectionalOnDemandTailSequence = (count, source) => {
+    return new OnDemandSequence({
+        done: () => source.done(),
+        dump: () => {
+            const array = [];
+            for(const element of source) array.push(element);
+            const sequence = new ArraySequence(array);
+            return (array.length <= count ? sequence :
+                sequence.slice(array.length - count, array.length)
+            );
+        },
+    });
+};
+
 // Get a sequence for enumerating the last so many elements of the input.
 // The resulting sequence may be shorter than the length specified, but
 // will never be longer.
@@ -20,6 +66,7 @@ export const tail = wrap({
         expects: (`
             The function expects a sequence as input and the number of trailing
             elements to acquire.
+            The input sequence must be either reversible or known-bounded.
         `),
         returns: (`
             The function returns a sequence enumerating the trailing so many
@@ -42,7 +89,7 @@ export const tail = wrap({
             numbers: 1,
             sequences: {one: wrap.expecting.either(
                 wrap.expecting.boundedSequence,
-                wrap.expecting.bidirectionalSequence
+                wrap.expecting.reversibleSequence
             )},
         }
     },
@@ -56,31 +103,14 @@ export const tail = wrap({
             return (sourceLength <= count ?
                 source : source.slice(sourceLength - count, sourceLength)
             );
+        }else if(source.length && source.length() <= count){
+            return source;
         }else if(source.back){
-            if(source.length && source.length() <= count) return source;
-            else return new OnDemandSequence({
-                done: () => source.done(),
-                back: () => source.back(),
-                dump: () => {
-                    const array = [];
-                    while(!source.done() && array.length < count){
-                        array.push(source.nextBack());
-                    }
-                    return new ReverseSequence(new ArraySequence(array));
-                },
-            });
+            return BidirectionalOnDemandTailSequence(count, source);
+        }else if(source.overrides.reverse){
+            return ReversibleOnDemandTailSequence(count, source);
         }else{ // Argument validation implies source.bounded()
-            if(source.length && source.length() <= count) return source;
-            else return new OnDemandSequence({
-                done: () => source.done(),
-                dump: () => {
-                    const array = [];
-                    for(const element of source) array.push(element);
-                    return new ArraySequence(array).slice(
-                        Math.max(0, array.length - count), array.length
-                    );
-                },
-            });
+            return UnidirectionalOnDemandTailSequence(count, source);
         }
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
@@ -112,14 +142,6 @@ export const tail = wrap({
             hi.assertEqual(hi.tail(8, array), [0, 1, 2, 3, 4, 5, 6, 7]);
             hi.assertEqual(hi.tail(20, array), [0, 1, 2, 3, 4, 5, 6, 7]);
         },
-        "unboundedBidirectionalInput": hi => {
-            const seq = () => hi.repeat([0, 1, 2, 3]);
-            hi.assertEmpty(seq().tail(0));
-            hi.assertEqual(seq().tail(1), [3]);
-            hi.assertEqual(seq().tail(2), [2, 3]);
-            hi.assertEqual(seq().tail(4), [0, 1, 2, 3]);
-            hi.assertEqual(seq().tail(6), [2, 3, 0, 1, 2, 3]);
-        },
         "boundedNonSlicingInput": hi => {
             const seq = () => (
                 hi.recur(i => i + 1).seed(0).until(i => i >= 8).assumeBounded()
@@ -131,8 +153,26 @@ export const tail = wrap({
             hi.assertEqual(seq().tail(8), [0, 1, 2, 3, 4, 5, 6, 7]);
             hi.assertEqual(seq().tail(20), [0, 1, 2, 3, 4, 5, 6, 7]);
         },
-        "unidirectionalUnboundedInput": hi => {
+        "unboundedBidirectionalInput": hi => {
+            const seq = () => hi.repeat([0, 1, 2, 3]);
+            hi.assertEmpty(seq().tail(0));
+            hi.assertEqual(seq().tail(1), [3]);
+            hi.assertEqual(seq().tail(2), [2, 3]);
+            hi.assertEqual(seq().tail(4), [0, 1, 2, 3]);
+            hi.assertEqual(seq().tail(6), [2, 3, 0, 1, 2, 3]);
+        },
+        "unboundedUnidirectionalInput": hi => {
             hi.assertFail(() => hi.recur(i => i + 1).seed(0).tail(10));
+        },
+        "boundedReverseOverrideInput": hi => {
+            const seq = () => hi.repeat(4, [[1, 2, 3], [4, 5]]).flatten();
+            const even = i => i % 2 === 0;
+            hi.assertEqual(seq().tail(7), [4, 5, 1, 2, 3, 4, 5]);
+        },
+        "unboundedReverseOverrideInput": hi => {
+            const seq = () => hi.repeat([[1, 2, 3], [4, 5]]).flatten();
+            const even = i => i % 2 === 0;
+            hi.assertEqual(seq().tail(7), [4, 5, 1, 2, 3, 4, 5]);
         },
     },
 });

@@ -4,12 +4,15 @@ import {wrap} from "../core/wrap";
 
 // TODO: These sequences probably need to implement collapseBreak methods
 export const ForwardFlattenSequence = defineSequence({
+    overrides: {
+        reverse: {none: true},
+    },
     constructor: function ForwardFlattenSequence(source, frontSource = null){
         this.source = source;
         this.frontSource = frontSource;
     },
     reverse: function(){
-        return new hi.BackwardFlattenSequence(this.source);
+        return new BackwardFlattenSequence(this.source);
     },
     initialize: function(){
         while((!this.frontSource || this.frontSource.done()) && !this.source.done()){
@@ -34,8 +37,6 @@ export const ForwardFlattenSequence = defineSequence({
         this.initialize();
         return this.frontSource.done();
     },
-    length: null,
-    left: null,
     front: function(){
         this.initialize();
         return this.frontSource.front();
@@ -44,12 +45,6 @@ export const ForwardFlattenSequence = defineSequence({
         this.initialize();
         this.popFront();
     },
-    back: null,
-    popBack: null,
-    index: null,
-    slice: null,
-    copy: null,
-    reset: null,
     rebase: function(source){
         this.source = source;
         this.frontSource = source;
@@ -58,6 +53,9 @@ export const ForwardFlattenSequence = defineSequence({
 });
 
 export const BackwardFlattenSequence = defineSequence({
+    overrides: {
+        reverse: {none: true},
+    },
     constructor: function BackwardFlattenSequence(source, frontSource = null){
         this.source = source;
         this.frontSource = frontSource;
@@ -88,8 +86,6 @@ export const BackwardFlattenSequence = defineSequence({
         this.initialize();
         return this.frontSource.done();
     },
-    length: null,
-    left: null,
     front: function(){
         this.initialize();
         return this.frontSource.back();
@@ -98,12 +94,6 @@ export const BackwardFlattenSequence = defineSequence({
         this.initialize();
         this.popFront();
     },
-    back: null,
-    popBack: null,
-    index: null,
-    slice: null,
-    copy: null,
-    reset: null,
     rebase: function(source){
         this.source = source;
         this.frontSource = source;
