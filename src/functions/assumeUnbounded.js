@@ -1,7 +1,7 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
-export const AssumeUnboundedSequence = Sequence.extend({
+export const AssumeUnboundedSequence = defineSequence({
     summary: "A known-unbounded sequence enumerating the elements of a not-known-unbounded sequence.",
     supportsWith: [
         "back", "index", "slice", "has", "get", "copy", "reset",

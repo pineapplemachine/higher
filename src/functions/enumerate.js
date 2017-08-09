@@ -1,7 +1,7 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
-export const EnumerateSequence = Sequence.extend({
+export const EnumerateSequence = defineSequence({
     summary: "Enumerate elements of an input sequence with indexes attached.",
     getSequence: process.env.NODE_ENV !== "development" ? undefined : [
         // Default start index

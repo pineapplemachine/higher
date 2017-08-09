@@ -1,10 +1,10 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {EmptySequence} from "./emptySequence";
 
 // TODO: Implement indexing and possibly slicing (this might be tricky)
-export const RoundRobinSequence = Sequence.extend({
+export const RoundRobinSequence = defineSequence({
     summary: "Enumerate elements of several input sequences in turn.",
     supportsWith: {
         "length": "all", "left": "all", "copy": "all", "reset": "all",

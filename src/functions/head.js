@@ -1,10 +1,10 @@
 import {wrap} from "../core/wrap";
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 
 import {EmptySequence} from "./emptySequence";
 
 // Fallback implementation of head function for when slicing is unavailable.
-export const HeadSequence = Sequence.extend({
+export const HeadSequence = defineSequence({
     summary: "Enumerate only the first so many elements of a sequence.",
     supportsWith: [
         "length", "left", "get", "copy", "reset"

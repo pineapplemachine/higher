@@ -1,10 +1,10 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {EmptySequence} from "./emptySequence";
 import {FilterSequence} from "./filter";
 
-export const DropFirstSequence = Sequence.extend({
+export const DropFirstSequence = defineSequence({
     summary: "Enumerate the contents of a sequence, omitting the first so many elements.",
     supportsWith: [
         "length", "left", "index", "slice", "copy", "reset",
@@ -106,7 +106,7 @@ export const DropFirstSequence = Sequence.extend({
     },
 });
 
-export const DropFirstPredicateSequence = Sequence.extend({
+export const DropFirstPredicateSequence = defineSequence({
     summary: "Enumerate the contents of a sequence, omitting the first so many elements to satisfy a predicate.",
     supportsWith: [
         "copy", "reset",

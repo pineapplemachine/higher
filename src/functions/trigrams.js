@@ -1,4 +1,4 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {SlicingNgramSequence, TrackingNgramSequence} from "./ngrams";

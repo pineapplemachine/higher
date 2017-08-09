@@ -1,9 +1,9 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {AssumeLengthSequence} from "./assumeLength";
 
-export const AssumeBoundedSequence = Sequence.extend({
+export const AssumeBoundedSequence = defineSequence({
     summary: "A known-bounded sequence enumerating the elements of a not-known-bounded sequence.",
     supportsWith: [
         "length", "left", "back", "index", "slice", "has", "get", "copy", "reset",

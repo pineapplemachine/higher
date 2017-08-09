@@ -1,5 +1,5 @@
 import {isEqual} from "../core/isEqual";
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {EmptySequence} from "./emptySequence";
@@ -7,11 +7,38 @@ import {OneElementSequence} from "./one";
 import {defaultUniqComparison} from "./uniq";
 import {defaultDistinctTransform} from "./distinct";
 
-export const FiniteRepeatElementSequence = Sequence.extend({
-    overrides: [
-        "filter", "reject", "repeat", "distinct", "uniq",
-        "firstElement", "firstElementElse", "containsElement",
+export const FiniteRepeatElementSequence = defineSequence({
+    supportsAlways: [
+        "back", "index", "slice", "copy", "reset",
     ],
+    overrides: {
+        "filter": {one: wrap.expecting.predicate},
+        "reject": {one: wrap.expecting.predicate},
+        "repeat": {optional: wrap.expecting.number},
+        "distinct": {optional: wrap.expecting.transformation},
+        "uniq": {none: true},
+        "containsElement": {one: wrap.expecting.anything},
+        "firstElement": {optional: wrap.expecting.predicate},
+        "lastElement": {optional: wrap.expecting.predicate},
+        "firstElementElse": {
+            unordered: {
+                functions: {
+                    amount: [1, 2],
+                    first: wrap.expecting.callback,
+                    second: wrap.expecting.predicate,
+                },
+            },
+        },
+        "lastElementElse": {
+            unordered: {
+                functions: {
+                    amount: [1, 2],
+                    first: wrap.expecting.callback,
+                    second: wrap.expecting.predicate,
+                },
+            },
+        },
+    },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "filterOverride": hi => {
             const seq = new hi.sequence.FiniteRepeatElementSequence(2, 1);
@@ -55,14 +82,26 @@ export const FiniteRepeatElementSequence = Sequence.extend({
             hi.assert(seq.firstElement(i => true) === "!");
             hi.assertUndefined(seq.firstElement(i => false));
         },
-        // TODO: Correctly wrap override function args
-        // "firstElementElseOverride": hi => {
-        //     const seq = new hi.sequence.FiniteRepeatElementSequence(4, "!");
-        //     const zero = () => 0;
-        //     hi.assert(seq.firstElementElse(zero) === "!");
-        //     hi.assert(seq.firstElementElse(zero, i => true) === "!");
-        //     hi.assert(seq.firstElementElse(zero, i => false) === 0);
-        // },
+        "lastElementOverride": hi => {
+            const seq = new hi.sequence.FiniteRepeatElementSequence(4, "!");
+            hi.assert(seq.lastElement() === "!");
+            hi.assert(seq.lastElement(i => true) === "!");
+            hi.assertUndefined(seq.lastElement(i => false));
+        },
+        "firstElementElseOverride": hi => {
+            const seq = new hi.sequence.FiniteRepeatElementSequence(4, "!");
+            const zero = () => 0;
+            hi.assert(seq.firstElementElse(zero) === "!");
+            hi.assert(seq.firstElementElse(zero, i => true) === "!");
+            hi.assert(seq.firstElementElse(zero, i => false) === 0);
+        },
+        "lastElementElseOverride": hi => {
+            const seq = new hi.sequence.FiniteRepeatElementSequence(4, "!");
+            const zero = () => 0;
+            hi.assert(seq.lastElementElse(zero) === "!");
+            hi.assert(seq.lastElementElse(zero, i => true) === "!");
+            hi.assert(seq.lastElementElse(zero, i => false) === 0);
+        },
         "containsElementOverride": hi => {
             const seq = new hi.sequence.FiniteRepeatElementSequence(3, "!");
             hi.assert(seq.containsElement("!"));
@@ -114,6 +153,22 @@ export const FiniteRepeatElementSequence = Sequence.extend({
     },
     containsElement: function(element){
         return isEqual(element, this.element);
+    },
+    firstElement: function(predicate){
+        return !predicate || predicate(this.element) ? this.element : undefined;
+    },
+    lastElement: function(predicate){
+        return !predicate || predicate(this.element) ? this.element : undefined;
+    },
+    firstElementElse: function(functions){
+        const callback = functions[0];
+        const predicate = functions[1];
+        return !predicate || predicate(this.element) ? this.element : callback();
+    },
+    lastElementElse: function(functions){
+        const callback = functions[0];
+        const predicate = functions[1];
+        return !predicate || predicate(this.element) ? this.element : callback();
     },
     repetitions: function(){
         return this.targetRepetitions();
@@ -170,11 +225,40 @@ export const FiniteRepeatElementSequence = Sequence.extend({
     },
 });
 
-export const InfiniteRepeatElementSequence = Sequence.extend({
-    overrides: [
-        "filter", "reject", "repeat", "distinct", "uniq",
-        "firstElement", "firstElementElse", "containsElement",
+export const InfiniteRepeatElementSequence = defineSequence({
+    supportsAlways: [
+        "back", "index", "slice", "copy", "reset",
     ],
+    overrides: {
+        "filter": {one: wrap.expecting.predicate},
+        "reject": {one: wrap.expecting.predicate},
+        "repeat": {optional: wrap.expecting.number},
+        "distinct": {optional: wrap.expecting.transformation},
+        "uniq": {none: true},
+        "containsElement": {async: true, one: wrap.expecting.anything},
+        "firstElement": {async: true, optional: wrap.expecting.predicate},
+        "lastElement": {async: true, optional: wrap.expecting.predicate},
+        "firstElementElse": {
+            async: true,
+            unordered: {
+                functions: {
+                    amount: [1, 2],
+                    first: wrap.expecting.callback,
+                    second: wrap.expecting.predicate,
+                },
+            },
+        },
+        "lastElementElse": {
+            async: true,
+            unordered: {
+                functions: {
+                    amount: [1, 2],
+                    first: wrap.expecting.callback,
+                    second: wrap.expecting.predicate,
+                },
+            },
+        },
+    },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "filterOverride": hi => {
             const seq = new hi.sequence.InfiniteRepeatElementSequence(1);
@@ -214,14 +298,26 @@ export const InfiniteRepeatElementSequence = Sequence.extend({
             hi.assert(seq.firstElement(i => true) === "!");
             hi.assertUndefined(seq.firstElement(i => false));
         },
-        // TODO: Correctly wrap override function args
-        // "firstElementElseOverride": hi => {
-        //     const seq = new hi.sequence.InfiniteRepeatElementSequence("!");
-        //     const zero = () => 0;
-        //     hi.assert(seq.firstElementElse(zero) === "!");
-        //     hi.assert(seq.firstElementElse(zero, i => true) === "!");
-        //     hi.assert(seq.firstElementElse(zero, i => false) === 0);
-        // },
+        "lastElementOverride": hi => {
+            const seq = new hi.sequence.FiniteRepeatElementSequence(4, "!");
+            hi.assert(seq.lastElement() === "!");
+            hi.assert(seq.lastElement(i => true) === "!");
+            hi.assertUndefined(seq.lastElement(i => false));
+        },
+        "firstElementElseOverride": hi => {
+            const seq = new hi.sequence.InfiniteRepeatElementSequence("!");
+            const zero = () => 0;
+            hi.assert(seq.firstElementElse(zero) === "!");
+            hi.assert(seq.firstElementElse(zero, i => true) === "!");
+            hi.assert(seq.firstElementElse(zero, i => false) === 0);
+        },
+        "lastElementElseOverride": hi => {
+            const seq = new hi.sequence.InfiniteRepeatElementSequence("!");
+            const zero = () => 0;
+            hi.assert(seq.lastElementElse(zero) === "!");
+            hi.assert(seq.lastElementElse(zero, i => true) === "!");
+            hi.assert(seq.lastElementElse(zero, i => false) === 0);
+        },
         "containsElementOverride": hi => {
             const seq = new hi.sequence.InfiniteRepeatElementSequence("!");
             hi.assert(seq.containsElement("!"));
@@ -265,6 +361,22 @@ export const InfiniteRepeatElementSequence = Sequence.extend({
     },
     containsElement: function(element){
         return isEqual(element, this.element);
+    },
+    firstElement: function(predicate){
+        return !predicate || predicate(this.element) ? this.element : undefined;
+    },
+    lastElement: function(predicate){
+        return !predicate || predicate(this.element) ? this.element : undefined;
+    },
+    firstElementElse: function(functions){
+        const callback = functions[0];
+        const predicate = functions[1];
+        return !predicate || predicate(this.element) ? this.element : callback();
+    },
+    lastElementElse: function(functions){
+        const callback = functions[0];
+        const predicate = functions[1];
+        return !predicate || predicate(this.element) ? this.element : callback();
     },
     repetitions: () => Infinity,
     seed: function(element){

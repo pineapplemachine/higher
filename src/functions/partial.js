@@ -1,4 +1,4 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {isArray} from "../core/types";
 import {wrap} from "../core/wrap";
 

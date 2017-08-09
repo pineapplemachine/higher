@@ -35,7 +35,7 @@ export const string = wrap({
     attachSequence: true,
     async: true,
     arguments: {
-        one: wrap.expecting.iterable
+        one: wrap.expecting.iterable,
     },
     implementation: (source) => {
         if(isString(source)) return source;
@@ -54,9 +54,8 @@ export const string = wrap({
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {
-            const strings = ["what", "lovely", "weather"];
-            const joined = hi.join(strings, " ").assumeBounded();
-            hi.assert(joined.string() === "what lovely weather"); 
+            const seq = hi(["what", " ", "lovely", " ", "weather"]);
+            hi.assert(seq.string() === "what lovely weather"); 
         },
         "flattenSubSequences": hi => {
             const sub = hi(["hello", " ", "world"]);

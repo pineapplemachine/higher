@@ -1,9 +1,9 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {EmptySequence} from "./emptySequence";
 
-export const ConcatSequence = Sequence.extend({
+export const ConcatSequence = defineSequence({
     summary: "Concatenate the contents of some input sequences.",
     supportsWith: {
         "length": "all", "left": "all", "back": "all",

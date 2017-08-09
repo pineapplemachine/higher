@@ -1,9 +1,9 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {NumberRangeSequence} from "./range";
 
-export const CounterSequence = Sequence.extend({
+export const CounterSequence = defineSequence({
     summary: "Count up from a number, continuously incrementing by one.",
     supportsAlways: [
         "back", "index", "slice", "copy", "reset"

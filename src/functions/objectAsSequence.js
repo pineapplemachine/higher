@@ -1,4 +1,4 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {isPlainObject} from "../core/types";
 import {wrap} from "../core/wrap";
 
@@ -35,7 +35,7 @@ const pushSorted = (value, array) => {
     }
 };
 
-export const ObjectSequence = Sequence.extend({
+export const ObjectSequence = defineSequence({
     summary: "Enumerate the key, value pairs of an object.",
     supportsWith: [],
     supportsAlways: [
@@ -199,7 +199,7 @@ export const ObjectSequence = Sequence.extend({
     rebase: null,
 });
 
-export const ObjectValuesSequence = Sequence.extend({
+export const ObjectValuesSequence = defineSequence({
     summary: "Enumerate the values of an object.",
     supportsWith: [],
     supportsAlways: [

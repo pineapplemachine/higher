@@ -1,9 +1,9 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {FiniteRepeatElementSequence} from "./repeatElement";
 
-export const FinitePadRightSequence = Sequence.extend({
+export const FinitePadRightSequence = defineSequence({
     summary: "Enumerate an finitely repeated element after a source sequence.",
     supportsWith: [
         "length", "left", "back", "index", "slice", "copy", "reset",
@@ -127,7 +127,7 @@ export const FinitePadRightSequence = Sequence.extend({
     },
 });
 
-export const InfinitePadRightSequence = Sequence.extend({
+export const InfinitePadRightSequence = defineSequence({
     summary: "Enumerate an infinitely repeated element after a source sequence.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",

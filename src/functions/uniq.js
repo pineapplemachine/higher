@@ -1,10 +1,10 @@
 import {isEqual} from "../core/isEqual";
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 export const defaultUniqComparison = isEqual;
 
-export const UniqSequence = Sequence.extend({
+export const UniqSequence = defineSequence({
     summary: "Enumerate only those elements of an input sequence not equivalent to their predecessor.",
     supportsWith: [
         "copy", "reset",
