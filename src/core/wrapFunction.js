@@ -3,7 +3,7 @@ import {callAsync} from "./callAsync";
 import {lightWrap} from "./lightWrap";
 import {isSequence} from "./sequence";
 import {validateOne, validateOrdered, validateUnordered} from "./validateExpecting";
-import {toUnorderedArguments} from "./validateExpecting";
+import {categorizeUnordered, toUnorderedArguments} from "./validateExpecting";
 
 const testWrappedFunction = process.env.NODE_ENV !== "development" ? undefined : (info, test) => {
     test(getWrappedFunction(info, false));
