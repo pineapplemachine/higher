@@ -1,8 +1,8 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 // A chronically empty sequence.
-export const EmptySequence = Sequence.extend({
+export const EmptySequence = defineSequence({
     summary: "An absolutely empty sequence",
     getSequence: process.env.NODE_ENV !== "development" ? undefined : [
         hi => new EmptySequence(),

@@ -1,4 +1,4 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {ArgumentsError} from "../errors/ArgumentsError";
@@ -10,7 +10,7 @@ import {InfiniteRepeatElementSequence} from "./repeatElement";
 
 // Implement chunking for sequences that are copyable but don't have
 // both slicing and known length.
-export const ForwardChunkSequence = Sequence.extend({
+export const ForwardChunkSequence = defineSequence({
     summary: "Enumerate sub-sequence chunks of an input sequence.",
     supportRequired: [
         "copy"
@@ -94,7 +94,7 @@ export const ForwardChunkSequence = Sequence.extend({
 });
 
 // Implement chunking for sequences with slicing and known length.
-export const BidirectionalChunkSequence = Sequence.extend({
+export const BidirectionalChunkSequence = defineSequence({
     summary: "Enumerate sub-sequence chunks of an input sequence.",
     supportRequired: [
         "slice", "length",

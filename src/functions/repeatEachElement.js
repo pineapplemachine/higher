@@ -1,10 +1,10 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {EmptySequence} from "./emptySequence";
 import {FiniteRepeatElementSequence} from "./repeatElement";
 
-export const FiniteRepeatEachElementSequence = Sequence.extend({
+export const FiniteRepeatEachElementSequence = defineSequence({
     summary: "Repeat each element of an input sequence some finite number of times.",
     supportsWith: {
         "length": "any", "left": "any", "index": "any",
@@ -171,7 +171,7 @@ export const FiniteRepeatEachElementSequence = Sequence.extend({
     },
 });
 
-export const InfiniteRepeatEachElementSequence = Sequence.extend({
+export const InfiniteRepeatEachElementSequence = defineSequence({
     summary: "Infinitely repeat each element of an input sequence,",
     supportsAlways: [
         "index", "slice", "has", "get", "copy", "reset",

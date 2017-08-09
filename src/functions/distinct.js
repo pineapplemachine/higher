@@ -1,9 +1,9 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 export const defaultDistinctTransform = element => element;
 
-export const DistinctSequence = Sequence.extend({
+export const DistinctSequence = defineSequence({
     summary: "Enumerate only those elements of an input sequence not equal to any other.",
     supportsWith: [
         "copy", "reset",

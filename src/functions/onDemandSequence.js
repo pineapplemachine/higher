@@ -1,9 +1,9 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {ArraySequence} from "./arrayAsSequence";
 
-export const OnDemandSequence = Sequence.extend({
+export const OnDemandSequence = defineSequence({
     summary: "Eagerly compute the contents of a sequence, but only when first needed.",
     supportsAlways: [
         "length", "left", "back", "index", "slice", "copy", "reset",

@@ -1,8 +1,8 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {isArray, isInteger} from "../core/types";
 import {wrap} from "../core/wrap";
 
-export const ArraySequence = Sequence.extend({
+export const ArraySequence = defineSequence({
     summary: "Enumerate the contents of an array.",
     supportsWith: [],
     supportsAlways: [

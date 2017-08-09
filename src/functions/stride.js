@@ -1,4 +1,4 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {EmptySequence} from "./emptySequence";
@@ -6,7 +6,7 @@ import {OneElementSequence} from "./one";
 import {InfiniteRepeatElementSequence} from "./repeatElement";
 
 // Implement stride using repeated popping of elements.
-export const PoppingStrideSequence = Sequence.extend({
+export const PoppingStrideSequence = defineSequence({
     summary: "Enumerate only every nth element of an input sequence.",
     supportsWith: [
         "length", "left", "back", "copy", "reset",
@@ -155,7 +155,7 @@ export const PoppingStrideSequence = Sequence.extend({
 
 // Implement stride using indexing.
 // For this to be available, the source must support index and length methods.
-export const IndexStrideSequence = Sequence.extend({
+export const IndexStrideSequence = defineSequence({
     summary: "Enumerate only every nth element of an input sequence.",
     supportRequired: [
         "index", "length",

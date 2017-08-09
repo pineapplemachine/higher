@@ -1,6 +1,7 @@
+import {isEqual} from "../core/isEqual";
 import {wrap} from "../core/wrap";
 
-import {mustSupport} from "./mustSupport";
+import {EagerSequence} from "./eager";
 
 // Determine equality of one or more sequences given a comparison function.
 // When only one sequence is given as input, the output is always true.
@@ -22,9 +23,9 @@ export const endsWith = wrap({
             if(source.length() < search.length()) return false;
         }
         // Both input sequences must be bidirectional
-        source = mustSupport(source, "back");
-        search = mustSupport(search, "back");
-        const compareFunc = compare || ((a, b) => (a === b));
+        source = source.back ? source : new EagerSequence(source);
+        search = search.back ? search : new EagerSequence(search);
+        const compareFunc = compare || isEqual;
         while(!search.done()){
             if(source.done() || !compareFunc(source.nextBack(), search.nextBack())){
                 return false;

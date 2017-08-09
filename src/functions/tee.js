@@ -1,7 +1,7 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
-export const TeeSequence = Sequence.extend({
+export const TeeSequence = defineSequence({
     constructor: function TeeSequence(
         source, elementBuffer, bufferIndex = undefined
     ){

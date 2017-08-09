@@ -1,8 +1,8 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {isArray, isIterable} from "../core/types";
 import {wrap} from "../core/wrap";
 
-export const IterableSequence = Sequence.extend({
+export const IterableSequence = defineSequence({
     summary: "Enumerate the element of an input iterable.",
     supportsWith: [],
     supportsAlways: [],

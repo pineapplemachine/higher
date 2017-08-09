@@ -1,10 +1,10 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {InfiniteRepeatElementSequence} from "./repeatElement";
 
 // Result of calling range with a step of exactly 1.
-export const NumberRangeSequence = Sequence.extend({
+export const NumberRangeSequence = defineSequence({
     summary: "Enumerate numbers from a low until a high bound, incrementing by one each step.",
     supportsAlways: [
         "length", "left", "back", "index", "slice", "copy", "reset",
@@ -111,7 +111,7 @@ export const NumberRangeSequence = Sequence.extend({
 });
 
 // Result of calling range with a step of greater than 0.
-export const ForwardNumberRangeSequence = Sequence.extend({
+export const ForwardNumberRangeSequence = defineSequence({
     summary: "Enumerate numbers from a low until a high bound, incrementing by some positive step.",
     supportsAlways: [
         "length", "left", "back", "index", "slice", "copy", "reset",
@@ -231,7 +231,7 @@ export const ForwardNumberRangeSequence = Sequence.extend({
 });
 
 // Result of calling range with a step of less than 0.
-export const BackwardNumberRangeSequence = Sequence.extend({
+export const BackwardNumberRangeSequence = defineSequence({
     summary: "Enumerate numbers from a high until a low bound, incrementing by some negative step.",
     supportsAlways: [
         "length", "left", "back", "index", "slice", "copy", "reset",

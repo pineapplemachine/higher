@@ -1,11 +1,11 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {ArraySequence} from "./arrayAsSequence";
 import {EmptySequence} from "./emptySequence";
 import {InfiniteRepeatElementSequence} from "./repeatElement";
 
-export const SlicingNgramSequence = Sequence.extend({
+export const SlicingNgramSequence = defineSequence({
     summary: "Enumerate ngrams in a sequence.",
     supportRequired: [
         "length", "slice",
@@ -105,7 +105,7 @@ export const SlicingNgramSequence = Sequence.extend({
     },
 });
 
-export const TrackingNgramSequence = Sequence.extend({
+export const TrackingNgramSequence = defineSequence({
     summary: "Enumerate ngrams in a sequence.",
     supportsWith: [
         "index", "slice", "copy", "reset",

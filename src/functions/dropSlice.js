@@ -1,11 +1,11 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {ConcatSequence} from "./concat";
 import {DropHeadSequence} from "./dropHead";
 import {DropTailSequence} from "./dropTail";
 import {EmptySequence} from "./emptySequence";
 import {wrap} from "../core/wrap";
 
-export const DropSliceSequence = Sequence.extend({
+export const DropSliceSequence = defineSequence({
     constructor: function DropSliceSequence(dropLow, dropHigh, source){
         if(dropLow === 0){
             throw "Error creating drop slice sequence: Use dropHead instead.";

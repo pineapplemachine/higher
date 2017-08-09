@@ -110,7 +110,7 @@ export const collapse = wrap({
     arguments: {
         unordered: {
             sequences: {one: wrap.expecting.boundedSequence},
-        }
+        },
     },
     implementation: (sequence) => {
         // Get the sequence chain and keep track of any breaks found therein

@@ -1,7 +1,7 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
-export const UntilSequence = Sequence.extend({
+export const UntilSequence = defineSequence({
     summary: "Enumerate elements in the input sequence until one satisfying a predicate is found.",
     supportsWith: [
         "index", "copy", "reset",

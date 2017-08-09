@@ -121,9 +121,15 @@ import {assertFailWith} from "./core/assert"; hi.register(assertFailWith);
 import {callAsync} from "./core/callAsync"; hi.register(callAsync);
 // core/constants
 import {constants} from "./core/constants"; hi.constant = constants;
+// core/defineSequence
+import {sequenceTypes} from "./core/defineSequence"; hi.sequence = sequenceTypes;
+import {defineSequence} from "./core/defineSequence"; hi.register(defineSequence);
 // core/error
 import {errorTypes} from "./core/error"; hi.error = errorTypes;
 import {defineError} from "./core/error"; hi.register(defineError);
+// core/expecting
+import {expecting} from "./core/expecting"; hi.expecting = expecting;
+import {Expecting} from "./core/expecting"; hi.Expecting = Expecting;
 // core/isEqual
 import {isEqual} from "./core/isEqual"; hi.register(isEqual);
 import {sequencesEqual} from "./core/isEqual"; hi.register(sequencesEqual);
@@ -133,11 +139,9 @@ import {valuesEqual} from "./core/isEqual"; hi.register(valuesEqual);
 // core/lightWrap
 /* imported above */ hi.register(lightWrap);
 // core/sequence
-import {sequenceTypes} from "./core/sequence"; hi.sequence = sequenceTypes;
 import {Sequence} from "./core/sequence"; hi.Sequence = Sequence;
 import {attachSequenceMethods} from "./core/sequence"; hi.register(attachSequenceMethods);
 import {isSequence} from "./core/sequence"; hi.register(isSequence);
-import {defineSequence} from "./core/sequence"; hi.register(defineSequence);
 // core/types
 import {isUndefined} from "./core/types"; hi.register(isUndefined);
 import {isNull} from "./core/types"; hi.register(isNull);
@@ -159,6 +163,8 @@ import {isFunction} from "./core/types"; hi.register(isFunction);
 import {isIterable} from "./core/types"; hi.register(isIterable);
 // core/wrap
 import {wrap} from "./core/wrap"; hi.register(wrap);
+// core/wrapFunction
+import {getWrappedFunction} from "./core/wrapFunction"; hi.register(getWrappedFunction);
 // docs/glossary
 import {glossary} from "./docs/glossary"; hi.glossary = glossary;
 // test/contracts

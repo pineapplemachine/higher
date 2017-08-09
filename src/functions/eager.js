@@ -1,11 +1,11 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {NotBoundedError} from "../errors/NotBoundedError";
 
 import {ArraySequence} from "./arrayAsSequence";
 
-export const EagerSequence = Sequence.extend({
+export const EagerSequence = defineSequence({
     summary: "Wrap a sequence with one supporting all sequence operations.",
     supportsWith: [
         "has", "get"

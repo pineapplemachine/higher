@@ -1,115 +1,4 @@
-import {callAsync} from "./callAsync";
-import {constants} from "./constants";
-import {error} from "./error";
 import {lightWrap} from "./lightWrap";
-import {isArray, isObject, isString} from "./types";
-
-import {cleanDocs} from "../docs/cleanString";
-
-export const defineSequence = lightWrap({
-    summary: "Extend the @Sequence prototype.",
-    docs: process.env.NODE_ENV !== "development" ? undefined : {
-        introduced: "higher@1.0.0",
-    },
-    implementation: function defineSequence(methods){
-        const constructor = methods.constructor;
-        constructor.prototype = Object.create(Sequence.prototype);
-        Object.assign(constructor.prototype, methods);
-        sequenceTypes[constructor.name] = constructor;
-        if(process.env.NODE_ENV === "development"){
-            constructor.getSequence = methods.getSequence;
-            constructor.docs = cleanDocs(constructor.docs);
-            constructor.tests = methods.tests;
-            constructor.test = sequenceTestRunner(constructor);
-        }
-        return constructor;
-    },
-});
-
-export const sequenceTestRunner = (sequence) => {
-    if(process.env.NODE_ENV !== "development") return undefined;
-    if(!sequence.getSequence && !sequence.tests) return undefined;
-    return hi => {
-        const result = {
-            pass: [],
-            fail: [],
-        }
-        if(sequence.getSequence) for(const sequenceGetter of sequence.getSequence){
-            for(const contractName in hi.contract){
-                const contract = hi.contract[contractName];
-                let success = true;
-                try{
-                    contract.enforce(() => sequenceGetter(hi));
-                }catch(error){
-                    success = false;
-                    result.fail.push({
-                        name: `${sequence.name}.contract.${contractName}`,
-                        sequence: sequence,
-                        contract: contract,
-                        sequenceGetter: sequenceGetter,
-                        error: error
-                    });
-                }
-                if(success){
-                    result.pass.push({
-                        name: `${sequence.name}.contract.${contractName}`,
-                        sequence: sequence,
-                        contract: contract,
-                    });
-                }
-            }
-        }
-        if(sequence.tests) for(const testName in sequence.tests){
-            const test = sequence.tests[testName];
-            let success = true;
-            try{
-                test(hi);
-            }catch(error){
-                success = false;
-                result.fail.push({
-                    name: `${sequence.name}.test.${testName}`,
-                    sequence: sequence,
-                    test: test,
-                    error: error,
-                });
-            }
-            if(success){
-                result.pass.push({
-                    name: `${sequence.name}.test.${testName}`,
-                    sequence: sequence,
-                    test: test,
-                });
-            }
-        }
-        return result;
-    };
-};
-
-export const attachSequenceMethods = lightWrap({
-    summary: "Attach a method from a wrapped function to the @Sequence prototype.",
-    internal: true,
-    docs: process.env.NODE_ENV !== "development" ? undefined : {
-        introduced: "higher@1.0.0",
-        expects: (`
-            The function expects a wrapped function as produced by a call to
-            @wrap.
-        `),
-        returns: (`
-            The function returns its input.
-        `),
-    },
-    implementation: function attachSequenceMethods(wrapped){
-        if(wrapped.method){
-            for(const name of wrapped.names){
-                Sequence.prototype[name] = wrapped.method;
-                if(wrapped.method.async){
-                    Sequence.prototype[name + "Async"] = wrapped.method.async;
-                }
-            }
-        }
-        return wrapped;
-    },
-});
 
 export const isSequence = lightWrap({
     summary: "Determine whether a value is some @Sequence.",
@@ -142,10 +31,33 @@ export const isSequence = lightWrap({
     },
 });
 
-export const sequenceTypes = {};
+export const attachSequenceMethods = lightWrap({
+    summary: "Attach a method from a wrapped function to the @Sequence prototype.",
+    internal: true,
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The function expects a wrapped function as produced by a call to
+            @wrap.
+        `),
+        returns: (`
+            The function returns its input.
+        `),
+    },
+    implementation: function attachSequenceMethods(wrapped){
+        if(wrapped.method){
+            for(const name of wrapped.names){
+                Sequence.prototype[name] = wrapped.method;
+                if(wrapped.method.async){
+                    Sequence.prototype[name + "Async"] = wrapped.method.async;
+                }
+            }
+        }
+        return wrapped;
+    },
+});
 
 export const Sequence = function(){};
-Sequence.extend = defineSequence;
 
 // Make all sequences iterables
 Sequence.prototype[Symbol.iterator] = function(){
@@ -170,6 +82,7 @@ Sequence.prototype.nextBack = function(){
 };
 
 // TODO: Stop using this
+// https://github.com/pineapplemachine/higher/issues/53
 Sequence.prototype.maskAbsentMethods = function(source){
     if(!source.back){
         this.back = undefined;

@@ -1,9 +1,9 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {asSequence, validAsSequence} from "../core/asSequence";
 import {wrap} from "../core/wrap";
 
 // TODO: These sequences probably need to implement collapseBreak methods
-export const ForwardFlattenSequence = Sequence.extend({
+export const ForwardFlattenSequence = defineSequence({
     constructor: function ForwardFlattenSequence(source, frontSource = null){
         this.source = source;
         this.frontSource = frontSource;
@@ -57,7 +57,7 @@ export const ForwardFlattenSequence = Sequence.extend({
     },
 });
 
-export const BackwardFlattenSequence = Sequence.extend({
+export const BackwardFlattenSequence = defineSequence({
     constructor: function BackwardFlattenSequence(source, frontSource = null){
         this.source = source;
         this.frontSource = frontSource;

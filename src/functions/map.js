@@ -1,10 +1,10 @@
-import {Sequence} from "../core/sequence";
+import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {EmptySequence} from "./emptySequence";
 
 // Map sequence optimized for one input sequence.
-export const SingularMapSequence = Sequence.extend({
+export const SingularMapSequence = defineSequence({
     summary: "Enumerate transformed elements of a source sequence.",
     supportsWith: [
         "length", "left", "back", "index", "slice", "has", "get", "copy", "reset"
@@ -76,7 +76,7 @@ export const SingularMapSequence = Sequence.extend({
 });
 
 // Map sequence for any number of input sequences.
-export const PluralMapSequence = Sequence.extend({
+export const PluralMapSequence = defineSequence({
     summary: "Enumerate transformed elements of any number of source sequences.",
     supportsWith: {
         "length": "all", "left": "all", "index": "all", "slice": "all",
