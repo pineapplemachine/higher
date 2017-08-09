@@ -143,7 +143,10 @@ export const getWrappedFunctionUnordered = function(info, isMethod, forceProd){
     }else{
         return function(...args){
             const found = categorizeUnordered(args);
-            if(found.sequences[0] && found.sequences[0].overrides[info.name]){
+            if(
+                found.sequences[0] && found.sequences[0].overrides &&
+                found.sequences[0].overrides[info.name]
+            ){
                 const sequence = found.sequences[0];
                 found.sequences.splice(0, 1);
                 const validated = validateUnordered(

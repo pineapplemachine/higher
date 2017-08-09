@@ -44,6 +44,8 @@ export const wrapSequenceOverrides = (sequence, overrides) => {
                 );
             }
         }
+    }else{
+        sequence.prototype.overrides = undefined;
     }
 };
 
