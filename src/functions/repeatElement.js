@@ -2,10 +2,11 @@ import {isEqual} from "../core/isEqual";
 import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
+import {defaultDistinctTransform} from "./distinct";
 import {EmptySequence} from "./emptySequence";
 import {OneElementSequence} from "./one";
+import {defaultUniformComparison} from "./uniform";
 import {defaultUniqComparison} from "./uniq";
-import {defaultDistinctTransform} from "./distinct";
 
 export const FiniteRepeatElementSequence = defineSequence({
     supportsAlways: [
@@ -17,6 +18,7 @@ export const FiniteRepeatElementSequence = defineSequence({
         "repeat": {optional: wrap.expecting.number},
         "distinct": {optional: wrap.expecting.transformation},
         "uniq": {none: true},
+        "uniform": {optional: wrap.expecting.comparison},
         "containsElement": {one: wrap.expecting.anything},
         "firstElement": {optional: wrap.expecting.predicate},
         "lastElement": {optional: wrap.expecting.predicate},
@@ -69,6 +71,11 @@ export const FiniteRepeatElementSequence = defineSequence({
         "uniqOverride": hi => {
             const seq = new hi.sequence.FiniteRepeatElementSequence(10, 0);
             hi.assertEqual(seq.uniq(), [0]);
+        },
+        "uniformOverride": hi => {
+            const seq = new hi.sequence.FiniteRepeatElementSequence(10, 0);
+            hi.assert(seq.uniform());
+            hi.assertNot(seq.uniform((a, b) => false));
         },
         "nonIdentityUniqOverride": hi => {
             const seq = new hi.sequence.FiniteRepeatElementSequence(4, 0);
@@ -142,6 +149,10 @@ export const FiniteRepeatElementSequence = defineSequence({
         }else{
             return this;
         }
+    },
+    uniform: function(compare){
+        const compareFunc = compare || defaultUniformComparison;
+        return compareFunc(this.element, this.element);
     },
     containsElement: function(element){
         return isEqual(element, this.element);
@@ -227,6 +238,7 @@ export const InfiniteRepeatElementSequence = defineSequence({
         "repeat": {optional: wrap.expecting.number},
         "distinct": {optional: wrap.expecting.transformation},
         "uniq": {none: true},
+        "uniform": {optional: wrap.expecting.comparison},
         "containsElement": {async: true, one: wrap.expecting.anything},
         "firstElement": {async: true, optional: wrap.expecting.predicate},
         "lastElement": {async: true, optional: wrap.expecting.predicate},
@@ -276,6 +288,11 @@ export const InfiniteRepeatElementSequence = defineSequence({
         "uniqOverride": hi => {
             const seq = new hi.sequence.InfiniteRepeatElementSequence(0);
             hi.assertEqual(seq.uniq(), [0]);
+        },
+        "uniformOverride": hi => {
+            const seq = new hi.sequence.InfiniteRepeatElementSequence(0);
+            hi.assert(seq.uniform());
+            hi.assertNot(seq.uniform((a, b) => false));
         },
         "nonIdentityUniqOverride": hi => {
             const seq = new hi.sequence.InfiniteRepeatElementSequence(0);
@@ -342,6 +359,10 @@ export const InfiniteRepeatElementSequence = defineSequence({
         }else{
             return this;
         }
+    },
+    uniform: function(compare){
+        const compareFunc = compare || defaultUniformComparison;
+        return compareFunc(this.element, this.element);
     },
     containsElement: function(element){
         return isEqual(element, this.element);

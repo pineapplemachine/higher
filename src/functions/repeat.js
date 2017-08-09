@@ -5,14 +5,39 @@ import {containsElement} from "./containsElement";
 import {copyable} from "./copyable";
 import {DistinctSequence, defaultDistinctTransform} from "./distinct";
 import {EmptySequence} from "./emptySequence";
+import {defaultUniformComparison} from "./uniform";
+
+// Implementation used by finite and infinite repeat sequences to override uniform.
+const repeatUniformOverride = function(compare){
+    const compareFunc = compare || defaultUniformComparison;
+    let first = true;
+    let firstElement = undefined;
+    let lastElement = undefined;
+    for(const element of this.source){
+        if(first){
+            firstElement = element;
+            first = false;
+        }else if(!compareFunc(element, lastElement)){
+            return false;
+        }
+        lastElement = element;
+    }
+    return first || compareFunc(lastElement, firstElement);
+};
 
 export const FiniteRepeatSequence = defineSequence({
     supportRequired: [
         "copy",
     ],
-    overrides: [
-        "repeat", "distinct", "containsElement",
+    supportsWith: [
+        "length", "left", "back", "index", "slice", "copy", "reset",
     ],
+    overrides: {
+        "repeat": {optional: wrap.expecting.number},
+        "distinct": {optional: wrap.expecting.transformation},
+        "uniform": {optional: wrap.expecting.comparison},
+        "containsElement": {one: wrap.expecting.anything},
+    },
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         expects: (`
@@ -38,6 +63,14 @@ export const FiniteRepeatSequence = defineSequence({
         "distinctOverride": hi => {
             const seq = new hi.sequence.FiniteRepeatSequence(3, hi("hello"));
             hi.assertEqual(seq.distinct(), "helo");
+        },
+        "uniformOverride": hi => {
+            const singleLengthSeq = new hi.sequence.FiniteRepeatSequence(3, hi("."));
+            hi.assert(singleLengthSeq.uniform());
+            const uniformSeq = new hi.sequence.FiniteRepeatSequence(3, hi("!!!")); 
+            hi.assert(uniformSeq.uniform());
+            const notUniformSeq = new hi.sequence.FiniteRepeatSequence(3, hi("nope")); 
+            hi.assertNot(notUniformSeq.uniform());
         },
         "containsElementOverride": hi => {
             const seq = () => new hi.sequence.FiniteRepeatSequence(5, hi([1, 2, 3, 4]));
@@ -98,6 +131,7 @@ export const FiniteRepeatSequence = defineSequence({
             transform || defaultDistinctTransform, this.source
         );
     },
+    uniform: repeatUniformOverride,
     containsElement: function(element){
         return containsElement(this.source, element);
     },
@@ -207,23 +241,23 @@ export const FiniteRepeatSequence = defineSequence({
     copy: function(){
         return new FiniteRepeatSequence(
             this.targetRepetitions, this.source,
-            this.frontSource ? this.frontSource.copy() : null,
-            this.backSource ? this.backSource.copy() : null
+            this.frontSource ? this.frontSource.copy() : undefined,
+            this.backSource ? this.backSource.copy() : undefined
         );
     },
     reset: function(){
         this.frontRepetitions = 0;
-        this.frontSource = null;
+        this.frontSource = undefined;
         if(this.back){
             this.backRepetitions = 0;
-            this.backSource = null;
+            this.backSource = undefined;
         }
         return this;
     },
     rebase: function(source){
         this.source = source;
-        this.frontSource = null;
-        this.backSource = null;
+        this.frontSource = undefined;
+        this.backSource = undefined;
         return this;
     },
     collapseBreak: function(target, length){
@@ -251,9 +285,15 @@ export const InfiniteRepeatSequence = defineSequence({
     supportRequired: [
         "copy",
     ],
-    overrides: [
-        "repeat", "distinct", "containsElement",
+    supportsWith: [
+        "back", "index", "slice", "copy", "reset",
     ],
+    overrides: {
+        "repeat": {optional: wrap.expecting.number},
+        "distinct": {optional: wrap.expecting.transformation},
+        "uniform": {optional: wrap.expecting.comparison},
+        "containsElement": {one: wrap.expecting.anything},
+    },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "repeatOverride": hi => {
             const seq = new hi.sequence.InfiniteRepeatSequence(hi.range(10));
@@ -265,6 +305,14 @@ export const InfiniteRepeatSequence = defineSequence({
         "distinctOverride": hi => {
             const seq = new hi.sequence.InfiniteRepeatSequence(hi("hello"));
             hi.assertEqual(seq.distinct(), "helo");
+        },
+        "uniformOverride": hi => {
+            const singleLengthSeq = new hi.sequence.InfiniteRepeatSequence(hi("."));
+            hi.assert(singleLengthSeq.uniform());
+            const uniformSeq = new hi.sequence.InfiniteRepeatSequence(hi("!!!")); 
+            hi.assert(uniformSeq.uniform());
+            const notUniformSeq = new hi.sequence.InfiniteRepeatSequence(hi("nope")); 
+            hi.assertNot(notUniformSeq.uniform());
         },
         "containsElementOverride": hi => {
             const seq = () => new hi.sequence.InfiniteRepeatSequence(hi([1, 2, 3, 4]));
@@ -299,15 +347,20 @@ export const InfiniteRepeatSequence = defineSequence({
             transform || defaultDistinctTransform, this.source
         );
     },
+    uniform: repeatUniformOverride,
     containsElement: function(element){
         return containsElement(this.source, element);
     },
     repetitions: () => Infinity,
-    bounded: () => false,
-    unbounded: () => true,
-    done: () => false,
-    length: null,
-    left: null,
+    bounded: function(){
+        return this.source.done();
+    },
+    unbounded: function(){
+        return !this.source.done();
+    },
+    done: function(){
+        return this.source.done()
+    },
     front: function(){
         return this.frontSource ? this.frontSource.front() : this.source.front();
     },
@@ -337,10 +390,9 @@ export const InfiniteRepeatSequence = defineSequence({
     },
     // This method is a bit dirty as it relies on knowing
     // the implementation details of FiniteRepeatSequence.
-    // I'm trying not to feel too bad about this since the relevant code
-    // is defined just a few tens of lines above here.
     slice: function(i, j){
-        return new FiniteRepeatSequence(0, this.source, null, null).slice(i, j);
+        const finite = FiniteRepeatSequence(0, this.source, undefined, undefined);
+        return finite.slice(i, j);
     },
     has: function(i){
         return this.source.has(i);
@@ -364,6 +416,7 @@ export const InfiniteRepeatSequence = defineSequence({
         this.backSource = null;
         return this;
     },
+    // Any sequence with this type in its chain cannot be collapsed in-place.
     collapseOutOfPlace: true,
 });
 
