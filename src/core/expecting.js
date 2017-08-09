@@ -351,9 +351,9 @@ export const expecting = {
         short: "sequence",
         sequence: true,
         suggestion: (
-            "Try using a method such as 'limit', 'head', or 'assumeBounded' " +
-            "to get a known-bounded sequence from one not already known to be " +
-            "bounded."
+            `A function such as "limit", "head", or "assumeBounded" may be used ` +
+            "to acquire a known-bounded sequence from one whose boundedness " +
+            "is unknown."
         ),
         validate: value => {
             const sequence = asSequence(value);
@@ -382,9 +382,9 @@ export const expecting = {
         short: "sequence",
         sequence: true,
         suggestion: (
-            "Try using a method such as 'limit', 'head', 'assumeBounded', " +
-            "or 'assumeUnbounded' to get a known-bounded or known-unbounded " +
-            "sequence from one not already known to be either."
+            `A function such as "limit", "head", "assumeBounded", or "assumeUnbounded"` +
+            "may be used to acquire a known-bounded or known-bounded sequence " +
+            "from one whose boundedness is unknown."
         ),
         validate: value => {
             const sequence = asSequence(value);

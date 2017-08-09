@@ -175,14 +175,18 @@ export const describeExpectingViolation = function(expects, violation){
                 `but found ${quantityName(violation.wrongAmount)}.`
             );
         }else if(violation.index !== undefined){
-            if(violation.order) message = (
-                `Expected the ${placeName(violation.index)} ${type.singular} ` +
+            if(violation.order && violation.order.length > 1) message = (
+                `Expected the ${placeName(violation.index + 1)} ${type.singular} ` +
                 `to be ${violation.wasNot.article} ${violation.wasNot.singular} ` +
                 "but it was not."
             );
+            else if(violation.order) message = (
+                `Expected the ${type.singular} to be ${violation.wasNot.article} ` +
+                `${violation.wasNot.singular} but it was not.`
+            );
             else if(violation.all) message = (
                 `Expected the all the ${type.plural} to be ${violation.wasNot.article} ` +
-                `${violation.wasNot.singular} but the ${placeName(violation.index)}` +
+                `${violation.wasNot.singular} but the ${placeName(violation.index + 1)}` +
                 `${type.singular} was not.`
             );
             else if(violation.any) message = (
