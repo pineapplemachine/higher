@@ -6,19 +6,20 @@ import {ArgumentsError} from "../errors/ArgumentsError";
 
 import {ArraySequence} from "./arrayAsSequence";
 import {EmptySequence} from "./emptySequence";
+import {OnDemandSequence} from "./onDemandSequence";
+import {ReverseSequence} from "./reverse";
 
 // Get a sequence for enumerating the last so many elements of the input.
 // The resulting sequence may be shorter than the length specified, but
 // will never be longer.
 export const tail = wrap({
     name: "tail",
-    summary: "Get the trailing elements of a sequence.",
+    summary: "Get a sequence enumerating the last so many elements of an input.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         expects: (`
             The function expects a sequence as input and the number of trailing
-            elements to acquire. To acquire one or more elements, the input
-            sequence must either be empty, bidirectional, or known to be bounded.
+            elements to acquire.
         `),
         returns: (`
             The function returns a sequence enumerating the trailing so many
@@ -31,7 +32,7 @@ export const tail = wrap({
             "basicUsage"
         ],
         related: [
-            "last", "head", "dropTail"
+            "last", "dropLast", "head",
         ],
     },
     attachSequence: true,
@@ -39,45 +40,47 @@ export const tail = wrap({
     arguments: {
         unordered: {
             numbers: 1,
-            sequences: 1
+            sequences: {one: wrap.expecting.either(
+                wrap.expecting.boundedSequence,
+                wrap.expecting.bidirectionalSequence
+            )},
         }
     },
-    implementation: (elements, source) => {
-        if(elements <= 0 || source.done()){
-            // The input is empty or 0 elements were requested
+    implementation: (count, source) => {
+        if(count <= 0){
             return new EmptySequence();
-        }else if(!isFinite(elements)){
+        }else if(!isFinite(count)){
             return source;
         }else if(source.length && source.slice){
-            // The input has length and slicing
             const sourceLength = source.length();
-            if(elements >= sourceLength) return source;
-            return source.slice(sourceLength - elements, sourceLength);
-        }else if(source.back){
-            // The input is bidirectional
-            // TODO: It ought to be possible to put off this consumption until
-            // the sequence is actually accessed
-            const array = [];
-            while(!source.done() && array.length < elements){
-                array.push(source.nextBack());
-            }
-            array.reverse();
-            return array;
-        }else if(source.bounded()){
-            // The input is at least bounded
-            // TODO: It ought to be possible to put off this consumption until
-            // the sequence is actually accessed
-            const array = [];
-            for(const element of source) array.push(element);
-            const slice = array.length < elements ? array.length : elements;
-            return new ArraySequence(array).slice(
-                array.length - slice, array.length
+            return (sourceLength <= count ?
+                source : source.slice(sourceLength - count, sourceLength)
             );
-        }else{
-            throw ArgumentsError({message: (
-                "The tail length must be zero or Infinity, or the input " +
-                "sequence must be either known-bounded or bidirectional."
-            )});
+        }else if(source.back){
+            if(source.length && source.length() <= count) return source;
+            else return new OnDemandSequence({
+                done: () => source.done(),
+                back: () => source.back(),
+                dump: () => {
+                    const array = [];
+                    while(!source.done() && array.length < count){
+                        array.push(source.nextBack());
+                    }
+                    return new ReverseSequence(new ArraySequence(array));
+                },
+            });
+        }else{ // Argument validation implies source.bounded()
+            if(source.length && source.length() <= count) return source;
+            else return new OnDemandSequence({
+                done: () => source.done(),
+                dump: () => {
+                    const array = [];
+                    for(const element of source) array.push(element);
+                    return new ArraySequence(array).slice(
+                        Math.max(0, array.length - count), array.length
+                    );
+                },
+            });
         }
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
@@ -86,23 +89,20 @@ export const tail = wrap({
             hi.assertEqual(hi.tail(3, array), [3, 4, 5]);
         },
         "zeroLength": hi => {
-            hi.assertEmpty(hi.tail(0, []));
-            hi.assertEmpty(hi.tail(0, [1]));
-            hi.assertEmpty(hi.tail(0, [1, 2, 3]));
-            hi.assertEmpty(hi.tail(0, hi.recur(i => i)));
+            hi.assertEmpty(hi.emptySequence().tail(0));
+            hi.assertEmpty(hi.range(10).tail(0));
+            hi.assertEmpty(hi("hello").tail(0));
         },
         "infiniteLength": hi => {
-            // Bounded sequence
-            hi.assertEqual(hi.tail(Infinity, [0, 1, 2]), [0, 1, 2]);
-            // Unbounded sequence
-            const seq = hi.counter();
-            hi.assert(seq.tail(Infinity) === seq);
+            const boundedSeq = hi.range(10);
+            hi.assert(boundedSeq.tail(Infinity) === boundedSeq);
+            const unboundedSeq = hi.counter();
+            hi.assert(unboundedSeq.tail(Infinity) === unboundedSeq);
         },
         "emptyInput": hi => {
-            hi.assertEmpty(hi.tail(0, []));
-            hi.assertEmpty(hi.tail(1, []));
-            hi.assertEmpty(hi.tail(2, []));
-            hi.assertEmpty(hi.tail(100, []));
+            hi.assertEmpty(hi.emptySequence().tail(0));
+            hi.assertEmpty(hi.emptySequence().tail(1));
+            hi.assertEmpty(hi.emptySequence().tail(100));
         },
         "boundedSlicingInput": hi => {
             const array = [0, 1, 2, 3, 4, 5, 6, 7];
@@ -131,7 +131,7 @@ export const tail = wrap({
             hi.assertEqual(seq().tail(8), [0, 1, 2, 3, 4, 5, 6, 7]);
             hi.assertEqual(seq().tail(20), [0, 1, 2, 3, 4, 5, 6, 7]);
         },
-        "illegalInput": hi => {
+        "unidirectionalUnboundedInput": hi => {
             hi.assertFail(() => hi.recur(i => i + 1).seed(0).tail(10));
         },
     },

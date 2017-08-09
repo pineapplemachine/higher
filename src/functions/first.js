@@ -1,27 +1,161 @@
 import {wrap} from "../core/wrap";
+import {Sequence} from "../core/sequence";
 
-// Get the first element in a sequence or, if a predicate is passed,
-// get the first element meeting that predicate.
+import {EmptySequence} from "./emptySequence";
+import {FilterSequence} from "./filter";
+import {HeadSequence} from "./head";
+
 export const first = wrap({
     name: "first",
+    summary: "Get the first so many elements of a sequence optionally satisfying a predicate.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The function expects a sequence, an optional number of elements, and
+            an optional predicate function as input.
+            When no number of elements is provided, #1 is used as a default.
+        `),
+        returns: (`
+            The function returns a sequence enumerating the first so many
+            elements of the input sequence, or the first so many elements
+            satisfying the predicate, if a predicate function was specified.
+            /Where there were fewer applicable elements in the input sequence
+            than were so requested, the output sequence will contain only as
+            many elements were applicable and will consequently be shorter than
+            the number of elements given.
+        `),
+        returnType: {
+            "typeof inputSequence": (`
+                When no predicate function was given and either the number of
+                elements was positive infinity, or the input sequence had known
+                length that was less than or equal to the number of elements
+                specified.
+            `),
+            "typeof inputSequence.slice()": (`
+                When no predicate function was given, the input sequence had
+                known length and allowed slicing, and the number of elements was
+                a finite positive number less than or equal to the length of
+                the input sequence.
+            `),
+            "FilterSequence": (`
+                When a predicate function was specified and either the number of
+                elements was positive infinity, or the input sequence had known
+                length that was less than or equal to the number of elements
+                specified.
+            `),
+            "HeadSequence": (`
+                When a predicate function was specified, the number of elements
+                was a finite positive number, and either the input sequence did
+                not have known length, or the input sequence had a known length
+                that was less than the number of elements requested.
+                Also when no predicate function was specified, the number of
+                elements was a finite positive number, and the input sequence
+                either did not have known length or did not support slicing.
+            `),
+        },
+        examples: [
+            "basicUsage", "basicUsagePredicate",
+        ],
+        related: [
+            "head", "firstElement", "dropFirst",
+        ],
+    },
     attachSequence: true,
-    async: true,
+    async: false,
     arguments: {
         unordered: {
-            functions: "?",
+            numbers: "?",
+            functions: {optional: wrap.expecting.predicate},
             sequences: 1,
-            allowIterables: true
         }
     },
-    implementation: (predicate, source) => {
-        if(predicate){
-            for(const element of source){
-                if(predicate(element)) return element;
+    implementation: (firstCount, predicate, source) => {
+        const count = firstCount || 1;
+        if(firstCount <= 0){
+            return new EmptySequence();
+        }else if(predicate){
+            // TODO: Possibly write an optimized FirstSequence implementation
+            // rather than returning a FilterSequence.HeadSequence.
+            const filterSequence = new FilterSequence(predicate, source);
+            if(!isFinite(count) || (source.length && source.length() <= count)){
+                return filterSequence;
+            }else{
+                return new HeadSequence(count, filterSequence);
             }
+        }else if(!isFinite(count)){
+            return source;
+        }else if(source.length){
+            const sourceLength = source.length();
+            return (sourceLength <= count ? source : (
+                source.slice ? source.slice(0, count) : new HeadSequence(count, source)
+            ));
         }else{
-            for(const element of source) return element;
+            return new HeadSequence(count, source);
         }
-        return undefined;
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": hi => {
+            const array = [1, 2, 3, 4, 5, 6, 7, 8];
+            const seq = hi.first(4, array);
+            hi.assertEqual(seq, [1, 2, 3, 4]);
+        },
+        "basicUsagePredicate": hi => {
+            const string = "once upon a midnight dreary";
+            const notVowel = i => !hi("aeiou").containsElement(i);
+            hi.assertEqual(hi.first(12, string, notVowel), "nc pn  mdngh");
+        },
+        "zeroCount": hi => {
+            const even = i => i % 2 === 0;
+            hi.assertEmpty(hi.range(10).first(0));
+            hi.assertEmpty(hi.range(10).first(0, even));
+            hi.assertEmpty(hi.counter().first(0));
+            hi.assertEmpty(hi.counter().first(0, even));
+        },
+        "singleCount": hi => {
+            const even = i => i % 2 === 0;
+            hi.assertEqual(hi([1, 2, 3]).first(1), [1]);
+            hi.assertEqual(hi(["hello", "world"]).first(1), ["hello"]);
+            hi.assertEqual(hi([1, 2, 3]).first(1, even), [2]);
+        },
+        "unspecifiedCount": hi => {
+            const even = i => i % 2 === 0;
+            hi.assertEqual(hi([1, 2, 3]).first(), [1]);
+            hi.assertEqual(hi(["hello", "world"]).first(), ["hello"]);
+            hi.assertEqual(hi([1, 2, 3]).first(even), [2]);
+        },
+        "finiteCount": hi => {
+            hi.assertEqual(hi.range(12).first(4), [0, 1, 2, 3]);
+            hi.assertEqual(hi.first("hello", 2), "he");
+        },
+        "finiteCountPredicate": hi => {
+            const even = i => i % 2 === 0;
+            hi.assertEqual(hi.range(12).first(4, even), [0, 2, 4, 6]);
+            const notL = i => i !== "l";
+            hi.assertEqual(hi.first("hello world", 6, notL), "heo wo");
+        },
+        "lengthLessThanCount": hi => {
+            const seq = hi.range(5);
+            hi.assert(seq.first(10) === seq);
+            hi.assert(seq.first(Infinity) === seq);
+        },
+        "lengthLessThanCountPredicate": hi => {
+            hi.assertEqual(hi.range(5).first(10, i => i % 2 === 0), [0, 2, 4]);
+            hi.assertEqual(hi.range(5).first(Infinity, i => i % 2 === 0), [0, 2, 4]);
+        },
+        "emptyInput": hi => {
+            hi.assertEmpty(hi.emptySequence().first(10));
+            hi.assertEmpty(hi.emptySequence().first(10, i => true));
+            hi.assertEmpty(hi.emptySequence().first(10, i => false));
+        },
+        "unboundedInput": hi => {
+            const even = i => i % 2 === 0;
+            hi.assertEqual(hi.counter().first(5), [0, 1, 2, 3, 4]);
+            hi.assertEqual(hi.counter().first(5, even), [0, 2, 4, 6, 8]);
+        },
+        "noneSatisfyPredicate": hi => {
+            hi.assertEmpty(hi.range(10).first(i => false));
+            hi.assertEmpty(hi("hello").first(i => false));
+        },
     },
 });
 

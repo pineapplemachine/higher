@@ -143,6 +143,14 @@ export const FiniteRepeatElementSequence = defineSequence({
             return this;
         }
     },
+    firstElement: function(predicate){
+        return !predicate || predicate(this.element) ? this.element : undefined;
+    },
+    firstElementElse: function(functions){
+        const callback = functions[0];
+        const predicate = functions[1];
+        return !predicate || predicate(this.element) ? this.element : callback();
+    },
     containsElement: function(element){
         return isEqual(element, this.element);
     },
@@ -311,7 +319,7 @@ export const InfiniteRepeatElementSequence = defineSequence({
             hi.assert(seq.lastElementElse(zero, i => false) === 0);
         },
         "containsElementOverride": hi => {
-            const seq = new hi.sequence.FiniteRepeatElementSequence(3, "!");
+            const seq = new hi.sequence.InfiniteRepeatElementSequence("!");
             hi.assert(seq.containsElement("!"));
             hi.assertNot(seq.containsElement("."));
         },
@@ -342,6 +350,14 @@ export const InfiniteRepeatElementSequence = defineSequence({
         }else{
             return this;
         }
+    },
+    firstElement: function(predicate){
+        return !predicate || predicate(this.element) ? this.element : undefined;
+    },
+    firstElementElse: function(functions){
+        const callback = functions[0];
+        const predicate = functions[1];
+        return !predicate || predicate(this.element) ? this.element : callback();
     },
     containsElement: function(element){
         return isEqual(element, this.element);

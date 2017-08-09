@@ -216,7 +216,7 @@ export const DropFirstPredicateSequence = defineSequence({
 
 export const dropFirst = wrap({
     name: "dropFirst",
-    summary: "Get a sequence enumerating the contents of an input sequence, minus the first so many elements.",
+    summary: "Get a sequence minus the first so many elements.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         expects: (`

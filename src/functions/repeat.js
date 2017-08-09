@@ -5,13 +5,14 @@ import {containsElement} from "./containsElement";
 import {copyable} from "./copyable";
 import {DistinctSequence, defaultDistinctTransform} from "./distinct";
 import {EmptySequence} from "./emptySequence";
+import {firstElement} from "./firstElement";
 
 export const FiniteRepeatSequence = defineSequence({
     supportRequired: [
         "copy",
     ],
     overrides: [
-        "repeat", "distinct", "containsElement",
+        "repeat", "distinct", "firstElement", "containsElement",
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
@@ -38,6 +39,12 @@ export const FiniteRepeatSequence = defineSequence({
         "distinctOverride": hi => {
             const seq = new hi.sequence.FiniteRepeatSequence(3, hi("hello"));
             hi.assertEqual(seq.distinct(), "helo");
+        },
+        "firstElementOverride": hi => {
+            const seq = () => new hi.sequence.FiniteRepeatSequence(5, hi([1, 2, 3, 4]));
+            hi.assert(seq().firstElement() === 1);
+            hi.assert(seq().firstElement(i => i === 3) === 3);
+            hi.assertUndefined(seq().firstElement(i => false));
         },
         "containsElementOverride": hi => {
             const seq = () => new hi.sequence.FiniteRepeatSequence(5, hi([1, 2, 3, 4]));
@@ -97,6 +104,9 @@ export const FiniteRepeatSequence = defineSequence({
         return new DistinctSequence(
             transform || defaultDistinctTransform, this.source
         );
+    },
+    firstElement: function(predicate){
+        return firstElement.implementation(predicate, this.source);
     },
     containsElement: function(element){
         return containsElement(this.source, element);
@@ -266,6 +276,12 @@ export const InfiniteRepeatSequence = defineSequence({
             const seq = new hi.sequence.InfiniteRepeatSequence(hi("hello"));
             hi.assertEqual(seq.distinct(), "helo");
         },
+        "firstElementOverride": hi => {
+            const seq = () => new hi.sequence.InfiniteRepeatSequence(hi([1, 2, 3, 4]));
+            hi.assert(seq().firstElement() === 1);
+            hi.assert(seq().firstElement(i => i === 3) === 3);
+            hi.assertUndefined(seq().firstElement(i => false));
+        },
         "containsElementOverride": hi => {
             const seq = () => new hi.sequence.InfiniteRepeatSequence(hi([1, 2, 3, 4]));
             hi.assert(seq().containsElement(2));
@@ -298,6 +314,9 @@ export const InfiniteRepeatSequence = defineSequence({
         return new DistinctSequence(
             transform || defaultDistinctTransform, this.source
         );
+    },
+    firstElement: function(predicate){
+        return firstElement.implementation(predicate, this.source);
     },
     containsElement: function(element){
         return containsElement(this.source, element);
