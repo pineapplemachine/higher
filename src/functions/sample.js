@@ -63,7 +63,7 @@ export const DistinctRandomIndexSequence = defineSequence({
         // just push undefined to the history array. This matters because it
         // handles the case where popFront pops the last element.
         // 2. i is set to some random number in the range [0, remaining elements).
-        // 3. All previously generated numbers are enumerated. While i is less
+        // 3. All previously generated numbers are enumerated. While i is greater
         // than or equal to any of those numbers, i is incremented and then the
         // numbers are enumerated repeatedly until i isn't incremented again.
         // This operation is the same as taking index i of the sequence of
