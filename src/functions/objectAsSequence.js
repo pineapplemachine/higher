@@ -37,33 +37,37 @@ const pushSorted = (value, array) => {
 
 export const ObjectSequence = defineSequence({
     summary: "Enumerate the key, value pairs of an object.",
-    supportsWith: [],
     supportsAlways: [
-        "length", "left", "has", "get", "copy", "reset"
+        "length", "left", "back", "index", "slice", "has", "get", "copy", "reset",
     ],
-    overrides: [
-        "object", "newObject"
-    ],
+    overrides: {
+        object: {none: true},
+        newObject: {none: true},
+        key: {none: true},
+        values: {none: true},
+    },
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
-        detail: (`
-            Enumerate the key, value pairs of an object in a deterministic order.
+        expects: (`
+            The function expects an object as input.
+        `),
+        developers: (`
             Sequences produced from different objects having the same keys will
-            always have the keys in their key, value pairs appear in the same
+            always enumerate the keys of their key, value pairs in the same
             order.
         `),
         methods: {
             "keys": {
                 introduced: "higher@1.0.0",
                 summary: "Get a sequence enumerating only the keys of the object.",
-                arguments: {none: true},
                 expects: "The function accepts no arguments.",
                 returns: (`
-                    This function returns a sequence enumerating the keys of
+                    The function returns a sequence enumerating the keys of
                     the object that the ObjectSequence was created from in the
                     same order that the sequence would have enumerated those
                     keys as part of key, value pairs.
                 `),
+                returnType: "ArraySequence",
                 examples: [
                     "keysBasicUsage",
                 ],
@@ -71,14 +75,14 @@ export const ObjectSequence = defineSequence({
             "values": {
                 introduced: "higher@1.0.0",
                 summary: "Get a sequence enumerating only the values of the object.",
-                arguments: {none: true},
                 expects: "The function accepts no arguments.",
                 returns: (`
-                    This function returns a sequence enumerating the values of
+                    The function returns a sequence enumerating the values of
                     the object that the ObjectSequence was created from in the
                     same order that the sequence would have enumerated those
                     values as part of key, value pairs.
                 `),
+                returnType: "ObjectValuesSequence",
                 examples: [
                     "valuesBasicUsage",
                 ],
@@ -88,11 +92,25 @@ export const ObjectSequence = defineSequence({
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "keysBasicUsage": hi => {
             const object = {hello: 100, world: 300};
-            hi.assertEqual(hi(object).keys(), ["hello", "world"]);
+            const seq = new hi.sequence.ObjectSequence(object);
+            hi.assertEqual(seq.keys(), ["hello", "world"]);
         },
         "valuesBasicUsage": hi => {
             const object = {hello: 100, world: 300};
-            hi.assertEqual(hi(object).values(), [100, 300]);
+            const seq = new hi.sequence.ObjectSequence(object);
+            hi.assertEqual(seq.values(), [100, 300]);
+        },
+        "objectOverload": hi => {
+            const object = {hello: 100, world: 300};
+            const seq = new hi.sequence.ObjectSequence(object);
+            hi.assert(seq.object() === object);
+        },
+        "newObjectOverload": hi => {
+            const object = {hello: 100, world: 300};
+            const seq = new hi.sequence.ObjectSequence(object);
+            const newObject = seq.newObject();
+            hi.assert(newObject !== object);
+            hi.assertEqual(newObject, object);
         },
     },
     getSequence: process.env.NODE_ENV !== "development" ? undefined : [
@@ -196,18 +214,30 @@ export const ObjectSequence = defineSequence({
         this.backIndex = this.highIndex;
         return this;
     },
-    rebase: null,
 });
 
 export const ObjectValuesSequence = defineSequence({
     summary: "Enumerate the values of an object.",
-    supportsWith: [],
     supportsAlways: [
-        "length", "left", "has", "get", "copy", "reset"
+        "length", "left", "back", "index", "slice", "copy", "reset",
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
+        expects: (`
+            The function expects an object as input.
+        `),
+        developers: (`
+            Sequences produced from different objects having the same keys will
+            always enumerate the keys of their key, value pairs in the same
+            order.
+        `),
     },
+    getSequence: process.env.NODE_ENV !== "development" ? undefined : [
+        hi => new ObjectValuesSequence({}),
+        hi => new ObjectValuesSequence({a: 0}),
+        hi => new ObjectValuesSequence({a: 0, b: 1}),
+        hi => new ObjectValuesSequence({x: "hello", y: "world", z: "how", w: "do"}),
+    ],
     constructor: function ObjectValuesSequence(
         source, objectKeys = undefined, lowIndex = undefined,
         highIndex = undefined, frontIndex = undefined, backIndex = undefined
@@ -255,8 +285,6 @@ export const ObjectValuesSequence = defineSequence({
             this.source, this.objectKeys, this.lowIndex + i, this.lowIndex + j
         );
     },
-    has: undefined,
-    get: undefined,
     copy: function(){
         return new ObjectValuesSequence(
             this.source, this.objectKeys, this.lowIndex,
@@ -268,7 +296,6 @@ export const ObjectValuesSequence = defineSequence({
         this.backIndex = this.highIndex;
         return this;
     },
-    rebase: null,
 });
 
 export const objectAsSequence = wrap({
