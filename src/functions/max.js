@@ -1,4 +1,3 @@
-import {constants} from "../core/constants";
 import {wrap} from "../core/wrap";
 
 import {NotBoundedError} from "../errors/NotBoundedError";
@@ -13,7 +12,7 @@ export const max = wrap({
         expects: (`
             The function expects a sequence as input and an optional
             [relational function].
-            If no relational function was passed, \`a < b\` is used as a default.
+            When no relational function was given, \`a < b\` is used as a default.
         `),
         returns: (`
             The function returns the maximum element in the sequence according

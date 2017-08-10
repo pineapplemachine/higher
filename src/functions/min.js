@@ -12,7 +12,7 @@ export const min = wrap({
         expects: (`
             The function expects a sequence as input and an optional
             [relational function].
-            If no relational function was passed, \`a < b\` is used as a default.
+            When no relational function was given, \`a < b\` is used as a default.
         `),
         returns: (`
             The function returns the minimum element in the sequence according
