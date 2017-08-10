@@ -225,6 +225,7 @@ import {from} from "./functions/from"; hi.register(from);
 import {groupBy} from "./functions/groupBy"; hi.register(groupBy);
 import {head} from "./functions/head"; hi.register(head);
 import {identity} from "./functions/identity"; hi.register(identity);
+import {indexes} from "./functions/indexes"; hi.register(indexes);
 import {isSorted} from "./functions/isSorted"; hi.register(isSorted);
 import {join} from "./functions/join"; hi.register(join);
 import {last} from "./functions/last"; hi.register(last);
