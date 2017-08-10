@@ -13,6 +13,8 @@ import {UnidirectionalOnDemandTailSequence} from "./tail";
 // Get an on-demand sequence for the last elements of a bidirectional sequence.
 const BidirectionalOnDemandLastSequence = (count, predicate, source) => {
     return new OnDemandSequence({
+        bounded: () => true,
+        unbounded: () => false,
         dump: () => {
             const array = [];
             while(array.length < count && !source.done()){
@@ -27,6 +29,8 @@ const BidirectionalOnDemandLastSequence = (count, predicate, source) => {
 // Get an on-demand sequence for the last elements of a reversible sequence.
 const ReversibleOnDemandLastSequence = (count, predicate, source) => {
     return new OnDemandSequence({
+        bounded: () => true,
+        unbounded: () => false,
         dump: () => {
             const reversed = source.reverse();
             const array = [];
@@ -42,6 +46,8 @@ const ReversibleOnDemandLastSequence = (count, predicate, source) => {
 // Get an on-demand sequence for the last elements of a unidirectional sequence.
 const UnidirectionalOnDemandLastSequence = (count, predicate, source) => {
     return new OnDemandSequence({
+        bounded: () => true,
+        unbounded: () => false,
         dump: () => {
             const array = [];
             while(!source.done()){

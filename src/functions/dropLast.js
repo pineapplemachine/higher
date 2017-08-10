@@ -191,6 +191,8 @@ export const UnboundedDropLastPredicateSequence = defineSequence({
 // Implement dropLast with a predicate for known-bounded sequence inputs
 const DropLastOnDemandSequence = (dropTarget, predicate, source) => {
     return new OnDemandSequence({
+        bounded: () => true,
+        unbounded: () => false,
         dump: () => {
             const array = [];
             let dropped = 0;

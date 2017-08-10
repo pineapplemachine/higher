@@ -12,6 +12,8 @@ import {ReverseSequence} from "./reverse";
 // Get an on-demand sequence for retrieving the tail of a bidirectional sequence.
 export const BidirectionalOnDemandTailSequence = (count, source) => {
     return new OnDemandSequence({
+        bounded: () => true,
+        unbounded: () => false,
         done: () => source.done(),
         back: () => source.back(),
         dump: () => {
@@ -28,6 +30,8 @@ export const BidirectionalOnDemandTailSequence = (count, source) => {
 export const ReversibleOnDemandTailSequence = (count, source) => {
     const reversed = source.reverse();
     return new OnDemandSequence({
+        bounded: () => true,
+        unbounded: () => false,
         done: () => reversed.done(),
         dump: () => {
             const array = [];
@@ -43,6 +47,8 @@ export const ReversibleOnDemandTailSequence = (count, source) => {
 // but known-bounded sequence.
 export const UnidirectionalOnDemandTailSequence = (count, source) => {
     return new OnDemandSequence({
+        bounded: () => true,
+        unbounded: () => false,
         done: () => source.done(),
         dump: () => {
             const array = [];

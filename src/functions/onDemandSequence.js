@@ -19,6 +19,12 @@ export const OnDemandSequence = defineSequence({
         this.backOnDemand = methods.back;
         this.hasOnDemand = methods.has;
         this.getOnDemand = methods.get;
+        if(this.boundedOnDemand) this.bounded = function(){
+            return this.boundedOnDema();
+        };
+        if(this.unboundedOnDemand) this.unbounded = function(){
+            return this.unboundedOnDemand();
+        };
         if(this.doneOnDemand) this.done = function(){
             return this.doneOnDemand();
         };
@@ -43,6 +49,12 @@ export const OnDemandSequence = defineSequence({
     },
     initialize: function(){
         this.source = this.dumpOnDemand();
+        this.bounded = function(){
+            return this.source.bounded();
+        };
+        this.unbounded = function(){
+            return this.source.unbounded();
+        };
         this.done = function(){
             return this.source.done();
         };
@@ -78,8 +90,14 @@ export const OnDemandSequence = defineSequence({
             return this;
         };
     },
-    bounded: () => true,
-    unbounded: () => false,
+    bounded: function(){
+        this.initialize();
+        return this.source.bounded();
+    },
+    unbounded: function(){
+        this.initialize();
+        return this.source.unbounded();
+    },
     done: function(){
         this.initialize();
         return this.source.done();
@@ -192,15 +210,18 @@ export const onDemandSequence = wrap({
             // Real use cases won't be so simple!
             let hasBeenComputed = false;
             const seq = hi.onDemandSequence({
-                // Get whether the sequence is initially empty
+                // Get whether the sequence is known-bounded or known-unbounded.
+                bounded: () => true,
+                unbounded: () => false,
+                // Get whether the sequence is initially empty.
                 done: () => false,
-                // Get the length of the sequence
+                // Get the length of the sequence.
                 length: () => 7,
-                // Get the initial front element of the sequence
+                // Get the initial front element of the sequence.
                 front: () => 1,
-                // Get the initial back element of the sequence
+                // Get the initial back element of the sequence.
                 back: () => 7,
-                // Get the whole contents as a sequence
+                // Get the whole contents as a sequence.
                 dump: () => {
                     hasBeenComputed = true;
                     return hi([1, 2, 3, 4, 5, 6, 7]);
