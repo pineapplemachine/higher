@@ -114,7 +114,6 @@ export const isEqual = lightWrap({
 
 export const sequencesEqual = lightWrap({
     summary: "Get whether some input sequences are deeply equal.",
-    internal: true,
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         throws: (`
@@ -176,7 +175,6 @@ export const sequencesEqual = lightWrap({
 
 export const stringsEqual = lightWrap({
     summary: "Get whether some strings and input sequences are equal.",
-    internal: true,
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         throws: (`
@@ -235,7 +233,6 @@ export const stringsEqual = lightWrap({
 
 export const objectsEqual = lightWrap({
     summary: "Get whether some input objects are deeply equal.",
-    internal: true,
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         returnType: "boolean",
@@ -246,6 +243,7 @@ export const objectsEqual = lightWrap({
     implementation: function objectsEqual(...objects){
         if(objects.length > 1){
             const visited = {};
+            // let lastObject = objects[0];
             for(let i = 0; i < objects.length; i++){
                 for(const key in objects[i]){
                     if(!visited[key]){
@@ -264,10 +262,12 @@ export const objectsEqual = lightWrap({
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {
             hi.assert(objectsEqual(
-                {x: 5, y: 10, z: 15}, {x: 5, y: 10, z: 15}
+                {x: 5, y: 10, z: 15},
+                {x: 5, y: 10, z: 15}
             ));
             hi.assertNot(objectsEqual(
-                {x: 1, y: 2, z: 3}, {x: 8, y: 8, z: 8}
+                {x: 1, y: 2, z: 3},
+                {x: 8, y: 8, z: 8}
             ));
         },
         "noInputs": hi => {
@@ -277,12 +277,32 @@ export const objectsEqual = lightWrap({
             hi.assert(objectsEqual({}));
             hi.assert(objectsEqual({x: 0, y: 1}));
         },
+        "compareToEmptyObject": hi => {
+            hi.assertNot(objectsEqual({}, {x: 1}));
+            hi.assertNot(objectsEqual({x: 1}, {}));
+            hi.assertNot(objectsEqual({}, {x: 1}, {x: 1}));
+            hi.assertNot(objectsEqual({x: 1}, {x: 1}, {}));
+            hi.assertNot(objectsEqual({x: 1}, {}, {x: 1}));
+        },
+        "compareUndefinedKeys": hi => {
+            hi.assert(objectsEqual({x: 1}, {x: 1, y: undefined}));
+            hi.assertNot(objectsEqual({x: 1}, {x: 1, y: null}));
+        },
+        "sequenceValueInputs": hi => {
+            const a = {x: hi.range(10)};
+            const b = {x: hi.range(10)};
+            const c = {x: hi.range(10)};
+            hi.assert(objectsEqual(a, b, c));
+            const d = {x: hi.range(10)};
+            const e = {x: hi.range(10)};
+            const f = {x: hi.range(5)};
+            hi.assertNot(objectsEqual(d, e, f));
+        },
     },
 });
 
 export const valuesEqual = lightWrap({
     summary: "Get whether some values are equal.",
-    internal: true,
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         returnType: "boolean",

@@ -1,10 +1,6 @@
-import {asImplicitSequence} from "../core/asSequence";
-import {isArray, isObject} from "../core/types";
 import {wrap} from "../core/wrap";
 
-import {NotBoundedError} from "../errors/NotBoundedError";
-
-import {asObject, ObjectError} from "./object";
+import {asObject} from "./object";
 
 export const newObject = wrap({
     name: "newObject",
@@ -14,39 +10,28 @@ export const newObject = wrap({
         expects: (`
             The function expects either an object or a known-bounded sequence
             of key, value pairs.
-            Key, value pairs are objects with a "key" attribute or arrays with
-            at least one element.
+            Key, value pairs are objects with a \`key\` attribute or arrays with
+            at least one element. Elements of the input sequence not qualifying
+            as key, value pairs are ignored.
         `),
         returns: (`
             The function returns an object with the key, value pairs as
             described by the input.
-            If the input was itself an object, the function returns a shallow
-            copy of that object.
         `),
         examples: [
             "basicUsage", "objectInput"
         ],
         related: [
-            "object"
+            "object",
         ],
     },
     attachSequence: true,
     async: true,
     arguments: {
-        one: wrap.expecting.anything // TODO: Be more specific
+        one: wrap.expecting.boundedSequence,
     },
     implementation: (source) => {
-        const pairs = asImplicitSequence(source);
-        if(pairs){
-            // Throws an error if the sequence is unbounded
-            return asObject(pairs);
-        }else if(isObject(source)){
-            const result = {};
-            for(const key in source) result[key] = source[key];
-            return result;
-        }else{
-            throw ObjectError(source);
-        }
+        return asObject(source);
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {
@@ -56,14 +41,28 @@ export const newObject = wrap({
             hi.assert(obj["2"] === 4);
             hi.assert(obj["9"] === 81);
         },
+        "arrayKeyValuePairs": hi => {
+            const pairs = [["x", 1], ["y", 2]];
+            hi.assertEqual(hi.newObject(pairs), {x: 1, y:2});
+        },
         "objectInput": hi => {
+            // This behavior is due to an override associated with ObjectSequence.
             const obj = {a: 0, b:1};
             hi.assert(hi.newObject(obj) !== obj);
+        },
+        "emptyInput": hi => {
+            hi.assertEqual(hi.emptySequence().newObject(), {});
         },
         "unboundedInput": hi => {
             hi.assertFail(
                 () => hi.newObject(hi.repeatElement({key: "hello", value: "world"}))
             );
+        },
+        "nonKeyValuePairsInput": hi => {
+            // Ignore things that aren't key, value pairs
+            hi.assertEqual(hi.newObject([1, 2, 3]), {});
+            hi.assertEqual(hi.newObject("ok"), {});
+            hi.assertEqual(hi.newObject(["hello", "world"]), {});
         },
     },
 });
