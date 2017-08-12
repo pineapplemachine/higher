@@ -37,6 +37,7 @@ export const ReduceSequence = defineSequence({
                 summary: "Modify the sequence to an initial seed value for the reduction operation.",
                 expects: "The function expects one value of any kind as input.",
                 returns: "The function returns the sequence itself.",
+                returnType: "sequence",
                 examples: ["seedBasicUsage"],
             },
             unseed: {
@@ -44,6 +45,7 @@ export const ReduceSequence = defineSequence({
                 summary: "Modify the sequence remove any seed value set for the reduction operation.",
                 expects: "The function accepts no arguments.",
                 returns: "The function returns the sequence itself.",
+                returnType: "sequence",
                 examples: ["unseedBasicUsage"],
             },
         },
@@ -363,7 +365,7 @@ export const reduce = wrap({
             the combination function to every element in the input sequence
             in series.
         `),
-        returnType: "ReduceSequence",
+        returnType: "sequence",
         examples: [
             "basicUsage",
         ],
