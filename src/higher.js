@@ -259,6 +259,7 @@ import {pluck} from "./functions/pluck"; hi.register(pluck);
 import {product} from "./functions/product"; hi.register(product);
 import {range} from "./functions/range"; hi.register(range);
 import {recur} from "./functions/recur"; hi.register(recur);
+import {reduce} from "./functions/reduce"; hi.register(reduce);
 import {reject} from "./functions/reject"; hi.register(reject);
 import {relationalToOrdering} from "./functions/relationalToOrdering"; hi.register(relationalToOrdering);
 import {repeat} from "./functions/repeat"; hi.register(repeat);
