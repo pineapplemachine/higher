@@ -315,6 +315,18 @@ export const expecting = {
             return value;
         },
     }),
+    combination: Expecting({
+        type: "function",
+        article: "a",
+        singular: "combination function",
+        plural: "combination functions",
+        short: "combination",
+        adjective: "combination",
+        validate: value => {
+            if(!isFunction(value)) throw new Error();
+            return value;
+        },
+    }),
     array: Expecting({
         type: "array",
         article: "an",
