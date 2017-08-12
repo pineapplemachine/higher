@@ -17,19 +17,15 @@ export const UntilSequence = defineSequence({
                 introduced: "higher@1.0.0",
                 summary: "Modify the sequence to include the first element satisfying the predicate.",
                 returns: "The function returns the sequence itself.",
-                returnType: "UntilSequence",
-                examples: [
-                    "inclusiveBasicUsage",
-                ],
+                returnType: "sequence",
+                examples: ["inclusiveBasicUsage"],
             },
             "exclusive": {
                 introduced: "higher@1.0.0",
                 summary: "Modify the sequence to exclude the first element satisfying the predicate.",
                 returns: "The function returns the sequence itself.",
-                returnType: "UntilSequence",
-                examples: [
-                    "exclusiveBasicUsage",
-                ],
+                returnType: "sequence",
+                examples: ["exclusiveBasicUsage"],
             },
         },
     },
@@ -134,6 +130,7 @@ export const until = wrap({
             The outputted sequence may be made to include the terminating
             element using its @UntilSequence.inclusive method.
         `),
+        returnType: "sequence",
         examples: [
             "basicUsageExclusive", "basicUsageInclusive",
         ],
@@ -143,9 +140,6 @@ export const until = wrap({
     },
     attachSequence: true,
     async: false,
-    sequences: [
-        UntilSequence
-    ],
     arguments: {
         unordered: {
             functions: 1,

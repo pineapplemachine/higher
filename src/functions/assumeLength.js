@@ -93,19 +93,7 @@ export const assumeLength = wrap({
             If the length specified was #Infinity, then the function instead
             returns a sequence that claims to be unbounded.
         `),
-        returnType: {
-            "typeof inputSequence": (`
-                When the input sequence had known length, and the specified
-                length was not #Infinity.
-            `),
-            "AssumeLengthSequence": (`
-                When the input sequence did not have known length, and the
-                specified length was not #Infinity.
-            `),
-            "AssumeUnboundedSequence": (`
-                When the specified length was #Infinity.
-            `),
-        },
+        returnType: "sequence",
         examples: [
             "basicUsage",
         ],

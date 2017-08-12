@@ -108,7 +108,7 @@ export const uniq = wrap({
             equivalent elements, then attempting to consume output sequence
             will produce an infinite loop.
         `),
-        returnType: "UniqSequence",
+        returnType: "sequence",
         examples: [
             "basicUsage", "comparisonFunctionInput",
         ],

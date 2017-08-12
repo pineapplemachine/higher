@@ -268,21 +268,7 @@ export const repeatEachElement = wrap({
             input, but with each element serially repeated the specified number
             of times.
         `),
-        returnType: {
-            "EmptySequence": (`
-                When the number of repetitions was zero, or the input sequence
-                was empty and the number of repetitions was #Infinity.
-            `),
-            "typeof inputSequence": (`
-                When the number of repetitions was #1.
-            `),
-            "InfiniteRepeatEachElementSequence": (`
-                When the number of repetitions was #Infinity.
-            `),
-            "FiniteRepeatEachElementSequence": (`
-                When the number of repetitions was neither #0, #1, or #Infinity.
-            `),
-        },
+        returnType: "sequence",
         examples: [
             "basicUsage", "infiniteRepetitions",
         ],

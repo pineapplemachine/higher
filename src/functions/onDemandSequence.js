@@ -189,7 +189,7 @@ export const onDemandSequence = wrap({
             attributes when the inputted object provided implementations for
             these properties that did not require fully computing the sequence.
         `),
-        returnType: "OnDemandSequence",
+        returnType: "sequence",
         examples: [
             "basicUsage",
         ],

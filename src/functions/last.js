@@ -82,9 +82,7 @@ export const last = wrap({
             many elements were applicable and will consequently be shorter than
             the number of elements given.
         `),
-        returnType: {
-            // TODO
-        },
+        returnType: "sequence",
         examples: [
             "basicUsage", "basicUsagePredicate",
         ],

@@ -98,7 +98,7 @@ export const iterableAsSequence = wrap({
             @assumeBounded or @assumeUnbounded function where knowing for sure
             the boundedness of the sequence would be beneficial.
         `),
-        returnType: "IterableSequence",
+        returnType: "sequence",
         examples: [
             "basicUsage",
         ],

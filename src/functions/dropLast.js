@@ -248,50 +248,7 @@ export const dropLast = wrap({
             elements to drop was a finite positive number and the input sequence
             was not either known-bounded or known-unbounded.
         `),
-        returnType: {
-            "typeof inputSequence": (`
-                When the number of elements to drop was less than or equal to zero.
-            `),
-            "typeof inputSequence.slice()": (`
-                When no predicate function was specified, the number of elements
-                to drop was a positive finite number less than the length of
-                the input sequence, and the sequence had both known length and
-                support for slicing.
-            `),
-            "FilterSequence": (`
-                When a predicate function was specified and the number of
-                elements to drop was positive infinity or, if the input sequence
-                had known length, was greater than or equal to the length of the
-                sequence.
-            `),
-            "EmptySequence": (`
-                When no predicate function was specified and the the number of
-                elements to drop was positive infinity or, if the input sequence
-                had known length, was greater than or equal to the length of the
-                sequence.
-            `),
-            "HeadSequence": (`
-                When no predicate function was specified, the number of elements
-                to drop was a finite positive number, and the input sequence had
-                known length but did not support slicing.
-            `),
-            "OnDemandSequence": (`
-                When the number of elements to drop was a finite positive number,
-                the input sequence was known-bounded, and either the sequence
-                did not have known length and support slicing, or a predicate
-                function was given as input.
-            `),
-            "UnboundedDropLastSequence": (`
-                When no predicate function was specified, the number of elements
-                to drop was a finite positive number, and the input sequence was
-                known to be unbounded.
-            `),
-            "UnboundedDropLastPredicateSequence": (`
-                When a predicate function was specified, the number of elements
-                to drop was a finite positive number, and the input sequence was
-                known to be unbounded.
-            `),
-        },
+        returnType: "sequence",
         examples: [
             "basicUsage", "basicUsagePredicate",
         ],

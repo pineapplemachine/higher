@@ -231,38 +231,7 @@ export const dropFirst = wrap({
             When no predicate was specified, the output behaves as though a
             predicate satisfied by every input was given.
         `),
-        returnType: {
-            "typeof inputSequence": (`
-                When the number of elements to drop was less than or equal to zero.
-            `),
-            "typeof inputSequence.slice()": (`
-                When no predicate function was specified, the number of elements
-                to drop was a positive finite number less than the length of
-                the input sequence, and the sequence had both known length and
-                support for slicing.
-            `),
-            "FilterSequence": (`
-                When a predicate function was specified and the number of
-                elements to drop was positive infinity or, if the input sequence
-                had known length, was greater than or equal to the length of the
-                sequence.
-            `),
-            "EmptySequence": (`
-                When no predicate function was specified and the the number of
-                elements to drop was positive infinity or, if the input sequence
-                had known length, was greater than or equal to the length of the
-                sequence.
-            `),
-            "DropFirstPredicateSequence": (`
-                When a predicate function was specified and the number of elements
-                to drop was a positive finite number.
-            `),
-            "DropFirstSequence": (`
-                When no predicate function was specified, the number of elements
-                to drop was a positive finite number, and the input sequence
-                either did not have known length or did not support slicing.
-            `),
-        },
+        returnType: "sequence",
         examples: [
             "basicUsage", "basicUsagePredicate",
         ],

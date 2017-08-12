@@ -375,20 +375,7 @@ export const range = wrap({
             exclusive ending bound; every element in the sequence is the result
             of summing the step value with its prior element.
         `),
-        returnType: {
-            "NumberRangeSequence": (`
-                When no interval argument was provided or, when the interval was 1.
-            `),
-            "ForwardNumberRangeSequence": (`
-                When the interval was greater than zero.
-            `),
-            "BackwardNumberRangeSequence": (`
-                When the interval was less than zero.
-            `),
-            "InfiniteRepeatElementSequence": (`
-                When the interval was zero.
-            `),
-        },
+        returnType: "sequence",
         related: [
             "counter"
         ],

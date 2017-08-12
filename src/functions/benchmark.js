@@ -16,6 +16,7 @@ export const benchmark = wrap({
             The function returns the amount of time in milliseconds that it
             took to evaluate the input function the given number of times.
         `),
+        returnType: "number",
         examples: [
             "basicUsage",
         ],

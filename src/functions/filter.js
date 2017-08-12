@@ -185,7 +185,7 @@ export const filter = wrap({
             certain point, will cause an infinite loop as soon as any
             information is requested from the outputted sequence.
         `),
-        returnType: "FilterSequence",
+        returnType: "sequence",
         examples: [
             "basicUsage"
         ],
