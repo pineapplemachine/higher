@@ -18,12 +18,12 @@ export const FiniteRepeatElementSequence = defineSequence({
         repeat: {optional: wrap.expecting.number},
         distinct: {optional: wrap.expecting.transformation},
         uniq: {optional: wrap.expecting.comparison},
-        uniform: {optional: wrap.expecting.comparison},
-        containsElement: {one: wrap.expecting.anything},
-        firstElement: {optional: wrap.expecting.predicate},
-        lastElement: {optional: wrap.expecting.predicate},
+        uniform: {async: true, optional: wrap.expecting.comparison},
+        containsElement: {async: true, one: wrap.expecting.anything},
+        firstElement: {async: true, optional: wrap.expecting.predicate},
+        lastElement: {async: true, optional: wrap.expecting.predicate},
         firstElementElse: {
-            unordered: {
+            async: true, unordered: {
                 functions: {
                     amount: [1, 2],
                     first: wrap.expecting.callback,
@@ -32,7 +32,7 @@ export const FiniteRepeatElementSequence = defineSequence({
             },
         },
         lastElementElse: {
-            unordered: {
+            async: true, unordered: {
                 functions: {
                     amount: [1, 2],
                     first: wrap.expecting.callback,
@@ -247,12 +247,12 @@ export const InfiniteRepeatElementSequence = defineSequence({
         repeat: {optional: wrap.expecting.number},
         distinct: {optional: wrap.expecting.transformation},
         uniq: {optional: wrap.expecting.comparison},
-        uniform: {optional: wrap.expecting.comparison},
-        containsElement: {one: wrap.expecting.anything},
-        firstElement: {optional: wrap.expecting.predicate},
-        lastElement: {optional: wrap.expecting.predicate},
+        uniform: {async: true, optional: wrap.expecting.comparison},
+        containsElement: {async: true, one: wrap.expecting.anything},
+        firstElement: {async: true, optional: wrap.expecting.predicate},
+        lastElement: {async: true, optional: wrap.expecting.predicate},
         firstElementElse: {
-            unordered: {
+            async: true, unordered: {
                 functions: {
                     amount: [1, 2],
                     first: wrap.expecting.callback,
@@ -261,7 +261,7 @@ export const InfiniteRepeatElementSequence = defineSequence({
             },
         },
         lastElementElse: {
-            unordered: {
+            async: true, unordered: {
                 functions: {
                     amount: [1, 2],
                     first: wrap.expecting.callback,
