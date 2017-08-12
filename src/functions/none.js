@@ -1,7 +1,5 @@
 import {wrap} from "../core/wrap";
 
-import {NotBoundedError} from "../errors/NotBoundedError";
-
 export const none = wrap({
     name: "none",
     summary: "Get whether none of the elements in a sequence satisfy a predicate.",

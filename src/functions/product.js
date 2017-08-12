@@ -1,7 +1,5 @@
 import {wrap} from "../core/wrap";
 
-import {NotBoundedError} from "../errors/NotBoundedError";
-
 // Get the product of the numbers in a sequence.
 // Returns 1 when the input was empty.
 export const product = wrap({
@@ -18,10 +16,6 @@ export const product = wrap({
             If there were any values in the sequence that weren't numbers, then
             the function returns NaN.
         `),
-        throws: (`
-            The function throws a @NotBoundedError when the input sequence was
-            not known to be bounded.
-        `),
         related: [
             "sumLinear", "sumKahan", "sumShew"
         ],
@@ -32,12 +26,9 @@ export const product = wrap({
     attachSequence: true,
     async: true,
     arguments: {
-        one: wrap.expecting.iterable
+        one: wrap.expecting.boundedSequence,
     },
     implementation: (source) => {
-        NotBoundedError.enforce(source, {
-            message: "Failed to compute product",
-        });
         let product = 1;
         for(const value of source) product *= value;
         return product;

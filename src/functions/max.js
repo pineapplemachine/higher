@@ -1,7 +1,5 @@
 import {wrap} from "../core/wrap";
 
-import {NotBoundedError} from "../errors/NotBoundedError";
-
 export const defaultMaxRelation = (a, b) => (a < b);
 
 export const max = wrap({

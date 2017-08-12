@@ -1,7 +1,5 @@
 import {wrap} from "../core/wrap";
 
-import {NotBoundedError} from "../errors/NotBoundedError";
-
 export const groupBy = wrap({
     name: "groupBy",
     summary: "Get an object associating keys with lists of elements.",
@@ -28,15 +26,11 @@ export const groupBy = wrap({
     async: true,
     arguments: {
         unordered: {
-            functions: 1,
-            sequences: 1,
-            allowIterables: true
+            functions: {one: wrap.expecting.transformation},
+            sequences: {one: wrap.expecting.boundedSequence},
         }
     },
     implementation: (transform, source) => {
-        NotBoundedError.enforce(source, {
-            message: "Failed to group elements in sequence",
-        });
         const object = {};
         for(const element of source){
             const key = transform(element);

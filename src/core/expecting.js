@@ -439,6 +439,20 @@ export const expecting = {
             return sequence;
         },
     }),
+    knownLengthSequence: Expecting({
+        type: "sequence",
+        article: "a",
+        singular: "sequence with known length",
+        plural: "sequence with known length",
+        adjective: "known-length",
+        short: "sequence",
+        sequence: true,
+        validate: value => {
+            const sequence = asSequence(value);
+            if(!sequence || (!sequence.bounded() && !sequence.length)) throw new Error();
+            return sequence;
+        },
+    }),
     bidirectionalSequence: Expecting({
         type: "sequence",
         article: "a",

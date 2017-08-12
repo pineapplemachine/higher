@@ -1,7 +1,5 @@
 import {wrap} from "../core/wrap";
 
-import {NotBoundedError} from "../errors/NotBoundedError";
-
 export const defaultMinRelation = (a, b) => (a < b);
 
 export const min = wrap({

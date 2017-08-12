@@ -243,11 +243,6 @@ export const dropLast = wrap({
             When no predicate was specified, the output behaves as though a
             predicate satisfied by every input was given.
         `),
-        throws: (`
-            The function throws a @NotKnownBounded error when the number of
-            elements to drop was a finite positive number and the input sequence
-            was not either known-bounded or known-unbounded.
-        `),
         returnType: {
             "typeof inputSequence": (`
                 When the number of elements to drop was less than or equal to zero.
