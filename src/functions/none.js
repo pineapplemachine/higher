@@ -22,18 +22,7 @@ export const none = wrap({
             of the elements were truthy. The function returns #true otherwise,
             including if the input sequence was empty.
         `),
-        returnType: {
-            "false": (`
-                When no predicate was given and any element of the input
-                sequence was truthy, or when a predicate was given and any
-                element satisfied the predicate.
-            `),
-            "true": (`
-                When no predicate was given and no elements of the input
-                were truthy, or when a predicate was given and no elements
-                satisfied it, or when the input sequence was empty.
-            `),
-        },
+        returnType: "boolean",
         examples: [
             "basicUsage", "basicUsagePredicate",
         ],

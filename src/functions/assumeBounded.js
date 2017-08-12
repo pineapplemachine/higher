@@ -108,16 +108,7 @@ export const assumeBounded = wrap({
             certain to be bounded will invalidate many of the safety guarantees
             that higher is otherwise able to provide.
         `),
-        returnType: {
-            "typeof inputSequence": (`
-                When the input sequence was known to be bounded or known to
-                be unbounded.
-            `),
-            "AssumeBoundedSequence": (`
-                When the input sequence was not known to be either bounded or
-                unbounded.
-            `),
-        },
+        returnType: "sequence",
         examples: [
             "basicUsage",
         ],

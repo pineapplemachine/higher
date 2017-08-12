@@ -67,10 +67,8 @@ export const ObjectSequence = defineSequence({
                     same order that the sequence would have enumerated those
                     keys as part of key, value pairs.
                 `),
-                returnType: "ArraySequence",
-                examples: [
-                    "keysBasicUsage",
-                ],
+                returnType: "sequence",
+                examples: ["keysBasicUsage"],
             },
             "values": {
                 introduced: "higher@1.0.0",
@@ -82,10 +80,8 @@ export const ObjectSequence = defineSequence({
                     same order that the sequence would have enumerated those
                     values as part of key, value pairs.
                 `),
-                returnType: "ObjectValuesSequence",
-                examples: [
-                    "valuesBasicUsage",
-                ],
+                returnType: "sequence",
+                examples: ["valuesBasicUsage"],
             },
         },
     },

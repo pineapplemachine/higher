@@ -12,6 +12,7 @@ export const time = wrap({
             The function returns the amount of time in milliseconds that it
             took to evaluate the input function once.
         `),
+        returnType: "number",
         examples: [
             "basicUsage",
         ],

@@ -1,21 +1,43 @@
 import {defineSequence} from "../core/defineSequence";
-import {FiniteRepeatElementSequence, InfiniteRepeatElementSequence} from "./repeatElement";
 import {wrap} from "../core/wrap";
+
+import {EmptySequence} from "./emptySequence";
+import {FiniteRepeatElementSequence} from "./repeatElement";
+import {InfiniteRepeatElementSequence} from "./repeatElement";
 
 export const OneElementSequence = defineSequence({
     summary: "A sequence containing exactly one element.",
     supportsAlways: [
         "length", "left", "back", "index", "slice", "copy", "reset",
     ],
-    overrides: [
-        "reverse", "filter", "reject",
-    ],
+    overrides: {
+        repeat: {optional: wrap.expecting.number},
+    },
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         expects: (`
             The constructor expects as its argument the one element that the
             sequence should enumerate.
         `),
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "repeatOverrideFinite": hi => {
+            const seq = new hi.sequence.OneElementSequence("!");
+            hi.assertEmpty(seq.repeat(0));
+            hi.assertEqual(seq.repeat(4), "!!!!");
+        },
+        "repeatOverrideInfiniteSpecified": hi => {
+            const seq = new hi.sequence.OneElementSequence("!");
+            const repeated = seq.repeat(Infinity);
+            hi.assert(repeated.unbounded());
+            hi.assert(repeated.startsWith("!!!!!!"));
+        },
+        "repeatOverrideInfiniteUnspecified": hi => {
+            const seq = new hi.sequence.OneElementSequence("!");
+            const repeated = seq.repeat();
+            hi.assert(repeated.unbounded());
+            hi.assert(repeated.startsWith("!!!!!!"));
+        },
     },
     getSequence: process.env.NODE_ENV !== "development" ? undefined : [
         hi => new OneElementSequence(0),
@@ -29,28 +51,14 @@ export const OneElementSequence = defineSequence({
         this.element = element;
         this.isDone = isDone;
     },
-    seed: function(element){
-        this.element = element;
-        return this;
-    },
-    // Optimized implementations of some common operations
-    repeat: function(repetitions = -1){
-        if(repetitions === 0){
-            return new EmptyElementSequence(this.element);
-        }else if(repetitions < 0){
+    repeat: function(repetitions){
+        if(repetitions <= 0){
+            return new EmptySequence(this.element);
+        }else if(!repetitions || !isFinite(repetitions)){
             return new InfiniteRepeatElementSequence(this.element);
         }else{
             return new FiniteRepeatElementSequence(repetitions, this.element);
         }
-    },
-    reverse: function(){
-        return this;
-    },
-    filter: function(predicate){
-        return predicate(this.element) ? this : new EmptySequence();
-    },
-    reject: function(predicate){
-        return predicate(this.element) ? new EmptySequence() : this;
     },
     bounded: () => true,
     unbounded: () => false,
@@ -76,10 +84,8 @@ export const OneElementSequence = defineSequence({
     index: function(i){
         return this.element;
     },
-    has: null,
-    get: null,
     slice: function(i, j){
-        return new OneElementSequence(this.element, i >= j);
+        return this.repeat.implementation.apply(this, j - i);
     },
     copy: function(){
         return new OneElementSequence(this.element, this.isDone);
@@ -88,7 +94,6 @@ export const OneElementSequence = defineSequence({
         this.isDone = false;
         return this;
     },
-    rebase: null,
 });
 
 export const one = wrap({
@@ -103,6 +108,7 @@ export const one = wrap({
         returns: (`
             The function returns a sequence enumerating only the given element.
         `),
+        returnType: "sequence",
         related: [
             "repeatElement", "emptySequence"
         ],
@@ -112,11 +118,8 @@ export const one = wrap({
     },
     attachSequence: false,
     async: false,
-    sequences: [
-        OneElementSequence
-    ],
     arguments: {
-        one: wrap.expecting.anything
+        one: wrap.expecting.anything,
     },
     implementation: (element) => {
         return new OneElementSequence(element);

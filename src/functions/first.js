@@ -24,35 +24,7 @@ export const first = wrap({
             many elements were applicable and will consequently be shorter than
             the number of elements given.
         `),
-        returnType: {
-            "typeof inputSequence": (`
-                When no predicate function was given and either the number of
-                elements was positive infinity, or the input sequence had known
-                length that was less than or equal to the number of elements
-                specified.
-            `),
-            "typeof inputSequence.slice()": (`
-                When no predicate function was given, the input sequence had
-                known length and allowed slicing, and the number of elements was
-                a finite positive number less than or equal to the length of
-                the input sequence.
-            `),
-            "FilterSequence": (`
-                When a predicate function was specified and either the number of
-                elements was positive infinity, or the input sequence had known
-                length that was less than or equal to the number of elements
-                specified.
-            `),
-            "HeadSequence": (`
-                When a predicate function was specified, the number of elements
-                was a finite positive number, and either the input sequence did
-                not have known length, or the input sequence had a known length
-                that was less than the number of elements requested.
-                Also when no predicate function was specified, the number of
-                elements was a finite positive number, and the input sequence
-                either did not have known length or did not support slicing.
-            `),
-        },
+        returnType: "sequence",
         examples: [
             "basicUsage", "basicUsagePredicate",
         ],

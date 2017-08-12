@@ -22,19 +22,9 @@ export const firstElementElse = wrap({
             is unbounded and a predicate function not satisfied by any element
             in that sequence is given as input.
         `),
-        returnType: {
-            "typeof first element of inputSequence": (`
-                When no predicate function was given and the input sequence was
-                not empty.
-            `),
-            "typeof first element of inputSequence satisfying the predicate": (`
-                When a predicate function was given and the input sequence was
-                not empty.
-            `),
-            "undefined": (`
-                When the input sequence was empty.
-            `),
-        },
+        returnType: [
+            "element", "callback()",
+        ],
         examples: [
             "basicUsage", "basicUsagePredicate", "emptyInput",
         ],

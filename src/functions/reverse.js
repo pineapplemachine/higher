@@ -138,7 +138,7 @@ export const reverse = wrap({
             The function returns a sequence which enumerates the elements of
             the input sequence in reverse order.
         `),
-        returnType: "ReverseSequence",
+        returnType: "sequence",
         examples: [
             "basicUsage",
         ],

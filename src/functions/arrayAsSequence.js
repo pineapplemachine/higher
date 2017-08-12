@@ -137,7 +137,7 @@ export const arrayAsSequence = wrap({
             The function returns a sequence for enumerating the elements of
             the input array.
         `),
-        returnType: "ArraySequence",
+        returnType: "sequence",
         examples: [
             "basicUsage",
         ],

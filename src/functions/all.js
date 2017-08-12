@@ -25,27 +25,7 @@ export const all = wrap({
             return value when a predicate was specified.
             The function returns #true when the input sequence was empty.
         `),
-        returnType: {
-            "typeof first falsey element": (`
-                When no predicate was given and any element of the input
-                sequence was falsey.
-            `),
-            "typeof last truthy element": (`
-                When no predicate was given and no element of the sequence
-                was falsey, but there was at least one element in the sequence.
-            `),
-            "typeof first falsey predicate return value": (`
-                When a predicate was given and any element of the input
-                failed to satisfy the predicate.
-            `),
-            "typeof last truthy predicate return value": (`
-                When a predicate was given and every element of the input
-                satisfied the predicate.
-            `),
-            "true": (`
-                When the input sequence was empty.
-            `),
-        },
+        returnType: ["element", "predicate(element)", "boolean"],
         examples: [
             "basicUsage", "basicUsagePredicate",
         ],

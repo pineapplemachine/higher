@@ -117,7 +117,7 @@ export const distinct = wrap({
             those unique elements in a sequence would be to @sort the sequence
             and then use the @uniq function.
         `),
-        returnType: "DistinctSequence",
+        returnType: "sequence",
         examples: [
             "basicUsage", "basicUsageTransform",
         ],
