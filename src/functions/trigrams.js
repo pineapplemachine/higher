@@ -5,14 +5,34 @@ import {SlicingNgramSequence, TrackingNgramSequence} from "./ngrams";
 
 export const trigrams = wrap({
     name: "trigrams",
+    summary: "Get a sequence enumerating trigrams of an input sequence.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The function expects a single sequence as input.
+        `),
+        returns: (`
+            The function returns a sequence enumerating the trigrams of the
+            input sequence.
+        `),
+        returnType: "sequence",
+        examples: [
+            "basicUsage",
+        ],
+        related: [
+            "ngrams", "bigrams",
+        ],
+        links: [
+            {
+                description: "Information about trigrams on Wikipedia",
+                url: "https://en.wikipedia.org/wiki/Trigram",
+            },
+        ],
+    },
     attachSequence: true,
     async: false,
-    sequences: [
-        SlicingNgramSequence,
-        TrackingNgramSequence
-    ],
     arguments: {
-        one: wrap.expecting.sequence
+        one: wrap.expecting.sequence,
     },
     implementation: (source) => {
         if(source.length && source.slice && source.bounded()){

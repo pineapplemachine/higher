@@ -6,7 +6,7 @@ import {EmptySequence} from "./emptySequence";
 import {InfiniteRepeatElementSequence} from "./repeatElement";
 
 export const SlicingNgramSequence = defineSequence({
-    summary: "Enumerate ngrams in a sequence.",
+    summary: "Enumerate n-grams in a sequence.",
     supportRequired: [
         "length", "slice",
     ],
@@ -16,7 +16,7 @@ export const SlicingNgramSequence = defineSequence({
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         expects: (`
-            The constructor expects a number indicating ngram size and one
+            The constructor expects a number indicating n-gram size and one
             sequence as input. Ngram size must be a positive integer.
             The input sequence must have known length and support slicing.
         `),
@@ -106,14 +106,14 @@ export const SlicingNgramSequence = defineSequence({
 });
 
 export const TrackingNgramSequence = defineSequence({
-    summary: "Enumerate ngrams in a sequence.",
+    summary: "Enumerate n-grams in a sequence.",
     supportsWith: [
         "index", "slice", "copy", "reset",
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         expects: (`
-            The constructor expects a number indicating ngram size and one
+            The constructor expects a number indicating n-gram size and one
             sequence as input. Ngram size must be a positive integer.
         `),
     },
@@ -208,12 +208,36 @@ export const TrackingNgramSequence = defineSequence({
 
 export const ngrams = wrap({
     name: "ngrams",
+    summary: "Get a sequence enumerating n-grams of an input sequence.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The function expects as input a sequence and a n-gram length.
+        `),
+        returns: (`
+            The function returns a sequence enumerating the n-grams of the
+            specified length of the input sequence.
+        `),
+        returnType: "sequence",
+        examples: [
+            "basicUsage",
+        ],
+        related: [
+            "bigrams", "trigrams",
+        ],
+        links: [
+            {
+                description: "Information about n-grams on Wikipedia",
+                url: "https://en.wikipedia.org/wiki/N-gram",
+            },
+        ],
+    },
     attachSequence: true,
     async: false,
     arguments: {
         unordered: {
-            numbers: {one: wrap.expecting.nonNegativeInteger},
-            sequences: 1
+            numbers: 1,
+            sequences: 1,
         }
     },
     implementation: (ngramSize, source) => {

@@ -5,14 +5,34 @@ import {SlicingNgramSequence, TrackingNgramSequence} from "./ngrams";
 
 export const bigrams = wrap({
     name: "bigrams",
+    summary: "Get a sequence enumerating bigrams of an input sequence.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The function expects a single sequence as input.
+        `),
+        returns: (`
+            The function returns a sequence enumerating the bigrams of the
+            input sequence.
+        `),
+        returnType: "sequence",
+        examples: [
+            "basicUsage",
+        ],
+        related: [
+            "ngrams", "trigrams",
+        ],
+        links: [
+            {
+                description: "Information about bigrams on Wikipedia",
+                url: "https://en.wikipedia.org/wiki/Bigram",
+            },
+        ],
+    },
     attachSequence: true,
     async: false,
-    sequences: [
-        SlicingNgramSequence,
-        TrackingNgramSequence
-    ],
     arguments: {
-        one: wrap.expecting.sequence
+        one: wrap.expecting.sequence,
     },
     implementation: (source) => {
         if(source.length && source.slice && source.bounded()){
