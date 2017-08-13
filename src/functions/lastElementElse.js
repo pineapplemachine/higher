@@ -23,19 +23,9 @@ export const lastElementElse = wrap({
             is unbounded and a predicate function not satisfied by any element
             in that sequence is given as input.
         `),
-        returnType: {
-            "typeof last element of inputSequence": (`
-                When no predicate function was given and the input sequence was
-                not empty.
-            `),
-            "typeof last element of inputSequence satisfying the predicate": (`
-                When a predicate function was given and the input sequence was
-                not empty.
-            `),
-            "undefined": (`
-                When the input sequence was empty.
-            `),
-        },
+        returnType: [
+            "element", "callback()",
+        ],
         examples: [
             "basicUsage", "basicUsagePredicate", "emptyInput",
         ],

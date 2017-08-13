@@ -316,32 +316,7 @@ export const stride = wrap({
             then the nth element, then the 2nth element, and so on where n is
             the provided stride length.
         `),
-        returnType: {
-            "EmptySequence": (`
-                When the stride length was either zero or #Infinity and the
-                input sequence was empty.
-            `),
-            "InfiniteRepeatElementSequence": (`
-                When the stride length was zero and the input sequence was
-                not empty.
-            `),
-            "OneElementSequence": (`
-                When the stride length was #Infinity and the input sequence was
-                not empty.
-            `),
-            "typeof inputSequence": (`
-                When the stride length was exactly #1.
-            `),
-            "IndexStrideSequence": (`
-                When the input sequence has known length and supports indexing,
-                and the stride length was neither #1, #0, or #Infinity.
-            `),
-            "PoppingStrideSequence": (`
-                When the input sequence either does not have known length or
-                does not support indexing, and the stride length was neither
-                #1, #0, or #Infinity.
-            `),
-        },
+        returnType: "sequence",
         examples: [
             "basicUsage",
         ],

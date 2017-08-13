@@ -234,6 +234,7 @@ export const dropLast = wrap({
         expects: (`
             The function expects as input a sequence, an optional number of
             elements to drop from its back, and an optional predicate function.
+            The input sequence must be either known-bounded or known-unbounded.
         `),
         returns: (`
             The function returns a sequence which enumerates the elements in
@@ -243,50 +244,7 @@ export const dropLast = wrap({
             When no predicate was specified, the output behaves as though a
             predicate satisfied by every input was given.
         `),
-        returnType: {
-            "typeof inputSequence": (`
-                When the number of elements to drop was less than or equal to zero.
-            `),
-            "typeof inputSequence.slice()": (`
-                When no predicate function was specified, the number of elements
-                to drop was a positive finite number less than the length of
-                the input sequence, and the sequence had both known length and
-                support for slicing.
-            `),
-            "FilterSequence": (`
-                When a predicate function was specified and the number of
-                elements to drop was positive infinity or, if the input sequence
-                had known length, was greater than or equal to the length of the
-                sequence.
-            `),
-            "EmptySequence": (`
-                When no predicate function was specified and the the number of
-                elements to drop was positive infinity or, if the input sequence
-                had known length, was greater than or equal to the length of the
-                sequence.
-            `),
-            "HeadSequence": (`
-                When no predicate function was specified, the number of elements
-                to drop was a finite positive number, and the input sequence had
-                known length but did not support slicing.
-            `),
-            "OnDemandSequence": (`
-                When the number of elements to drop was a finite positive number,
-                the input sequence was known-bounded, and either the sequence
-                did not have known length and support slicing, or a predicate
-                function was given as input.
-            `),
-            "UnboundedDropLastSequence": (`
-                When no predicate function was specified, the number of elements
-                to drop was a finite positive number, and the input sequence was
-                known to be unbounded.
-            `),
-            "UnboundedDropLastPredicateSequence": (`
-                When a predicate function was specified, the number of elements
-                to drop was a finite positive number, and the input sequence was
-                known to be unbounded.
-            `),
-        },
+        returnType: "sequence",
         examples: [
             "basicUsage", "basicUsagePredicate",
         ],
@@ -300,7 +258,7 @@ export const dropLast = wrap({
         unordered: {
             numbers: "?",
             functions: {optional: wrap.expecting.predicate},
-            sequences: 1,
+            sequences: {one: wrap.expecting.knownBoundsSequence},
         }
     },
     implementation: (dropTarget, predicate, source) => {
@@ -344,12 +302,8 @@ export const dropLast = wrap({
                     );
                 },
             });
-        }else if(source.unbounded()){
+        }else{ // Argument validation implies source.unbounded()
             return new UnboundedDropLastSequence(drop, source);
-        }else{
-            throw BoundsUnknownError(source, {
-                message: "Failed to drop last elements",
-            });
         }
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
@@ -445,10 +399,8 @@ export const dropLast = wrap({
         },
         "notKnownBoundedInput": hi => {
             const seq = hi.counter().until(i => i >= 8);
-            hi.assert(seq.dropLast(0) === seq);
-            hi.assertEmpty(seq.dropLast(Infinity));
-            hi.assertFailWith(BoundsUnknownError,() => seq.dropLast(1));
-            hi.assertFailWith(BoundsUnknownError,() => seq.dropLast(1, i => i !== 5));
+            hi.assertFail(() => seq.dropLast(1));
+            hi.assertFail(() => seq.dropLast(1, i => i !== 5));
         },
     },
 });

@@ -76,16 +76,7 @@ export const assumeUnbounded = wrap({
             If the input sequence was already known to be either bounded or
             unbounded, then that sequence is itself returned.
         `),
-        returnType: {
-            "typeof inputSequence": (`
-                When the input sequence was known to be bounded or known to
-                be unbounded.
-            `),
-            "AssumeUnboundedSequence": (`
-                When the input sequence was not known to be either bounded or
-                unbounded.
-            `),
-        },
+        returnType: "sequence",
         examples: [
             "basicUsage",
         ],

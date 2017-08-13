@@ -127,7 +127,7 @@ export const stringAsSequence = wrap({
             The function returns a sequence for enumerating the characters of
             the input string.
         `),
-        returnType: "StringSequence",
+        returnType: "sequence",
         examples: [
             "basicUsage",
         ],
