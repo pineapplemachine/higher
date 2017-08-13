@@ -2,8 +2,6 @@ import {isSequence} from "../core/sequence";
 import {isString} from "../core/types";
 import {wrap} from "../core/wrap";
 
-import {NotBoundedError} from "../errors/NotBoundedError";
-
 export const string = wrap({
     name: "string",
     summary: "Concatenate a string from a sequence of strings.",
@@ -21,10 +19,6 @@ export const string = wrap({
             having their own contents recursively written as strings and
             appended to the output string.
         `),
-        throws: (`
-            The function throws a @NotBoundedError when the input sequence
-            was not known to be bounded.
-        `),
         examples: [
             "basicUsage", "flattenSubSequences",
         ],
@@ -35,13 +29,10 @@ export const string = wrap({
     attachSequence: true,
     async: true,
     arguments: {
-        one: wrap.expecting.iterable,
+        one: wrap.expecting.boundedSequence,
     },
     implementation: (source) => {
         if(isString(source)) return source;
-        NotBoundedError.enforce(source, {
-            message: "Failed to create string",
-        });
         let result = "";
         for(const element of source){
             if(isSequence(element) && element.bounded()){

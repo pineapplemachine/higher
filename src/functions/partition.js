@@ -1,7 +1,5 @@
 import {wrap} from "../core/wrap";
 
-import {NotBoundedError} from "../errors/NotBoundedError";
-
 export const partition = wrap({
     name: "partition",
     summary: "Partition the elements of a sequence by a predicate into two arrays.",
@@ -17,10 +15,6 @@ export const partition = wrap({
             satisfy the predicate function and the second array contains those
             elements of the input that did satisfy the predicate.
         `),
-        throws: (`
-            The function throws a @NotBoundedError when the input sequence was
-            not known to be bounded.
-        `),
         examples: [
             "basicUsage",
         ],
@@ -29,15 +23,11 @@ export const partition = wrap({
     async: true,
     arguments: {
         unordered: {
-            functions: 1,
-            sequences: 1,
-            allowIterables: true
+            functions: {one: wrap.expecting.predicate},
+            sequences: {one: wrap.expecting.boundedSequence},
         }
     },
     implementation: (predicate, source) => {
-        NotBoundedError.enforce(source, {
-            message: "Failed to partition sequence",
-        });
         const a = [];
         const b = [];
         for(const element of source){

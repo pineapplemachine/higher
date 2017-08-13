@@ -2,8 +2,6 @@ import {constants} from "../core/constants";
 import {isEqual} from "../core/isEqual";
 import {wrap} from "../core/wrap";
 
-import {NotBoundedError} from "../errors/NotBoundedError";
-
 export const defaultUniformComparison = isEqual;
 
 export const uniform = wrap({

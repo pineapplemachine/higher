@@ -1,7 +1,5 @@
 import {wrap} from "../core/wrap";
 
-import {NotBoundedError} from "../errors/NotBoundedError";
-
 export const all = wrap({
     name: "all",
     summary: "Get whether all elements in a sequence satisfy a predicate.",

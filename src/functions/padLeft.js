@@ -1,7 +1,5 @@
 import {wrap} from "../core/wrap";
 
-import {BoundsUnknownError} from "../errors/BoundsUnknownError";
-
 import {EagerSequence} from "./eager";
 import {FinitePadLeftSequence, InfinitePadLeftSequence} from "./padLeftCount";
 
@@ -10,11 +8,6 @@ export const padLeft = wrap({
     summary: "Satisfy a length requirement by padding the front of a sequence with some repeated element.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
-        throws: (`
-            The function throws a @BoundsUnknownError if the input sequence did
-            not have known length and was not known to be either bounded or
-            unbounded, and the target length was not @Infinity.
-        `),
         examples: [
             "basicUsage",
         ],
@@ -26,16 +19,18 @@ export const padLeft = wrap({
     async: false,
     arguments: {
         ordered: [
-            wrap.expecting.sequence, wrap.expecting.number, wrap.expecting.anything
+            wrap.expecting.either(
+                wrap.expecting.unboundedSequence,
+                wrap.expecting.knownLengthSequence
+            ),
+            wrap.expecting.number,
+            wrap.expecting.anything,
         ],
     },
     implementation: (source, targetLength, element) => {
         if(targetLength <= 0 || source.unbounded()){
             return source;
         }else if(isFinite(targetLength)){
-            if(!source.bounded()) throw BoundsUnknownError(source, {
-                message: "Failed to left pad sequence.",
-            });
             const padSource = source.length ? source : new EagerSequence(source);
             const sourceLength = padSource.length();
             if(targetLength <= sourceLength){
@@ -81,13 +76,7 @@ export const padLeft = wrap({
             hi.assert(seq.endsWith("abcabcabc"));
         },
         "boundsUnknownInput": hi => {
-            // Ok to pad with 0 elements
             const seq = () => hi.recur(i => i + 1).seed(0).until(i => i >= 5);
-            hi.assertEqual(seq().padLeft(0, "!"), [0, 1, 2, 3, 4]);
-            // Ok to pad with infinity elements
-            const inf = seq().padLeft(Infinity, "!");
-            hi.assert(inf.startsWith(["!", "!", "!"]));
-            // Error to pad with any other number of elements
             hi.assertFail(() => seq().padLeft(10, "!"));
         },
     },

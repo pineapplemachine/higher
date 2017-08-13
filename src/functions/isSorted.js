@@ -1,8 +1,6 @@
 import {constants} from "../core/constants";
 import {wrap} from "../core/wrap";
 
-import {NotBoundedError} from "../errors/NotBoundedError";
-
 export const isSorted = wrap({
     name: "isSorted",
     summary: "Get whether a sequence is sorted in according to a relational function.",
@@ -34,15 +32,11 @@ export const isSorted = wrap({
     async: true,
     arguments: {
         unordered: {
-            functions: "?",
-            sequences: 1,
-            allowIterables: true
-        }
+            functions: {optional: wrap.expecting.relation},
+            sequences: {one: wrap.expecting.boundedSequence},
+        },
     },
     implementation: (relate, source) => {
-        NotBoundedError.enforce(source, {
-            message: "Failed to determine whether sequence was sorted",
-        });
         const relateFunc = relate || constants.defaults.relationalFunction;
         let last = undefined;
         let first = true;
