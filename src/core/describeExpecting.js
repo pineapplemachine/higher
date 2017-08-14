@@ -72,20 +72,24 @@ export const describeExpecting = function(expects){
     }else if(expects.one){
         return `The function expects one ${expects.one.singular} as input.`;
     }else if(expects.ordered){
-        if(expects.ordered.length === 1 && expects.plusVariadic){
-            return (
-                `The function expects one ${expects.ordered[0].singular} plus ` +
-                "any number of additional arguments of any type as input."
-            );
+        let base = "";
+        if(expects.ordered.order.length === 1){
+            base = `The function expects one ${expects.ordered.order[0].singular}`;
         }else{
             const parts = [];
-            for(const expect of expects.ordered){
+            for(const expect of expects.ordered.order){
                 parts.push(`${expect.article} ${expect.singular}`);
             }
-            const base = `The function expects, in this order, ${joinSeries(parts)} `;
-            return base + (!expects.plusVariadic ? "" :
-                "plus any number of additional arguments of any type "
-            ) + "as input.";
+            base = `The function expects, in this order, ${joinSeries(parts)}`;
+        }
+        if(expects.ordered.plusVariadic){
+            const variadic = expects.ordered.plusVariadic;
+            return (
+                `plus ${describeAmount(variadic.amount, variadic.type)} ` +
+                "as input."
+            );
+        }else{
+            return `${base} as input.`;
         }
     }else if(expects.unordered){
         const unordered = expects.unordered;
@@ -203,12 +207,12 @@ export const describeExpectingViolation = function(expects, violation){
     }else if(violation.index !== undefined){
         message = (
             `Expected ${violation.wasNot.article} ${violation.wasNot.singular} ` +
-            `at position ${violation.index} but did not find one.`
+            `at position ${violation.index} but found something else.`
         );
     }else if(violation.one){
         message = (
             `Expected ${violation.wasNot.article} ${violation.wasNot.singular} ` +
-            `as the single argument but did not find one.`
+            `as the single argument but found something else.`
         );
     }
     let suggestion = "";

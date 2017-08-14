@@ -328,8 +328,8 @@ export const stride = wrap({
     async: false,
     arguments: {
         unordered: {
-            numbers: {one: wrap.expecting.nonNegativeInteger},
-            sequences: 1
+            numbers: 1,
+            sequences: 1,
         }
     },
     implementation: (strideLength, source) => {
