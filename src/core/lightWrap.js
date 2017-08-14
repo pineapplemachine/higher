@@ -43,6 +43,7 @@ export const lightWrap = function lightWrap(info){
     const wrapped = info.implementation;
     wrapped.summary = info.summary;
     wrapped.internal = info.internal;
+    wrapped.names = info.names || [wrapped.name];
     if(process.env.NODE_ENV === "development"){
         wrapped.docs = cleanDocs(info.docs);
         wrapped.test = wrappedTestRunner(wrapped, info.tests);
