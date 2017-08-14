@@ -1,52 +1,23 @@
 import {addSequenceConverter} from "./asSequence";
 import {expecting, Expecting, normalizeExpecting} from "./expecting";
 import {lightWrap, wrappedTestRunner} from "./lightWrap";
+import {partialLeft, partialRight} from "./partial";
 import {attachSequenceMethods} from "./sequence";
 import {getWrappedFunction, getWrappedMethod} from "./wrapFunction";
 import {getWrappedFunctionAsync} from "./wrapFunction";
 
 import {cleanDocs} from "../docs/cleanString";
 
-const normalizeArguments = (args) => {
-    if(args && args.unordered){
-        const unordered = args.unordered;
-        for(const type of ["numbers", "functions", "sequences"]){
-            if(unordered[type] && !unordered[type].amount){
-                if(unordered[type].one){
-                    unordered[type].amount = 1;
-                    unordered[type].order = [unordered[type].one];
-                }else if(unordered[type].optional){
-                    unordered[type].amount = "?";
-                    unordered[type].order = [unordered[type].optional];
-                }else if(unordered[type].anyNumberOf){
-                    unordered[type].amount = "*";
-                    unordered[type].all = unordered[type].anyNumberOf;
-                }else if(unordered[type].atLeastOne){
-                    unordered[type].amount = "+";
-                    unordered[type].all = unordered[type].atLeastOne;
-                }else if(unordered[type].order){
-                    unordered[type].amount = unordered[type].order.length;
-                }else{
-                    unordered[type] = {amount: unordered[type]};
-                }
-            }
-            if(unordered[type]){
-                const places = [
-                    "first", "second", "third", "fourth", "fifth", "sixth"
-                ];
-                for(let i = 0; i < places.length; i++){
-                    if(places[i] in unordered[type]){
-                        if(!unordered[type].order) unordered[type].order = [];
-                        unordered[type].order[i] = unordered[type][places[i]];
-                        unordered[type].order.length = Math.max(
-                            i + 1, unordered[type].order.length
-                        );
-                    }
-                }
-            }
-        }
-    }
-    return args;
+const getPartialLeft = (wrapped) => {
+    return function(...partialArgs){
+        return partialLeft.call(this, wrapped, ...partialArgs);
+    };
+};
+
+const getPartialRight = (wrapped) => {
+    return function(...partialArgs){
+        return partialRight.call(this, wrapped, ...partialArgs);
+    };
 };
 
 export const wrap = lightWrap({
@@ -79,6 +50,14 @@ export const wrap = lightWrap({
         fancy.summary = info.summary;
         if(info.async){
             fancy.async = getWrappedFunctionAsync(fancy);
+        }
+        fancy.partialLeft = getPartialLeft(fancy);
+        fancy.partialRight = getPartialRight(fancy);
+        fancy.partial = fancy.partialLeft;
+        if(fancy.async){
+            fancy.async.partialLeft = getPartialLeft(fancy.async);
+            fancy.async.partialRight = getPartialRight(fancy.async);
+            fancy.async.partial = fancy.async.partialLeft;
         }
         if(info.attachSequence){
             fancy.method = getWrappedMethod(info);

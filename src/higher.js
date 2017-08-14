@@ -138,6 +138,9 @@ import {objectsEqual} from "./core/isEqual"; hi.register(objectsEqual);
 import {valuesEqual} from "./core/isEqual"; hi.register(valuesEqual);
 // core/lightWrap
 /* imported above */ hi.register(lightWrap);
+// core/partial
+import {partial} from "./core/partial"; hi.register(partial);
+import {partialRight} from "./core/partial"; hi.register(partialRight);
 // core/sequence
 import {Sequence} from "./core/sequence"; hi.Sequence = Sequence;
 import {attachSequenceMethods} from "./core/sequence"; hi.register(attachSequenceMethods);
@@ -252,7 +255,6 @@ import {padLeft} from "./functions/padLeft"; hi.register(padLeft);
 import {padLeftCount} from "./functions/padLeftCount"; hi.register(padLeftCount);
 import {padRight} from "./functions/padRight"; hi.register(padRight);
 import {padRightCount} from "./functions/padRightCount"; hi.register(padRightCount);
-import {partial} from "./functions/partial"; hi.register(partial);
 import {partition} from "./functions/partition"; hi.register(partition);
 import {pipe} from "./functions/pipe"; hi.register(pipe);
 import {pluck} from "./functions/pluck"; hi.register(pluck);
