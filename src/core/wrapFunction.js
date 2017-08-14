@@ -51,7 +51,9 @@ export const getWrappedFunction = lightWrap({
         },
         "orderedArguments": hi => {
             testWrappedFunction({
-                arguments: {ordered: [hi.expecting.string, hi.expecting.number]},
+                arguments: {ordered: 
+                    {order: [hi.expecting.string, hi.expecting.number]},
+                },
                 implementation: (str, n) => `${str}(${n})`,
             }, func => {
                 hi.assert(func("ok", 0) === "ok(0)");
@@ -92,7 +94,7 @@ export const getWrappedFunctionOrdered = function(info, isMethod){
         };
     }else{
         return function(...args){
-            if(args[0] && info.arguments.ordered[0].sequence){
+            if(args[0] && info.arguments.ordered.order[0].sequence){
                 args[0] = asSequence(args[0]);
                 if(args[0] && args[0].overrides[info.name]){
                     const sequence = args[0];

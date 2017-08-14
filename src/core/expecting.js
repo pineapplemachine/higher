@@ -32,6 +32,9 @@ export const unorderedAmountOptional = function(amount, index = undefined){
 };
 
 export const normalizeExpecting = (args) => {
+    const places = [
+        "first", "second", "third", "fourth",
+    ];
     if(args && args.unordered){
         const unordered = args.unordered;
         for(const type of ["numbers", "functions", "sequences"]){
@@ -66,9 +69,6 @@ export const normalizeExpecting = (args) => {
                         unordered[type].amount = unordered[type].amount[0];
                     }
                 }
-                const places = [
-                    "first", "second", "third", "fourth", "fifth", "sixth"
-                ];
                 for(let i = 0; i < places.length; i++){
                     if(places[i] in unordered[type]){
                         if(!unordered[type].order) unordered[type].order = [];
@@ -84,29 +84,52 @@ export const normalizeExpecting = (args) => {
     if(args && args.optional){
         args.one = expecting.optional(args.optional);
     }
+    if(args && args.ordered){
+        if(isArray(args.ordered)){
+            args.ordered = {
+                order: args.ordered,
+            };
+        }else{
+            for(let i = 0; i < places.length; i++){
+                if(places[i] in args.ordered){
+                    if(!args.ordered.order) args.ordered.order = [];
+                    args.ordered.order[i] = args.ordered[places[i]];
+                    args.ordered.order.length = Math.max(
+                        i + 1, args.ordered.order.length
+                    );
+                }
+            }
+        }
+    }
     return args;
 };
 
 // Used by expecting.either
-const eitherString = function(expecting, plural = undefined){
-    let type = expecting.length ? expecting[0].type : undefined;
-    for(const expect of expecting){
-        if(expect.type !== type || !expect.adjective){
+const eitherString = function(options, plural = undefined){
+    let type = options.length ? options[0].type : undefined;
+    for(const option of options){
+        if(option.type !== type || !option.adjective){
             type = undefined;
             break;
         }
     }
     if(type){
         const adjectives = [];
-        for(const expect of expecting) adjectives.push(expect.adjective);
+        for(const option of options) adjectives.push(option.adjective);
         return joinSeries(adjectives, "or") + " " + type + (plural ? "s" : "");
     }else{
         const names = [];
-        for(const expect of expecting) names.push(
-            plural ? expect.plural : expect.singular
+        for(const option of options) names.push(
+            plural ? option.plural : option.singular
         );
         return names;
     }
+};
+const eitherTransforms = function(options){
+    for(const option in options){
+        if(option.transforms) return true;
+    }
+    return false;
 };
 
 export const Expecting = function(options){
@@ -120,6 +143,7 @@ export const Expecting = function(options){
     func.short = options.short;
     func.sequence = options.sequence;
     func.suggestion = options.suggestion;
+    func.transforms = options.transforms;
     return func;
 };
 
@@ -130,6 +154,7 @@ export const expecting = {
         singular: "value of any type",
         plural: "values of any type",
         adjective: "anything",
+        transforms: false,
         validate: value => value,
     }),
     number: Expecting({
@@ -138,9 +163,10 @@ export const expecting = {
         singular: "number",
         plural: "numbers",
         adjective: "numeric",
+        transforms: false,
         validate: value => {
             if(!isNumber(value)) throw new Error();
-            return +value;
+            return value;
         },
     }),
     positiveNumber: Expecting({
@@ -150,9 +176,10 @@ export const expecting = {
         plural: "positive numbers",
         short: "number",
         adjective: "positive",
+        transforms: false,
         validate: value => {
-            if(!isNumber(value) || +value <= 0) throw new Error();
-            return +value;
+            if(!isNumber(value) || value <= 0) throw new Error();
+            return value;
         },
     }),
     negativeNumber: Expecting({
@@ -162,9 +189,10 @@ export const expecting = {
         plural: "negative numbers",
         short: "number",
         adjective: "negative",
+        transforms: false,
         validate: value => {
-            if(!isNumber(value) || +value >= 0) throw new Error();
-            return +value;
+            if(!isNumber(value) || value >= 0) throw new Error();
+            return value;
         },
     }),
     nonNegativeNumber: Expecting({
@@ -174,9 +202,10 @@ export const expecting = {
         plural: "non-negative numbers",
         short: "number",
         adjective: "non-negative",
+        transforms: false,
         validate: value => {
-            if(!isNumber(value) || +value < 0) throw new Error();
-            return +value;
+            if(!isNumber(value) || value < 0) throw new Error();
+            return value;
         },
     }),
     integer: Expecting({
@@ -185,9 +214,10 @@ export const expecting = {
         singular: "integer",
         plural: "integers",
         adjective: "integral",
+        transforms: false,
         validate: value => {
-            if(!isNumber(value)) throw new Error();
-            return Math.floor(+value);
+            if(!Number.isInteger(value)) throw new Error();
+            return value;
         },
     }),
     index: Expecting({
@@ -196,9 +226,10 @@ export const expecting = {
         singular: "index",
         plural: "indexes",
         adjective: "non-negative and integral",
+        transforms: false,
         validate: value => {
-            if(!isNumber(value) || +value < 0) throw new Error();
-            return Math.floor(+value);
+            if(!Number.isInteger(value) || value < 0) throw new Error();
+            return value;
         },
     }),
     nonNegativeInteger: Expecting({
@@ -206,12 +237,25 @@ export const expecting = {
         article: "a",
         singular: "non-negative integer",
         plural: "non-negative integers",
-        adjective: "non-negative and integral",
+        adjective: "non-negative integral",
         shortArticle: "an",
         short: "integer",
+        transforms: false,
         validate: value => {
-            if(!isNumber(value) || +value < 0) throw new Error();
-            return Math.floor(+value);
+            if(!Number.isInteger(value) || value < 0) throw new Error();
+            return value;
+        },
+    }),
+    infinity: Expecting({
+        type: "number",
+        article: "an",
+        singular: "infinity",
+        plural: "infinities",
+        adjective: "infinite",
+        transforms: false,
+        validate: value => {
+            if(value !== Infinity) throw new Error();
+            return value;
         },
     }),
     string: Expecting({
@@ -219,6 +263,7 @@ export const expecting = {
         article: "a",
         singular: "string",
         plural: "strings",
+        transforms: true,
         validate: value => {
             return String(value);
         },
@@ -238,6 +283,7 @@ export const expecting = {
         article: "a",
         singular: "function",
         plural: "functions",
+        transforms: false,
         validate: value => {
             if(!isFunction(value)) throw new Error();
             return value;
@@ -250,6 +296,7 @@ export const expecting = {
         plural: "callback functions",
         short: "callback",
         adjective: "callback",
+        transforms: false,
         validate: value => {
             if(!isFunction(value)) throw new Error();
             return value;
@@ -262,6 +309,7 @@ export const expecting = {
         plural: "predicate functions",
         short: "predicate",
         adjective: "predicate",
+        transforms: false,
         validate: value => {
             if(!isFunction(value)) throw new Error();
             return value;
@@ -274,6 +322,7 @@ export const expecting = {
         plural: "transformation functions",
         short: "transformation",
         adjective: "transformation",
+        transforms: false,
         validate: value => {
             if(!isFunction(value)) throw new Error();
             return value;
@@ -286,6 +335,7 @@ export const expecting = {
         plural: "comparison functions",
         short: "comparison",
         adjective: "comparison",
+        transforms: false,
         validate: value => {
             if(!isFunction(value)) throw new Error();
             return value;
@@ -298,6 +348,7 @@ export const expecting = {
         plural: "relational functions",
         short: "relation",
         adjective: "relational",
+        transforms: false,
         validate: value => {
             if(!isFunction(value)) throw new Error();
             return value;
@@ -310,6 +361,7 @@ export const expecting = {
         plural: "ordering functions",
         short: "ordering",
         adjective: "ordering",
+        transforms: false,
         validate: value => {
             if(!isFunction(value)) throw new Error();
             return value;
@@ -322,6 +374,7 @@ export const expecting = {
         plural: "combination functions",
         short: "combination",
         adjective: "combination",
+        transforms: false,
         validate: value => {
             if(!isFunction(value)) throw new Error();
             return value;
@@ -332,6 +385,7 @@ export const expecting = {
         article: "an",
         singular: "array",
         plural: "arrays",
+        transforms: false,
         validate: value => {
             if(!isArray(value)) throw new Error();
             return value;
@@ -343,6 +397,7 @@ export const expecting = {
         singular: `array of ${element.plural}`,
         plural: `arrays of ${element.plural}`,
         short: "array",
+        transforms: element.transforms,
         validate: value => {
             if(!isArray(value)) throw new Error();
             const result = [];
@@ -356,6 +411,7 @@ export const expecting = {
         singular: "iterable",
         plural: "iterables",
         adjective: "iterable",
+        transforms: false,
         validate: value => {
             if(!isIterable(value)) throw new Error();
             return value;
@@ -367,6 +423,7 @@ export const expecting = {
         singular: "sequence",
         plural: "sequences",
         sequence: true,
+        transforms: true,
         validate: value => {
             const sequence = asSequence(value);
             if(!sequence) throw new Error();
@@ -381,6 +438,7 @@ export const expecting = {
         adjective: "implicit",
         short: "sequence",
         sequence: true,
+        transforms: true,
         validate: value => {
             const sequence = asImplicitSequence(value);
             if(!sequence) throw new Error();
@@ -395,6 +453,7 @@ export const expecting = {
         adjective: "known-bounded",
         short: "sequence",
         sequence: true,
+        transforms: true,
         suggestion: (
             `A function such as "limit", "head", or "assumeBounded" may be used ` +
             "to acquire a known-bounded sequence from one whose boundedness " +
@@ -414,6 +473,7 @@ export const expecting = {
         adjective: "known-unbounded",
         short: "sequence",
         sequence: true,
+        transforms: true,
         validate: value => {
             const sequence = asSequence(value);
             if(!sequence || !sequence.unbounded()) throw new Error();
@@ -428,6 +488,7 @@ export const expecting = {
         adjective: "known-bounded or known-unbounded",
         short: "sequence",
         sequence: true,
+        transforms: true,
         suggestion: (
             `A function such as "limit", "head", "assumeBounded", or "assumeUnbounded"` +
             "may be used to acquire a known-bounded or known-bounded sequence " +
@@ -443,13 +504,18 @@ export const expecting = {
         type: "sequence",
         article: "a",
         singular: "sequence with known length",
-        plural: "sequence with known length",
+        plural: "sequences with known length",
         adjective: "known-length",
         short: "sequence",
         sequence: true,
+        transforms: true,
+        suggestion: (
+            `The "assumeLength" function may be used to acquire a known-length ` +
+            "sequence from one whose length is definite yet not otherwise known."
+        ),
         validate: value => {
             const sequence = asSequence(value);
-            if(!sequence || (!sequence.bounded() && !sequence.length)) throw new Error();
+            if(!sequence || !sequence.length) throw new Error();
             return sequence;
         },
     }),
@@ -461,6 +527,7 @@ export const expecting = {
         adjective: "bidirectional",
         short: "sequence",
         sequence: true,
+        transforms: true,
         validate: value => {
             const sequence = asSequence(value);
             if(!sequence || !sequence.back) throw new Error();
@@ -475,6 +542,7 @@ export const expecting = {
         adjective: "reversible",
         short: "sequence",
         sequence: true,
+        transforms: true,
         validate: value => {
             const sequence = asSequence(value);
             if(!sequence) throw new Error();
@@ -487,6 +555,7 @@ export const expecting = {
         singular: String(option),
         plural: String(option),
         adjective: `exactly ${String(option)}`,
+        transforms: false,
         validate: value => {
             if(value !== option) throw new Error();
             return value;
@@ -496,6 +565,7 @@ export const expecting = {
         article: options[0].article,
         singular: eitherString(options, false),
         plural: eitherString(options, true),
+        transforms: eitherTransforms(options),
         validate: value => {
             for(const option of options){
                 try{
@@ -513,6 +583,7 @@ export const expecting = {
         plural: `optional ${expect.plural}`,
         shortArticle: expect.shortArticle,
         short: expect.short,
+        transforms: expect.transforms,
         validate: value => {
             if(value === null || value === undefined) return value;
             return expect(value);

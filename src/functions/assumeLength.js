@@ -2,6 +2,7 @@ import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {AssumeUnboundedSequence} from "./assumeUnbounded";
+import {EmptySequence} from "./emptySequence";
 
 export const AssumeLengthSequence = defineSequence({
     summary: "Wrap an input sequence so it behaves as though it were unidirectional.",
@@ -105,7 +106,7 @@ export const assumeLength = wrap({
     async: false,
     arguments: {
         unordered: {
-            numbers: {one: wrap.expecting.nonNegativeInteger},
+            numbers: {one: wrap.expecting.number},
             sequences: 1,
         },
     },
@@ -116,8 +117,10 @@ export const assumeLength = wrap({
             return (source.bounded() || source.unbounded() ?
                 source : new AssumeUnboundedSequence(source)
             );
+        }else if(assumedLength <= 0){
+            return new EmptySequence();
         }else{
-            return new AssumeLengthSequence(assumedLength, source);
+            return new AssumeLengthSequence(Math.floor(assumedLength), source);
         }
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
@@ -129,6 +132,10 @@ export const assumeLength = wrap({
             const withLength = seq.assumeLength(8);
             hi.assert(withLength.length() === 8);
             hi.assertEqual(withLength, [0, 1, 2, 3, 4, 5, 6, 7]);
+        },
+        "zeroLength": hi => {
+            const seq = hi.recur(i => i + 1).seed(0).until(i => true);
+            hi.assertEmpty(seq.assumeLength(0));
         },
         "infiniteLength": hi => {
             const seq = hi.counter().until(i => i < 0).assumeLength(Infinity);

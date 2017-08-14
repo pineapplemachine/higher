@@ -280,7 +280,7 @@ export const repeatEachElement = wrap({
     async: false,
     arguments: {
         unordered: {
-            numbers: {optional: wrap.expecting.index},
+            numbers: {optional: wrap.expecting.number},
             sequences: 1,
         },
     },

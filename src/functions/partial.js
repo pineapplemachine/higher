@@ -1,15 +1,4 @@
-import {defineSequence} from "../core/defineSequence";
-import {isArray} from "../core/types";
 import {wrap} from "../core/wrap";
-
-const expectingArrayOrFalsey = (value) => {
-    if(value && !isArray(value)){
-        // TODO: Better error message
-        throw "Expecting an array or a falsey value.";
-    }else{
-        return value;
-    }
-};
 
 export const partial = wrap({
     name: "partial",
@@ -17,7 +6,9 @@ export const partial = wrap({
     async: false,
     arguments: {
         ordered: [
-            wrap.expecting.function, expectingArrayOrFalsey, expectingArrayOrFalsey
+            wrap.expecting.function,
+            wrap.expecting.optional(wrap.expecting.array),
+            wrap.expecting.optional(wrap.expecting.array),
         ],
     },
     implementation: (target, leftArgs, rightArgs) => {

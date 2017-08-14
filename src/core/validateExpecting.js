@@ -21,21 +21,50 @@ export const validateOne = function(arg, expecting){
 
 // Validate arguments for a function expecting ordered arguments.
 export const validateOrdered = function(args, expecting){
+    const ordered = expecting.ordered;
     if(process.env.NODE_ENV !== "development"){
-        for(i = 0; i < expecting.ordered.length; i++){
-            args[i] = expecting.ordered[i](args[i]);
+        for(i = 0; i < ordered.order.length; i++){
+            args[i] = ordered.order[i](args[i]);
+        }
+        if(ordered.plusVariadic && ordered.plusVariadic.type.transforms){
+            for(; i < args.length; i++){
+                args[i] = ordered.plusVariadic.type(args[i]);
+            }
         }
         return args;
     }else{
         let i;
         try{
-            for(i = 0; i < expecting.ordered.length; i++){
-                args[i] = expecting.ordered[i](args[i]);
+            for(i = 0; i < ordered.order.length; i++){
+                args[i] = ordered.order[i](args[i]);
             }
         }catch(error){
             throw ArgumentsError({
-                expects: expecting, violation: {index: i, wasNot: expecting.ordered[i]}
+                expects: expecting,
+                violation: {index: i, wasNot: ordered.order[i]},
             });
+        }
+        if(ordered.plusVariadic){
+            const foundVariadic = Math.max(0, args.length - ordered.order.length);
+            const variadicType = {
+                singular: "additional argument", plural: "additional arguments",
+            };
+            if(!satisfiesUnordered(foundVariadic, ordered.plusVariadic.amount)){
+                throw ArgumentsError({
+                    expects: expecting,
+                    violation: {type: foundVariadic, wrongAmount: foundVariadic}
+                });
+            }
+            try{
+                for(; i < args.length; i++){
+                    args[i] = ordered.plusVariadic.type(args[i]);
+                }
+            }catch(error){
+                throw ArgumentsError({
+                    expects: expecting,
+                    violation: {index: i, wasNot: ordered.plusVariadic.type},
+                });
+            }
         }
         return args;
     }
@@ -63,7 +92,8 @@ export const validateUnordered = function(
             (expect[type] && !satisfiesUnordered(found[type].length, expect[type].amount))
         ){
             throw ArgumentsError({
-                expects: expecting, violation: {type: type, wrongAmount: found[type].length}
+                expects: expecting,
+                violation: {type: type, wrongAmount: found[type].length}
             });
         }
         // Ordered per argument type validation, if given.
