@@ -124,7 +124,7 @@ export const describeExpecting = function(expects){
                     }
                 }
                 if(unordered[type].any){
-                    post.push(
+                    post[type].push(
                         `At least one of the ${type.plural} must be ` +
                         `${unordered[type].any.adjective}.`
                     );
@@ -142,12 +142,12 @@ export const describeExpecting = function(expects){
                         if(unordered[type].amount === 1 || unordered[type].amount === "?"){
                             // Do nothing (handled above)
                         }else if(unorderedAmountOptional(unordered[type].amount, i)){
-                            post.push(
+                            post[type].push(
                                 `The ${placeName(i + 1)} ${fullType.singular}, ` +
                                 `if specified, must be ${mustBe}.`
                             );
                         }else{
-                            post.push(
+                            post[type].push(
                                 `The ${placeName(i + 1)} ${fullType.singular} ` +
                                 `must be ${mustBe}.`
                             );
@@ -160,7 +160,7 @@ export const describeExpecting = function(expects){
             `The function expects ${joinSeries(amounts)} as input.` :
             `The function expects, in any order, ${joinSeries(amounts)} as input.`
         );
-        for(const postType in post){
+        for(const postType of types){
             if(post[postType].length) result += ` ${post[postType].join(" ")}`;
         }
         return result;
@@ -189,9 +189,8 @@ export const describeExpectingViolation = function(expects, violation){
                 `${violation.wasNot.singular} but it was not.`
             );
             else if(violation.all) message = (
-                `Expected the all the ${type.plural} to be ${violation.wasNot.article} ` +
-                `${violation.wasNot.singular} but the ${placeName(violation.index + 1)}` +
-                `${type.singular} was not.`
+                `Expected the all the ${type.plural} to be ${violation.wasNot.plural} ` +
+                `but the ${placeName(violation.index + 1)} ${type.singular} was not.`
             );
             else if(violation.any) message = (
                 `Expected the at least one of the ${type.plural} to be ` +
