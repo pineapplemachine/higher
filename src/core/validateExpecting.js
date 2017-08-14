@@ -102,9 +102,13 @@ export const validateUnordered = function(
                 try{
                     if(expect[type].order[i]) expect[type].order[i](found[type][i]);
                 }catch(error){
-                    throw ArgumentsError({expects: expecting, violation: {
-                        order: true, type: type, index: i, wasNot: expect[type].order[i]
-                    }});
+                    throw ArgumentsError({
+                        expects: expecting,
+                        violation: {
+                            order: true, type: type, index: i,
+                            wasNot: expect[type].order[i],
+                        }
+                    });
                 }
             }
         }
@@ -114,9 +118,13 @@ export const validateUnordered = function(
                 try{
                     expect[type].all(found[type][i]);
                 }catch(error){
-                    throw ArgumentsError({expects: expecting, violation: {
-                        all: true, type: type, index: i, wasNot: expect[type].order[i]
-                    }});
+                    throw ArgumentsError({
+                        expects: expecting, 
+                        violation: {
+                            all: true, type: type, index: i,
+                            wasNot: expect[type].all,
+                        },
+                    });
                 }
             }
         }
@@ -132,9 +140,10 @@ export const validateUnordered = function(
                     // Do nothing
                 }
             }
-            if(!success) throw ArgumentsError({expects: expecting, violation: {
-                any: true, type: type, wasNot: expect[type].order[i]
-            }});
+            if(!success) throw ArgumentsError({
+                expects: expecting,
+                violation: {any: true, type: type, wasNot: expect[type].any},
+            });
         }
     }
     // All done! Return the categorized arguments.
