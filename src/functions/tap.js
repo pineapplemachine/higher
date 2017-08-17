@@ -14,6 +14,13 @@ export const TapSequence = defineSequence({
             popped element as an argument to that callback.
         `),
     },
+    getSequence: process.env.NODE_ENV !== "development" ? undefined : [
+        hi => new TapSequence(() => {}, hi.emptySequence()),
+        hi => new TapSequence(() => true, hi.emptySequence()),
+        hi => new TapSequence(() => {}, hi.range(10)),
+        hi => new TapSequence(() => {}, hi.counter()),
+        hi => new TapSequence(() => {}, hi.repeat("hello")),
+    ],
     constructor: function TapSequence(callback, source){
         this.callback = callback;
         this.source = source;
@@ -120,6 +127,13 @@ export const tap = wrap({
             hi.assert(sum === 1);
             while(!seq.done()) seq.popFront();
             hi.assert(sum === 1 + 2 + 3 + 4);
+        },
+        "emptyInput": hi => {
+            const callback = () => {throw new Error()};
+            const seq = hi.emptySequence().tap(callback);
+            hi.assert(seq.done());
+            // Consuming the sequence must not produce an error
+            seq.each();
         },
     },
 });
