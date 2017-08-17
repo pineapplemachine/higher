@@ -166,9 +166,6 @@ export const ForwardNumberRangeSequence = defineSequence({
         hi => new ForwardNumberRangeSequence(5, -5, 2),
     ],
     constructor: function ForwardNumberRangeSequence(start, end, step){
-        if(step <= 0){
-            throw "Failed to create range: Step must be greater than zero.";
-        }
         this.start = start;
         this.end = end > start ? end : start;
         this.stepValue = step;
@@ -286,9 +283,6 @@ export const BackwardNumberRangeSequence = defineSequence({
         hi => new BackwardNumberRangeSequence(-5, 5, -2),
     ],
     constructor: function BackwardNumberRangeSequence(start, end, step){
-        if(step >= 0){
-            throw "Failed to create range: Step must be less than zero.";
-        }
         this.start = start;
         this.end = end < start ? end : start;
         this.stepValue = step;

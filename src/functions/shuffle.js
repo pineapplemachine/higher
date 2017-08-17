@@ -6,14 +6,18 @@ import {ArraySequence} from "./arrayAsSequence";
 // https://en.wikipedia.org/wiki/Fisher%E2%80%93Yates_shuffle#The_.22inside-out.22_algorithm
 
 export const ShuffleSequence = defineSequence({
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The constructor expects a random number generation function and
+            a known-bounded sequence as input.
+        `),
+    },
     constructor: function ShuffleSequence(
         random, source, shuffledSource = undefined,
         lowIndex = undefined, highIndex = undefined,
         frontIndex = undefined, backIndex = undefined
     ){
-        if(!source.bounded()){
-            throw "Error shuffling sequence: Input must be known to be bounded.";
-        }
         this.random = random;
         this.source = source;
         // Note that shuffledSource will be an array, not a sequence.

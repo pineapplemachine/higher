@@ -6,13 +6,16 @@ import {EmptySequence} from "./emptySequence";
 import {wrap} from "../core/wrap";
 
 export const DropSliceSequence = defineSequence({
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The constructor expects two numbers and an input sequence as input.
+            The first number, being the inclusive low bound of the slice to drop,
+            must be greater than zero. The second number is the exclusive high
+            bound of the slice to drop.
+        `),
+    },
     constructor: function DropSliceSequence(dropLow, dropHigh, source){
-        if(dropLow === 0){
-            throw "Error creating drop slice sequence: Use dropHead instead.";
-        }
-        if(source.back && source.length && dropHigh === source.length()){
-            throw "Error creating drop slice sequence: Use dropTail instead.";
-        }
         this.dropLow = dropLow < 0 ? 0 : dropLow;
         this.dropHigh = dropHigh;
         if(source.length){
@@ -74,10 +77,6 @@ export const DropSliceSequence = defineSequence({
             i < this.dropLow ? i : i + this.dropLength
         );
     },
-    // Just use slice and concat to accomplish the same instead of creating
-    // a DropSliceSequence for a slicing source ya dingus.
-    slice: null,
-    has: null,
     get: function(i){
         return this.source.get(i);
     },
