@@ -56,10 +56,9 @@ export const EagerSequence = defineSequence({
         if(!this.source.left){
             // If the source doesn't support left, it hasn't been consumed either
             if(this.source.length) return this.source.length()
-            this.initialize();
-        }else{
-            return this.source.left();
+            else this.initialize();
         }
+        return this.source.left();
     },
     front: function(){
         return this.source.front();
