@@ -260,6 +260,7 @@ export const sequenceSliceWrapper = function(i, j){
 };
 
 export const sequenceSlicePatch = function(i, j){
+    // TODO: Fix missing imports!
     let low, high;
     if(j === undefined){
         if(i === undefined) return this.copy();
@@ -309,6 +310,87 @@ export const addStandardSequenceInterface = (sequence) => {
         return new constants.Promise((resolve, reject) => {
             callAsync(() => resolve(this.slice(i, j)))
         });
+    };
+};
+
+export const nativeMethodNameMap = {
+    "done": "nativeDone",
+    "front": "nativeFront",
+    "popFront": "nativePopFront",
+    "back": "nativeBack",
+    "popBack": "nativePopBack",
+    "copy": "nativeCopy",
+    "length": "nativeLength",
+    "index": "nativeIndex",
+    "slice": "nativeSlice",
+};
+
+export const appliedSequenceSupportsMethod = function(
+    methodName, sequenceType, sourceTypes
+){
+    const nativeMethodName = nativeMethodNameMap[methodName];
+    const supportedMethod = sequenceType[nativeMethodName];
+    for(const supportsAlways of sequenceType.supportsAlways){
+        if(methodName === supportsAlways) return supportedMethod;
+    }
+    const supportsWith = sequenceType.supportsWith[methodName];
+    if(supportsWith === "any"){
+        const nativeMethodName = nativeMethodNameMap[methodName];
+        for(const sourceType of sourceTypes){
+            if(sourceType[nativeMethodName]) return supportedMethod;
+        }
+        return undefined;
+    }else if(supportsWith === "all"){
+        const nativeMethodName = nativeMethodNameMap[methodName];
+        for(const sourceType of sourceTypes){
+            if(!sourceType[nativeMethodName]) return undefined;
+        }
+        return supportedMethod;
+    }else if(supportsWith && supportsWith instanceof Array){
+        for(const withMethodName of supportsWith){
+            const withNativeMethodName = nativeMethodNameMap[withMethodName];
+            for(const sourceType of sourceTypes){
+                if(!sourceType[withNativeMethodName]) return undefined;
+            }
+        }
+        return supportedMethod;
+    }else if(supportsWith && typeof(supportsWith) !== "string"){
+        for(const withMethodName in supportsWith){
+            const withNativeMethodName = nativeMethodNameMap[withMethodName];
+            if(supportsWith[withMethodName] === "any"){
+                for(const sourceType of sourceTypes){
+                    if(sourceType[withNativeMethodName]) return supportedMethod;
+                }
+                return undefined;
+            }else if(supportsWith[withMethodName] === "all"){
+                for(const sourceType of sourceTypes){
+                    if(!sourceType[withNativeMethodName]) return undefined;
+                }
+                return supportedMethod;
+            }else{
+                return undefined;
+            }
+        }
+        return supportedMethod;
+    }else{
+        return undefined;
+    }
+};
+
+export const appliedSequenceSupports = function(sequenceType, sourceTypes){
+    return {
+        nativeDone: sequenceType.nativeDone,
+        nativeFront: sequenceType.nativeFront,
+        nativePopFront: sequenceType.nativePopFront,
+        nativeCopy: appliedSequenceSupportsMethod("copy", sequenceType, sourceTypes),
+        nativeLength: appliedSequenceSupportsMethod("length", sequenceType, sourceTypes),
+        nativeIndex: appliedSequenceSupportsMethod("index", sequenceType, sourceTypes),
+        nativeSlice: appliedSequenceSupportsMethod("slice", sequenceType, sourceTypes),
+        nativeBack: appliedSequenceSupportsMethod("back", sequenceType, sourceTypes),
+        nativePopBack: (
+            appliedSequenceSupportsMethod("back", sequenceType, sourceTypes) &&
+            sequenceType.nativePopBack
+        ),
     };
 };
 

@@ -3,13 +3,14 @@ import {constants} from "./constants";
 import {normalizeExpecting} from "./expecting";
 import {lightWrap} from "./lightWrap";
 import {Sequence, addStandardSequenceInterface} from "./sequence";
+import {appliedSequenceSupports} from "./sequence";
 import {isArray, isNumber} from "./types";
 import {getWrappedFunction, getWrappedFunctionAsync} from "./wrapFunction";
 
 import {ArgumentsError} from "../errors/ArgumentsError";
 import {NotBoundedError} from "../errors/NotBoundedError";
 
-import {cleanDocs} from "../docs/cleanString";
+import {cleanDocs, cleanString} from "../docs/cleanString";
 
 export const sequenceTypes = {};
 
@@ -22,46 +23,82 @@ export const defineSequence = lightWrap({
         const constructor = attributes.constructor;
         attributes.overrides = attributes.overrides || [];
         constructor.prototype = Object.create(Sequence.prototype);
+        constructor.definedAttributes = attributes;
+        constructor.appliedTo = function(sourceTypes){
+            return appliedSequenceSupports(constructor,
+                isArray(sourceTypes) ? sourceTypes : [sourceTypes]
+            );
+        };
         for(const attributeName in attributes){
             const attribute = attributes[attributeName];
             if(attributeName === "done"){
+                constructor.nativeDone = attribute;
                 constructor.prototype.nativeDone = attribute;
                 constructor.prototype.done = attribute;
             }else if(attributeName === "length"){
+                constructor.nativeLength = attribute;
                 constructor.prototype.nativeLength = attribute;
                 constructor.prototype.length = attribute;
             }else if(attributeName === "front"){
+                constructor.nativeFront = attribute;
                 constructor.prototype.nativeFront = attribute;
                 constructor.prototype.front = attribute;
             }else if(attributeName === "popFront"){
+                constructor.nativePopFront = attribute;
                 constructor.prototype.nativePopFront = attribute;
                 constructor.prototype.popFront = attribute;
             }else if(attributeName === "back"){
+                constructor.nativeBack = attribute;
                 constructor.prototype.nativeBack = attribute;
                 constructor.prototype.back = attribute;
             }else if(attributeName === "popBack"){
+                constructor.nativePopBack = attribute;
                 constructor.prototype.nativePopBack = attribute;
                 constructor.prototype.popBack = attribute;
             }else if(attributeName === "index"){
+                constructor.nativeIndex = attribute;
                 constructor.prototype.nativeIndex = attribute;
                 constructor.prototype.index = attribute;
             }else if(attributeName === "slice"){
+                constructor.nativeSlice = attribute;
                 constructor.prototype.nativeSlice = attribute;
+            }else if(attributeName === "has"){
+                constructor.nativeHas = attribute;
+                constructor.prototype.nativeHas = attribute;
+                constructor.prototype.has = attribute;
+            }else if(attributeName === "get"){
+                constructor.nativeGet = attribute;
+                constructor.prototype.nativeGet = attribute;
+                constructor.prototype.get = attribute;
             }else if(attributeName === "copy"){
+                constructor.nativeCopy = attribute;
                 constructor.prototype.nativeCopy = attribute;
                 constructor.prototype.copy = attribute;
             }else if(attributeName === "overrides"){
                 constructor.prototype.overrides = attribute;
                 constructor.overrides = attribute;
             }else if(
+                attributeName === "supportRequired" ||
+                attributeName === "supportsWith"
+            ){
+                if(isArray(attribute)){
+                    const obj = {};
+                    for(const methodName of attribute) obj[methodName] = "any";
+                    constructor[attributeName] = obj;
+                }else{
+                    constructor[attributeName] = attribute;
+                }
+            }else if(
+                attributeName === "summary" ||
                 attributeName === "docs" ||
                 attributeName === "tests" ||
                 attributeName === "getSequence" ||
-                attributeName === "supportRequired" ||
-                attributeName === "supportsWith" ||
-                attributeName === "supportsAlways"
+                attributeName === "supportsAlways" ||
+                attributeName === "supportComplicated"
             ){
                 constructor[attributeName] = attribute;
+            }else if(attributeName === "supportDescription"){
+                constructor[attributeName] = cleanString(attribute);
             }else{
                 constructor.prototype[attributeName] = attribute;
             }

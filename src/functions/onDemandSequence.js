@@ -1,138 +1,150 @@
 import {defineSequence} from "../core/defineSequence";
+import {sequenceLengthPatch, sequenceIndexPatch, sequenceSlicePatch} from "../core/sequence";
 import {wrap} from "../core/wrap";
-
-import {ArraySequence} from "./arrayAsSequence";
 
 export const OnDemandSequence = defineSequence({
     summary: "Eagerly compute the contents of a sequence, but only when first needed.",
-    supportsAlways: [
-        "length", "left", "back", "index", "slice", "copy", "reset",
-    ],
+    supportComplicated: true,
+    supportDescription: process.env.NODE_ENV !== "development" ? undefined : (`
+        The output sequence's support depends on the sequence returned by
+        the on-demand object's \`dump\` function. The output sequence will
+        support all the same operations as that dumped sequence.
+    `),
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
+        expects: (`
+            The constructor expects a sequence constructor and an on-demand
+            object as input.
+        `),
     },
-    constructor: function OnDemandSequence(methods){
-        this.dumpOnDemand = methods.dump;
-        this.doneOnDemand = methods.done;
-        this.lengthOnDemand = methods.length;
-        this.frontOnDemand = methods.front;
-        this.backOnDemand = methods.back;
-        this.hasOnDemand = methods.has;
-        this.getOnDemand = methods.get;
-        if(this.boundedOnDemand) this.bounded = function(){
-            return this.boundedOnDema();
-        };
-        if(this.unboundedOnDemand) this.unbounded = function(){
-            return this.unboundedOnDemand();
-        };
-        if(this.doneOnDemand) this.done = function(){
-            return this.doneOnDemand();
-        };
-        if(this.lengthOnDemand) this.length = function(){
-            return this.lengthOnDemand();
-        };
-        if(this.lengthOnDemand) this.left = function(){
-            return this.lengthOnDemand();
-        };
-        if(this.frontOnDemand) this.front = function(){
-            return this.frontOnDemand();
-        };
-        if(this.backOnDemand) this.back = function(){
-            return this.backOnDemand();
-        };
-        if(this.hasOnDemand) this.has = function(i){
-            return this.hasOnDemand(i);
-        };
-        if(this.getOnDemand) this.get = function(i){
-            return this.getOnDemand(i);
-        };
+    constructor: function OnDemandSequence(
+        sourceType, onDemandMethods, source = undefined
+    ){
+        this.sourceType = sourceType;
+        this.onDemandMethods = onDemandMethods;
+        this.source = source;
+        if(!sourceType.nativeBack){
+            this.back = undefined;
+            this.popBack = undefined;
+            this.nextBack = undefined;
+        }
+        if(!sourceType.nativeLength){
+            this.nativeLength = undefined;
+            this.length = sequenceLengthPatch;
+        }
+        if(!sourceType.nativeIndex){
+            this.nativeIndex = undefined;
+            this.index = sequenceIndexPatch;
+        }
+        if(!sourceType.nativeSlice){
+            this.nativeSlice = undefined;
+            this.slice = sequenceSlicePatch;
+        }
+        if(!sourceType.nativeHas){
+            this.has = undefined;
+        }
+        if(!sourceType.nativeGet){
+            this.get = undefined;
+        }
     },
     initialize: function(){
-        this.source = this.dumpOnDemand();
-        this.bounded = function(){
-            return this.source.bounded();
-        };
-        this.unbounded = function(){
-            return this.source.unbounded();
-        };
-        this.done = function(){
-            return this.source.done();
-        };
-        this.length = function(){
-            return this.source.length();
-        };
-        this.left = function(){
-            return this.source.left();
-        };
-        this.front = function(){
-            return this.source.front();
-        };
-        this.popFront = function(){
-            return this.source.popFront();
-        };
-        this.back = function(){
-            return this.source.back();
-        };
-        this.popBack = function(){
-            return this.source.popBack();
-        };
-        this.index = function(i){
-            return this.source.index(i);
-        };
-        this.slice = function(i, j){
-            return this.source.index(i, j);
-        };
-        this.copy = function(){
-            return this.source.copy();
-        };
-        this.reset = function(){
-            this.source.reset();
-            return this;
-        };
+        this.source = this.onDemandMethods.dump();
     },
     bounded: function(){
-        this.initialize();
-        return this.source.bounded();
+        if(this.source){
+            return this.source.bounded();
+        }else if(this.onDemandMethods.bounded){
+            return this.onDemandMethods.bounded();
+        }else{
+            this.initialize();
+            return this.source.bounded();
+        }
     },
     unbounded: function(){
-        this.initialize();
-        return this.source.unbounded();
+        if(this.source){
+            return this.source.unbounded();
+        }else if(this.onDemandMethods.unbounded){
+            return this.onDemandMethods.unbounded();
+        }else{
+            this.initialize();
+            return this.source.unbounded();
+        }
     },
     done: function(){
-        this.initialize();
-        return this.source.done();
+        if(this.source){
+            return this.source.done();
+        }else if(this.onDemandMethods.done){
+            return this.onDemandMethods.done();
+        }else{
+            this.initialize();
+            return this.source.done();
+        }
     },
     length: function(){
-        this.initialize();
-        return this.source.length();
-    },
-    left: function(){
-        this.initialize();
-        return this.source.left();
+        if(this.source){
+            return this.source.length();
+        }else if(this.onDemandMethods.length){
+            return this.onDemandMethods.length();
+        }else{
+            this.initialize();
+            return this.source.length();
+        }
     },
     front: function(){
-        this.initialize();
-        return this.source.front();
+        if(this.source){
+            return this.source.front();
+        }else if(this.onDemandMethods.front){
+            return this.onDemandMethods.front();
+        }else{
+            this.initialize();
+            return this.source.front();
+        }
     },
     popFront: function(){
-        this.initialize();
+        if(!this.source) this.initialize();
         return this.source.popFront();
     },
     back: function(){
-        this.initialize();
-        return this.source.back();
+        if(this.source){
+            return this.source.back();
+        }else if(this.onDemandMethods.back){
+            return this.onDemandMethods.back();
+        }else{
+            this.initialize();
+            return this.source.back();
+        }
     },
     popBack: function(){
-        this.initialize();
+        if(!this.source) this.initialize();
         return this.source.popBack();
     },
     index: function(i){
-        this.initialize();
-        return this.source.index(i);
+        if(!this.source) this.initialize();
+        return this.source.nativeIndex(i);
     },
     slice: function(i, j){
-        this.initialize();
-        return this.source.slice(i, j);
+        if(!this.source) this.initialize();
+        return this.source.nativeSlice(i, j);
+    },
+    has: function(){
+        if(this.source){
+            return this.source.has(i);
+        }else if(this.onDemandMethods.has){
+            return this.onDemandMethods.has(i);
+        }else{
+            this.initialize();
+            return this.source.has(i);
+        }
+    },
+    get: function(){
+        if(this.source){
+            return this.source.get(i);
+        }else if(this.onDemandMethods.get){
+            return this.onDemandMethods.get(i);
+        }else{
+            this.initialize();
+            return this.source.get(i);
+        }
     },
     copy: function(){
         return new OnDemandSequence({
@@ -145,8 +157,18 @@ export const OnDemandSequence = defineSequence({
             get: this.getOnDemand,
         });
     },
-    reset: function(){
-        return this;
+});
+
+export const expectingSequenceType = wrap.Expecting({
+    article: "a",
+    singular: "sequence constructor",
+    plural: "sequence constructors",
+    validate: value => {
+        if(
+            !value || !value.nativeFront ||
+            !value.nativePopFront || !value.nativeDone
+        ) throw new Error();
+        return value;
     },
 });
 
@@ -173,43 +195,44 @@ export const onDemandSequence = wrap({
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         expects: (`
-            The function expects an object as its single input. The object
-            must have a #dump function attribute. Other specially-regonized but
-            not mandatory attributes are #done, #length, #front, #back, #has,
-            and #get. The more such properties that can be provided, the
-            fewer cases that will require computing the whole contents of the
-            output sequence.
+            The function expects a sequence type and an object as its inputs.
+            A sequence type is any sequence constructor.
+            The input object must have a \`dump\` function attribute.
+            Other specially-regonized but not mandatory attributes are
+            \`bounded\`, \`unbounded\`, \`done\`, \`length\`, \`front\`,
+            \`back\`, \`has\`, and \`get\`.
+            The more such properties that can be provided, the fewer cases that
+            will require computing the whole contents of the output sequence to
+            obtain the result.
         `),
         returns: (`
             The function returns a sequence whose contents are described by the
-            sequence returned by the input object's #dump function attribute.
+            sequence returned by the input object's \`dump\` function attribute.
             The contents of the sequence will be fully computed using that
-            function as soon as any contents of the output sequence are
-            accessed, except for the #done, #length, #left, #front, or #back
-            attributes when the inputted object provided implementations for
-            these properties that did not require fully computing the sequence.
+            function as soon as any information about the output sequence is
+            accessed and cannot otherwise be determined.
         `),
         returnType: "sequence",
         examples: [
             "basicUsage",
         ],
-        related: [
-            "eagerSequence",
-        ],
     },
     attachSequence: false,
     async: false,
     arguments: {
-        one: expectingOnDemandObject,
+        ordered: [
+            expectingSequenceType,
+            expectingOnDemandObject,
+        ],
     },
-    implementation: (object) => {
-        return new OnDemandSequence(object);
+    implementation: (sequenceType, object) => {
+        return new OnDemandSequence(sequenceType, object);
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {
             // Real use cases won't be so simple!
             let hasBeenComputed = false;
-            const seq = hi.onDemandSequence({
+            const seq = hi.onDemandSequence(hi.sequence.ArraySequence, {
                 // Get whether the sequence is known-bounded or known-unbounded.
                 bounded: () => true,
                 unbounded: () => false,
@@ -224,7 +247,7 @@ export const onDemandSequence = wrap({
                 // Get the whole contents as a sequence.
                 dump: () => {
                     hasBeenComputed = true;
-                    return hi([1, 2, 3, 4, 5, 6, 7]);
+                    return new hi.sequence.ArraySequence([1, 2, 3, 4, 5, 6, 7]);
                 },
             });
             // The full contents aren't computed until really necessary.
