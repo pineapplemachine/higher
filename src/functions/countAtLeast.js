@@ -37,7 +37,7 @@ export const countAtLeast = wrap({
         // Count is always greater than or equal to zero or a negative number.
         if(count <= 0) return true;
         // Count can never be greater than the input sequence's length.
-        if(source.length && count > source.length()) return false;
+        if(source.nativeLength && count > source.length()) return false;
         // None of those conditions were met, so just consume the sequence.
         let i = 0;
         for(const element of source){

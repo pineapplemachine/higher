@@ -36,7 +36,7 @@ export const countEquals = wrap({
         // Count is never negative, infinite, or NaN or undefined.
         if(count < 0 || !isFinite(count) || (!count && count !== 0)) return false;
         // Count must always be less than the input sequence's length.
-        if(source.length && count > source.length()) return false;
+        if(source.nativeLength && count > source.length()) return false;
         // None of those conditions were met, so just consume the sequence.
         let i = 0;
         for(const element of source){

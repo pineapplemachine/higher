@@ -37,7 +37,7 @@ export const countLessThan = wrap({
         // Count is always less than infinity.
         if(!isFinite(count)) return true;
         // Count must always be less than the input sequence's length.
-        if(source.length && count > source.length()) return true;
+        if(source.nativeLength && count > source.length()) return true;
         // None of those conditions were met, so just consume the sequence.
         let i = 0;
         for(const element of source){
