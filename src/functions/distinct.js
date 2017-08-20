@@ -6,7 +6,7 @@ export const defaultDistinctTransform = element => element;
 export const DistinctSequence = defineSequence({
     summary: "Enumerate only those elements of an input sequence not equal to any other.",
     supportsWith: [
-        "copy", "reset",
+        "copy",
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
@@ -73,11 +73,6 @@ export const DistinctSequence = defineSequence({
         return new DistinctSequence(
             this.transform, this.source.copy(), new Set(this.history)
         );
-    },
-    reset: function(){
-        this.source.reset();
-        this.history = new Set();
-        return this;
     },
     rebase: function(source){
         this.source = source;
@@ -158,6 +153,10 @@ export const distinct = wrap({
         "unboundedInput": hi => {
             const seq = hi.roundRobin(hi.range(5), hi.counter());
             hi.assert(seq.distinct().startsWith([0, 1, 2, 3, 4, 5, 6, 7, 8]));
+        },
+        "allTransformToSame": hi => {
+            const seq = hi.range(20).distinct(i => "!");
+            hi.assertEqual(seq, [0]);
         },
     },
 });
