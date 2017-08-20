@@ -111,9 +111,9 @@ export const assumeLength = wrap({
         },
     },
     implementation: (assumedLength, source) => {
-        if(source.nativeLength){
+        if(source.nativeLength || source.unbounded()){
             return source;
-        }else if(assumedLength === Infinity){
+        }else if(!isFinite(assumedLength)){
             return (source.bounded() || source.unbounded() ?
                 source : new AssumeUnboundedSequence(source)
             );
@@ -144,7 +144,16 @@ export const assumeLength = wrap({
             hi.assert(seq.unbounded());
             hi.assert(seq.startsWith([0, 1, 2, 3, 4, 5]));
         },
-        "lengthAlreadyKnown": hi => {
+        "emptyInput": hi => {
+            const seq = hi.recur(i => i).until(i => true).assumeLength(0);
+            hi.assertEmpty(seq);
+        },
+        "unboundedInput": hi => {
+            const seq = hi.repeat("hello");
+            hi.assert(seq.assumeLength(10) === seq);
+            hi.assert(seq.assumeLength(Infinity) === seq);
+        },
+        "knownLengthInput": hi => {
             const seq = hi.range(10);
             hi.assert(seq.assumeLength(10) === seq);
             hi.assert(seq.assumeLength(100) === seq);
