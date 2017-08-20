@@ -5,7 +5,7 @@ import {AssumeUnboundedSequence} from "./assumeUnbounded";
 import {EmptySequence} from "./emptySequence";
 
 export const AssumeLengthSequence = defineSequence({
-    summary: "Wrap an input sequence so it behaves as though it were unidirectional.",
+    summary: "A known-length sequence enumerating the elements of an unknown-length sequence.",
     supportsAlways: [
         "length", "left",
     ],
