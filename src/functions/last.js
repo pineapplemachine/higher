@@ -12,7 +12,7 @@ import {UnidirectionalOnDemandTailSequence} from "./tail";
 
 // Get an on-demand sequence for the last elements of a bidirectional sequence.
 const BidirectionalOnDemandLastSequence = (count, predicate, source) => {
-    return new OnDemandSequence({
+    return new OnDemandSequence(ReverseSequence.appliedTo(ArraySequence), {
         bounded: () => true,
         unbounded: () => false,
         dump: () => {
@@ -28,7 +28,7 @@ const BidirectionalOnDemandLastSequence = (count, predicate, source) => {
 
 // Get an on-demand sequence for the last elements of a reversible sequence.
 const ReversibleOnDemandLastSequence = (count, predicate, source) => {
-    return new OnDemandSequence({
+    return new OnDemandSequence(ReverseSequence.appliedTo(ArraySequence), {
         bounded: () => true,
         unbounded: () => false,
         dump: () => {
@@ -45,7 +45,7 @@ const ReversibleOnDemandLastSequence = (count, predicate, source) => {
 
 // Get an on-demand sequence for the last elements of a unidirectional sequence.
 const UnidirectionalOnDemandLastSequence = (count, predicate, source) => {
-    return new OnDemandSequence({
+    return new OnDemandSequence(ArraySequence, {
         bounded: () => true,
         unbounded: () => false,
         dump: () => {
@@ -56,7 +56,7 @@ const UnidirectionalOnDemandLastSequence = (count, predicate, source) => {
             }
             const sequence = new ArraySequence(array);
             return (array.length <= count ? sequence :
-                sequence.slice(array.length - count, array.length)
+                sequence.nativeSlice(array.length - count, array.length)
             );
         },
     });
@@ -107,7 +107,7 @@ export const last = wrap({
         if(lastCount <= 0){
             return new EmptySequence();
         }else if(predicate){
-            if(!isFinite(count) || (source.length && source.length() <= count)){
+            if(!isFinite(count) || (source.nativeLength && source.length() <= count)){
                 return new FilterSequence(predicate, source);
             }else if(source.back){
                 return BidirectionalOnDemandLastSequence(count, predicate, source);
@@ -118,11 +118,11 @@ export const last = wrap({
             }
         }else if(!isFinite(count)){
             return source;
-        }else if(source.length && source.slice){
+        }else if(source.nativeLength && source.nativeSlice){
             const sourceLength = source.length();
             if(sourceLength <= count) return source;
-            else return source.slice(sourceLength - count, sourceLength);
-        }else if(source.length && source.length() <= count){
+            else return source.nativeSlice(sourceLength - count, sourceLength);
+        }else if(source.nativeLength && source.length() <= count){
             return source;
         }else if(source.back){
             return BidirectionalOnDemandTailSequence(count, source);
