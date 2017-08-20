@@ -18,13 +18,14 @@ export const AssumeLengthSequence = defineSequence({
         this.assumedLength = assumedLength;
         this.source = source;
         this.consumedElements = consumedElements || 0;
+        // TODO: Don't
+        // https://github.com/pineapplemachine/higher/issues/53
         if(!source.back) this.back = undefined;
-        if(!source.index) this.index = undefined;
-        if(!source.slice) this.slice = undefined;
+        if(!source.nativeIndex) this.nativeIndex = undefined;
+        if(!source.nativeSlice) this.nativeSlice = undefined;
         if(!source.has) this.has = undefined;
         if(!source.get) this.get = undefined;
         if(!source.copy) this.copy = undefined;
-        if(!source.reset) this.reset = undefined;
     },
     bounded: () => true,
     unbounded: () => false,
