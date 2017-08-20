@@ -134,14 +134,14 @@ const adjustIndex = (sequence, index) => {
         if(!isNumber(index) || !isFinite(index)){
             throw ArgumentsError({message: "Index must be a finite number."});
         }
-        if(i < 0 && !sequence.bounded()){
+        if(index < 0 && !sequence.bounded()){
             throw NotBoundedError(sequence, {message: (
                 "Negative indexes are not allowed for sequences not " +
                 "known to be bounded."
             )});
         }
     }
-    return sequence.length() - i - 1;
+    return index >= 0 ? index : sequence.length() - index - 1;
 };
 
 const sequenceLengthPatch = function(){
@@ -162,11 +162,11 @@ const sequenceLengthPatch = function(){
 };
 
 const sequenceIndexWrapper = function(i){
-    return this.nativeIndex(adjustIndex(i));
+    return this.nativeIndex(adjustIndex(this, i));
 };
 
 const sequenceIndexPatch = function(i){
-    const index = adjustIndex(i);
+    const index = adjustIndex(this, i);
     if(!this.indexPatchArray){
         addIndexPatch.call(this, index);
     }
@@ -181,9 +181,11 @@ const sequenceIndexPatch = function(i){
 const sequenceSliceWrapper = function(i, j){
     if(j === undefined){
         if(i === undefined) return this.copy();
-        return this.nativeSlice(0, adjustIndex(i));
+        return this.nativeSlice(0, adjustIndex(this, i));
     }else{
-        return this.nativeSlice(adjustIndex(i), adjustIndex(j));
+        return this.nativeSlice(
+            adjustIndex(this, i), adjustIndex(this, j)
+        );
     }
 };
 
