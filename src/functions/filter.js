@@ -78,7 +78,7 @@ export const FilterSequence = defineSequence({
         }
     },
     initializeBack: function(){
-        this.this.initializedBack = true;
+        this.initializedBack = true;
         while(!this.source.done() && !this.predicate(this.source.back())){
             this.source.popBack();
         }
