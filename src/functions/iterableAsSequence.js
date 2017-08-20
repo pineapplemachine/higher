@@ -4,8 +4,6 @@ import {wrap} from "../core/wrap";
 
 export const IterableSequence = defineSequence({
     summary: "Enumerate the element of an input iterable.",
-    supportsWith: [],
-    supportsAlways: [],
     overrides: [
         Symbol.iterator,
     ],
@@ -39,43 +37,20 @@ export const IterableSequence = defineSequence({
     [Symbol.iterator]: function(){
         return this.source[Symbol.iterator]();
     },
-    initialize: function(){
-        this.item = this.source.next();
-        this.done = function(){
-            return this.item.done;
-        };
-        this.front = function(){
-            return this.item.value;
-        };
-        this.popFront = function(){
-            this.item = this.source.next();
-        };
-    },
     bounded: () => false,
     unbounded: () => false,
     done: function(){
-        this.initialize();
+        if(!this.item) this.item = this.source.next();
         return this.item.done;
     },
-    length: null,
-    left: null,
     front: function(){
-        this.initialize();
+        if(!this.item) this.item = this.source.next();
         return this.item.value;
     },
     popFront: function(){
-        this.initialize();
+        if(!this.item) this.source.next();
         this.item = this.source.next();
     },
-    back: null,
-    popBack: null,
-    index: null,
-    slice: null,
-    has: null,
-    get: null,
-    copy: null,
-    reset: null,
-    rebase: null,
 });
 
 export const iterableAsSequence = wrap({
