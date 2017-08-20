@@ -124,10 +124,20 @@ export const describeExpecting = function(expects){
                     }
                 }
                 if(unordered[type].any){
-                    post[type].push(
-                        `At least one of the ${type.plural} must be ` +
-                        `${unordered[type].any.adjective}.`
-                    );
+                    if(unordered[type].amount === "*" || (
+                        isArray(unordered[type].amount) &&
+                        unordered[type].amount[0] === 0
+                    )){
+                        post[type].push(
+                            `At least one of the ${fullType.plural}, if any ` +
+                            `are given, must be ${unordered[type].any.adjective}.`
+                        );
+                    }else{
+                        post[type].push(
+                            `At least one of the ${fullType.plural} must be ` +
+                            `${unordered[type].any.adjective}.`
+                        );
+                    }
                 }
                 if(unordered[type].order){
                     const order = unordered[type].order;
@@ -192,10 +202,11 @@ export const describeExpectingViolation = function(expects, violation){
                 `Expected the all the ${type.plural} to be ${violation.wasNot.plural} ` +
                 `but the ${placeName(violation.index + 1)} ${type.singular} was not.`
             );
-            else if(violation.any) message = (
+        }else if(violation.any){
+            message = (
                 `Expected the at least one of the ${type.plural} to be ` +
                 `${violation.wasNot.article} ${violation.wasNot.singular} but ` +
-                `none of the ${type.plural} were.`
+                `none of them were.`
             );
         }
     }else if(violation.invalid){
