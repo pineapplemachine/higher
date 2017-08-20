@@ -2,7 +2,8 @@ import {error} from "../core/error";
 import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
-import {EagerSequence} from "./eager";
+import {ArraySequence} from "./arrayAsSequence";
+import {OnDemandSequence} from "./onDemandSequence";
 
 export const ReverseSequence = defineSequence({
     summary: "Enumerate the elements of an input sequence in reverse order.",
@@ -123,6 +124,24 @@ export const ReverseSequence = defineSequence({
     },
 });
 
+// Implementation for reversing a known-bounded unidirectional sequence.
+export const ReverseOnDemandSequence = function(source){
+    return new OnDemandSequence(ReverseSequence.appliedTo(ArraySequence), {
+        bounded: () => true,
+        unbounded: () => false,
+        done: () => source.done(),
+        back: () => source.front(),
+        length: source.nativeLength ? () => source.length() : undefined,
+        has: source.has ? (i) => source.has(i) : undefined,
+        get: source.get ? (i) => source.get(i) : undefined,
+        dump: () => {
+            const array = [];
+            for(const element of source) array.push(element);
+            return new ReverseSequence(new ArraySequence(array));
+        },
+    });
+};
+
 // Enumerate the contents of a bidirectional input sequence in reverse order.
 export const reverse = wrap({
     name: "reverse",
@@ -150,16 +169,15 @@ export const reverse = wrap({
     ],
     arguments: {
         one: wrap.expecting.either(
-            wrap.expecting.boundedSequence, wrap.expecting.bidirectionalSequence
+            wrap.expecting.bidirectionalSequence,
+            wrap.expecting.boundedSequence
         ),
     },
-    implementation: (source) => {
+    implementation: function reverse(source){
         if(source.back){
             return new ReverseSequence(source);
-        }else{
-            // Arguments validator should guarantee that all inputs that
-            // aren't bidirectional must at least be known-bounded.
-            return new ReverseSequence(new EagerSequence(source));
+        }else{ // Argument validation implies source.bounded()
+            return ReverseOnDemandSequence(source);
         }
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
@@ -173,15 +191,26 @@ export const reverse = wrap({
         "singleLengthInput": hi => {
             hi.assertEqual(hi.reverse("?"), "?");
         },
+        "boundedBidirectionalInput": hi => {
+            hi.assertEqual(hi.repeat("ih", 2).reverse(), "hihi");
+        },
+        "boundedUnidirectionalInput": hi => {
+            const seq = () => hi.recur(i => i + i).seed(1).head(4);
+            hi.assertEqual(seq(), [1, 2, 4, 8]);
+            hi.assertEqual(seq().reverse(), [8, 4, 2, 1]);
+        },
         "unboundedBidirectionalInput": hi => {
             const seq = hi.repeat("hello", Infinity).reverse();
             hi.assert(seq.startsWith("olleholleholleh"));
             hi.assert(seq.endsWith("olleholleholleh"));
         },
-        "unidirectionalBoundedInput": hi => {
-            const seq = () => hi.recur(i => i + i).seed(1).head(4);
-            hi.assertEqual(seq(), [1, 2, 4, 8]);
-            hi.assertEqual(seq().reverse(), [8, 4, 2, 1]);
+        "unboundedUnidirectionalInput": hi => {
+            const seq = hi.recur(i => i + "!").seed("hello");
+            hi.assertFail(() => seq.reverse());
+        },
+        "notKnownBoundedUnidirectionalInput": hi => {
+            const seq = hi.recur(i => i + 1).seed(1).until(i => i >= 8);
+            hi.assertFail(() => seq.reverse());
         },
     },
 });
