@@ -151,7 +151,9 @@ const adjustIndex = (sequence, index) => {
 };
 
 const sequenceLengthPatch = function(){
-    if(!this.bounded()){
+    if(this.unbounded()){
+        return Infinity;
+    }else if(!this.bounded()){
         throw NotBoundedError(this, {
             message: "Failed to determine sequence length",
         });
