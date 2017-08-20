@@ -129,28 +129,44 @@ export const sequencesEqual = lightWrap({
         if(sources.length <= 1) return true;
         const sequences = [];
         let anyBounded = false;
+        let sameLength = undefined;
         for(const source of sources){
             const sequence = asSequence(source);
             anyBounded = anyBounded || sequence.bounded();
             sequences.push(sequence);
+            if(sequence.nativeLength){
+                if(sameLength === undefined) sameLength = sequence.length();
+                else if(sequence.length() !== sameLength) return false;
+            }else if(sequence.unbounded()){
+                return false;
+            }
         }
         if(!anyBounded) throw NotBoundedError(sources[0], {
             message: "Failed to compare sequences",
         });
-        while(!sequences[0].done()){
-            const elements = [sequences[0].nextFront()];
-            for(let i = 1; i < sequences.length; i++){
-                if(sequences[i].done()) return false;
-                elements.push(sequences[i].nextFront());
+        if(sequences.length === 2){
+            while(!sequences[0].done() && !sequences[1].done()){
+                if(!isEqual(sequences[0].nextFront(), sequences[1].nextFront())){
+                    return false;
+                }
             }
-            if(!isEqual(...elements)){
-                return false;
+            return sequences[0].done() && sequences[1].done();
+        }else{
+            while(!sequences[0].done()){
+                const elements = [sequences[0].nextFront()];
+                for(let i = 1; i < sequences.length; i++){
+                    if(sequences[i].done()) return false;
+                    elements.push(sequences[i].nextFront());
+                }
+                if(!isEqual(...elements)){
+                    return false;
+                }
             }
+            for(const sequence of sequences){
+                if(!sequence.done()) return false;
+            }
+            return true;
         }
-        for(const sequence of sequences){
-            if(!sequence.done()) return false;
-        }
-        return true;
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {

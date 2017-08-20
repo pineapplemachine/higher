@@ -1,7 +1,6 @@
-import {asSequence} from "../core/asSequence";
-import {constants} from "../core/constants";
-import {isEqual} from "../core/isEqual";
 import {wrap} from "../core/wrap";
+
+import {defaultEqualityComparison} from "./equals";
 
 // Determine equality of one or more sequences given a comparison function.
 // When only one sequence is given as input, the output is always true.
@@ -56,7 +55,7 @@ export const startsWith = wrap({
         ){
             return false;
         }
-        const compareFunc = compare || isEqual;
+        const compareFunc = compare || defaultEqualityComparison;
         for(const element of search){
             if(source.done() || !compareFunc(source.nextFront(), element)){
                 return false;

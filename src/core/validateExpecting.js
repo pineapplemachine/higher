@@ -130,7 +130,7 @@ export const validateUnordered = function(
         }
         // Check that at least one argument satisfies a validator, if given.
         if(expect[type] && expect[type].any){
-            let success = false;
+            let success = found[type].length === 0;
             for(let i = 0; i < found[type].length; i++){
                 try{
                     expect[type].any(found[type][i]);

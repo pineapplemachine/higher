@@ -1,5 +1,6 @@
-import {isEqual} from "../core/isEqual";
 import {wrap} from "../core/wrap";
+
+import {defaultEqualityComparison} from "./equals";
 
 // Determine equality of one or more sequences given a comparison function.
 // When only one sequence is given as input, the output is always true.
@@ -59,7 +60,7 @@ export const endsWith = wrap({
         ){
             return false;
         }
-        const compareFunc = compare || isEqual;
+        const compareFunc = compare || defaultEqualityComparison;
         if(source.back && search.back){
             while(!search.done()){
                 if(source.done() || !compareFunc(source.nextBack(), search.nextBack())){
