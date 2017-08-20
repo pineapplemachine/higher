@@ -4,99 +4,115 @@ import {wrap} from "../core/wrap";
 
 // TODO: These sequences probably need to implement collapseBreak methods
 export const ForwardFlattenSequence = defineSequence({
+    summary: "Enumerate in series the elements of a sequence's subsequences.",
+    collapseOutOfPlace: true,
     overrides: {
         reverse: {none: true},
     },
-    constructor: function ForwardFlattenSequence(source, frontSource = null){
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The constructor expects a single sequence as input.
+        `),
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "reverseOverride": hi => {
+            const seq = new hi.sequence.ForwardFlattenSequence(hi([[1, 2], [3, 4]]));
+            hi.assertEqual(seq.reverse(), [4, 3, 2, 1]);
+        },
+    },
+    constructor: function ForwardFlattenSequence(
+        source, frontSource = undefined
+    ){
         this.source = source;
         this.frontSource = frontSource;
     },
     reverse: function(){
         return new BackwardFlattenSequence(this.source);
     },
-    initialize: function(){
+    initializeFront: function(){
         while((!this.frontSource || this.frontSource.done()) && !this.source.done()){
             this.frontSource = asSequence(this.source.nextFront());
         }
-        this.done = function(){
-            return this.frontSource.done();
-        };
-        this.front = function(){
-            return this.frontSource.front();
-        };
-        this.popFront = function(){
-            this.frontSource.popFront();
-            while(this.frontSource.done() && !this.source.done()){
-                this.frontSource = asSequence(this.source.nextFront());
-            }
-        };
     },
     bounded: () => false,
-    unbounded: () => false,
+    unbounded: () => {
+        return this.source.unbounded();
+    },
     done: function(){
-        this.initialize();
-        return this.frontSource.done();
+        if(!this.frontSource) this.initializeFront();
+        return !this.frontSource || this.frontSource.done();
     },
     front: function(){
-        this.initialize();
+        if(!this.frontSource) this.initializeFront();
         return this.frontSource.front();
     },
     popFront: function(){
-        this.initialize();
-        this.popFront();
+        if(!this.frontSource) this.initializeFront();
+        this.frontSource.popFront();
+        while((!this.frontSource || this.frontSource.done()) && !this.source.done()){
+            this.frontSource = asSequence(this.source.nextFront());
+        }
     },
     rebase: function(source){
         this.source = source;
-        this.frontSource = source;
         return this;
     },
 });
 
 export const BackwardFlattenSequence = defineSequence({
+    summary: "Enumerate in series the elements of a sequence's subsequences, in reverse.",
+    collapseOutOfPlace: true,
     overrides: {
         reverse: {none: true},
     },
-    constructor: function BackwardFlattenSequence(source, frontSource = null){
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The constructor expects a single sequence as input.
+        `),
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "reverseOverride": hi => {
+            const seq = new hi.sequence.BackwardFlattenSequence(hi([[1, 2], [3, 4]]));
+            hi.assertEqual(seq.reverse(), [1, 2, 3, 4]);
+        },
+    },
+    constructor: function BackwardFlattenSequence(
+        source, frontSource = undefined
+    ){
         this.source = source;
         this.frontSource = frontSource;
     },
     reverse: function(){
         return new ForwardFlattenSequence(this.source);
     },
-    initialize: function(){
+    initializeFront: function(){
         while((!this.frontSource || this.frontSource.done()) && !this.source.done()){
             this.frontSource = asSequence(this.source.nextBack());
         }
-        this.done = function(){
-            return this.frontSource.done();
-        };
-        this.front = function(){
-            return this.frontSource.back();
-        };
-        this.popFront = function(){
-            this.frontSource.popBack();
-            while(this.frontSource.done() && !this.source.done()){
-                this.frontSource = asSequence(this.source.nextBack());
-            }
-        };
     },
     bounded: () => false,
-    unbounded: () => false,
+    unbounded: () => {
+        return this.source.unbounded();
+    },
     done: function(){
-        this.initialize();
-        return this.frontSource.done();
+        if(!this.frontSource) this.initializeFront();
+        return !this.frontSource || this.frontSource.done();
     },
     front: function(){
-        this.initialize();
+        if(!this.frontSource) this.initializeFront();
         return this.frontSource.back();
     },
     popFront: function(){
-        this.initialize();
-        this.popFront();
+        if(!this.frontSource) this.initializeFront();
+        this.frontSource.popBack();
+        while((!this.frontSource || this.frontSource.done()) && !this.source.done()){
+            this.frontSource = asSequence(this.source.nextBack());
+        }
     },
     rebase: function(source){
         this.source = source;
-        this.frontSource = source;
         return this;
     },
 });
@@ -104,17 +120,66 @@ export const BackwardFlattenSequence = defineSequence({
 // Flatten a single level deep.
 export const flatten = wrap({
     name: "flatten",
+    summary: "Get the elements of a sequence of sequences as one flat sequence.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The function expects a single sequence as input.
+        `),
+        returns: (`
+            The function returns a sequence which enumerates in series the
+            elements of every subsequence which is an element of the input
+            sequence.
+        `),
+        developers: (`
+            Note that elements of the input sequence that are not themselves
+            sequences are ignored completely.
+            /The output sequence, perhaps unintuitively, is never known-bounded
+            and supports only a minimum of sequence operations.
+            This is because the sequence cannot know in advance whether any of
+            the subsequences are themselves known-bounded or known-unbounded,
+            or if they support a given operation.
+            One alternative to this function when it is very useful to have
+            known boundedness and better support for sequence operations is
+            to use @array to produce an array of sequences and then @concat to
+            concatenate the sequences in that array.
+        `),
+        returnType: "sequence",
+        examples: [
+            "basicUsage",
+        ],
+        related: [
+            "flattenDeep", "concat",
+        ],
+    },
     attachSequence: true,
     async: false,
-    sequences: [
-        ForwardFlattenSequence,
-        BackwardFlattenSequence
-    ],
     arguments: {
-        one: wrap.expecting.sequence
+        one: wrap.expecting.sequence,
     },
     implementation: (source) => {
         return new ForwardFlattenSequence(source);
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": hi => {
+            const arrays = [[1, 2, 3], [4, 5], [6, 7, 8], [9]];
+            hi.assertEqual(hi.flatten(arrays), [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+        },
+        "emptyInput": hi => {
+            hi.assertEmpty(hi.emptySequence().flatten());
+        },
+        "emptySequenceElements": hi => {
+            hi.assertEmpty(hi([[]]).flatten());
+            hi.assertEmpty(hi([[], []]).flatten());
+            hi.assertEmpty(hi([[], [], [], []]).flatten());
+            hi.assertEqual(hi([[], [1, 2, 3]]).flatten(), [1, 2, 3]);
+        },
+        "nonSequenceElements": hi => {
+            hi.assertEmpty(hi([1, 2, 3]).flatten());
+            hi.assertEmpty(hi([[], 1, 2]).flatten());
+            hi.assertEqual(hi([null, [1, 2], null]).flatten(), [1, 2]);
+            hi.assertEqual(hi([1, hi.range(3), 2, [3, 4]]).flatten(), [0, 1, 2, 3, 4]);
+        },
     },
 });
 
