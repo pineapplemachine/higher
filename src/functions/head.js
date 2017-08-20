@@ -7,7 +7,7 @@ import {EmptySequence} from "./emptySequence";
 export const HeadSequence = defineSequence({
     summary: "Enumerate only the first so many elements of a sequence.",
     supportsWith: [
-        "length", "left", "get", "copy", "reset"
+        "length", "get", "copy",
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
