@@ -3,6 +3,16 @@ import {wrap} from "../core/wrap";
 
 export const EnumerateSequence = defineSequence({
     summary: "Enumerate elements of an input sequence with indexes attached.",
+    supportsWith: {
+        "length": "any", "index": "any", "slice": "any", "copy": "any",
+        "back": ["back", "length"],
+    },
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The constructor expects a single sequence as input.
+        `),
+    },
     getSequence: process.env.NODE_ENV !== "development" ? undefined : [
         // Default start index
         hi => new EnumerateSequence(hi.emptySequence()),
@@ -34,8 +44,12 @@ export const EnumerateSequence = defineSequence({
         this.frontIndex = frontIndex || this.startIndex;
         this.backIndex = backIndex;
         this.maskAbsentMethods(source);
-        if(!source.length) this.back = null;
-        if(this.back && backIndex === undefined){
+        if(!source.nativeLength){
+            this.back = undefined;
+            this.popBack = undefined;
+            this.nextBack = undefined;
+        }
+        if(this.source.back && this.source.nativeLength && backIndex === undefined){
             this.backIndex = this.startIndex + source.length() - 1;
         }
     },
@@ -50,9 +64,6 @@ export const EnumerateSequence = defineSequence({
     },
     length: function(){
         return this.source.length();
-    },
-    left: function(){
-        return this.source.left();
     },
     front: function(){
         return {index: this.frontIndex, value: this.source.front()};
@@ -76,18 +87,11 @@ export const EnumerateSequence = defineSequence({
             this.source.slice(i, j), this.startIndex + i
         );
     },
-    has: null,
-    get: null,
     copy: function(){
         return new EnumerateSequence(
-            this.source.copy(), this.startIndex, this.frontIndex, this.backIndex
+            this.source.copy(), this.startIndex,
+            this.frontIndex, this.backIndex
         );
-    },
-    reset: function(){
-        this.source.reset();
-        this.frontIndex = this.startIndex;
-        if(this.back) this.backIndex = this.startIndex + this.source.length() - 1;
-        return this;
     },
     rebase: function(source){
         this.source = source;
@@ -119,13 +123,10 @@ export const enumerate = wrap({
     attachSequence: true,
     async: false,
     arguments: {
-        unordered: {
-            numbers: "?",
-            sequences: 1,
-        },
+        one: wrap.expecting.sequence,
     },
-    implementation: (startIndex, source) =>{
-        return new EnumerateSequence(source, startIndex || 0);
+    implementation: (source) =>{
+        return new EnumerateSequence(source);
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {
@@ -141,14 +142,6 @@ export const enumerate = wrap({
         },
         "emptyInput": hi => {
             hi.assertEmpty(hi.emptySequence().enumerate());
-        },
-        "nonZeroStartIndex": hi => {
-            const seq = hi.enumerate(4, [0, 1, 2]);
-            hi.assertEqual(seq, [
-                {index: 4, value: 0},
-                {index: 5, value: 1},
-                {index: 6, value: 2},
-            ]);
         },
     },
 });
