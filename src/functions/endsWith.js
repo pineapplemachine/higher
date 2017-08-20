@@ -55,7 +55,10 @@ export const endsWith = wrap({
             return false; // Argument validation implies source.bounded()
         }
         const source = sources[0];
-        if(source.length && search.length && source.length() < search.length()){
+        if(
+            source.nativeLength && search.nativeLength &&
+            source.length() < search.length()
+        ){
             return false;
         }
         const compareFunc = compare || isEqual;
