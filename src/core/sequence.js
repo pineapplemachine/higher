@@ -89,9 +89,9 @@ Sequence.prototype.maskAbsentMethods = function(source){
         this.popBack = undefined;
         this.nextBack = undefined;
     }
-    if(this.length && !source.nativeLength) this.length = undefined;
-    if(this.index && !source.nativeIndex) this.index = undefined;
-    if(this.slice && !source.nativeSlice) this.slice = undefined;
+    if(this.length && !source.nativeLength) this.nativeLength = undefined;
+    if(this.index && !source.nativeIndex) this.nativeIndex = undefined;
+    if(this.slice && !source.nativeSlice) this.nativeSlice = undefined;
     if(this.has && !source.has) this.has = undefined;
     if(this.get && !source.get) this.get = undefined;
     if(this.copy && !source.copy) this.copy = undefined;

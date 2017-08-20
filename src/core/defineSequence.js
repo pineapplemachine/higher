@@ -50,10 +50,16 @@ export const defineSequence = lightWrap({
             }else if(attributeName === "copy"){
                 constructor.prototype.nativeCopy = attribute;
                 constructor.prototype.copy = attribute;
+            }else if(attributeName === "overrides"){
+                constructor.prototype.overrides = attribute;
+                constructor.overrides = attribute;
             }else if(
                 attributeName === "docs" ||
                 attributeName === "tests" ||
-                attributeName === "getSequence"
+                attributeName === "getSequence" ||
+                attributeName === "supportRequired" ||
+                attributeName === "supportsWith" ||
+                attributeName === "supportsAlways"
             ){
                 constructor[attributeName] = attribute;
             }else{
