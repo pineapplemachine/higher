@@ -111,7 +111,7 @@ export const assumeLength = wrap({
         },
     },
     implementation: (assumedLength, source) => {
-        if(source.length){
+        if(source.nativeLength){
             return source;
         }else if(assumedLength === Infinity){
             return (source.bounded() || source.unbounded() ?
@@ -120,7 +120,9 @@ export const assumeLength = wrap({
         }else if(assumedLength <= 0){
             return new EmptySequence();
         }else{
-            return new AssumeLengthSequence(Math.floor(assumedLength), source);
+            return new AssumeLengthSequence(
+                Math.floor(assumedLength), source
+            );
         }
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
