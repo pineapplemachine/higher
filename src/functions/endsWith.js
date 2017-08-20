@@ -1,8 +1,6 @@
 import {isEqual} from "../core/isEqual";
 import {wrap} from "../core/wrap";
 
-import {EagerSequence} from "./eager";
-
 // Determine equality of one or more sequences given a comparison function.
 // When only one sequence is given as input, the output is always true.
 export const endsWith = wrap({
