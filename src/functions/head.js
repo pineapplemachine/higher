@@ -47,11 +47,6 @@ export const HeadSequence = defineSequence({
         const sourceLength = this.source.length();
         return sourceLength < this.headLength ? sourceLength : this.headLength;
     },
-    left: function(){
-        const sourceLeft = this.source.left();
-        const indexLeft = this.headLength - this.frontIndex;
-        return sourceLeft < indexLeft ? sourceLeft : indexLeft;
-    },
     front: function(){
         return this.source.front();
     },
@@ -59,25 +54,16 @@ export const HeadSequence = defineSequence({
         this.source.popFront();
         this.frontIndex++;
     },
-    back: null,
-    popBack: null,
     index: function(i){
         return this.source.index(i);
     },
     slice: function(i, j){
         return this.source.slice(i, j);
     },
-    has: null,
-    get: null,
     copy: function(){
         return new HeadSequence(
             this.headLength, this.source.copy(), this.frontIndex
         );
-    },
-    reset: function(){
-        this.source.reset();
-        this.frontIndex = 0;
-        return this;
     },
     rebase: function(source){
         this.source = source;
@@ -121,9 +107,11 @@ export const head = wrap({
     implementation: (count, source) => {
         if(count <= 0){
             return new EmptySequence();
-        }else if(source.length && source.slice){
+        }else if(!isFinite(count)){
+            return source;
+        }else if(source.nativeLength && source.nativeSlice){
             const sourceLength = source.length();
-            return sourceLength <= count ? source : source.slice(0, count);
+            return sourceLength <= count ? source : source.nativeSlice(0, count);
         }else{
             return new HeadSequence(count, source);
         }
@@ -141,6 +129,10 @@ export const head = wrap({
         "emptyInput": hi => {
             hi.assertEmpty(hi.head(1, hi.emptySequence()));
             hi.assertEmpty(hi.head(10, hi.emptySequence()));
+        },
+        "infiniteInput": hi => {
+            const seq = hi.range(100);
+            hi.assert(seq.head(Infinity) === seq);
         },
         "boundedInputs": hi => {
             hi.assertEqual(hi.head(1, [0, 1, 2, 3, 4]), [0]);
