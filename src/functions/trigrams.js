@@ -35,7 +35,7 @@ export const trigrams = wrap({
         one: wrap.expecting.sequence,
     },
     implementation: (source) => {
-        if(source.length && source.slice && source.bounded()){
+        if(source.nativeLength && source.nativeSlice){
             return new SlicingNgramSequence(3, source);
         }else{
             return new TrackingNgramSequence(3, source);
