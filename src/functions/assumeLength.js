@@ -1,4 +1,5 @@
 import {defineSequence} from "../core/defineSequence";
+import {sequenceIndexPatch, sequenceSlicePatch} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 import {AssumeUnboundedSequence} from "./assumeUnbounded";
@@ -20,9 +21,19 @@ export const AssumeLengthSequence = defineSequence({
         this.consumedElements = consumedElements || 0;
         // TODO: Don't
         // https://github.com/pineapplemachine/higher/issues/53
-        if(!source.back) this.back = undefined;
-        if(!source.nativeIndex) this.nativeIndex = undefined;
-        if(!source.nativeSlice) this.nativeSlice = undefined;
+        if(!source.back){
+            this.back = undefined;
+            this.popBack = undefined;
+            this.nextBack = undefined;
+        }
+        if(!source.nativeIndex){
+            this.nativeIndex = undefined;
+            this.index = sequenceIndexPatch;
+        }
+        if(!source.nativeSlice){
+            this.nativeSlice = undefined;
+            this.slice = sequenceSlicePatch;
+        }
         if(!source.has) this.has = undefined;
         if(!source.get) this.get = undefined;
         if(!source.copy) this.copy = undefined;

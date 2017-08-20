@@ -1,6 +1,4 @@
-import {sequenceConverters} from "../core/asSequence";
 import {error} from "../core/error";
-import {isSequence} from "../core/sequence";
 import {isArray, isString} from "../core/types";
 
 export const BoundsUnknownError = error({
@@ -17,12 +15,9 @@ export const BoundsUnknownError = error({
     constructor: function BoundsUnknownError(source, options){
         this.source = source;
         this.options = options || {};
-        const sourceType = (isSequence(source) ?
-            source.typeChainString() + " sequence" : "iterable"
-        );
         this.message = (
             "The action requires knowing whether the input is bounded or " +
-            "unbounded, but the ${sourceType} is not known to be either. " +
+            "unbounded, but the sequence is not known to be either. " +
             "Try using a method such as 'head', 'limit', 'assumeBounded', or " +
             "'assumeUnbounded' to resolve this error."
         );
@@ -31,21 +26,7 @@ export const BoundsUnknownError = error({
         }
     },
     enforce: function(source, options){
-        if(
-            (isSequence(source) && (source.bounded() || source.unbounded())) ||
-            isArray(source) || isString(source)
-        ){
-            return source;
-        }
-        for(const converter of sequenceConverters){
-            if(converter.predicate(source)){
-                if(converter.bounded(source) || converter.unbounded(source)){
-                    return source;
-                }else{
-                    break;
-                }
-            }
-        }
+        if(source.bounded() || source.unbounded()) return source;
         throw BoundsUnknownError(source, options);
     },
 });

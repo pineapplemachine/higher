@@ -1,5 +1,8 @@
 import {lightWrap} from "./lightWrap";
 
+import {BoundsUnknownError} from "../errors/BoundsUnknownError";
+import {NotBoundedError} from "../errors/NotBoundedError";
+
 export const isSequence = lightWrap({
     summary: "Determine whether a value is some @Sequence.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
@@ -89,9 +92,18 @@ Sequence.prototype.maskAbsentMethods = function(source){
         this.popBack = undefined;
         this.nextBack = undefined;
     }
-    if(this.length && !source.nativeLength) this.nativeLength = undefined;
-    if(this.index && !source.nativeIndex) this.nativeIndex = undefined;
-    if(this.slice && !source.nativeSlice) this.nativeSlice = undefined;
+    if(this.length && !source.nativeLength){
+        this.nativeLength = undefined;
+        this.length = sequenceLengthPatch;
+    }
+    if(this.index && !source.nativeIndex){
+        this.nativeIndex = undefined;
+        this.index = sequenceIndexPatch;
+    }
+    if(this.slice && !source.nativeSlice){
+        this.nativeSlice = undefined;
+        this.slice = sequenceSlicePatch;
+    }
     if(this.has && !source.has) this.has = undefined;
     if(this.get && !source.get) this.get = undefined;
     if(this.copy && !source.copy) this.copy = undefined;
@@ -120,6 +132,184 @@ Sequence.prototype.typeChainString = function(){
     }else{
         return this.constructor.name;
     }
+};
+
+const addIndexPatch = function(i){
+    throw new Error("this should not be being called right now!");
+    this.indexPatchArray = [];
+    while(this.indexPatchArray.length < i && !this.nativeDone()){
+        this.indexPatchArray.push(this.nativeFront());
+        this.nativePopFront();
+    }
+    this.indexPatchFrontIndex = 0;
+    this.indexPatchBackIndex = this.indexPatchArray.length;
+    this.done = function(){
+        return (
+            this.indexPatchFrontIndex >= this.indexPatchBackIndex &&
+            this.nativeDone()
+        );
+    };
+    this.front = function(){
+        if(this.indexPatchFrontIndex < this.indexPatchArray.length){
+            return this.indexPatchArray(this.indexPatchFrontIndex);
+        }else{
+            return this.nativeFront();
+        }
+    };
+    this.popFront = function(){
+        this.indexPatchFrontIndex++;
+        if(this.indexPatchFrontIndex >= this.indexPatchArray.length){
+            return this.nativePopFront();
+        }
+    };
+    if(this.back){
+        this.back = function(){
+            if(this.nativeDone()){
+                return this.indexPatchArray[this.indexPatchBackIndex - 1];
+            }else{
+                return this.nativeBack();
+            }
+        };
+        this.popBack = function(){
+            if(this.nativeDone()){
+                this.indexPatchBackIndex--;
+            }else{
+                return this.nativePopBack();
+            }
+        };
+    }
+    if(this.copy){
+        const copyMethod = function(){
+            const copy = this.nativeCopy();
+            copy.indexPatchArray = this.indexPatchArray.slice();
+            copy.indexPatchFrontIndex = this.indexPatchFrontIndex;
+            copy.indexPatchBackIndex = this.indexPatchBackIndex;
+            copy.done = this.done;
+            copy.front = this.front;
+            copy.popFront = this.popFront;
+            copy.back = this.back;
+            copy.popBack = this.popBack;
+            copy.copy = copyMethod;
+            return copy;
+        };
+        this.copy = copyMethod;
+    }
+};
+
+export const adjustSequenceIndex = function(sequence, index){
+    if(process.env.NODE_ENV === "development"){
+        if(!isNumber(index) || !isFinite(index)){
+            throw ArgumentsError({message: "Index must be a finite number."});
+        }
+        if(index < 0 && !sequence.bounded()){
+            throw NotBoundedError(sequence, {message: (
+                "Negative indexes are not allowed for sequences not " +
+                "known to be bounded."
+            )});
+        }
+    }
+    return index >= 0 ? index : sequence.length() - index - 1;
+};
+
+export const sequenceLengthPatch = function(){
+    throw new Error("this should not be being called right now!");
+    if(this.unbounded()){
+        return Infinity;
+    }else if(!this.bounded()){
+        throw BoundsUnknownError(this, {
+            message: "Failed to determine sequence length",
+        });
+    }
+    if(!this.indexPatchArray){
+        addIndexPatch.call(this, Infinity);
+    }
+    while(!this.nativeDone()){
+        this.indexPatchArray.push(this.nativeFront());
+        this.nativePopFront();
+        this.indexPatchBackIndex++;
+    }
+    return this.indexPatchArray.length;
+};
+
+export const sequenceIndexWrapper = function(i){
+    return this.nativeIndex(adjustSequenceIndex(this, i));
+};
+
+export const sequenceIndexPatch = function(i){
+    const index = adjustSequenceIndex(this, i);
+    if(!this.indexPatchArray){
+        addIndexPatch.call(this, index);
+    }
+    while(this.indexPatchArray.length <= index && !this.nativeDone()){
+        this.indexPatchArray.push(this.nativeFront());
+        this.nativePopFront();
+        this.indexPatchBackIndex++;
+    }
+    return this.indexPatchArray[index];
+};
+
+export const sequenceSliceWrapper = function(i, j){
+    if(j === undefined){
+        if(i === undefined) return this.copy();
+        return this.nativeSlice(0, adjustSequenceIndex(this, i));
+    }else{
+        return this.nativeSlice(
+            adjustSequenceIndex(this, i), adjustSequenceIndex(this, j)
+        );
+    }
+};
+
+export const sequenceSlicePatch = function(i, j){
+    let low, high;
+    if(j === undefined){
+        if(i === undefined) return this.copy();
+        low = 0;
+        high = adjustSequenceIndex(i);
+    }else{
+        low = adjustSequenceIndex(i);
+        high = adjustSequenceIndex(j);
+    }
+    if(low >= high){
+        return new EmptySequence();
+    }
+    if(!this.indexPatchArray){
+        addIndexPatch.call(this, high);
+    }
+    while(this.indexPatchArray.length <= high && !this.nativeDone()){
+        this.indexPatchArray.push(this.nativeFront());
+        this.nativePopFront();
+        this.indexPatchBackIndex++;
+    }
+    return new ArraySequence(
+        this.indexPatchArray, low, high
+    );
+};
+
+export const addStandardSequenceInterface = (sequence) => {
+    sequence.prototype.length = (
+        sequence.prototype.length || sequenceLengthPatch
+    );
+    sequence.prototype.index = (sequence.prototype.nativeIndex ?
+        sequenceIndexWrapper : sequenceIndexPatch
+    );
+    sequence.prototype.slice = (sequence.prototype.nativeSlice ?
+        sequenceSliceWrapper : sequenceSlicePatch
+    );
+    sequence.prototype.lengthAsync = function(){
+        return new constants.Promise((resolve, reject) => {
+            callAsync(() => resolve(this.length()))
+        });
+    };
+    sequence.prototype.indexAsync = function(i){
+        return new constants.Promise((resolve, reject) => {
+            callAsync(() => resolve(this.index(i)))
+        });
+    };
+    sequence.prototype.sliceAsync = function(i, j){
+        return new constants.Promise((resolve, reject) => {
+            callAsync(() => resolve(this.slice(i, j)))
+        });
+    };
 };
 
 export default Sequence;
