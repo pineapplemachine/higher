@@ -72,38 +72,16 @@ export const FilterSequence = defineSequence({
         );
     },
     initializeFront: function(){
+        this.initializedFront = true;
         while(!this.source.done() && !this.predicate(this.source.front())){
             this.source.popFront();
         }
-        this.done = function(){
-            return this.source.done();
-        };
-        this.front = function(){
-            return this.source.front();
-        };
-        this.popFront = function(){
-            this.source.popFront();
-            while(!this.source.done() && !this.predicate(this.source.front())){
-                this.source.popFront();
-            }
-        };
     },
     initializeBack: function(){
+        this.this.initializedBack = true;
         while(!this.source.done() && !this.predicate(this.source.back())){
             this.source.popBack();
         }
-        this.done = function(){
-            return this.source.done();
-        };
-        this.back = function(){
-            return this.source.back();
-        };
-        this.popBack = function(){
-            this.source.popBack();
-            while(!this.source.done() && !this.predicate(this.source.back())){
-                this.source.popBack();
-            }
-        };
     },
     // These methods assume that if the input is unbounded, then so will be the
     // number of elements satisfying the predicate.
