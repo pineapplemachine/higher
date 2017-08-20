@@ -527,10 +527,7 @@ export const assertEmpty = lightWrap({
     },
     implementation: function assertEmpty(source, message = undefined){
         const sequence = asSequence(source);
-        if(sequence && sequence.done() &&
-            (!sequence.length || sequence.length() === 0) &&
-            (!sequence.left || sequence.left() === 0)
-        ) return source;
+        if(sequence && sequence.done()) return source;
         throw AssertError(message || "Value must be an empty sequence.", source);
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {

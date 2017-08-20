@@ -1,5 +1,6 @@
-import {error} from "../core/error";
 import {describeExpecting, describeExpectingViolation} from "../core/describeExpecting";
+
+import {error} from "../core/error";
 
 export const ArgumentsError = error({
     summary: "Function was called with invalid arguments.",
@@ -16,18 +17,18 @@ export const ArgumentsError = error({
         );
         if(this.violation){
             this.violationInfo = describeExpectingViolation(
-                options.expects, options.violation
+                this.options.expects, this.options.violation
             );
             this.message += " " + this.violationInfo.message;
         }
         if(this.expects){
-            this.message += " " + describeExpecting(options.expects);
+            this.message += " " + describeExpecting(this.options.expects);
         }
         if(this.violationInfo && this.violationInfo.suggestion){
             this.message += " " + this.violationInfo.suggestion;
         }
         if(this.options.message){
-            this.message = this.options.message + ": " + this.message;
+            this.message += " " + this.options.message;
         }
     },
 });
