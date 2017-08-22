@@ -98,7 +98,7 @@ export const last = wrap({
             functions: {optional: wrap.expecting.predicate},
             sequences: {one: wrap.expecting.either(
                 wrap.expecting.boundedSequence,
-                wrap.expecting.reversibleSequence
+                wrap.expecting.bidirectionalSequence
             )},
         }
     },
@@ -111,8 +111,6 @@ export const last = wrap({
                 return new FilterSequence(predicate, source);
             }else if(source.back){
                 return BidirectionalOnDemandLastSequence(count, predicate, source);
-            }else if(source.overrides.reverse){
-                return ReversibleOnDemandLastSequence(count, predicate, source);
             }else{ // Argument validation implies that source.bounded()
                 return UnidirectionalOnDemandLastSequence(count, predicate, source);
             }
@@ -126,8 +124,6 @@ export const last = wrap({
             return source;
         }else if(source.back){
             return BidirectionalOnDemandTailSequence(count, source);
-        }else if(source.overrides.reverse){
-            return ReversibleOnDemandTailSequence(count, source);
         }else{ // Argument validation implies that source.bounded()
             return UnidirectionalOnDemandTailSequence(count, source);
         }
@@ -236,18 +232,6 @@ export const last = wrap({
         "noneSatisfyPredicate": hi => {
             hi.assertEmpty(hi.range(10).last(i => false));
             hi.assertEmpty(hi("hello").last(i => false));
-        },
-        "boundedReverseOverrideInput": hi => {
-            const seq = () => hi.repeat(4, [[1, 2, 3], [4, 5]]).flatten();
-            const even = i => i % 2 === 0;
-            hi.assertEqual(seq().last(7), [4, 5, 1, 2, 3, 4, 5]);
-            hi.assertEqual(seq().last(5, even), [4, 2, 4, 2, 4]);
-        },
-        "unboundedReverseOverrideInput": hi => {
-            const seq = () => hi.repeat([[1, 2, 3], [4, 5]]).flatten();
-            const even = i => i % 2 === 0;
-            hi.assertEqual(seq().last(7), [4, 5, 1, 2, 3, 4, 5]);
-            hi.assertEqual(seq().last(5, even), [4, 2, 4, 2, 4]);
         },
     },
 });

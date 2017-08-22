@@ -2,33 +2,20 @@ import {defineSequence} from "../core/defineSequence";
 import {asSequence, validAsSequence} from "../core/asSequence";
 import {wrap} from "../core/wrap";
 
-// TODO: These sequences probably need to implement collapseBreak methods
-export const ForwardFlattenSequence = defineSequence({
+export const FlattenSequence = defineSequence({
     summary: "Enumerate in series the elements of a sequence's subsequences.",
     collapseOutOfPlace: true,
-    overrides: {
-        reverse: {none: true},
-    },
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         expects: (`
             The constructor expects a single sequence as input.
         `),
     },
-    tests: process.env.NODE_ENV !== "development" ? undefined : {
-        "reverseOverride": hi => {
-            const seq = new hi.sequence.ForwardFlattenSequence(hi([[1, 2], [3, 4]]));
-            hi.assertEqual(seq.reverse(), [4, 3, 2, 1]);
-        },
-    },
-    constructor: function ForwardFlattenSequence(
+    constructor: function FlattenSequence(
         source, frontSource = undefined
     ){
         this.source = source;
         this.frontSource = frontSource;
-    },
-    reverse: function(){
-        return new BackwardFlattenSequence(this.source);
     },
     initializeFront: function(){
         while((!this.frontSource || this.frontSource.done()) && !this.source.done()){
@@ -36,7 +23,7 @@ export const ForwardFlattenSequence = defineSequence({
         }
     },
     bounded: () => false,
-    unbounded: () => {
+    unbounded: function(){
         return this.source.unbounded();
     },
     done: function(){
@@ -52,63 +39,6 @@ export const ForwardFlattenSequence = defineSequence({
         this.frontSource.popFront();
         while((!this.frontSource || this.frontSource.done()) && !this.source.done()){
             this.frontSource = asSequence(this.source.nextFront());
-        }
-    },
-    rebase: function(source){
-        this.source = source;
-        return this;
-    },
-});
-
-export const BackwardFlattenSequence = defineSequence({
-    summary: "Enumerate in series the elements of a sequence's subsequences, in reverse.",
-    collapseOutOfPlace: true,
-    overrides: {
-        reverse: {none: true},
-    },
-    docs: process.env.NODE_ENV !== "development" ? undefined : {
-        introduced: "higher@1.0.0",
-        expects: (`
-            The constructor expects a single sequence as input.
-        `),
-    },
-    tests: process.env.NODE_ENV !== "development" ? undefined : {
-        "reverseOverride": hi => {
-            const seq = new hi.sequence.BackwardFlattenSequence(hi([[1, 2], [3, 4]]));
-            hi.assertEqual(seq.reverse(), [1, 2, 3, 4]);
-        },
-    },
-    constructor: function BackwardFlattenSequence(
-        source, frontSource = undefined
-    ){
-        this.source = source;
-        this.frontSource = frontSource;
-    },
-    reverse: function(){
-        return new ForwardFlattenSequence(this.source);
-    },
-    initializeFront: function(){
-        while((!this.frontSource || this.frontSource.done()) && !this.source.done()){
-            this.frontSource = asSequence(this.source.nextBack());
-        }
-    },
-    bounded: () => false,
-    unbounded: () => {
-        return this.source.unbounded();
-    },
-    done: function(){
-        if(!this.frontSource) this.initializeFront();
-        return !this.frontSource || this.frontSource.done();
-    },
-    front: function(){
-        if(!this.frontSource) this.initializeFront();
-        return this.frontSource.back();
-    },
-    popFront: function(){
-        if(!this.frontSource) this.initializeFront();
-        this.frontSource.popBack();
-        while((!this.frontSource || this.frontSource.done()) && !this.source.done()){
-            this.frontSource = asSequence(this.source.nextBack());
         }
     },
     rebase: function(source){

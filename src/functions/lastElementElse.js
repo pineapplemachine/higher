@@ -44,7 +44,7 @@ export const lastElementElse = wrap({
             },
             sequences: {one: wrap.expecting.either(
                 wrap.expecting.boundedSequence,
-                wrap.expecting.reversibleSequence
+                wrap.expecting.bidirectionalSequence
             )},
         },
     },
@@ -60,19 +60,6 @@ export const lastElementElse = wrap({
                 return callback();
             }else if(!source.done()){
                 return source.back();
-            }else{
-                return callback();
-            }
-        }else if(source.overrides.reverse){
-            const reversed = source.reverse();
-            if(predicate){
-                while(!reversed.done()){
-                    const element = reversed.nextFront();
-                    if(predicate(element)) return element;
-                }
-                return callback();
-            }else if(!reversed.done()){
-                return reversed.front();
             }else{
                 return callback();
             }
@@ -124,13 +111,6 @@ export const lastElementElse = wrap({
             hi.assert(seq().lastElementElse(bang) === 7);
             hi.assert(seq().lastElementElse(bang, even) === 6);
             hi.assert(seq().lastElementElse(bang, i => false) === "!");
-        },
-        "reversibleInput": hi => {
-            const seq = () => hi.flatten([[1, 2, 3], [4, 5]]);
-            const even = i => i % 2 === 0;
-            hi.assert(seq().lastElementElse(() => "!") === 5);
-            hi.assert(seq().lastElementElse(() => "!", even) === 4);
-            hi.assert(seq().lastElementElse(() => "!", i => false) === "!");
         },
         "unboundedBidirectionalInput": hi => {
             hi.assert(hi.counter().lastElementElse(() => 0) === Infinity);
