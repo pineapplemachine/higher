@@ -184,14 +184,14 @@ export const last = wrap({
             hi.assertEmpty(hi.emptySequence().last(10, i => false));
         },
         "knownLengthNonSlicingInput": hi => {
-            const seq = () => hi.recur(i => i + 1).seed(0).until(i => i >= 8).assumeLength(8);
+            const seq = () => hi.range(8).from(i => true).assumeLength(8);
             hi.assertEqual(seq().last(4), [4, 5, 6, 7]);
             hi.assertEqual(seq().last(8), [0, 1, 2, 3, 4, 5, 6, 7]);
             hi.assertEqual(seq().last(10), [0, 1, 2, 3, 4, 5, 6, 7]);
             hi.assertEqual(seq().last(Infinity), [0, 1, 2, 3, 4, 5, 6, 7]);
         },
         "knownLengthNonSlicingInputPredicate": hi => {
-            const seq = () => hi.recur(i => i + 1).seed(0).until(i => i >= 8).assumeLength(8);
+            const seq = () => hi.range(8).from(i => true).assumeLength(8);
             const even = i => i % 2 === 0;
             hi.assertEqual(seq().last(2, even), [4, 6]);
             hi.assertEqual(seq().last(8, even), [0, 2, 4, 6]);
@@ -199,9 +199,7 @@ export const last = wrap({
             hi.assertEqual(seq().last(Infinity, even), [0, 2, 4, 6]);
         },
         "boundedNonSlicingInput": hi => {
-            const seq = () => (
-                hi.recur(i => i + 1).seed(0).until(i => i >= 8).assumeBounded()
-            );
+            const seq = () => hi.range(8).from(i => true);
             hi.assertEmpty(seq().last(0));
             hi.assertEqual(seq().last(1), [7]);
             hi.assertEqual(seq().last(4), [4, 5, 6, 7]);
@@ -209,9 +207,7 @@ export const last = wrap({
             hi.assertEqual(seq().last(20), [0, 1, 2, 3, 4, 5, 6, 7]);
         },
         "boundedNonSlicingInputPredicate": hi => {
-            const seq = () => (
-                hi.recur(i => i + 1).seed(0).until(i => i >= 8).assumeBounded()
-            );
+            const seq = () => hi.range(8).from(i => true);
             const even = i => i % 2 === 0;
             hi.assertEmpty(seq().last(0, even));
             hi.assertEqual(seq().last(1, even), [6]);

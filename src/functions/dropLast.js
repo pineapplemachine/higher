@@ -499,7 +499,7 @@ export const dropLast = wrap({
             hi.assertEqual(seq().dropLast(Infinity, even), [1, 3, 5, 7]);
         },
         "boundedNonSlicingInput": hi => {
-            const seq = () => hi.recur(i => i + 1).seed(0).until(i => i >= 8).assumeBounded();
+            const seq = () => hi.range(8).from(i => true);
             const even = i => i % 2 === 0;
             hi.assertEqual(seq().dropLast(2), [0, 1, 2, 3, 4, 5]);
             hi.assertEmpty(seq().dropLast(10));

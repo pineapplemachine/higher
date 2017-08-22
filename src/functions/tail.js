@@ -130,9 +130,7 @@ export const tail = wrap({
             hi.assertEqual(hi.tail(20, array), [0, 1, 2, 3, 4, 5, 6, 7]);
         },
         "boundedNonSlicingInput": hi => {
-            const seq = () => (
-                hi.recur(i => i + 1).seed(0).until(i => i >= 8).assumeBounded()
-            );
+            const seq = () => hi.range(8).from(i => true);
             hi.assertEmpty(seq().tail(0));
             hi.assertEqual(seq().tail(1), [7]);
             hi.assertEqual(seq().tail(2), [6, 7]);
