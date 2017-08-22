@@ -221,11 +221,6 @@ export const FiniteRepeatSequence = defineSequence({
     length: function(){
         return this.source.length() * this.targetRepetitions;
     },
-    left: function(){
-        return this.source.left() + this.source.length() * (
-            this.targetRepetitions - this.finishedRepetitions() - 1
-        );
-    },
     front: function(){
         return this.frontSource ? this.frontSource.front() : this.source.front();
     },
@@ -307,15 +302,6 @@ export const FiniteRepeatSequence = defineSequence({
             this.backSource ? this.backSource.copy() : undefined
         );
     },
-    reset: function(){
-        this.frontRepetitions = 0;
-        this.frontSource = undefined;
-        if(this.back){
-            this.backRepetitions = 0;
-            this.backSource = undefined;
-        }
-        return this;
-    },
     rebase: function(source){
         this.source = source;
         this.frontSource = undefined;
@@ -350,6 +336,7 @@ export const InfiniteRepeatSequence = defineSequence({
     supportsWith: [
         "back", "index", "slice", "copy", "reset",
     ],
+    collapseOutOfPlace: true,
     overrides: {
         repeat: {optional: wrap.expecting.number},
         distinct: {optional: wrap.expecting.transformation},
@@ -526,18 +513,12 @@ export const InfiniteRepeatSequence = defineSequence({
             this.backSource ? this.backSource.copy() : undefined
         );
     },
-    reset: function(){
-        this.frontSource = null;
-        this.backSource = null;
-    },
     rebase: function(source){
         this.source = source;
         this.frontSource = null;
         this.backSource = null;
         return this;
     },
-    // Any sequence with this type in its chain cannot be collapsed in-place.
-    collapseOutOfPlace: true,
 });
 
 export const repeat = wrap({
