@@ -68,9 +68,6 @@ export const FinitePadLeftSequence = defineSequence({
     length: function(){
         return this.source.length() + this.padTotal;
     },
-    left: function(){
-        return this.source.left() + (this.padTotal - this.padCount);
-    },
     front: function(){
         return (this.padCount >= this.padTotal ?
             this.source.front() : this.padElement
@@ -94,33 +91,26 @@ export const FinitePadLeftSequence = defineSequence({
     },
     index: function(i){
         return (i < this.padTotal ?
-            this.padElement : this.source.index(i - this.padTotal)
+            this.padElement : this.source.nativeIndex(i - this.padTotal)
         );
     },
     slice: function(i, j){
         if(j < this.padTotal){
             return new FiniteRepeatElementSequence(j - i, this.padElement);
         }else if(i >= this.padTotal){
-            return this.source.slice(i - this.padTotal, j - this.padTotal);
+            return this.source.nativeSlice(i - this.padTotal, j - this.padTotal);
         }else{
             return new PadLeftSequence(
-                this.source.slice(0, j - this.padTotal),
+                this.source.nativeSlice(0, j - this.padTotal),
                 this.padElement, this.padTotal - i
             );
         }
     },
-    has: null,
-    get: null,
     copy: function(){
         return new FinitePadLeftSequence(
             this.source.copy(), this.padElement,
             this.padTotal, this.padCount
         );
-    },
-    reset: function(){
-        this.source.reset();
-        this.padCount = 0;
-        return this;
     },
     rebase: function(source){
         this.source = source;

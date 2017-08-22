@@ -3,6 +3,27 @@ import {wrap} from "../core/wrap";
 import {EagerSequence} from "./eager";
 import {FinitePadRightSequence, InfinitePadRightSequence} from "./padRightCount";
 
+export const PadRightOnDemandSequence = function(source, targetLength, element){
+    return new OnDemandSequence(FinitePadRightSequence.appliedTo(ArraySequence), {
+        bounded: () => source.bounded(),
+        unbounded: () => false, // Do not call this function with unbounded inputs
+        done: () => source.done() && targetLength === 0,
+        front: () => source.done() ? element : source.front(),
+        dump: () => {
+            const array = [];
+            for(const element of source) array.push(element);
+            const arraySequence = new ArraySequence(array);
+            if(array.length >= targetLength){
+                return arraySequence;
+            }else{
+                return new FinitePadRightSequence(
+                    arraySequence, element, array.length - targetLength
+                );
+            }
+        },
+    });
+};
+
 export const padRight = wrap({
     name: "padRight",
     summary: "Satisfy a length requirement by padding the back of a sequence with some repeated element.",
@@ -31,14 +52,17 @@ export const padRight = wrap({
         if(targetLength <= 0 || source.unbounded()){
             return source;
         }else if(isFinite(targetLength)){
-            const padSource = source.length ? source : new EagerSequence(source);
-            const sourceLength = padSource.length();
-            if(targetLength <= sourceLength){
-                return padSource;
-            }else{
-                return new FinitePadRightSequence(
-                    padSource, element, targetLength - sourceLength
-                );
+            if(source.nativeLength){
+                const sourceLength = source.length();
+                if(sourceLength >= targetLength){
+                    return source;
+                }else{
+                    return new FinitePadRightSequence(
+                        source, element, targetLength - sourceLength
+                    );
+                }
+            }else{ // Argument validation implies source.bounded()
+                return PadRightOnDemandSequence(source, targetLength, element);
             }
         }else{
             return new InfinitePadRightSequence(source, element);
