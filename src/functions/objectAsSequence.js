@@ -43,7 +43,7 @@ export const ObjectSequence = defineSequence({
     overrides: {
         object: {none: true},
         newObject: {none: true},
-        key: {none: true},
+        keys: {none: true},
         values: {none: true},
     },
     docs: process.env.NODE_ENV !== "development" ? undefined : {

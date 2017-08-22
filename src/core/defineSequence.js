@@ -115,6 +115,11 @@ const wrapSequenceOverrides = (sequence, overrides) => {
     // TODO: Remove isArray check after all override attributes are updated
     if(overrides && !isArray(overrides)){
         for(const override in overrides){
+            if(process.env.NODE_ENV === "development"){
+                if(!sequence.prototype[override]){
+                    throw new Error(`Invalid override method name "${override}".`);
+                }
+            }
             sequence.prototype[override] = getWrappedFunction({
                 arguments: normalizeExpecting(overrides[override]),
                 implementation: sequence.prototype[override]
