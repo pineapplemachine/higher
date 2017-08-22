@@ -76,6 +76,28 @@ export const JoinSequence = defineSequence({
 
 export const join = wrap({
     name: "join",
+    summary: "Get a sequence from a sequence of sequences, joined by some delimiter.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The function expects a sequence of sequences and an optional
+            delimiter sequence as input.
+        `),
+        returns: (`
+            The function returns a sequence which enumerates the elements of
+            the subsequences of the first input sequence, with the elements
+            of the delimiter sequence added in between every subsequence.
+            /When no delimiter was provided, the output sequence behaves as
+            though it received an empty delimiter.
+        `),
+        returnType: "sequence",
+        examples: [
+            "basicUsage",
+        ],
+        related: [
+            "concat", "flatten", "split",
+        ],
+    },
     attachSequence: true,
     async: false,
     arguments: {
@@ -96,6 +118,18 @@ export const join = wrap({
         "basicUsage": hi => {
             const strings = ["one", "two", "three"];
             hi.assertEqual(hi(strings).join(", "), "one, two, three");
+        },
+        "emptyInput": hi => {
+            hi.assertEmpty(hi.emptySequence().join());
+            hi.assertEmpty(hi.emptySequence().join(hi.emptySequence()));
+            hi.assertEmpty(hi.emptySequence().join(","));
+            hi.assertEmpty(hi.emptySequence().join(",,,,,"));
+        },
+        "noDelimiter": hi => {
+            hi.assertEqual(hi([[1, 2], [3, 4]]).join(), [[1, 2], [3, 4]]);
+        },
+        "emptyDelimiter": hi => {
+            hi.assertEqual(hi([[1, 2], [3, 4]]).join([]), [[1, 2], [3, 4]]);
         },
     },
 });
