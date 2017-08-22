@@ -102,6 +102,14 @@ export const FromSequence = defineSequence({
         if(!this.initializedFront) this.initializeFront();
         return this.source.popFront();
     },
+    back: function(){
+        if(!this.initializedFront) this.initializeFront();
+        return this.source.back();
+    },
+    popBack: function(){
+        if(!this.initializedFront) this.initializeFront();
+        return this.source.popBack();
+    },
     copy: function(){
         return new FromSequence(
             this.predicate, this.source.copy(),
