@@ -5,7 +5,6 @@ import {ArgumentsError} from "../errors/ArgumentsError";
 
 import {EmptySequence} from "./emptySequence";
 import {HeadSequence} from "./head";
-import {mustSupport} from "./mustSupport";
 import {ShuffleSequence} from "./shuffle";
 
 // An alternative to commiting a sequence of indexes fully to memory and then

@@ -17,9 +17,8 @@ export const findFirst = wrap({
     async: true,
     arguments: {
         unordered: {
-            functions: "?",
+            functions: {optional: wrap.expecting.comparison},
             sequences: 2,
-            allowIterables: true
         }
     },
     implementation: (compare, sequences) => {

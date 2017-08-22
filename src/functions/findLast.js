@@ -5,7 +5,7 @@ import {wrap} from "../core/wrap";
 
 import {equals} from "./equals";
 import {FindSequenceResult, BackwardFindSequenceThread, stepFindThreads} from "./findAll";
-import {mustSupport} from "./mustSupport";
+import {copyable} from "./copyable";
 
 // Find the last occurrence of a substring as judged by a comparison function.
 export const findLast = wrap({
@@ -14,8 +14,10 @@ export const findLast = wrap({
     async: true,
     arguments: {
         unordered: {
-            functions: "?",
-            sequences: 2
+            functions: {optional: wrap.expecting.comparison},
+            sequences: {
+                amount: 2,
+            },
         }
     },
     implementation: (compare, sequences) => {
@@ -36,10 +38,11 @@ export const findLast = wrap({
                 return undefined;
             }
         }
+        // TODO: Handle this better using argument validation.
         // Source sequence absolutely must be bidirectional and have known length
-        source = mustSupport(source, "length", "back");
+        source = source; //mustSupport(source, "length", "back");
         // Search sequence absolutely must be bidirectional and copyable
-        search = mustSupport(source, "copy", "back");
+        search = copyable(search);
         const searchElement = search.nextBack();
         // Handle single-element search subject
         if(search.done()){
