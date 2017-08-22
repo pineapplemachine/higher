@@ -88,12 +88,12 @@ export const flatten = wrap({
         one: wrap.expecting.sequence,
     },
     implementation: (source) => {
-        return new ForwardFlattenSequence(source);
+        return new FlattenSequence(source);
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {
-            const arrays = [[1, 2, 3], [4, 5], [6, 7, 8], [9]];
-            hi.assertEqual(hi.flatten(arrays), [1, 2, 3, 4, 5, 6, 7, 8, 9]);
+            const numbers = [[1, 2, 3], [4, 5], [6, 7, 8], [9]];
+            hi.assertEqual(hi.flatten(numbers), [1, 2, 3, 4, 5, 6, 7, 8, 9]);
         },
         "emptyInput": hi => {
             hi.assertEmpty(hi.emptySequence().flatten());
