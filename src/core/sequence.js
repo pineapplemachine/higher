@@ -1,4 +1,5 @@
 import {lightWrap} from "./lightWrap";
+import {isNumber} from "./types";
 
 import {BoundsUnknownError} from "../errors/BoundsUnknownError";
 import {NotBoundedError} from "../errors/NotBoundedError";
@@ -197,6 +198,7 @@ const addIndexPatch = function(i){
 };
 
 export const adjustSequenceIndex = function(sequence, index){
+    throw new Error("this should not be being called right now!");
     if(process.env.NODE_ENV === "development"){
         if(!isNumber(index) || !isFinite(index)){
             throw ArgumentsError({message: "Index must be a finite number."});
