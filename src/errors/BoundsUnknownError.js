@@ -8,8 +8,6 @@ export const BoundsUnknownError = error({
         expects: (`
             The error function expects as an argument the sequence which was
             required to be known to be bounded or unbounded, but was not.
-            The function also accepts an options object which may have a message
-            attribute providing additional error information.
         `),
     },
     constructor: function BoundsUnknownError(source, options){
@@ -18,8 +16,10 @@ export const BoundsUnknownError = error({
         this.message = (
             "The action requires knowing whether the input is bounded or " +
             "unbounded, but the sequence is not known to be either. " +
-            "Try using a method such as 'head', 'limit', 'assumeBounded', or " +
-            "'assumeUnbounded' to resolve this error."
+            "The \`head\`, \`limit\`, \`assumeBounded\` and \`assumeBounded\` " +
+            "functions are some options for resolving this error by acquiring a " +
+            "known-bounded or known-unbounded sequence from one whose bounds " +
+            "are not otherwise known."
         );
         if(this.options.message){
             this.message = this.options.message + ": " + this.message;

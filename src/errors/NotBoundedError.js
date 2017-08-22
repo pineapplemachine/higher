@@ -8,10 +8,6 @@ export const NotBoundedError = error({
         expects: (`
             The error function expects as an argument the sequence which was
             required to be known to be bounded, but was not.
-            The function also accepts an options object which may have a message
-            attribute providing additional error information, and an optional
-            limitArgument which, when true, causes the error message to include
-            passing a limit argument as a possible way to resolve the issue.
         `),
     },
     constructor: function NotBoundedError(source, options = undefined){
@@ -21,14 +17,11 @@ export const NotBoundedError = error({
             "known to be unbounded" : "not known to be bounded"
         );
         this.message = (
-            `The action requires fully consuming a sequence that is ` +
+            "The action requires fully consuming a sequence that is " +
             `${knownBounded}. ` +
-            "Try using a method such as 'head', 'limit', or 'assumeBounded' to " +
-            "resolve this error."
-        );
-        if(this.options.limitArgument) this.message += " " + (
-            "You could alternatively pass a single numeric argument indicating " +
-            "the maximum number of elements of the sequence to consume."
+            "The \`head\`, \`limit\`, and \`assumeBounded\` functions are some " +
+            "options for resolving this error by acquiring a known-bounded " +
+            "sequence from one not otherwise known to be bounded."
         );
         if(this.options.message){
             this.message = this.options.message + ": " + this.message;
