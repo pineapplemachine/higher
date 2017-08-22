@@ -8,7 +8,7 @@ import {InfiniteRepeatElementSequence} from "./repeatElement";
 export const OneElementSequence = defineSequence({
     summary: "A sequence containing exactly one element.",
     supportsAlways: [
-        "length", "left", "back", "index", "slice", "copy", "reset",
+        "length", "back", "index", "slice", "copy",
     ],
     overrides: {
         repeat: {optional: wrap.expecting.number},
@@ -66,9 +66,6 @@ export const OneElementSequence = defineSequence({
         return this.isDone;
     },
     length: () => 1,
-    left: function(){
-        return this.isDone ? 0 : 1;
-    },
     front: function(){
         return this.element;
     },
@@ -90,10 +87,6 @@ export const OneElementSequence = defineSequence({
     copy: function(){
         return new OneElementSequence(this.element, this.isDone);
     },
-    reset: function(){
-        this.isDone = false;
-        return this;
-    },
 });
 
 export const one = wrap({
@@ -102,15 +95,15 @@ export const one = wrap({
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         expects: (`
-            The function expects as its single argument the one element that the
-            sequence should contain.
+            The function accepts any value as its single argument.
         `),
         returns: (`
-            The function returns a sequence enumerating only the given element.
+            The function returns a sequence enumerating exactly one element,
+            where that element is the given value.
         `),
         returnType: "sequence",
         related: [
-            "repeatElement", "emptySequence"
+            "repeatElement", "emptySequence",
         ],
         examples: [
             "basicUsage",
