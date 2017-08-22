@@ -19,7 +19,7 @@ export const max = wrap({
             function and taking its back element.
         `),
         related: [
-            "min"
+            "min",
         ],
         examples: [
             "basicUsage", "withRelationalFunction"
