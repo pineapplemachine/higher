@@ -7,7 +7,7 @@ import {EmptySequence} from "./emptySequence";
 export const SingularMapSequence = defineSequence({
     summary: "Enumerate transformed elements of a source sequence.",
     supportsWith: [
-        "length", "left", "back", "index", "slice", "has", "get", "copy", "reset"
+        "length", "back", "index", "slice", "has", "get", "copy",
     ],
     getSequence: process.env.NODE_ENV !== "development" ? undefined : [
         hi => new SingularMapSequence(i => i, hi.emptySequence()),
@@ -34,9 +34,6 @@ export const SingularMapSequence = defineSequence({
     },
     length: function(){
         return this.source.length();
-    },
-    left: function(){
-        return this.source.left();
     },
     front: function(){
         return this.transform(this.source.front());
@@ -65,10 +62,6 @@ export const SingularMapSequence = defineSequence({
     copy: function(){
         return new SingularMapSequence(this.transform, this.source.copy());
     },
-    reset: function(){
-        this.source.reset();
-        return this;
-    },
     rebase: function(source){
         this.source = source;
         return this;
@@ -79,8 +72,8 @@ export const SingularMapSequence = defineSequence({
 export const PluralMapSequence = defineSequence({
     summary: "Enumerate transformed elements of any number of source sequences.",
     supportsWith: {
-        "length": "all", "left": "all", "index": "all", "slice": "all",
-        "has": "all", "get": "all", "copy": "all", "reset": "all",
+        "length": "all", "index": "all", "slice": "all",
+        "has": "all", "get": "all", "copy": "all",
     },
     getSequence: process.env.NODE_ENV !== "development" ? undefined : [
         // No sources
@@ -163,14 +156,6 @@ export const PluralMapSequence = defineSequence({
         }
         return min;
     },
-    left: function(){
-        if(this.sources.length === 0) return 0;
-        let min = this.sources[0].left();
-        for(let i = 1; i < this.sources.length; i++){
-            min = Math.min(min, this.sources[i].left());
-        }
-        return min;
-    },
     front: function(){
         const elements = [];
         for(const source of this.sources) elements.push(source.front());
@@ -181,8 +166,6 @@ export const PluralMapSequence = defineSequence({
             source.popFront();
         }
     },
-    back: null,
-    popBack: null,
     index: function(i){
         const elements = [];
         for(const source of this.sources) elements.push(source.index(i));
@@ -208,10 +191,6 @@ export const PluralMapSequence = defineSequence({
         const copies = [];
         for(const source of this.sources) copies.push(source.copy());
         return new PluralMapSequence(this.transform, copies);
-    },
-    reset: function(){
-        for(const source of this.sources) source.reset();
-        return this;
     },
     rebase: function(source){
         this.source = source;
@@ -267,9 +246,9 @@ export const map = wrap({
     async: false,
     arguments: {
         unordered: {
-            functions: 1,
-            sequences: "*"
-        }
+            functions: {one: wrap.expecting.transformation},
+            sequences: "*",
+        },
     },
     implementation: (transform, sources) => {
         if(sources.length === 1){
