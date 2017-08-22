@@ -71,9 +71,6 @@ export const HeadSequence = defineSequence({
     },
 });
 
-// Get a sequence for enumerating the first so many elements of the input.
-// The resulting sequence may be shorter than the length specified, but
-// will never be longer.
 export const head = wrap({
     names: ["head", "take"],
     summary: "Get a sequence enumerating the first so many elements of an input.",
@@ -101,8 +98,8 @@ export const head = wrap({
     arguments: {
         unordered: {
             numbers: 1,
-            sequences: 1
-        }
+            sequences: 1,
+        },
     },
     implementation: (count, source) => {
         if(count <= 0){
