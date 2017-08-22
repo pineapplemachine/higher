@@ -90,7 +90,10 @@ export const UntilSequence = defineSequence({
         }
     },
     index: function(i){
-        return this.source.index(i);
+        return this.source.nativeIndex(i);
+    },
+    slice: function(i, j){
+        return this.source.nativeSlice(i, j);
     },
     copy: function(){
         return new UntilSequence(

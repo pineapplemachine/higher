@@ -64,10 +64,10 @@ export const AssumeLengthSequence = defineSequence({
         return this.source.popBack();
     },
     index: function(i){
-        return this.source.index(i);
+        return this.source.nativeIndex(i);
     },
     slice: function(i, j){
-        return this.source.slice(i, j);
+        return this.source.nativeSlice(i, j);
     },
     has: function(i){
         return this.source.has(i);
