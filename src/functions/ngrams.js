@@ -170,7 +170,7 @@ export const TrackingNgramSequence = defineSequence({
     },
     slice: function(i, j){
         return new NgramSequence(
-            this.ngramSize, this.source.slice(i, j + this.ngramSize)
+            this.ngramSize, this.source.nativeSlice(i, j + this.ngramSize)
         );
     },
     copy: function(){
