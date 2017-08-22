@@ -145,7 +145,7 @@ export const LengthContract = defineContract({
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
     },
-    predicate: (sequence) => (sequence.length),
+    predicate: (sequence) => (sequence.nativeLength),
     test: function LengthContract(sequence){
         const a = sequence();
         if(!a.bounded()) throw ContractError(sequence(), this, {
