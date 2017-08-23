@@ -1,3 +1,6 @@
+import {defineSequence} from "../core/defineSequence";
+import {lightWrap} from "../core/lightWrap";
+
 export const NonSlicingSequence = process.env.NODE_ENV !== "development" ? undefined : defineSequence({
     summary: "A known-bounded sequence enumerating the elements of a not-known-bounded sequence.",
     supportsWith: [
