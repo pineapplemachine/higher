@@ -7,11 +7,11 @@ import {InfiniteRepeatElementSequence} from "./repeatElement";
 export const NumberRangeSequence = defineSequence({
     summary: "Enumerate numbers from a low until a high bound, incrementing by one each step.",
     supportsAlways: [
-        "length", "left", "back", "index", "slice", "copy", "reset",
+        "length", "back", "index", "slice", "copy",
     ],
-    overrides: [
-        "reverse",
-    ],
+    overrides: {
+        reverse: {none: true},
+    },
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         expects: (`
@@ -77,9 +77,6 @@ export const NumberRangeSequence = defineSequence({
     length: function(){
         return this.end - this.start;
     },
-    left: function(){
-        return this.backValue - this.frontValue;
-    },
     front: function(){
         return this.frontValue;
     },
@@ -103,22 +100,17 @@ export const NumberRangeSequence = defineSequence({
             this.start, this.end, this.frontValue, this.backValue
         );
     },
-    reset: function(){
-        this.frontValue = this.start;
-        this.backValue = this.end;
-        return this;
-    },
 });
 
 // Result of calling range with a step of greater than 0.
 export const ForwardNumberRangeSequence = defineSequence({
     summary: "Enumerate numbers from a low until a high bound, incrementing by some positive step.",
     supportsAlways: [
-        "length", "left", "back", "index", "slice", "copy", "reset",
+        "length", "back", "index", "slice", "copy",
     ],
-    overrides: [
-        "reverse",
-    ],
+    overrides: {
+        reverse: {none: true},
+    },
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         expects: (`
@@ -165,13 +157,19 @@ export const ForwardNumberRangeSequence = defineSequence({
         hi => new ForwardNumberRangeSequence(-5, 0, 1),
         hi => new ForwardNumberRangeSequence(5, -5, 2),
     ],
-    constructor: function ForwardNumberRangeSequence(start, end, step){
+    constructor: function ForwardNumberRangeSequence(
+        start, end, step, frontValue = undefined, backValue = undefined
+    ){
         this.start = start;
         this.end = end > start ? end : start;
         this.stepValue = step;
-        this.frontValue = start;
-        const delta = this.end - start;
-        this.backValue = this.end - (delta % step || step);
+        this.frontValue = frontValue === undefined ? this.start : frontValue;
+        if(backValue === undefined){
+            const delta = this.end - start;
+            this.backValue = this.end - (delta % step || step);
+        }else{
+            this.backValue = backValue;
+        }
     },
     reverse: function(){
         return new BackwardNumberRangeSequence(
@@ -188,9 +186,6 @@ export const ForwardNumberRangeSequence = defineSequence({
     },
     length: function(){
         return Math.ceil((this.end - this.start) / this.stepValue);
-    },
-    left: function(){
-        return Math.ceil((this.backValue - this.frontValue) / this.stepValue);
     },
     front: function(){
         return this.frontValue;
@@ -213,17 +208,9 @@ export const ForwardNumberRangeSequence = defineSequence({
         );
     },
     copy: function(){
-        const copy = new ForwardNumberRangeSequence(
-            this.start, this.end, this.stepValue
+        return new ForwardNumberRangeSequence(
+            this.start, this.end, this.stepValue, this.frontValue, this.backValue
         );
-        copy.frontValue = this.frontValue;
-        copy.backValue = this.backValue;
-        return copy;
-    },
-    reset: function(){
-        this.frontValue = this.start;
-        this.backValue = this.end;
-        return this;
     },
 });
 
@@ -231,11 +218,11 @@ export const ForwardNumberRangeSequence = defineSequence({
 export const BackwardNumberRangeSequence = defineSequence({
     summary: "Enumerate numbers from a high until a low bound, incrementing by some negative step.",
     supportsAlways: [
-        "length", "left", "back", "index", "slice", "copy", "reset",
+        "length", "back", "index", "slice", "copy",
     ],
-    overrides: [
-        "reverse",
-    ],
+    overrides: {
+        reverse: {none: true},
+    },
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         expects: (`
@@ -282,13 +269,19 @@ export const BackwardNumberRangeSequence = defineSequence({
         hi => new BackwardNumberRangeSequence(0, -5, -1),
         hi => new BackwardNumberRangeSequence(-5, 5, -2),
     ],
-    constructor: function BackwardNumberRangeSequence(start, end, step){
+    constructor: function BackwardNumberRangeSequence(
+        start, end, step, frontValue = undefined, backValue = undefined
+    ){
         this.start = start;
         this.end = end < start ? end : start;
         this.stepValue = step;
-        this.frontValue = start;
-        const delta = start - this.end;
-        this.backValue = this.end + (delta % -step || -step);
+        this.frontValue = frontValue === undefined ? start : frontValue;
+        if(backValue == undefined){
+            const delta = start - this.end;
+            this.backValue = this.end + (delta % -step || -step);
+        }else{
+            this.backValue = backValue;
+        }
     },
     reverse: function(){
         return new ForwardNumberRangeSequence(
@@ -305,9 +298,6 @@ export const BackwardNumberRangeSequence = defineSequence({
     },
     length: function(){
         return Math.ceil((this.end - this.start) / this.stepValue);
-    },
-    left: function(){
-        return 1 + Math.ceil((this.backValue - this.frontValue) / this.stepValue);
     },
     front: function(){
         return this.frontValue;
@@ -330,17 +320,9 @@ export const BackwardNumberRangeSequence = defineSequence({
         );
     },
     copy: function(){
-        const copy = new BackwardNumberRangeSequence(
-            this.start, this.end, this.stepValue
+        return new BackwardNumberRangeSequence(
+            this.start, this.end, this.stepValue, this.frontValue, this.backValue
         );
-        copy.frontValue = this.frontValue;
-        copy.backValue = this.backValue;
-        return copy;
-    },
-    reset: function(){
-        this.frontValue = this.start;
-        this.backValue = this.end;
-        return this;
     },
 });
 
@@ -351,17 +333,13 @@ export const range = wrap({
         introduced: "higher@1.0.0",
         expects: (`
             The function expects either one, two, or three numbers as arguments.
-            When the function receives three numbers, they represent the
-            inclusive beginning bound, the exclusive ending bound, and the step,
-            respectively. The inclusive beginning bound is the first number in
-            the sequence, the exclusive ending bound is what would come after
-            the last number in the sequence if the step were applied once more,
-            and the step is the value added to each prior number to determine
-            the next.
-            When the function receives two numbers, they represent the inclusive
-            low and exclusive high bounds, respectively; the step is one.
-            When the function receives one number, that input is interpreted as
-            an exclusive high bound; the low bound is zero and the step is one.
+            If there was one argument, the inclusive lower bound of the output
+            sequence is #0 and the exclusive upper bound is that value.
+            If there were two arguments, the first number is the lower bound and
+            the second number is the higher bound.
+            If there were three arugmnets, the first number is the lower bound,
+            the second number is the higher bound, and the third number is the step.
+            The step between values defaults to #1 when not specified.
         `),
         returns: (`
             The function returns a sequence enumerating numbers starting with
@@ -381,7 +359,7 @@ export const range = wrap({
     async: false,
     arguments: {
         unordered: {
-            numbers: [1, 3]
+            numbers: [1, 3],
         }
     },
     implementation: (numbers) => {
