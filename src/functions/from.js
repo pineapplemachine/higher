@@ -57,22 +57,28 @@ export const FromSequence = defineSequence({
         },
     },
     constructor: function FromSequence(
-        predicate, source, isInclusive = true, initializedFront = false
+        predicate, source, isInclusive = true,
+        initializedFront = undefined, poppedElements = undefined
     ){
         this.predicate = predicate;
         this.source = source;
         this.isInclusive = isInclusive;
         this.initializedFront = initializedFront;
+        this.poppedElements = poppedElements || 0;
         this.maskAbsentMethods(source);
     },
     initializeFront: function(){
         this.initializedFront = true;
         while(!this.source.done()){
             if(this.predicate(this.source.front())){
-                if(!this.isInclusive) this.source.popFront();
+                if(!this.isInclusive){
+                    this.source.popFront();
+                    this.poppedElements++;
+                }
                 break;
             }else{
                 this.source.popFront();
+                this.poppedElements++;
             }
         }
     },
@@ -110,10 +116,20 @@ export const FromSequence = defineSequence({
         if(!this.initializedFront) this.initializeFront();
         return this.source.popBack();
     },
+    index: function(i){
+        if(!this.initializedFront) this.initializeFront();
+        return this.source.nativeIndex(i + this.poppedElements);
+    },
+    slice: function(i, j){
+        if(!this.initializedFront) this.initializeFront();
+        return this.source.nativeSlice(
+            i + this.poppedElements, j + this.poppedElements
+        );
+    },
     copy: function(){
         return new FromSequence(
-            this.predicate, this.source.copy(),
-            this.isInclusive, this.initializedFront
+            this.predicate, this.source.copy(), this.isInclusive,
+            this.initializedFront, this.poppedElements
         );
     },
     rebase: function(source){
