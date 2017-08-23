@@ -85,6 +85,74 @@ Sequence.prototype.nextBack = function(){
     return value;
 };
 
+Sequence.prototype.cacheUntilIndex = function(i){
+    if(i <= 0){
+        return undefined;
+    }else if(!this.elementCache){
+        this.elementCache = [];
+        this.elementCacheFrontIndex = 0;
+    }else if(this.elementCache.length >= i){
+        return this.elementCache;
+    }
+    for(const element of this){
+        this.elementCache.push(element);
+        if(this.elementCache.length >= i) break;
+    }
+    this.elementCacheBackIndex = this.elementCache.length;
+    this.done = function(){
+        return (
+            this.elementCacheFrontIndex >= this.elementCacheBackIndex &&
+            this.nativeDone()
+        );
+    };
+    this.front = function(){
+        if(this.elementCacheFrontIndex < this.elementCache.length){
+            return this.elementCache[this.elementCacheFrontIndex];
+        }else{
+            return this.nativeFront();
+        }
+    };
+    this.popFront = function(){
+        this.elementCacheFrontIndex++;
+        if(this.elementCacheFrontIndex >= this.elementCache.length){
+            return this.nativePopFront();
+        }
+    };
+    if(this.back){
+        this.back = function(){
+            if(this.nativeDone()){
+                return this.elementCache[this.elementCacheBackIndex - 1];
+            }else{
+                return this.nativeBack();
+            }
+        };
+        this.popBack = function(){
+            if(this.nativeDone()){
+                this.elementCacheBackIndex--;
+            }else{
+                return this.nativePopBack();
+            }
+        };
+    }
+    if(this.copy){
+        const copyMethod = function(){
+            const copy = this.nativeCopy();
+            copy.elementCache = this.elementCache.slice();
+            copy.elementCacheFrontIndex = this.elementCacheFrontIndex;
+            copy.elementCacheBackIndex = this.elementCacheBackIndex;
+            copy.done = this.done;
+            copy.front = this.front;
+            copy.popFront = this.popFront;
+            copy.back = this.back;
+            copy.popBack = this.popBack;
+            copy.copy = copyMethod;
+            return copy;
+        };
+        this.copy = copyMethod;
+    }
+    return this.elementCache;
+};
+
 // TODO: Stop using this
 // https://github.com/pineapplemachine/higher/issues/53
 Sequence.prototype.maskAbsentMethods = function(source){
@@ -95,15 +163,15 @@ Sequence.prototype.maskAbsentMethods = function(source){
     }
     if(this.length && !source.nativeLength){
         this.nativeLength = undefined;
-        this.length = sequenceLengthPatch;
+        // this.length = sequenceLengthPatch;
     }
     if(this.index && !source.nativeIndex){
         this.nativeIndex = undefined;
-        this.index = sequenceIndexPatch;
+        // this.index = sequenceIndexPatch;
     }
     if(this.slice && !source.nativeSlice){
         this.nativeSlice = undefined;
-        this.slice = sequenceSlicePatch;
+        // this.slice = sequenceSlicePatch;
     }
     if(this.has && !source.has) this.has = undefined;
     if(this.get && !source.get) this.get = undefined;
@@ -135,13 +203,13 @@ Sequence.prototype.typeChainString = function(){
     }
 };
 
-const addIndexPatch = function(i){
+export const addIndexPatch = function(i){
     throw new Error("this should not be being called right now!");
     this.indexPatchArray = [];
-    while(this.indexPatchArray.length < i && !this.nativeDone()){
-        this.indexPatchArray.push(this.nativeFront());
-        this.nativePopFront();
-    }
+    // while(this.indexPatchArray.length < i && !this.nativeDone()){
+    //     this.indexPatchArray.push(this.nativeFront());
+    //     this.nativePopFront();
+    // }
     this.indexPatchFrontIndex = 0;
     this.indexPatchBackIndex = this.indexPatchArray.length;
     this.done = function(){
@@ -198,10 +266,9 @@ const addIndexPatch = function(i){
 };
 
 export const adjustSequenceIndex = function(sequence, index){
-    throw new Error("this should not be being called right now!");
     if(process.env.NODE_ENV === "development"){
-        if(!isNumber(index) || !isFinite(index)){
-            throw ArgumentsError({message: "Index must be a finite number."});
+        if(!isNumber(index)){
+            throw ArgumentsError({message: "Index must be a number."});
         }
         if(index < 0 && !sequence.bounded()){
             throw NotBoundedError(sequence, {message: (
@@ -265,7 +332,11 @@ export const sequenceSlicePatch = function(i, j){
     // TODO: Fix missing imports!
     let low, high;
     if(j === undefined){
-        if(i === undefined) return this.copy();
+        if(i === undefined){
+            // TODO: Handle this case differently
+            if(!this.copy) throw new Error();
+            return this.copy();
+        }
         low = 0;
         high = adjustSequenceIndex(i);
     }else{
@@ -274,6 +345,12 @@ export const sequenceSlicePatch = function(i, j){
     }
     if(low >= high){
         return new EmptySequence();
+    }
+    if(this.copy){
+        const slice = this.copy();
+        for(let k = 0; k < low; k++) slice.popFront();
+        // TODO: Do something about missing import
+        return new HeadSequence(high - low, slice);
     }
     if(!this.indexPatchArray){
         addIndexPatch.call(this, high);
@@ -289,20 +366,20 @@ export const sequenceSlicePatch = function(i, j){
 };
 
 export const addStandardSequenceInterface = (sequence) => {
-    sequence.prototype.length = (
-        sequence.prototype.length || sequenceLengthPatch
-    );
+    // sequence.prototype.length = (
+    //     sequence.prototype.length || sequenceLengthPatch
+    // );
     sequence.prototype.index = (sequence.prototype.nativeIndex ?
         sequenceIndexWrapper : sequenceIndexPatch
     );
     sequence.prototype.slice = (sequence.prototype.nativeSlice ?
         sequenceSliceWrapper : sequenceSlicePatch
     );
-    sequence.prototype.lengthAsync = function(){
-        return new constants.Promise((resolve, reject) => {
-            callAsync(() => resolve(this.length()))
-        });
-    };
+    // sequence.prototype.lengthAsync = function(){
+    //     return new constants.Promise((resolve, reject) => {
+    //         callAsync(() => resolve(this.length()))
+    //     });
+    // };
     sequence.prototype.indexAsync = function(i){
         return new constants.Promise((resolve, reject) => {
             callAsync(() => resolve(this.index(i)))

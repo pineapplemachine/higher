@@ -23,7 +23,10 @@ hi.register = lightWrap({
                 // Do nothing
             }else if(wrapped.names){
                 for(const name of wrapped.names){
-                    this[name] = wrapped;
+                    // this[name] = wrapped;
+                    Object.defineProperty(this, name, {
+                        value: wrapped, writable: false
+                    });
                     if(wrapped.async) this[name + "Async"] = wrapped.async;
                 }
             }else{
@@ -233,6 +236,7 @@ import {join} from "./functions/join"; hi.register(join);
 import {last} from "./functions/last"; hi.register(last);
 import {lastElement} from "./functions/lastElement"; hi.register(lastElement);
 import {lastElementElse} from "./functions/lastElementElse"; hi.register(lastElementElse);
+import {length} from "./functions/length"; hi.register(length);
 import {lexOrder} from "./functions/lexOrder"; hi.register(lexOrder);
 import {limit} from "./functions/limit"; hi.register(limit);
 import {map} from "./functions/map"; hi.register(map);

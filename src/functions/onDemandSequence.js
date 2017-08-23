@@ -1,5 +1,4 @@
 import {defineSequence} from "../core/defineSequence";
-import {sequenceLengthPatch, sequenceIndexPatch, sequenceSlicePatch} from "../core/sequence";
 import {wrap} from "../core/wrap";
 
 export const OnDemandSequence = defineSequence({
@@ -30,15 +29,12 @@ export const OnDemandSequence = defineSequence({
         }
         if(!sourceType.nativeLength){
             this.nativeLength = undefined;
-            this.length = sequenceLengthPatch;
         }
         if(!sourceType.nativeIndex){
             this.nativeIndex = undefined;
-            this.index = sequenceIndexPatch;
         }
         if(!sourceType.nativeSlice){
             this.nativeSlice = undefined;
-            this.slice = sequenceSlicePatch;
         }
         if(!sourceType.nativeHas){
             this.has = undefined;
