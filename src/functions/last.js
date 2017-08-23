@@ -107,7 +107,7 @@ export const last = wrap({
         if(lastCount <= 0){
             return new EmptySequence();
         }else if(predicate){
-            if(!isFinite(count) || (source.nativeLength && source.length() <= count)){
+            if(!isFinite(count) || (source.nativeLength && source.nativeLength() <= count)){
                 return new FilterSequence(predicate, source);
             }else if(source.back){
                 return BidirectionalOnDemandLastSequence(count, predicate, source);
@@ -117,10 +117,10 @@ export const last = wrap({
         }else if(!isFinite(count)){
             return source;
         }else if(source.nativeLength && source.nativeSlice){
-            const sourceLength = source.length();
+            const sourceLength = source.nativeLength();
             if(sourceLength <= count) return source;
             else return source.nativeSlice(sourceLength - count, sourceLength);
-        }else if(source.nativeLength && source.length() <= count){
+        }else if(source.nativeLength && source.nativeLength() <= count){
             return source;
         }else if(source.back){
             return BidirectionalOnDemandTailSequence(count, source);
@@ -184,14 +184,14 @@ export const last = wrap({
             hi.assertEmpty(hi.emptySequence().last(10, i => false));
         },
         "knownLengthNonSlicingInput": hi => {
-            const seq = () => hi.range(8).from(i => true).assumeLength(8);
+            const seq = () => hi.range(8).nonSlicing().assumeLength(8);
             hi.assertEqual(seq().last(4), [4, 5, 6, 7]);
             hi.assertEqual(seq().last(8), [0, 1, 2, 3, 4, 5, 6, 7]);
             hi.assertEqual(seq().last(10), [0, 1, 2, 3, 4, 5, 6, 7]);
             hi.assertEqual(seq().last(Infinity), [0, 1, 2, 3, 4, 5, 6, 7]);
         },
         "knownLengthNonSlicingInputPredicate": hi => {
-            const seq = () => hi.range(8).from(i => true).assumeLength(8);
+            const seq = () => hi.range(8).nonSlicing().assumeLength(8);
             const even = i => i % 2 === 0;
             hi.assertEqual(seq().last(2, even), [4, 6]);
             hi.assertEqual(seq().last(8, even), [0, 2, 4, 6]);
@@ -199,7 +199,7 @@ export const last = wrap({
             hi.assertEqual(seq().last(Infinity, even), [0, 2, 4, 6]);
         },
         "boundedNonSlicingInput": hi => {
-            const seq = () => hi.range(8).from(i => true);
+            const seq = () => hi.range(8).nonSlicing();
             hi.assertEmpty(seq().last(0));
             hi.assertEqual(seq().last(1), [7]);
             hi.assertEqual(seq().last(4), [4, 5, 6, 7]);
@@ -207,7 +207,7 @@ export const last = wrap({
             hi.assertEqual(seq().last(20), [0, 1, 2, 3, 4, 5, 6, 7]);
         },
         "boundedNonSlicingInputPredicate": hi => {
-            const seq = () => hi.range(8).from(i => true);
+            const seq = () => hi.range(8).nonSlicing();
             const even = i => i % 2 === 0;
             hi.assertEmpty(seq().last(0, even));
             hi.assertEqual(seq().last(1, even), [6]);

@@ -176,6 +176,8 @@ import {glossary} from "./docs/glossary"; hi.glossary = glossary;
 // test/contracts
 import {contractTypes} from "./test/contracts"; hi.contract = contractTypes;
 import {defineContract} from "./test/contracts"; hi.register(defineContract);
+// test/sequenceTools
+import {nonSlicing} from "./test/sequenceTools"; hi.register(nonSlicing);
 
 // Core sequence types
 import {arrayAsSequence} from "./functions/arrayAsSequence"; hi.register(arrayAsSequence);

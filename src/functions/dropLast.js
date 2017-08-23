@@ -40,7 +40,7 @@ export const DropLastSequence = defineSequence({
         return this.source.done();
     },
     length: function(){
-        return Math.max(0, this.source.length() - this.dropTarget);
+        return Math.max(0, this.source.nativeLength() - this.dropTarget);
     },
     front: function(){
         if(!this.seenElements) this.initializeFront();
@@ -380,7 +380,7 @@ export const dropLast = wrap({
                 new EmptySequence()
             );
         }else if(predicate){
-            if(source.nativeLength && source.length() <= dropTarget){
+            if(source.nativeLength && source.nativeLength() <= dropTarget){
                 return new FilterSequence(element => !predicate(element), source);
             }else if(source.unbounded()){
                 if(source.back){
@@ -392,7 +392,7 @@ export const dropLast = wrap({
                 return new DropLastPredicateSequence(drop, predicate, source);
             }
         }else if(source.nativeLength){
-            const sourceLength = source.length();
+            const sourceLength = source.nativeLength();
             return (sourceLength <= drop ?
                 new EmptySequence() :
                 (source.nativeSlice ?
@@ -499,7 +499,7 @@ export const dropLast = wrap({
             hi.assertEqual(seq().dropLast(Infinity, even), [1, 3, 5, 7]);
         },
         "boundedNonSlicingInput": hi => {
-            const seq = () => hi.range(8).from(i => true);
+            const seq = () => hi.range(8).nonSlicing();
             const even = i => i % 2 === 0;
             hi.assertEqual(seq().dropLast(2), [0, 1, 2, 3, 4, 5]);
             hi.assertEmpty(seq().dropLast(10));
