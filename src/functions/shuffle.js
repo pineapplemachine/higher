@@ -90,7 +90,7 @@ export const ShuffleSequence = defineSequence({
         return this.source.done();
     },
     length: function(){
-        return this.source.length();
+        return this.source.nativeLength();
     },
     left: function(){
         this.initialize();

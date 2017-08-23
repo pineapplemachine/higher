@@ -53,7 +53,7 @@ export const padRight = wrap({
             return source;
         }else if(isFinite(targetLength)){
             if(source.nativeLength){
-                const sourceLength = source.length();
+                const sourceLength = source.nativeLength();
                 if(sourceLength >= targetLength){
                     return source;
                 }else{

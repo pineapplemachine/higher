@@ -37,7 +37,7 @@ export const countAtMost = wrap({
         // Count is always less than infinity.
         if(!isFinite(count)) return true;
         // Count is always less than or equal to the input sequence's length.
-        if(source.nativeLength && count >= source.length()) return true;
+        if(source.nativeLength && count >= source.nativeLength()) return true;
         // None of those conditions were met, so just consume the sequence.
         let i = 0;
         for(const element of source){

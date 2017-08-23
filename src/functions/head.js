@@ -44,7 +44,7 @@ export const HeadSequence = defineSequence({
         return this.frontIndex >= this.headLength || this.source.done();
     },
     length: function(){
-        const sourceLength = this.source.length();
+        const sourceLength = this.source.nativeLength();
         return sourceLength < this.headLength ? sourceLength : this.headLength;
     },
     front: function(){
@@ -107,7 +107,7 @@ export const head = wrap({
         }else if(!isFinite(count)){
             return source;
         }else if(source.nativeLength && source.nativeSlice){
-            const sourceLength = source.length();
+            const sourceLength = source.nativeLength();
             return sourceLength <= count ? source : source.nativeSlice(0, count);
         }else{
             return new HeadSequence(count, source);

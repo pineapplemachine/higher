@@ -55,7 +55,7 @@ export const DropFirstSequence = defineSequence({
         return this.source.done();
     },
     length: function(){
-        return Math.max(0, this.source.length() - this.dropTarget);
+        return Math.max(0, this.source.nativeLength() - this.dropTarget);
     },
     front: function(){
         if(!this.initializedFront) this.initializeFront();
@@ -235,16 +235,16 @@ export const dropFirst = wrap({
                 new EmptySequence()
             );
         }else if(!predicate && source.nativeSlice && source.nativeLength){
-            return (source.length() <= drop ?
-                new EmptySequence() : source.nativeSlice(drop, source.length())
+            return (source.nativeLength() <= drop ?
+                new EmptySequence() : source.nativeSlice(drop, source.nativeLength())
             );
         }else if(predicate){
-            return (source.nativeLength && source.length() <= drop ?
+            return (source.nativeLength && source.nativeLength() <= drop ?
                 new FilterSequence(element => !predicate(element), source) :
                 new DropFirstPredicateSequence(drop, predicate, source)
             );
         }else{
-            return (source.nativeLength && source.length() <= drop ?
+            return (source.nativeLength && source.nativeLength() <= drop ?
                 new EmptySequence() :
                 new DropFirstSequence(drop, source)
             );

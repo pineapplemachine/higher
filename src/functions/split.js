@@ -50,7 +50,7 @@ export const SplitSequence = defineSequence({
         if(this.findDelimiters.done()){
             this.frontValue = !this.frontResult ? null : this.source.slice(
                 this.beginDelimiter ? this.frontResult.low : this.frontResult.high,
-                this.source.length()
+                this.source.nativeLength()
             );
             this.frontResult = null;
         }else{

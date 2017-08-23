@@ -306,7 +306,7 @@ export const BackwardFindSequence = defineSequence({
         this.searchElement = null;
         this.nextSearchElement = null;
         this.searchThreads = searchThreads || [];
-        this.index = source.length();
+        this.index = source.nativeLength();
         if(!source.copy) this.copy = null;
         if(!source.reset) this.reset = null;
     },
@@ -418,16 +418,6 @@ export const BackwardFindSequence = defineSequence({
         copy.front = this.front;
         copy.popFront = this.popFront;
         return copy;
-    },
-    reset: function(){
-        this.source.reset();
-        this.index = this.source.length();
-        this.currentResult = null;
-        this.searchThreads = [];
-        delete this.done;
-        delete this.front;
-        delete this.popFront;
-        return this;
     },
     rebase: function(source){
         this.source = source;

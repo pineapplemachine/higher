@@ -25,7 +25,7 @@ export const TeeSequence = defineSequence({
         return this.bufferIndex >= (this.elementBuffer.elements.length + this.elementBuffer.offset) && this.source.done();
     },
     length: function(){
-        return this.source.length();
+        return this.source.nativeLength();
     },
     left: function(){
         return this.source.left() + (this.elementBuffer.length - (

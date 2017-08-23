@@ -33,7 +33,7 @@ export const SingularMapSequence = defineSequence({
         return this.source.done();
     },
     length: function(){
-        return this.source.length();
+        return this.source.nativeLength();
     },
     front: function(){
         return this.transform(this.source.front());
@@ -150,9 +150,9 @@ export const PluralMapSequence = defineSequence({
     },
     length: function(){
         if(this.sources.length === 0) return 0;
-        let min = this.sources[0].length();
+        let min = this.sources[0].nativeLength();
         for(let i = 1; i < this.sources.length; i++){
-            min = Math.min(min, this.sources[i].length());
+            min = Math.min(min, this.sources[i].nativeLength());
         }
         return min;
     },
@@ -168,12 +168,12 @@ export const PluralMapSequence = defineSequence({
     },
     index: function(i){
         const elements = [];
-        for(const source of this.sources) elements.push(source.index(i));
+        for(const source of this.sources) elements.push(source.nativeIndex(i));
         return this.transform.apply(this, elements);
     },
     slice: function(i, j){
         const slices = [];
-        for(const source of this.sources) slices.push(source.slice(i, j));
+        for(const source of this.sources) slices.push(source.nativeSlice(i, j));
         return new PluralMapSequence(this.transform, slices);
     },
     has: function(i){

@@ -219,7 +219,7 @@ export const FiniteRepeatSequence = defineSequence({
         );
     },
     length: function(){
-        return this.source.length() * this.targetRepetitions;
+        return this.source.nativeLength() * this.targetRepetitions;
     },
     front: function(){
         return this.frontSource ? this.frontSource.front() : this.source.front();
@@ -264,10 +264,10 @@ export const FiniteRepeatSequence = defineSequence({
         }
     },
     index: function(i){
-        return this.source.index(i % this.source.length());
+        return this.source.index(i % this.source.nativeLength());
     },
     slice: function(i, j){
-        const length = this.source.length();
+        const length = this.source.nativeLength();
         const lowIndex = i % length;
         const highIndex = j % length;
         if(j - i < length && highIndex >= lowIndex){
@@ -493,13 +493,13 @@ export const InfiniteRepeatSequence = defineSequence({
         }
     },
     index: function(i){
-        return this.source.index(i % this.source.length());
+        return this.source.nativeIndex(i % this.source.nativeLength());
     },
     // This method is a bit dirty as it relies on knowing
     // the implementation details of FiniteRepeatSequence.
     slice: function(i, j){
         const finite = FiniteRepeatSequence(0, this.source, undefined, undefined);
-        return finite.slice(i, j);
+        return finite.nativeSlice(i, j);
     },
     has: function(i){
         return this.source.has(i);

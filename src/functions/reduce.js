@@ -307,7 +307,7 @@ export const ReduceSequence = defineSequence({
         return this.isDone && this.source.done();
     },
     length: function(){
-        return Math.max(0, this.source.length() - 1 + this.hasSeed);
+        return Math.max(0, this.source.nativeLength() - 1 + this.hasSeed);
     },
     left: function(){
         return Math.max(0, this.source.left() - 1 + this.hasSeed);

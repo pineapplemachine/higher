@@ -66,7 +66,7 @@ export const FinitePadLeftSequence = defineSequence({
         return this.padCount >= this.padTotal && this.source.done();
     },
     length: function(){
-        return this.source.length() + this.padTotal;
+        return this.source.nativeLength() + this.padTotal;
     },
     front: function(){
         return (this.padCount >= this.padTotal ?

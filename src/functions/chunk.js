@@ -50,7 +50,7 @@ export const ForwardChunkSequence = defineSequence({
         return this.source.done();
     },
     length: function(){
-        const sourceLength = this.source.length();
+        const sourceLength = this.source.nativeLength();
         const remLength = sourceLength % this.chunkLength;
         return 1 + Math.floor(sourceLength / this.chunkLength) - (remLength === 0);
     },
@@ -108,7 +108,7 @@ export const BidirectionalChunkSequence = defineSequence({
         this.lowIndex = lowIndex || 0;
         this.frontIndex = frontIndex || 0;
         if(highIndex === undefined){
-            const sourceLength = source.length();
+            const sourceLength = source.nativeLength();
             const remLength = sourceLength % chunkLength;
             this.highIndex = 1 + Math.floor(sourceLength / chunkLength) - (remLength === 0);
         }else{
@@ -143,7 +143,7 @@ export const BidirectionalChunkSequence = defineSequence({
     index: function(i){
         const low = i * this.chunkLength;
         return this.source.nativeSlice(
-            low, Math.min(low + this.chunkLength, this.source.length())
+            low, Math.min(low + this.chunkLength, this.source.nativeLength())
         );
     },
     slice: function(i, j){

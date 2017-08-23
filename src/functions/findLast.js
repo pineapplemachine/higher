@@ -67,7 +67,7 @@ export const findLast = wrap({
             searchElement: searchElement,
             nextSearchElement: search.nextBack(),
             searchThreads: [],
-            index: source.length(),
+            index: source.nativeLength(),
         };
         while(!source.done()){
             const result = findObject.stepThreads(source.nextBack());

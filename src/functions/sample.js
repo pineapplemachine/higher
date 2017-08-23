@@ -140,7 +140,7 @@ const SampleSequence = defineSequence({
         hi => new SampleSequence(10, Math.random, hi.range(10)),
     ],
     constructor: function SampleSequence(samples, random, source, indexes = undefined){
-        const sourceLength = source.length();
+        const sourceLength = source.nativeLength();
         ArgumentsError.assert(samples <= sourceLength, {
             isConstructor: true,
             message: "Failed to create sequence",
@@ -158,7 +158,7 @@ const SampleSequence = defineSequence({
         return this.indexes.valueHistory.length > this.samples;
     },
     length: function(){
-        const sourceLength = this.source.length();
+        const sourceLength = this.source.nativeLength();
         return this.samples <= sourceLength ? this.samples : sourceLength;
     },
     left: function(){
@@ -232,7 +232,7 @@ export const sample = wrap({
         if(samples <= 0) return new EmptySequence();
         // TODO: Don't default to Math.random
         const randomFunc = random || Math.random;
-        const sourceLength = source.length();
+        const sourceLength = source.nativeLength();
         if(source.index && samples <= sourceLength / 5){
             // Lazy implementation is usually more performant when the sample
             // count is no more than 20% of the total number of elements.

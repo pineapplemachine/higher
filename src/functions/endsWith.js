@@ -56,7 +56,7 @@ export const endsWith = wrap({
         const source = sources[0];
         if(
             source.nativeLength && search.nativeLength &&
-            source.length() < search.length()
+            source.nativeLength() < search.nativeLength()
         ){
             return false;
         }

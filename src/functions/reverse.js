@@ -66,7 +66,7 @@ export const ReverseSequence = defineSequence({
         return this.source.done();
     },
     length: function(){
-        return this.source.length();
+        return this.source.nativeLength();
     },
     left: function(){
         return this.source.left();
@@ -131,7 +131,7 @@ export const ReverseOnDemandSequence = function(source){
         unbounded: () => false,
         done: () => source.done(),
         back: () => source.front(),
-        length: source.nativeLength ? () => source.length() : undefined,
+        length: source.nativeLength ? () => source.nativeLength() : undefined,
         has: source.has ? (i) => source.has(i) : undefined,
         get: source.get ? (i) => source.get(i) : undefined,
         dump: () => {

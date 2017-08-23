@@ -7,7 +7,7 @@ export const length = wrap({
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         expects: (`
-            The function expects asequence as input.
+            The function expects a sequence as input.
         `),
         returns: (`
             The function returns the number of elements in the input sequence.

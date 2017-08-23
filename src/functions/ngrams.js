@@ -46,7 +46,7 @@ export const SlicingNgramSequence = defineSequence({
         this.source = source;
         this.lowIndex = lowIndex || 0;
         this.highIndex = (highIndex !== undefined ?
-            highIndex : Math.max(this.lowIndex, 1 + source.length() - ngramSize)
+            highIndex : Math.max(this.lowIndex, 1 + source.nativeLength() - ngramSize)
         );
         this.frontIndex = frontIndex !== undefined ? frontIndex : this.lowIndex;
         this.backIndex = backIndex !== undefined ? backIndex : this.highIndex;
@@ -147,7 +147,7 @@ export const TrackingNgramSequence = defineSequence({
         return this.source.done() && this.currentNgram.length < this.ngramSize;
     },
     length: function(){
-        return Math.max(0, 1 + this.source.length() - this.ngramSize);
+        return Math.max(0, 1 + this.source.nativeLength() - this.ngramSize);
     },
     front: function(){
         if(!this.currentNgram) this.initializeFront();

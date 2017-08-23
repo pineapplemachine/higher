@@ -55,7 +55,7 @@ export const equals = wrap({
         }else if(sources.length === 2){
             if(
                 sources[0].nativeLength && sources[1].nativeLength &&
-                sources[0].length() !== sources[1].length()
+                sources[0].nativeLength() !== sources[1].nativeLength()
             ){
                 return false;
             }
@@ -72,8 +72,8 @@ export const equals = wrap({
             // or are known-unbounded.
             for(const source of sources){
                 if(source.nativeLength){
-                    if(sameLength === undefined) sameLength = source.length();
-                    else if(source.length() !== sameLength) return false;
+                    if(sameLength === undefined) sameLength = source.nativeLength();
+                    else if(source.nativeLength() !== sameLength) return false;
                 }else if(source.unbounded()){
                     return false;
                 }

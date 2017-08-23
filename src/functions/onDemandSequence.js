@@ -78,12 +78,12 @@ export const OnDemandSequence = defineSequence({
     },
     length: function(){
         if(this.source){
-            return this.source.length();
+            return this.source.nativeLength();
         }else if(this.onDemandMethods.length){
             return this.onDemandMethods.length();
         }else{
             this.initialize();
-            return this.source.length();
+            return this.source.nativeLength();
         }
     },
     front: function(){

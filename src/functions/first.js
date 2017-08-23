@@ -49,7 +49,7 @@ export const first = wrap({
             // TODO: Possibly write an optimized FirstSequence implementation
             // rather than returning a FilterSequence.HeadSequence.
             const filterSequence = new FilterSequence(predicate, source);
-            if(!isFinite(count) || (source.nativeLength && source.length() <= count)){
+            if(!isFinite(count) || (source.nativeLength && source.nativeLength() <= count)){
                 return filterSequence;
             }else{
                 return new HeadSequence(count, filterSequence);
@@ -57,7 +57,7 @@ export const first = wrap({
         }else if(!isFinite(count)){
             return source;
         }else if(source.nativeLength){
-            const sourceLength = source.length();
+            const sourceLength = source.nativeLength();
             if(sourceLength <= count) return source;
             else return (source.nativeSlice ?
                 source.nativeSlice(0, count) :

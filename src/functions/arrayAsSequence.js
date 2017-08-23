@@ -106,7 +106,7 @@ export const ArraySequence = defineSequence({
         );
     },
     has: function(i){
-        return isInteger(i) && i >= 0 && i < this.length();
+        return isInteger(i) && i >= 0 && i < this.nativeLength();
     },
     get: function(i){
         return this.source[i - this.lowIndex];

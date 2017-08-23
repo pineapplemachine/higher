@@ -36,7 +36,7 @@ export const TapSequence = defineSequence({
         return this.source.done();
     },
     length: function(){
-        return this.source.length();
+        return this.source.nativeLength();
     },
     left: function(){
         return this.source.left();

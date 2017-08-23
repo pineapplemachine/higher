@@ -56,7 +56,7 @@ export const RoundRobinSequence = defineSequence({
     },
     length: function(){
         let sum = 0;
-        for(const source of this.sources) sum += source.length();
+        for(const source of this.sources) sum += source.nativeLength();
         return sum;
     },
     left: function(){

@@ -50,7 +50,7 @@ export const EnumerateSequence = defineSequence({
             this.nextBack = undefined;
         }
         if(this.source.back && this.source.nativeLength && backIndex === undefined){
-            this.backIndex = this.startIndex + source.length() - 1;
+            this.backIndex = this.startIndex + source.nativeLength() - 1;
         }
     },
     bounded: function(){
@@ -63,7 +63,7 @@ export const EnumerateSequence = defineSequence({
         return this.source.done();
     },
     length: function(){
-        return this.source.length();
+        return this.source.nativeLength();
     },
     front: function(){
         return {index: this.frontIndex, value: this.source.front()};
@@ -80,11 +80,11 @@ export const EnumerateSequence = defineSequence({
         this.backIndex--;
     },
     index: function(i){
-        return {index: this.startIndex + i, value: this.source.index(i)};
+        return {index: this.startIndex + i, value: this.source.nativeIndex(i)};
     },
     slice: function(i, j){
         return new EnumerateSequence(
-            this.source.slice(i, j), this.startIndex + i
+            this.source.nativeSlice(i, j), this.startIndex + i
         );
     },
     copy: function(){

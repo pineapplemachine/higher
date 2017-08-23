@@ -87,7 +87,7 @@ export const ConcatSequence = defineSequence({
     },
     length: function(){
         let sum = 0;
-        for(const source of this.sources) sum += source.length();
+        for(const source of this.sources) sum += source.nativeLength();
         return sum;
     },
     front: function(){
@@ -117,17 +117,18 @@ export const ConcatSequence = defineSequence({
     index: function(i){
         let offset = 0;
         for(const source of this.sources){
-            const nextOffset = offset + source.length();
+            const nextOffset = offset + source.nativeLength();
             if(nextOffset > i) return source.index(i - offset);
             offset = nextOffset;
         }
         return this.sources[this.sources.length - 1].index(i - offset);
     },
     slice: function(i, j){
+        // TODO: Fix this
         let offset = 0;
         const sliceSources = [];
         for(const source of this.sources){
-            const nextOffset = offset + source.length();
+            const nextOffset = offset + source.nativeLength();
             if(nextOffset > i){
                 if(!sliceSources.length){
                     for(let k = offset; k < i; k++) source.popFront();

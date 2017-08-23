@@ -6,11 +6,11 @@ import {AssumeLengthSequence} from "./assumeLength";
 export const AssumeBoundedSequence = defineSequence({
     summary: "A known-bounded sequence enumerating the elements of a not-known-bounded sequence.",
     supportsWith: [
-        "length", "left", "back", "index", "slice", "has", "get", "copy", "reset",
+        "length", "back", "index", "slice", "has", "get", "copy",
     ],
-    overrides: [
-        "assumeLength",
-    ],
+    overrides: {
+        "assumeLength": {one: wrap.expecting.number},
+    },
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         expects: (`
@@ -22,7 +22,7 @@ export const AssumeBoundedSequence = defineSequence({
             const source = hi.repeat("hello!").until(i => i === "!");
             const seq = new AssumeBoundedSequence(source);
             const knownLength = seq.assumeLength(5);
-            hi.assert(knownLength.length() === 5);
+            hi.assert(knownLength.nativeLength() === 5);
             hi.assertEqual(knownLength, "hello");
         },
     },
@@ -47,10 +47,7 @@ export const AssumeBoundedSequence = defineSequence({
         return this.source.done();
     },
     length: function(){
-        return this.source.length();
-    },
-    left: function(){
-        return this.source.left();
+        return this.source.nativeLength();
     },
     front: function(){
         return this.source.front();
@@ -65,10 +62,10 @@ export const AssumeBoundedSequence = defineSequence({
         return this.source.popBack();
     },
     index: function(i){
-        return this.source.index(i);
+        return this.source.nativeIndex(i);
     },
     slice: function(i, j){
-        return this.source.slice(i, j);
+        return this.source.nativeSlice(i, j);
     },
     has: function(i){
         return this.source.has(i);
@@ -78,10 +75,6 @@ export const AssumeBoundedSequence = defineSequence({
     },
     copy: function(){
         return new AssumeBoundedSequence(this.source.copy());
-    },
-    reset: function(){
-        this.source.reset();
-        return this;
     },
     rebase: function(source){
         this.source = source;

@@ -105,7 +105,7 @@ export const FiniteRepeatEachElementSequence = defineSequence({
         );
     },
     length: function(){
-        return this.source.length() * this.elementRepetitions;
+        return this.source.nativeLength() * this.elementRepetitions;
     },
     left: function(){
         return (
