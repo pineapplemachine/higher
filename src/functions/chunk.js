@@ -129,13 +129,13 @@ export const BidirectionalChunkSequence = defineSequence({
         return this.highIndex - this.lowIndex;
     },
     front: function(){
-        return this.index(this.frontIndex);
+        return this.nativeIndex(this.frontIndex);
     },
     popFront: function(){
         this.frontIndex++;
     },
     back: function(){
-        return this.index(this.backIndex - 1);
+        return this.nativeIndex(this.backIndex - 1);
     },
     popBack: function(){
         this.backIndex--;

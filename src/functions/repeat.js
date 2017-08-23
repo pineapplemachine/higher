@@ -264,23 +264,23 @@ export const FiniteRepeatSequence = defineSequence({
         }
     },
     index: function(i){
-        return this.source.index(i % this.source.nativeLength());
+        return this.source.nativeIndex(i % this.source.nativeLength());
     },
     slice: function(i, j){
         const length = this.source.nativeLength();
         const lowIndex = i % length;
         const highIndex = j % length;
         if(j - i < length && highIndex >= lowIndex){
-            return this.source.slice(lowIndex, highIndex);
+            return this.source.nativeSlice(lowIndex, highIndex);
         }else if(lowIndex === 0 && highIndex === 0){
             return new FiniteRepeatSequence((j - i) / length, this.source);
         }else{
             const repetitions = Math.ceil(j / length) - Math.floor(i / length);
             const frontSource = (
-                lowIndex === 0 ? this.source : this.source.slice(lowIndex, length)
+                lowIndex === 0 ? this.source : this.source.nativeSlice(lowIndex, length)
             );
             const backSource = (
-                highIndex === 0 ? this.source : this.source.slice(0, highIndex)
+                highIndex === 0 ? this.source : this.source.nativeSlice(0, highIndex)
             );
             return new FiniteRepeatSequence(
                 repetitions, this.source,

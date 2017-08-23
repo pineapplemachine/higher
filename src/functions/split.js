@@ -48,14 +48,14 @@ export const SplitSequence = defineSequence({
     },
     popFront: function(){
         if(this.findDelimiters.done()){
-            this.frontValue = !this.frontResult ? null : this.source.slice(
+            this.frontValue = !this.frontResult ? null : this.source.nativeSlice(
                 this.beginDelimiter ? this.frontResult.low : this.frontResult.high,
                 this.source.nativeLength()
             );
             this.frontResult = null;
         }else{
             const result = this.findDelimiters.nextFront();
-            this.frontValue = this.source.slice(
+            this.frontValue = this.source.nativeSlice(
                 this.beginDelimiter ? this.frontResult.low : this.frontResult.high,
                 this.endDelimiter ? result.high : result.low
             );

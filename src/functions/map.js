@@ -48,10 +48,10 @@ export const SingularMapSequence = defineSequence({
         this.source.popBack();
     },
     index: function(i){
-        return this.transform(this.source.index(i));
+        return this.transform(this.source.nativeIndex(i));
     },
     slice: function(i, j){
-        return new SingularMapSequence(this.transform, this.source.slice(i, j));
+        return new SingularMapSequence(this.transform, this.source.nativeSlice(i, j));
     },
     has: function(i){
         return this.source.has(i);

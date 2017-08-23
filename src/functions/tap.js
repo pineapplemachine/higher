@@ -54,10 +54,10 @@ export const TapSequence = defineSequence({
         return this.callback(this.source.nextBack());
     },
     index: function(i){
-        return this.source.index(i);
+        return this.source.nativeIndex(i);
     },
     slice: function(i, j){
-        return new TapSequence(this.callback, this.source.slice(i, j));
+        return new TapSequence(this.callback, this.source.nativeSlice(i, j));
     },
     has: function(i){
         return this.source.has(i);

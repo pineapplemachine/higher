@@ -84,10 +84,10 @@ export const ReverseSequence = defineSequence({
         return this.source.popFront();
     },
     index: function(i){
-        return this.source.index(this.source.length - i - 1);
+        return this.source.nativeIndex(this.source.length - i - 1);
     },
     slice: function(i, j){
-        return new ReverseSequence(this.source.slice(
+        return new ReverseSequence(this.source.nativeSlice(
             this.source.length - j - 1,
             this.source.length - i - 1
         ));

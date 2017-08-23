@@ -66,10 +66,10 @@ export const DropFirstSequence = defineSequence({
         return this.source.popFront();
     },
     index: function(i){
-        return this.source.index(i + this.dropTarget);
+        return this.source.nativeIndex(i + this.dropTarget);
     },
     slice: function(i, j){
-        return this.source.slice(i + this.dropTarget, j + this.dropTarget);
+        return this.source.nativeSlice(i + this.dropTarget, j + this.dropTarget);
     },
     copy: function(){
         return new DropFirstSequence(

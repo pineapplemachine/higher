@@ -134,10 +134,10 @@ export const FiniteRepeatEachElementSequence = defineSequence({
         }
     },
     index: function(i){
-        return this.source.index(Math.floor(i / this.elementRepetitions));
+        return this.source.nativeIndex(Math.floor(i / this.elementRepetitions));
     },
     slice: function(i, j){
-        const slice = this.source.slice(
+        const slice = this.source.nativeSlice(
             Math.floor(i / this.elementRepetitions),
             Math.ceil(j / this.elementRepetitions)
         );

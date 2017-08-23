@@ -164,7 +164,7 @@ export const TrackingNgramSequence = defineSequence({
     index: function(i){
         const ngram = [];
         for(let j = i; j < i + this.ngramSize; j++){
-            ngram.push(this.source.index(i));
+            ngram.push(this.source.nativeIndex(i));
         }
         return ngram;
     },

@@ -165,7 +165,7 @@ const SampleSequence = defineSequence({
         return this.samples - this.indexes.valueHistory.length;
     },
     front: function(){
-        return this.source.index(this.indexes.front());
+        return this.source.nativeIndex(this.indexes.front());
     },
     popFront: function(){
         return this.indexes.popFront();

@@ -118,10 +118,10 @@ export const ConcatSequence = defineSequence({
         let offset = 0;
         for(const source of this.sources){
             const nextOffset = offset + source.nativeLength();
-            if(nextOffset > i) return source.index(i - offset);
+            if(nextOffset > i) return source.nativeIndex(i - offset);
             offset = nextOffset;
         }
-        return this.sources[this.sources.length - 1].index(i - offset);
+        return this.sources[this.sources.length - 1].nativeIndex(i - offset);
     },
     slice: function(i, j){
         // TODO: Fix this

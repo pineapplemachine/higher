@@ -19,7 +19,7 @@ export const FindSequenceResult = function(source, low, high){
 FindSequenceResult.prototype.constructor = FindSequenceResult;
 Object.assign(FindSequenceResult.prototype, {
     slice: function(){
-        return this.source.slice(this.low, this.high);
+        return this.source.nativeSlice(this.low, this.high);
     },
     array: function(...args){
         return this.slice().array(...args);

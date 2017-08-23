@@ -252,13 +252,13 @@ export const IndexStrideSequence = defineSequence({
         return Math.ceil(this.source.nativeLength() / this.strideLength);
     },
     front: function(){
-        return this.source.index(Math.floor(this.frontIndex));
+        return this.source.nativeIndex(Math.floor(this.frontIndex));
     },
     popFront: function(){
         this.frontIndex += this.strideLength;
     },
     back: function(){
-        return this.source.index(Math.floor(this.backIndex - 1));
+        return this.source.nativeIndex(Math.floor(this.backIndex - 1));
     },
     popBack: function(){
         this.backIndex -= this.strideLength;

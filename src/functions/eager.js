@@ -68,12 +68,12 @@ export const EagerSequence = defineSequence({
         return this.source.popBack();
     },
     index: function(i){
-        if(!this.source.index) this.initialize();
-        return this.source.index(i);
+        if(!this.source.nativeIndex) this.initialize();
+        return this.source.nativeIndex(i);
     },
     slice: function(i, j){
         if(!this.initialized) this.initialize();
-        return this.source.slice(i, j);
+        return this.source.nativeSlice(i, j);
     },
     has: function(i){
         return this.originalSource.has(i);

@@ -66,13 +66,13 @@ export const ArraySequence = defineSequence({
     },
     array: function(){
         if(this.lowIndex !== 0 || this.highIndex !== this.source.length){
-            return this.source.slice(this.lowIndex, this.highIndex);
+            return this.source.nativeSlice(this.lowIndex, this.highIndex);
         }else{
             return this.source;
         }
     },
     newArray: function(){
-        return this.source.slice(this.lowIndex, this.highIndex);
+        return this.source.nativeSlice(this.lowIndex, this.highIndex);
     },
     bounded: () => true,
     unbounded: () => false,

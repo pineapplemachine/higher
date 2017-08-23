@@ -52,10 +52,10 @@ export const DropLastSequence = defineSequence({
         this.seenElements.push(this.source.nextFront());
     },
     index: function(i){
-        return this.source.index(i);
+        return this.source.nativeIndex(i);
     },
     slice: function(i, j){
-        return this.source.slice(i, j);
+        return this.source.nativeSlice(i, j);
     },
     copy: function(){
         return new DropLastSequence(
@@ -225,10 +225,10 @@ export const UnboundedDropLastSequence = defineSequence({
         return this.source.popBack();
     },
     index: function(i){
-        return this.source.index(i);
+        return this.source.nativeIndex(i);
     },
     slice: function(i, j){
-        return this.source.slice(i, j);
+        return this.source.nativeSlice(i, j);
     },
     copy: function(){
         return new UnboundedDropLastSequence(
@@ -312,10 +312,10 @@ export const UnboundedDropLastPredicateSequence = defineSequence({
         }
     },
     index: function(i){
-        return this.source.index(i);
+        return this.source.nativeIndex(i);
     },
     slice: function(i, j){
-        return this.source.slice(i, j);
+        return this.source.nativeSlice(i, j);
     },
     copy: function(){
         return new UnboundedDropLastPredicateSequence(
