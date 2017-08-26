@@ -8,8 +8,8 @@ export const isUndefined = lightWrap({
             The function expects a single argument of any type as input.
         `),
         returns: (`
-            The function returns true when the input value was \`undefined\`
-            and false otherwise.
+            The function returns #true when the input value was \`undefined\`
+            #and false otherwise.
         `),
         related: [
             "isNull", "isNil"
@@ -38,8 +38,8 @@ export const isNull = lightWrap({
             The function expects a single argument of any type as input.
         `),
         returns: (`
-            The function returns true when the input value was \`null\`
-            and false otherwise.
+            The function returns #true when the input value was \`null\`
+            #and false otherwise.
         `),
         related: [
             "isUndefined", "isNil"
@@ -68,8 +68,8 @@ export const isNil = lightWrap({
             The function expects a single argument of any type as input.
         `),
         returns: (`
-            The function returns true when the input value was either \`null\`
-            or \`undefined\` and false otherwise.
+            The function returns #true when the input value was either #null
+            or #undefined and #false otherwise.
         `),
         related: [
             "isUndefined", "isNull"
@@ -99,8 +99,8 @@ export const isBoolean = lightWrap({
             The function expects a single argument of any type as input.
         `),
         returns: (`
-            The function returns true when the input value was either \`true\`
-            or \`false\` and false otherwise.
+            The function returns #true when the input value was either #true
+            or #false and it returns #false otherwise.
         `),
         examples: [
             "basicUsage"
@@ -131,8 +131,8 @@ export const isNumber = lightWrap({
             The function expects a single argument of any type as input.
         `),
         returns: (`
-            The function returns true when the input value was any number,
-            including #NaN, and it returns false otherwise.
+            The function returns #true when the input value was any number,
+            including #NaN, and it returns #false otherwise.
         `),
         related: [
             "isInteger", "isNaN",
@@ -175,8 +175,8 @@ export const isInteger = lightWrap({
             The function expects a single argument of any type as input.
         `),
         returns: (`
-            The function returns true when the input value was both a
-            number and an integer. It returns false otherwise.
+            The function returns #true when the input value was both a
+            number and an integer. It returns #false otherwise.
         `),
         related: [
             "isNumber", "isNaN",
@@ -257,8 +257,8 @@ export const isInfinity = lightWrap({
             The function expects a single argument of any type as input.
         `),
         returns: (`
-            The function returns true when the input value was positive or
-            negative #Infinity and false otherwise.
+            The function returns #true when the input value was positive or
+            negative #Infinity and #false otherwise.
         `),
         related: [
             "isNumber", "isNaN",
@@ -295,8 +295,8 @@ export const isPositiveInfinity = lightWrap({
             The function expects a single argument of any type as input.
         `),
         returns: (`
-            The function returns true when the input value was positive
-            #Infinity and false otherwise.
+            The function returns #true when the input value was positive
+            #Infinity and #false otherwise.
         `),
         related: [
             "isNumber", "isNaN",
@@ -333,8 +333,8 @@ export const isNegativeInfinity = lightWrap({
             The function expects a single argument of any type as input.
         `),
         returns: (`
-            The function returns true when the input value was negative
-            #Infinity and false otherwise.
+            The function returns #true when the input value was negative
+            #Infinity and #false otherwise.
         `),
         related: [
             "isNumber", "isNaN",
@@ -363,6 +363,174 @@ export const isNegativeInfinity = lightWrap({
     },
 });
 
+export const isPositiveZero = lightWrap({
+    summary: "Get whether an input is positive zero.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The function expects a single argument of any type as input.
+        `),
+        returns: (`
+            The function returns #true when the input value was #[+0] and
+            #false otherwise, including when the input value was #[-0].
+        `),
+        related: [
+            "isNegativeZero",
+        ],
+        examples: [
+            "basicUsage",
+        ],
+        links: [
+            {
+                description: "EMCAScript specification's definition of positive and negative zero.",
+                url: "https://www.ecma-international.org/ecma-262/5.1/#sec-8.5",
+            },
+        ],
+    },
+    implementation: function isPositiveZero(value){
+        return value === 0 && (1 / value > 0);
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": hi => {
+            hi.assert(hi.isPositiveZero(+0));
+            hi.assertNot(hi.isPositiveZero(-0));
+        },
+        "nilInput": hi => {
+            hi.assertNot(hi.isPositiveZero(null));
+            hi.assertNot(hi.isPositiveZero(undefined));
+        },
+        "numericInput": hi => {
+            hi.assertNot(hi.isPositiveZero(+1));
+            hi.assertNot(hi.isPositiveZero(-1));
+            hi.assertNot(hi.isPositiveZero(+Infinity));
+            hi.assertNot(hi.isPositiveZero(-Infinity));
+            hi.assertNot(hi.isPositiveZero(NaN));
+        },
+    },
+});
+
+export const isNegativeZero = lightWrap({
+    summary: "Get whether an input is negative zero.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The function expects a single argument of any type as input.
+        `),
+        returns: (`
+            The function returns true when the input value was #[-0] and
+            false otherwise, including when the input value was #[+0].
+        `),
+        related: [
+            "isPositiveZero",
+        ],
+        examples: [
+            "basicUsage",
+        ],
+        links: [
+            {
+                description: "EMCAScript specification's definition of positive and negative zero.",
+                url: "https://www.ecma-international.org/ecma-262/5.1/#sec-8.5",
+            },
+        ],
+    },
+    implementation: function isNegativeZero(value){
+        return value === 0 && (1 / value < 0);
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": hi => {
+            hi.assert(hi.isNegativeZero(-0));
+            hi.assertNot(hi.isNegativeZero(+0));
+        },
+        "nilInput": hi => {
+            hi.assertNot(hi.isNegativeZero(null));
+            hi.assertNot(hi.isNegativeZero(undefined));
+        },
+        "numericInput": hi => {
+            hi.assertNot(hi.isNegativeZero(+1));
+            hi.assertNot(hi.isNegativeZero(-1));
+            hi.assertNot(hi.isNegativeZero(+Infinity));
+            hi.assertNot(hi.isNegativeZero(-Infinity));
+            hi.assertNot(hi.isNegativeZero(NaN));
+        },
+    },
+});
+
+export const isPositive = lightWrap({
+    summary: "Get whether an input is positive.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The function expects a single argument of any type as input.
+        `),
+        returns: (`
+            The function returns #true when the input value was greater than #0
+            or equal to #[+0] and #false otherwise.
+        `),
+        related: [
+            "isNegative", "isPositiveZero",
+        ],
+        examples: [
+            "basicUsage",
+        ],
+    },
+    implementation: function isPositive(value){
+        return value > 0 || (value === 0 && (1 / value > 0));
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": hi => {
+            hi.assert(hi.isPositive(+1));
+            hi.assertNot(hi.isPositive(-1));
+        },
+        "zeroInput": hi => {
+            hi.assert(hi.isPositive(0));
+            hi.assert(hi.isPositive(+0));
+            hi.assertNot(hi.isPositive(-0));
+        },
+        "nilInput": hi => {
+            hi.assertNot(hi.isPositive(null));
+            hi.assertNot(hi.isPositive(undefined));
+        },
+    },
+});
+
+export const isNegative = lightWrap({
+    summary: "Get whether an input is negative.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The function expects a single argument of any type as input.
+        `),
+        returns: (`
+            The function returns #true when the input value was less than #0 or
+            equal to #[-0] and #false otherwise.
+        `),
+        related: [
+            "isPositive", "isNegativeZero",
+        ],
+        examples: [
+            "basicUsage",
+        ],
+    },
+    implementation: function isNegative(value){
+        return value < 0 || (value === 0 && (1 / value < 0));
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": hi => {
+            hi.assert(hi.isNegative(-1));
+            hi.assertNot(hi.isNegative(+1));
+        },
+        "zeroInput": hi => {
+            hi.assert(hi.isNegative(-0));
+            hi.assertNot(hi.isNegative(+0));
+            hi.assertNot(hi.isNegative(0));
+        },
+        "nilInput": hi => {
+            hi.assertNot(hi.isNegative(null));
+            hi.assertNot(hi.isNegative(undefined));
+        },
+    },
+});
+
 export const isString = lightWrap({
     summary: "Get whether an input is a string.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
@@ -371,8 +539,8 @@ export const isString = lightWrap({
             The function expects a single argument of any type as input.
         `),
         returns: (`
-            The function returns true when the input value was a string and
-            false otherwise.
+            The function returns #true when the input value was a string and
+            #false otherwise.
         `),
         examples: [
             "basicUsage"
@@ -408,8 +576,8 @@ export const isArray = lightWrap({
             The function expects a single argument of any type as input.
         `),
         returns: (`
-            The function returns true when the input value was an array and
-            false otherwise.
+            The function returns #true when the input value was an array and
+            #false otherwise.
         `),
         examples: [
             "basicUsage"
@@ -440,8 +608,8 @@ export const isSymbol = lightWrap({
             The function expects a single argument of any type as input.
         `),
         returns: (`
-            The function returns true when the input value was a symbol and
-            false otherwise.
+            The function returns #true when the input value was a symbol and
+            #false otherwise.
         `),
         examples: [
             "basicUsage"
@@ -483,8 +651,8 @@ export const isPrimitive = lightWrap({
             The function expects a single argument of any type as input.
         `),
         returns: (`
-            The function returns true when the input value was a primitive value
-            and false otherwise.
+            The function returns #true when the input value was a primitive value
+            and #false otherwise.
         `),
         examples: [
             "basicUsage"
@@ -556,8 +724,8 @@ export const isObject = lightWrap({
             The function expects a single argument of any type as input.
         `),
         returns: (`
-            The function returns true when the input value was any object and
-            false otherwise.
+            The function returns #true when the input value was any object and
+            #false otherwise.
         `),
         examples: [
             "basicUsage", "basicUsageArray", "basicUsageFunction",
@@ -623,8 +791,8 @@ export const isPlainObject = lightWrap({
             The function expects a single argument of any type as input.
         `),
         returns: (`
-            The function returns true when the input value was a plain object and
-            false otherwise.
+            The function returns #true when the input value was a plain object and
+            #false otherwise.
         `),
         examples: [
             "basicUsage"
@@ -674,8 +842,8 @@ export const isIterable = lightWrap({
             The function expects a single argument of any type as input.
         `),
         returns: (`
-            The function returns true when the input value was a iterable and
-            false otherwise. An iterable is any value for which a statement
+            The function returns #true when the input value was a iterable and
+            #false otherwise. An iterable is any value for which a statement
             like \`for(element of iterable)\` is valid.
         `),
         examples: [
@@ -721,8 +889,8 @@ export const isFunction = lightWrap({
             The function expects a single argument of any type as input.
         `),
         returns: (`
-            The function returns true when the input value was a function and
-            false otherwise.
+            The function returns #true when the input value was a function and
+            #false otherwise.
         `),
         examples: [
             "basicUsage"
