@@ -7,7 +7,7 @@ import {FilterSequence} from "./filter";
 export const DropFirstSequence = defineSequence({
     summary: "Enumerate the contents of a sequence, omitting the first so many elements.",
     supportsWith: [
-        "length", "left", "index", "slice", "copy", "reset",
+        "length", "index", "back", "slice", "copy",
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
@@ -65,6 +65,12 @@ export const DropFirstSequence = defineSequence({
         if(!this.initializedFront) this.initializeFront();
         return this.source.popFront();
     },
+    back: function(){
+        return this.source.back();
+    },
+    popBack: function(){
+        return this.source.popBack();
+    },
     index: function(i){
         return this.source.nativeIndex(i + this.dropTarget);
     },
@@ -115,15 +121,18 @@ export const DropFirstPredicateSequence = defineSequence({
         hi => new DropFirstPredicateSequence(5, i => false, hi.counter()),
     ],
     constructor: function DropFirstPredicateSequence(
-        dropTarget, predicate, source, droppedElements = undefined
+        dropTarget, predicate, source,
+        droppedElements = undefined, initializedFront = undefined
     ){
         this.dropTarget = dropTarget;
         this.predicate = predicate;
         this.source = source;
         this.droppedElements = droppedElements || 0;
+        this.initializedFront = initializedFront;
         this.maskAbsentMethods(source);
     },
-    initialize: function(){
+    initializeFront: function(){
+        this.initializedFront = true;
         while(
             this.droppedElements < this.dropTarget && !this.source.done() &&
             this.predicate(this.source.front())
@@ -131,22 +140,6 @@ export const DropFirstPredicateSequence = defineSequence({
             this.source.popFront();
             this.droppedElements++;
         }
-        this.done = function(){
-            return this.source.done();
-        };
-        this.front = function(){
-            return this.source.front();
-        };
-        this.popFront = function(){
-            this.source.popFront();
-            while(
-                this.droppedElements < this.dropTarget && !this.source.done() &&
-                this.predicate(this.source.front())
-            ){
-                this.source.popFront();
-                this.droppedElements++;
-            }
-        };
     },
     bounded: function(){
         return this.source.bounded();
@@ -155,34 +148,29 @@ export const DropFirstPredicateSequence = defineSequence({
         return this.source.unbounded();
     },
     done: function(){
-        this.initialize();
+        if(!this.initializedFront) this.initializeFront();
         return this.source.done();
     },
     front: function(){
-        this.initialize();
+        if(!this.initializedFront) this.initializeFront();
         return this.source.front();
     },
     popFront: function(){
-        this.initialize();
-        return this.source.popFront();
+        if(!this.initializedFront) this.initializeFront();
+        this.source.popFront();
+        while(
+            this.droppedElements < this.dropTarget && !this.source.done() &&
+            this.predicate(this.source.front())
+        ){
+            this.source.popFront();
+            this.droppedElements++;
+        }
     },
     copy: function(){
-        const copy = new DropFirstPredicateSequence(
-            this.dropTarget, this.predicate, this.source.copy(), this.droppedElements
+        return new DropFirstPredicateSequence(
+            this.dropTarget, this.predicate, this.source.copy(),
+            this.droppedElements, this.initializedFront
         );
-        copy.done = this.done;
-        copy.front = this.front;
-        copy.popFront = this.popFront;
-        copy.left = this.left;
-        return copy;
-    },
-    reset: function(){
-        this.source.reset();
-        delete this.done;
-        delete this.front;
-        delete this.popFront;
-        delete this.left;
-        return this;
     },
     rebase: function(source){
         this.source = source;
