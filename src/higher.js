@@ -177,7 +177,10 @@ import {glossary} from "./docs/glossary"; hi.glossary = glossary;
 import {contractTypes} from "./test/contracts"; hi.contract = contractTypes;
 import {defineContract} from "./test/contracts"; hi.register(defineContract);
 // test/sequenceTools
-import {nonSlicing} from "./test/sequenceTools"; hi.register(nonSlicing);
+import {boundsUnknown} from "./test/sequenceTools"; hi.register(boundsUnknown);
+import {makeNonSlicing} from "./test/sequenceTools"; hi.register(makeNonSlicing);
+import {makeUncopyable} from "./test/sequenceTools"; hi.register(makeUncopyable);
+import {makeUnidirectional} from "./test/sequenceTools"; hi.register(makeUnidirectional);
 
 // Core sequence types
 import {arrayAsSequence} from "./functions/arrayAsSequence"; hi.register(arrayAsSequence);
