@@ -265,20 +265,7 @@ export const addIndexPatch = function(i){
     }
 };
 
-export const adjustSequenceIndex = function(sequence, index){
-    if(process.env.NODE_ENV === "development"){
-        if(!isNumber(index)){
-            throw ArgumentsError({message: "Index must be a number."});
-        }
-        if(index < 0 && !sequence.bounded()){
-            throw NotBoundedError(sequence, {message: (
-                "Negative indexes are not allowed for sequences not " +
-                "known to be bounded."
-            )});
-        }
-    }
-    return index >= 0 ? index : sequence.length() - index - 1;
-};
+
 
 export const sequenceLengthPatch = function(){
     throw new Error("this should not be being called right now!");
@@ -317,54 +304,6 @@ export const sequenceIndexPatch = function(i){
     return this.indexPatchArray[index];
 };
 
-export const sequenceSliceWrapper = function(i, j){
-    if(j === undefined){
-        if(i === undefined) return this.copy();
-        return this.nativeSlice(0, adjustSequenceIndex(this, i));
-    }else{
-        return this.nativeSlice(
-            adjustSequenceIndex(this, i), adjustSequenceIndex(this, j)
-        );
-    }
-};
-
-export const sequenceSlicePatch = function(i, j){
-    // TODO: Fix missing imports!
-    let low, high;
-    if(j === undefined){
-        if(i === undefined){
-            // TODO: Handle this case differently
-            if(!this.copy) throw new Error();
-            return this.copy();
-        }
-        low = 0;
-        high = adjustSequenceIndex(i);
-    }else{
-        low = adjustSequenceIndex(i);
-        high = adjustSequenceIndex(j);
-    }
-    if(low >= high){
-        return new EmptySequence();
-    }
-    if(this.copy){
-        const slice = this.copy();
-        for(let k = 0; k < low; k++) slice.popFront();
-        // TODO: Do something about missing import
-        return new HeadSequence(high - low, slice);
-    }
-    if(!this.indexPatchArray){
-        addIndexPatch.call(this, high);
-    }
-    while(this.indexPatchArray.length <= high && !this.nativeDone()){
-        this.indexPatchArray.push(this.nativeFront());
-        this.nativePopFront();
-        this.indexPatchBackIndex++;
-    }
-    return new ArraySequence(
-        this.indexPatchArray, low, high
-    );
-};
-
 export const addStandardSequenceInterface = (sequence) => {
     // sequence.prototype.length = (
     //     sequence.prototype.length || sequenceLengthPatch
@@ -372,9 +311,9 @@ export const addStandardSequenceInterface = (sequence) => {
     sequence.prototype.index = (sequence.prototype.nativeIndex ?
         sequenceIndexWrapper : sequenceIndexPatch
     );
-    sequence.prototype.slice = (sequence.prototype.nativeSlice ?
-        sequenceSliceWrapper : sequenceSlicePatch
-    );
+    // sequence.prototype.slice = (sequence.prototype.nativeSlice ?
+    //     sequenceSliceWrapper : sequenceSlicePatch
+    // );
     // sequence.prototype.lengthAsync = function(){
     //     return new constants.Promise((resolve, reject) => {
     //         callAsync(() => resolve(this.length()))
@@ -385,11 +324,11 @@ export const addStandardSequenceInterface = (sequence) => {
             callAsync(() => resolve(this.index(i)))
         });
     };
-    sequence.prototype.sliceAsync = function(i, j){
-        return new constants.Promise((resolve, reject) => {
-            callAsync(() => resolve(this.slice(i, j)))
-        });
-    };
+    // sequence.prototype.sliceAsync = function(i, j){
+    //     return new constants.Promise((resolve, reject) => {
+    //         callAsync(() => resolve(this.slice(i, j)))
+    //     });
+    // };
 };
 
 export const nativeMethodNameMap = {

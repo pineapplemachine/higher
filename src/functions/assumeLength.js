@@ -28,11 +28,9 @@ export const AssumeLengthSequence = defineSequence({
         }
         if(!source.nativeIndex){
             this.nativeIndex = undefined;
-            this.index = sequenceIndexPatch;
         }
         if(!source.nativeSlice){
             this.nativeSlice = undefined;
-            this.slice = sequenceSlicePatch;
         }
         if(!source.has) this.has = undefined;
         if(!source.get) this.get = undefined;

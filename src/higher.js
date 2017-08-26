@@ -18,22 +18,23 @@ hi.register = lightWrap({
     },
     implementation: function register(...functions){
         for(const wrapped of functions){
+            // This check required because some functions are exclusively for
+            // testing/development use and so are undefined in production builds.
+            if(!wrapped) continue;
+            // Add the function to to the dictionary under its primary name.
             this.function[wrapped.name] = wrapped;
-            if(wrapped.internal){
-                // Do nothing
-            }else if(wrapped.names){
-                for(const name of wrapped.names){
-                    // this[name] = wrapped;
-                    Object.defineProperty(this, name, {
-                        value: wrapped, writable: false
-                    });
-                    if(wrapped.async) this[name + "Async"] = wrapped.async;
+            // And then handle all of its names.
+            if(wrapped.names) for(const name of wrapped.names){
+                // Property chicanery made necessary by functions like "length".
+                Object.defineProperty(this, name, {
+                    value: wrapped, writable: false
+                });
+                // Add async function variants where indicated.
+                if(wrapped.async){
+                    this[name + "Async"] = wrapped.async;
                 }
-            }else{
-                this[wrapped.name] = wrapped;
             }
         }
-        return functions[0];
     },
 });
 
@@ -283,6 +284,7 @@ import {reverse} from "./functions/reverse"; hi.register(reverse);
 import {roundRobin} from "./functions/roundRobin"; hi.register(roundRobin);
 import {sample} from "./functions/sample"; hi.register(sample);
 import {shuffle} from "./functions/shuffle"; hi.register(shuffle);
+import {slice} from "./functions/slice"; hi.register(slice);
 import {split} from "./functions/split"; hi.register(split);
 import {startsWith} from "./functions/startsWith"; hi.register(startsWith);
 import {stride} from "./functions/stride"; hi.register(stride);
