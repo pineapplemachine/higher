@@ -27,11 +27,6 @@ export const TeeSequence = defineSequence({
     length: function(){
         return this.source.nativeLength();
     },
-    left: function(){
-        return this.source.left() + (this.elementBuffer.length - (
-            this.bufferIndex - this.elementBuffer.offset
-        ));
-    },
     front: function(){
         const index = this.bufferIndex - this.elementBuffer.offset;
         if(index < this.elementBuffer.elements.length){
@@ -52,8 +47,6 @@ export const TeeSequence = defineSequence({
         this.elementBuffer.elements.shift();
         this.elementBuffer.offset++;
     },
-    back: null,
-    popBack: null,
     index: function(i){
         return this.source.nativeIndex(i);
     },
@@ -73,7 +66,6 @@ export const TeeSequence = defineSequence({
         this.elementBuffer.sequences.push(sequence);
         return sequence;
     },
-    reset: null,
     // Implementation is weird because rebasing this sequence must not affect
     // the state of its companion TeeSequences.
     rebase: function(source){
