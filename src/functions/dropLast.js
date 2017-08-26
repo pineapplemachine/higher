@@ -5,7 +5,7 @@ import {EmptySequence} from "./emptySequence";
 import {FilterSequence} from "./filter";
 import {HeadSequence} from "./head";
 
-export const DropLastSequence = defineSequence({
+export const UnidirectionalDropLastSequence = defineSequence({
     summary: "Enumerate the contents of a sequence, omitting the last so many elements.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
@@ -14,7 +14,7 @@ export const DropLastSequence = defineSequence({
             to drop them from as input.
         `),
     },
-    constructor: function DropLastSequence(
+    constructor: function UnidirectionalDropLastSequence(
         dropTarget, source, seenElements = undefined
     ){
         this.dropTarget = dropTarget;
@@ -32,7 +32,6 @@ export const DropLastSequence = defineSequence({
         return this.source.bounded();
     },
     unbounded: function(){
-        // Use UnboundedDropLastSequence instead when source is known-unbounded!
         return this.source.unbounded();
     },
     done: function(){
@@ -58,7 +57,7 @@ export const DropLastSequence = defineSequence({
         return this.source.nativeSlice(i, j);
     },
     copy: function(){
-        return new DropLastSequence(
+        return new UnidirectionalDropLastSequence(
             this.dropTarget, this.source.copy(), (this.seenElements ?
                 this.seenElements.slice() : undefined
             )
@@ -114,7 +113,6 @@ export const DropLastPredicateSequence = defineSequence({
         return this.source.bounded();
     },
     unbounded: function(){
-        // Use UnboundedDropLastPredicateSequence instead when source is known-unbounded!
         return this.source.unbounded();
     },
     done: function(){
@@ -171,7 +169,7 @@ export const DropLastPredicateSequence = defineSequence({
     },
 });
 
-export const UnboundedDropLastSequence = defineSequence({
+export const BidirectionalDropLastSequence = defineSequence({
     summary: "Enumerate the contents of an unbounded sequence, omitting the last so many elements.",
     supportRequired: [
         "back",
@@ -188,12 +186,12 @@ export const UnboundedDropLastSequence = defineSequence({
         `),
     },
     getSequence: process.env.NODE_ENV !== "development" ? undefined : [
-        hi => new UnboundedDropLastSequence(0, hi.counter()),
-        hi => new UnboundedDropLastSequence(10, hi.counter()),
-        hi => new UnboundedDropLastSequence(0, hi.repeat("hello")),
-        hi => new UnboundedDropLastSequence(10, hi.repeat("hello")),
+        hi => new BidirectionalDropLastSequence(0, hi.counter()),
+        hi => new BidirectionalDropLastSequence(10, hi.counter()),
+        hi => new BidirectionalDropLastSequence(0, hi.repeat("hello")),
+        hi => new BidirectionalDropLastSequence(10, hi.repeat("hello")),
     ],
-    constructor: function UnboundedDropLastSequence(
+    constructor: function BidirectionalDropLastSequence(
         dropTarget, source, initializedBack = undefined
     ){
         this.dropTarget = dropTarget;
@@ -231,7 +229,7 @@ export const UnboundedDropLastSequence = defineSequence({
         return this.source.nativeSlice(i, j);
     },
     copy: function(){
-        return new UnboundedDropLastSequence(
+        return new BidirectionalDropLastSequence(
             this.dropTarget, this.source.copy(), this.initializedBack
         );
     },
@@ -287,9 +285,15 @@ export const UnboundedDropLastPredicateSequence = defineSequence({
             this.droppedElements++;
         }
     },
-    bounded: () => false,
-    unbounded: () => true,
-    done: () => false,
+    bounded: function(){
+        return this.source.bounded();
+    },
+    unbounded: function(){
+        return this.source.unbounded();
+    },
+    done: function(){
+        return this.source.done();
+    },
     front: function(){
         return this.source.front();
     },
@@ -400,14 +404,12 @@ export const dropLast = wrap({
                     new HeadSequence(sourceLength - drop, source)
                 )
             );
+        }else if(source.back){
+            return new BidirectionalDropLastSequence(drop, source);
         }else if(source.unbounded()){
-            if(source.back){
-                return new UnboundedDropLastSequence(drop, source);
-            }else{
-                return source;
-            }
+            return source;
         }else{
-            return new DropLastSequence(drop, source);
+            return new UnidirectionalDropLastSequence(drop, source);
         }
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
@@ -499,7 +501,7 @@ export const dropLast = wrap({
             hi.assertEqual(seq().dropLast(Infinity, even), [1, 3, 5, 7]);
         },
         "boundedNonSlicingInput": hi => {
-            const seq = () => hi.range(8).nonSlicing();
+            const seq = () => hi.range(8).makeNonSlicing();
             const even = i => i % 2 === 0;
             hi.assertEqual(seq().dropLast(2), [0, 1, 2, 3, 4, 5]);
             hi.assertEmpty(seq().dropLast(10));
