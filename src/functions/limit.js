@@ -93,7 +93,7 @@ export const limit = wrap({
             hi.assert(seq.limit() === seq);
         },
         "notKnownBoundedNonSlicingInput": hi => {
-            const seq = hi.recur(i => i + 1).seed(0).until(i => i >= 8).nonSlicing();
+            const seq = hi.recur(i => i + 1).seed(0).until(i => i >= 8).makeNonSlicing();
             hi.assertEqual(seq.copy().limit(), seq);
         },
     },
