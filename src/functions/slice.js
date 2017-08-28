@@ -155,7 +155,7 @@ export const slice = wrap({
             "basicUsage", "basicUsageNegative",
         ],
         related: [
-            "assumeLength",
+            "head", "tail", "index",
         ],
     },
     attachSequence: true,
