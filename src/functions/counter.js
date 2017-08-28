@@ -22,33 +22,31 @@ export const CounterSequence = defineSequence({
         hi => new CounterSequence(0.5),
         hi => new CounterSequence(-0.5),
     ],
-    constructor: function CounterSequence(startValue, currentValue = undefined){
-        this.startValue = startValue || 0;
-        this.currentValue = currentValue === undefined ? this.startValue : currentValue;
+    constructor: function CounterSequence(frontValue = undefined){
+        this.frontValue = frontValue || 0;
     },
     bounded: () => false,
     unbounded: () => true,
     done: () => false,
     front: function(){
-        return this.currentValue;
+        return this.frontValue;
     },
     popFront: function(){
-        return this.currentValue++;
+        return this.frontValue++;
     },
     back: () => Infinity,
     popBack: () => {},
     index: function(i){
-        return this.startValue + i;
+        return i;
+    },
+    indexNegative: function(i){
+        return Infinity;
     },
     slice: function(i, j){
-        return new NumberRangeSequence(this.startValue + i, this.startValue + j);
+        return new NumberRangeSequence(i, j);
     },
     copy: function(){
-        return new CounterSequence(this.startValue, this.currentValue);
-    },
-    reset: function(){
-        this.currentValue = this.startValue;
-        return this;
+        return new CounterSequence(this.frontValue);
     },
 });
 
