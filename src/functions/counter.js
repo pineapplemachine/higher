@@ -56,8 +56,7 @@ export const counter = wrap({
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         detail: (`
-            Get a sequence counting up by one from a given number, or from zero
-            if no number was given.
+            Get a sequence counting up by one from zero.
         `),
         expects: (`
             The function expects an optional number to count up from. When no
@@ -79,33 +78,16 @@ export const counter = wrap({
     attachSequence: false,
     async: false,
     arguments: {
-        unordered: {
-            numbers: "?"
-        }
+        none: true,
     },
-    implementation: (start) => {
-        return new CounterSequence(start || 0);
+    implementation: function counter(){
+        return new CounterSequence();
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {
             const seq = hi.counter();
-            hi.assertEqual(seq.head(5), [0, 1, 2, 3, 4]);
-        },
-        "positiveInput": hi => {
-            const seq = hi.counter(40);
-            hi.assertEqual(seq.head(5), [40, 41, 42, 43, 44]);
-        },
-        "negativeInput": hi => {
-            const seq = hi.counter(-5);
-            hi.assertEqual(seq.head(5), [-5, -4, -3, -2, -1]);
-        },
-        "fractionalInput": hi => {
-            const seq = hi.counter(0.5);
-            hi.assertEqual(seq.head(5), [0.5, 1.5, 2.5, 3.5, 4.5]);
-        },
-        "bidirectionality": hi => {
-            hi.assert(hi.counter().startsWith([0, 1, 2]));
-            hi.assert(hi.counter().endsWith([Infinity, Infinity, Infinity]));
+            hi.assertEqual(seq.startsWith([0, 1, 2, 3, 4, 5]));
+            hi.assertEqual(seq.endsWith([Infinity, Infinity, Infinity]));
         },
     },
 });
