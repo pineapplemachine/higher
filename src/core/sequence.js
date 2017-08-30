@@ -91,11 +91,12 @@ Sequence.prototype.cacheUntilIndex = function(i){
     }else if(!this.elementCache){
         this.elementCache = [];
         this.elementCacheFrontIndex = 0;
-    }else if(this.elementCache.length >= i){
+    }else if(this.done() || this.elementCache.length >= i){
         return this.elementCache;
     }
-    for(const element of this){
-        this.elementCache.push(element);
+    while(!this.nativeDone()){
+        this.elementCache.push(this.nativeFront());
+        this.nativePopFront();
         if(this.elementCache.length >= i) break;
     }
     this.elementCacheBackIndex = this.elementCache.length;
@@ -163,15 +164,12 @@ Sequence.prototype.maskAbsentMethods = function(source){
     }
     if(this.length && !source.nativeLength){
         this.nativeLength = undefined;
-        // this.length = sequenceLengthPatch;
     }
     if(this.index && !source.nativeIndex){
         this.nativeIndex = undefined;
-        // this.index = sequenceIndexPatch;
     }
     if(this.slice && !source.nativeSlice){
         this.nativeSlice = undefined;
-        // this.slice = sequenceSlicePatch;
     }
     if(this.has && !source.has) this.has = undefined;
     if(this.get && !source.get) this.get = undefined;
@@ -203,134 +201,6 @@ Sequence.prototype.typeChainString = function(){
     }
 };
 
-export const addIndexPatch = function(i){
-    throw new Error("this should not be being called right now!");
-    this.indexPatchArray = [];
-    // while(this.indexPatchArray.length < i && !this.nativeDone()){
-    //     this.indexPatchArray.push(this.nativeFront());
-    //     this.nativePopFront();
-    // }
-    this.indexPatchFrontIndex = 0;
-    this.indexPatchBackIndex = this.indexPatchArray.length;
-    this.done = function(){
-        return (
-            this.indexPatchFrontIndex >= this.indexPatchBackIndex &&
-            this.nativeDone()
-        );
-    };
-    this.front = function(){
-        if(this.indexPatchFrontIndex < this.indexPatchArray.length){
-            return this.indexPatchArray(this.indexPatchFrontIndex);
-        }else{
-            return this.nativeFront();
-        }
-    };
-    this.popFront = function(){
-        this.indexPatchFrontIndex++;
-        if(this.indexPatchFrontIndex >= this.indexPatchArray.length){
-            return this.nativePopFront();
-        }
-    };
-    if(this.back){
-        this.back = function(){
-            if(this.nativeDone()){
-                return this.indexPatchArray[this.indexPatchBackIndex - 1];
-            }else{
-                return this.nativeBack();
-            }
-        };
-        this.popBack = function(){
-            if(this.nativeDone()){
-                this.indexPatchBackIndex--;
-            }else{
-                return this.nativePopBack();
-            }
-        };
-    }
-    if(this.copy){
-        const copyMethod = function(){
-            const copy = this.nativeCopy();
-            copy.indexPatchArray = this.indexPatchArray.slice();
-            copy.indexPatchFrontIndex = this.indexPatchFrontIndex;
-            copy.indexPatchBackIndex = this.indexPatchBackIndex;
-            copy.done = this.done;
-            copy.front = this.front;
-            copy.popFront = this.popFront;
-            copy.back = this.back;
-            copy.popBack = this.popBack;
-            copy.copy = copyMethod;
-            return copy;
-        };
-        this.copy = copyMethod;
-    }
-};
-
-
-
-export const sequenceLengthPatch = function(){
-    throw new Error("this should not be being called right now!");
-    if(this.unbounded()){
-        return Infinity;
-    }else if(!this.bounded()){
-        throw BoundsUnknownError(this, {
-            message: "Failed to determine sequence length",
-        });
-    }
-    if(!this.indexPatchArray){
-        addIndexPatch.call(this, Infinity);
-    }
-    while(!this.nativeDone()){
-        this.indexPatchArray.push(this.nativeFront());
-        this.nativePopFront();
-        this.indexPatchBackIndex++;
-    }
-    return this.indexPatchArray.length;
-};
-
-export const sequenceIndexWrapper = function(i){
-    return this.nativeIndex(adjustSequenceIndex(this, i));
-};
-
-export const sequenceIndexPatch = function(i){
-    const index = adjustSequenceIndex(this, i);
-    if(!this.indexPatchArray){
-        addIndexPatch.call(this, index);
-    }
-    while(this.indexPatchArray.length <= index && !this.nativeDone()){
-        this.indexPatchArray.push(this.nativeFront());
-        this.nativePopFront();
-        this.indexPatchBackIndex++;
-    }
-    return this.indexPatchArray[index];
-};
-
-export const addStandardSequenceInterface = (sequence) => {
-    // sequence.prototype.length = (
-    //     sequence.prototype.length || sequenceLengthPatch
-    // );
-    sequence.prototype.index = (sequence.prototype.nativeIndex ?
-        sequenceIndexWrapper : sequenceIndexPatch
-    );
-    // sequence.prototype.slice = (sequence.prototype.nativeSlice ?
-    //     sequenceSliceWrapper : sequenceSlicePatch
-    // );
-    // sequence.prototype.lengthAsync = function(){
-    //     return new constants.Promise((resolve, reject) => {
-    //         callAsync(() => resolve(this.length()))
-    //     });
-    // };
-    sequence.prototype.indexAsync = function(i){
-        return new constants.Promise((resolve, reject) => {
-            callAsync(() => resolve(this.index(i)))
-        });
-    };
-    // sequence.prototype.sliceAsync = function(i, j){
-    //     return new constants.Promise((resolve, reject) => {
-    //         callAsync(() => resolve(this.slice(i, j)))
-    //     });
-    // };
-};
-
 export const nativeMethodNameMap = {
     "done": "nativeDone",
     "front": "nativeFront",
@@ -340,6 +210,7 @@ export const nativeMethodNameMap = {
     "copy": "nativeCopy",
     "length": "nativeLength",
     "index": "nativeIndex",
+    "indexNegative": "nativeIndexNegative",
     "slice": "nativeSlice",
 };
 
@@ -403,6 +274,7 @@ export const appliedSequenceSupports = function(sequenceType, sourceTypes){
         nativeCopy: appliedSequenceSupportsMethod("copy", sequenceType, sourceTypes),
         nativeLength: appliedSequenceSupportsMethod("length", sequenceType, sourceTypes),
         nativeIndex: appliedSequenceSupportsMethod("index", sequenceType, sourceTypes),
+        nativeIndexNegative: appliedSequenceSupportsMethod("indexNegative", sequenceType, sourceTypes),
         nativeSlice: appliedSequenceSupportsMethod("slice", sequenceType, sourceTypes),
         nativeBack: appliedSequenceSupportsMethod("back", sequenceType, sourceTypes),
         nativePopBack: (

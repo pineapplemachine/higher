@@ -183,6 +183,8 @@ import {contractTypes} from "./test/contracts"; hi.contract = contractTypes;
 import {defineContract} from "./test/contracts"; hi.register(defineContract);
 // test/sequenceTools
 import {boundsUnknown} from "./test/sequenceTools"; hi.register(boundsUnknown);
+import {lengthUnknown} from "./test/sequenceTools"; hi.register(lengthUnknown);
+import {makeNonIndexing} from "./test/sequenceTools"; hi.register(makeNonIndexing);
 import {makeNonSlicing} from "./test/sequenceTools"; hi.register(makeNonSlicing);
 import {makeUncopyable} from "./test/sequenceTools"; hi.register(makeUncopyable);
 import {makeUnidirectional} from "./test/sequenceTools"; hi.register(makeUnidirectional);
@@ -241,6 +243,7 @@ import {from} from "./functions/from"; hi.register(from);
 import {groupBy} from "./functions/groupBy"; hi.register(groupBy);
 import {head} from "./functions/head"; hi.register(head);
 import {identity} from "./functions/identity"; hi.register(identity);
+import {index} from "./functions/index"; hi.register(index);
 import {isSorted} from "./functions/isSorted"; hi.register(isSorted);
 import {join} from "./functions/join"; hi.register(join);
 import {last} from "./functions/last"; hi.register(last);

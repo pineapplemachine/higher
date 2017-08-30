@@ -2,7 +2,7 @@ import {callAsync} from "./callAsync";
 import {constants} from "./constants";
 import {normalizeExpecting} from "./expecting";
 import {lightWrap} from "./lightWrap";
-import {Sequence, addStandardSequenceInterface} from "./sequence";
+import {Sequence} from "./sequence";
 import {appliedSequenceSupports} from "./sequence";
 import {isArray, isNumber} from "./types";
 import {getWrappedFunction, getWrappedFunctionAsync} from "./wrapFunction";
@@ -58,7 +58,10 @@ export const defineSequence = lightWrap({
             }else if(attributeName === "index"){
                 constructor.nativeIndex = attribute;
                 constructor.prototype.nativeIndex = attribute;
-                constructor.prototype.index = attribute;
+            }else if(attributeName === "indexNegative"){
+                constructor.nativeIndexNegative = attribute;
+                constructor.prototype.nativeIndexNegative = attribute;
+                constructor.prototype.indexNegative = attribute;
             }else if(attributeName === "slice"){
                 constructor.nativeSlice = attribute;
                 constructor.prototype.nativeSlice = attribute;
@@ -103,7 +106,6 @@ export const defineSequence = lightWrap({
                 constructor.prototype[attributeName] = attribute;
             }
         }
-        addStandardSequenceInterface(constructor);
         wrapSequenceOverrides(constructor, attributes.overrides);
         constructor.test = sequenceTestRunner(constructor);
         sequenceTypes[constructor.name] = constructor;

@@ -271,7 +271,8 @@ export const FiniteRepeatSequence = defineSequence({
     },
     indexNegative: function(i){
         const sourceLength = this.source.nativeLength();
-        return this.source.nativeIndex(sourceLength + (i % sourceLength));
+        const index = sourceLength + (i % sourceLength);
+        return this.source.nativeIndex(index === sourceLength ? 0 : index);
     },
     slice: function(i, j){
         const length = this.source.nativeLength();
@@ -490,7 +491,8 @@ export const InfiniteRepeatSequence = defineSequence({
     },
     indexNegative: function(i){
         const sourceLength = this.source.nativeLength();
-        return this.source.nativeIndex(sourceLength + (i % sourceLength));
+        const index = sourceLength + (i % sourceLength);
+        return this.source.nativeIndex(index === sourceLength ? 0 : index);
     },
     // This method is a bit dirty as it relies on knowing
     // the implementation details of FiniteRepeatSequence.
