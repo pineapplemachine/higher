@@ -135,8 +135,11 @@ export const sequencesEqual = lightWrap({
             anyBounded = anyBounded || sequence.bounded();
             sequences.push(sequence);
             if(sequence.nativeLength){
-                if(sameLength === undefined) sameLength = sequence.nativeLength();
-                else if(sequence.nativeLength() !== sameLength) return false;
+                if(sameLength === undefined){
+                    sameLength = sequence.nativeLength();
+                }else if(sequence.nativeLength() !== sameLength){
+                    return false;
+                }
             }else if(sequence.unbounded()){
                 return false;
             }
