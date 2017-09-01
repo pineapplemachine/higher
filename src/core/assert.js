@@ -585,16 +585,17 @@ export const assertFail = lightWrap({
         ],
     },
     implementation: function assertFail(first, second = undefined){
+        let callback;
         if(second){
             const predicate = first;
-            const callback = second;
+            callback = second;
             try{
                 callback();
             }catch(error){
                 if(predicate(error)) return error;
             }
         }else{
-            const callback = first;
+            callback = first;
             try{
                 callback();
             }catch(error){
