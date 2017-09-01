@@ -328,7 +328,7 @@ export const stride = wrap({
                 new EmptySequence() :
                 new OneElementSequence(source.front())
             );
-        }else if(source.index && source.length){
+        }else if(source.nativeIndex && source.nativeLength){
             return new IndexStrideSequence(strideLength, source);
         }else{
             return new PoppingStrideSequence(strideLength, source);
