@@ -1,6 +1,23 @@
+import {error} from "../core/error";
 import {addIndexPatch} from "../core/sequence";
 import {isNegative, isNegativeZero} from "../core/types";
 import {wrap} from "../core/wrap";
+
+export const IndexError = error({
+    summary: "Failed to get element at an index.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The error function expects as an argument the sequence which was
+            given as input to an index function and an optional error message
+            string detailing what went wrong.
+        `),
+    },
+    constructor: function IndexError(source, message){
+        this.source = source;
+        this.message = "Failed to index sequence" + (message ? ": " + message : ".");
+    },
+});
 
 export const index = wrap({
     name: "index",
@@ -11,21 +28,33 @@ export const index = wrap({
             The function expects as input one sequence and one number as input.
         `),
         returns: (`
-            The function returns a sequence enumerating the elements of the
-            input sequence starting with the given low index bound and ending
-            immediately before the given high index bound.
+            The function returns the element of the input sequence at the
+            given index. Negative indexes are relative to the length of the
+            input sequence.
+            /The function returns #undefined when the index was not an integer.
+        `),
+        throws: (`
+            The function throws an @IndexError when it was not possible to
+            acquire the element of the input sequence at the given index.
+            The error is thrown when the index was #[-1] and the input sequence
+            was unidirectional with unknown bounds, 
+            when the index was #Infinity and the input sequence had unknown
+            bounds or was known-unbounded without also being bidirectional,
+            when the index was #[-Infinity] and the input had unknown bounds,
+            and when the index was less than #[-1] and the input sequence was
+            known-unbounded while also being uncopyable and unidirectional and
+            not supporting a native negative indexing operation.
         `),
         warnings: (`
             When the input sequence is in fact unbounded without being
-            known-unbounded and the high or low index bound is negative or
-            the high index bound is #Infinity, this function will produce an
-            infinite loop.
+            known-unbounded and the given index is negative, this function will
+            produce an infinite loop.
         `),
         examples: [
             "basicUsage", "basicUsageNegative",
         ],
         related: [
-            "slice",
+            "slice", "enumerate",
         ],
     },
     attachSequence: true,
@@ -36,6 +65,8 @@ export const index = wrap({
     implementation: function index(source, at){
         if(at === 0){
             return source.front();
+        }else if(Math.floor(at) !== at){
+            return undefined;
         }else if(at === -1){
             if(source.back){
                 return source.back();
@@ -45,19 +76,23 @@ export const index = wrap({
                 const cache = source.cacheUntilIndex(Infinity);
                 return cache[cache.length - 1];
             }else{
-                throw new Error("TODO");
+                throw IndexError(source);
             }
         }else if(at === Infinity){
             if(source.back && source.unbounded()){
                 return source.back();
+            }else if(source.bounded()){
+                return undefined;
             }else{
-                throw new Error("TODO");
+                throw IndexError(source);
             }
         }else if(at === -Infinity){
             if(source.unbounded()){
                 return source.front();
+            }else if(source.bounded()){
+                return undefined;
             }else{
-                throw new Error("TODO");
+                throw IndexError(source);
             }
         }else if(at < 0){
             if(source.nativeIndexNegative){
@@ -76,10 +111,8 @@ export const index = wrap({
                     const copiedSource = source.copy();
                     for(let i = at + 1; i < 0; i++) copiedSource.popBack();
                     return copiedSource.back();
-                }else if(!source.back){
-                    throw new Error("TODO");
                 }else{
-                    throw new Error("TODO");
+                    throw IndexError(source);
                 }
             }else{
                 const cache = source.cacheUntilIndex(Infinity);
@@ -157,8 +190,8 @@ export const index = wrap({
             hi.assert(seq.index(-1) === 9);
             hi.assert(seq.index(-10) === 0);
             hi.assert(seq.index(-4) === 6);
-            hi.assertFail(() => seq.index(+Infinity));
-            hi.assertFail(() => seq.index(-Infinity));
+            hi.assert(seq.index(+Infinity) === undefined);
+            hi.assert(seq.index(-Infinity) === undefined);
         },
         "unidirectionalUnboundedNonIndexInput": hi => {
             const seq = hi.counter().makeNonIndexing().makeUnidirectional();
@@ -166,10 +199,10 @@ export const index = wrap({
             hi.assert(seq.index(8) === 8);
             hi.assert(seq.index(5) === 5);
             // Function returns undefined when the index is inaccessible
-            hi.assertFail(() => seq.index(-1));
-            hi.assertFail(() => seq.index(-10));
-            hi.assertFail(() => seq.index(-4));
-            hi.assertFail(() => seq.index(+Infinity));
+            hi.assertFailWith(IndexError, () => seq.index(-1));
+            hi.assertFailWith(IndexError, () => seq.index(-10));
+            hi.assertFailWith(IndexError, () => seq.index(-4));
+            hi.assertFailWith(IndexError, () => seq.index(+Infinity));
             hi.assert(seq.index(-Infinity) === 0);
         },
         "bidirectionalUnboundedNonIndexInput": hi => {
@@ -189,10 +222,10 @@ export const index = wrap({
             hi.assert(seq.index(8) === 8);
             hi.assert(seq.index(5) === 5);
             // Function returns undefined when the index is inaccessible
-            hi.assertFail(() => seq.index(-1));
-            hi.assertFail(() => seq.index(-10));
-            hi.assertFail(() => seq.index(-4));
-            hi.assertFail(() => seq.index(+Infinity));
+            hi.assertFailWith(IndexError, () => seq.index(-1));
+            hi.assertFailWith(IndexError, () => seq.index(-10));
+            hi.assertFailWith(IndexError, () => seq.index(-4));
+            hi.assertFailWith(IndexError, () => seq.index(+Infinity));
             hi.assert(seq.index(-Infinity) === 0);
         },
         "bidirectionalUnboundedUncopyableNonIndexInput": hi => {
@@ -203,7 +236,7 @@ export const index = wrap({
             hi.assert(seq.index(+Infinity) === Infinity);
             hi.assert(seq.index(-Infinity) === 0);
             hi.assert(seq.index(-1) === Infinity);
-            hi.assertFail(() => seq.index(-10));
+            hi.assertFailWith(IndexError, () => seq.index(-10));
         },
         "unidirectionalKnownLengthIndexingInput": hi => {
             const seq = hi.range(10).makeUnidirectional();
@@ -213,8 +246,22 @@ export const index = wrap({
             hi.assert(seq.index(-1) === 9);
             hi.assert(seq.index(-10) === 0);
             hi.assert(seq.index(-4) === 6);
-            hi.assertFail(() => seq.index(+Infinity));
-            hi.assertFail(() => seq.index(-Infinity));
+            hi.assert(seq.index(+Infinity) === undefined);
+            hi.assert(seq.index(-Infinity) === undefined);
+        },
+        "notKnownBoundedNonIndexingExternalNonModification": hi => {
+            const seq = hi.recur(i => i + 1).seed(0).until(i => i >= 8);
+            hi.assert(seq.front() === 0);
+            hi.assert(seq.index(0) === 0);
+            hi.assert(seq.index(5) === 5);
+            hi.assert(seq.index(3) === 3);
+            hi.assert(seq.index(-4) === 4);
+            hi.assert(seq.index(-8) === 0);
+            hi.assert(seq.index(-1) === 7);
+            // Traversal to index does not modify the sequence's state,
+            // as far as external observers are concerned.
+            hi.assert(seq.front() === 0);
+            hi.assertEqual(seq, [0, 1, 2, 3, 4, 5, 6, 7]);
         },
     },
 });
