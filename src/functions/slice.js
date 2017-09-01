@@ -1,3 +1,4 @@
+import {error} from "../core/error";
 import {defineSequence} from "../core/defineSequence";
 import {addIndexPatch} from "../core/sequence";
 import {isNegative, isNegativeZero} from "../core/types";
@@ -13,6 +14,22 @@ import {OnDemandSequence} from "./onDemandSequence";
 import {InfiniteRepeatElementSequence} from "./repeatElement";
 import {ReverseSequence} from "./reverse";
 import {BidirectionalOnDemandTailSequence} from "./tail";
+
+export const SliceError = error({
+    summary: "Failed to slice a sequence.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The error function expects as an argument the sequence which was
+            given as input to a slice function and an optional error message
+            string detailing what went wrong.
+        `),
+    },
+    constructor: function SliceError(source, message){
+        this.source = source;
+        this.message = "Failed to slice sequence" + (message ? ": " + message : ".");
+    },
+});
 
 export const SliceSequence = defineSequence({
     summary: "Enumerate the elements of a sequence within a range of indexes.",
@@ -145,17 +162,24 @@ export const slice = wrap({
             input sequence starting with the given low index bound and ending
             immediately before the given high index bound.
         `),
+        throws: (`
+            The function throws a @SliceError when it was not possible to
+            aquire the specified slice of the input sequence. The error occurs
+            for all known-unbounded uncopyable input sequences which do not
+            natively support slicing, except for where the index bounds
+            described a zero-or-less length range.
+        `),
         warnings: (`
             When the input sequence is in fact unbounded without being
             known-unbounded and the high or low index bound is negative or
-            the high index bound is #Infinity, this function will produce an
+            the high index bound is #Infinity, this function may produce an
             infinite loop.
         `),
         examples: [
             "basicUsage", "basicUsageNegative",
         ],
         related: [
-            "head", "tail", "index",
+            "head", "tail", "index", "enumerate",
         ],
     },
     attachSequence: true,
@@ -174,11 +198,10 @@ export const slice = wrap({
                 if(source.copy){
                     return source.copy();
                 }else if(!source.unbounded()){
-                    // TODO: Hijack this!?
                     const cache = source.cacheUntilIndex(high);
                     return new ArraySequence(cache);
                 }else{
-                    throw new Error("TODO");
+                    throw SliceError(source);
                 }
             }else{
                 low = 0;
@@ -203,21 +226,23 @@ export const slice = wrap({
                     if(source.back){
                         return BidirectionalOnDemandTailSequence(-low, source);
                     }else{
-                        throw new Error("TODO");
+                        throw SliceError(source);
                     }
                 }else if(low === 0){
                     if(source.copy){
                         return source.copy();
                     }else{
-                        throw new Error("TODO")
+                        throw SliceError(source);
                     }
                 }else if(source.copy){
                     return new DropFirstSequence(low, source.copy());
                 }else{
-                    throw new Error("TODO");
+                    throw SliceError(source);
                 }
             }else if(low >= 0 && isNegative(high)){
-                if(source.copy){
+                if(source.nativeSliceMixed){
+                    return source.nativeSliceMixed(low, high);
+                }else if(source.copy){
                     if(low === 0){
                         if(source.back){
                             return new BidirectionalDropLastSequence(-high, source.copy());
@@ -232,7 +257,7 @@ export const slice = wrap({
                         return new DropFirstSequence(low, source.copy());
                     }
                 }else{
-                    throw new Error("TODO");
+                    throw SliceError(source);
                 }
             }else if(low >= 0 && high >= 0){
                 if(source.nativeSlice){
@@ -243,10 +268,12 @@ export const slice = wrap({
                     const cache = source.cacheUntilIndex(high);
                     return new ArraySequence(cache).nativeSlice(low, high);
                 }
+            }else if(source.nativeSliceNegative){
+                return source.nativeSliceNegative(low, high);
             }else if(source.copy){ // low < 0 && high < 0
                 return OnDemandUnboundedTailSliceSequence(source, low, high);
             }else{
-                throw new Error("TODO");
+                throw SliceError(source);
             }
         }else if(low === Infinity || high === -Infinity){
             return new EmptySequence();
@@ -332,10 +359,18 @@ export const slice = wrap({
             hi.assertEqual(seq.slice(-3, -1), [7, 8]);
             hi.assertEqual(seq.slice(-3, -0), [7, 8, 9]);
         },
-        "slicingInput": hi => {
+        "boundedSlicingInput": hi => {
             hi.assertEqual(hi.range(6).slice(1, 2), [1]);
             hi.assertEqual(hi("hello").slice(2, 4), "ll");
-            hi.assertEqual(hi.counter().slice(0, 6), [0, 1, 2, 3, 4, 5]);
+        },
+        "unboundedSlicingInput": hi => {
+            hi.assertEqual(hi.counter().slice(0, 3), [0, 1, 2]);
+            hi.assertEqual(hi.counter().slice(2, 6), [2, 3, 4, 5]);
+            hi.assertEqual(hi.counter().slice(-3, -0), [Infinity, Infinity, Infinity]);
+            hi.assertEqual(hi.counter().slice(-4, -1), [Infinity, Infinity, Infinity]);
+            const seq = hi.counter().slice(2, -2);
+            hi.assert(seq.startsWith([2, 3, 4, 5]));
+            hi.assert(seq.endsWith([Infinity, Infinity, Infinity]));
         },
         "negativeBoundsUnknownLengthInput": hi => {
             const seq = () => hi.recur(i => i + 1).seed(0).until(i => i >= 10);
@@ -412,14 +447,14 @@ export const slice = wrap({
             hi.assertEqual(seq().slice(3), [0, 1, 2]);
             hi.assertEqual(seq().slice(2, 6), [2, 3, 4, 5]);
             // TODO: It may be manageable to fix these cases
-            hi.assertFail(() => seq().slice());
-            hi.assertFail(() => seq().slice(-6));
-            hi.assertFail(() => seq().slice(-0));
-            hi.assertFail(() => seq().slice(3, -6));
-            hi.assertFail(() => seq().slice(3, -0));
-            hi.assertFail(() => seq().slice(-4, -2));
-            hi.assertFail(() => seq().slice(-4, -0));
-            hi.assertFail(() => seq().slice(Infinity));
+            hi.assertFailWith(SliceError, () => seq().slice());
+            hi.assertFailWith(SliceError, () => seq().slice(-6));
+            hi.assertFailWith(SliceError, () => seq().slice(-0));
+            hi.assertFailWith(SliceError, () => seq().slice(3, -6));
+            hi.assertFailWith(SliceError, () => seq().slice(3, -0));
+            hi.assertFailWith(SliceError, () => seq().slice(-4, -2));
+            hi.assertFailWith(SliceError, () => seq().slice(-4, -0));
+            hi.assertFailWith(SliceError, () => seq().slice(Infinity));
         },
         "positiveInfiniteLowBound": hi => {
             hi.assertEmpty(hi.range(10).slice(Infinity, 1));
@@ -444,7 +479,7 @@ export const slice = wrap({
             const biSeq = hi.repeat("abcdef");
             hi.assertEqual(biSeq.slice(-10, Infinity), "cdefabcdef");
             const uniSeq = hi.recur(i => i + 1).seed(0);
-            hi.assertFail(() => uniSeq.slice(-4, Infinity));
+            hi.assertFailWith(SliceError, () => uniSeq.slice(-4, Infinity));
         },
         "negativeInfiniteHighBoundBoundedInput": hi => {
             hi.assertEmpty(hi.range(10).slice(0, -Infinity));
@@ -494,8 +529,23 @@ export const slice = wrap({
             hi.assertEqual(seq().slice(3), [0, 1, 2]);
             hi.assertEqual(seq().slice(1, 3), [1, 2]);
             // TODO: It may be manageable to fix these cases
-            hi.assertFail(() => seq.slice());
-            hi.assertFail(() => seq.slice(0, -2));
+            hi.assertFailWith(SliceError, () => seq().slice());
+            hi.assertFailWith(SliceError, () => seq().slice(0, -2));
+        },
+        "notKnownBoundedNonSlicingExternalNonModification": hi => {
+            const seq = hi.recur(i => i + 1).seed(0).until(i => i >= 8);
+            hi.assert(seq.front() === 0);
+            hi.assertEmpty(seq.slice(0, 0));
+            hi.assertEmpty(seq.slice(2, 2));
+            hi.assertEqual(seq.slice(0, 3), [0, 1, 2]);
+            hi.assertEqual(seq.slice(2, 4), [2, 3]);
+            hi.assertEqual(seq.slice(2, -2), [2, 3, 4, 5]);
+            hi.assertEqual(seq.slice(4, -0), [4, 5, 6, 7]);
+            hi.assertEqual(seq.slice(), [0, 1, 2, 3, 4, 5, 6, 7]);
+            // Traversal to index does not modify the sequence's state,
+            // as far as external observers are concerned.
+            hi.assert(seq.front() === 0);
+            hi.assertEqual(seq, [0, 1, 2, 3, 4, 5, 6, 7]);
         },
     },
 });

@@ -212,6 +212,8 @@ export const nativeMethodNameMap = {
     "index": "nativeIndex",
     "indexNegative": "nativeIndexNegative",
     "slice": "nativeSlice",
+    "sliceNegative": "nativeSliceNegative",
+    "sliceMixed": "nativeSliceMixed",
 };
 
 export const appliedSequenceSupportsMethod = function(
@@ -276,6 +278,8 @@ export const appliedSequenceSupports = function(sequenceType, sourceTypes){
         nativeIndex: appliedSequenceSupportsMethod("index", sequenceType, sourceTypes),
         nativeIndexNegative: appliedSequenceSupportsMethod("indexNegative", sequenceType, sourceTypes),
         nativeSlice: appliedSequenceSupportsMethod("slice", sequenceType, sourceTypes),
+        nativeSliceNegative: appliedSequenceSupportsMethod("sliceNegative", sequenceType, sourceTypes),
+        nativeSliceMixed: appliedSequenceSupportsMethod("sliceMixed", sequenceType, sourceTypes),
         nativeBack: appliedSequenceSupportsMethod("back", sequenceType, sourceTypes),
         nativePopBack: (
             appliedSequenceSupportsMethod("back", sequenceType, sourceTypes) &&

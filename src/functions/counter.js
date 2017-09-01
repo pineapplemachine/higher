@@ -2,11 +2,13 @@ import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {NumberRangeSequence} from "./range";
+import {FiniteRepeatElementSequence} from "./repeatElement";
 
 export const CounterSequence = defineSequence({
     summary: "Count up from a number, continuously incrementing by one.",
     supportsAlways: [
-        "back", "index", "slice", "copy", "reset"
+        "back", "index", "indexNegative", "slice",
+        "sliceNegative", "sliceMixed", "copy", "reset"
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
@@ -44,6 +46,12 @@ export const CounterSequence = defineSequence({
     },
     slice: function(i, j){
         return new NumberRangeSequence(i, j);
+    },
+    sliceNegative: function(i, j){
+        return new FiniteRepeatElementSequence(j - i, Infinity);
+    },
+    sliceMixed: function(i, j){
+        return new CounterSequence(i);
     },
     copy: function(){
         return new CounterSequence(this.frontValue);

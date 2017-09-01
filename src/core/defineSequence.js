@@ -61,10 +61,15 @@ export const defineSequence = lightWrap({
             }else if(attributeName === "indexNegative"){
                 constructor.nativeIndexNegative = attribute;
                 constructor.prototype.nativeIndexNegative = attribute;
-                constructor.prototype.indexNegative = attribute;
             }else if(attributeName === "slice"){
                 constructor.nativeSlice = attribute;
                 constructor.prototype.nativeSlice = attribute;
+            }else if(attributeName === "sliceNegative"){
+                constructor.nativeSliceNegative = attribute;
+                constructor.prototype.nativeSliceNegative = attribute;
+            }else if(attributeName === "sliceMixed"){
+                constructor.nativeSliceMixed = attribute;
+                constructor.prototype.nativeSliceMixed = attribute;
             }else if(attributeName === "has"){
                 constructor.nativeHas = attribute;
                 constructor.prototype.nativeHas = attribute;
