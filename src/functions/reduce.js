@@ -153,7 +153,7 @@ export const ReduceSequence = defineSequence({
         this.maskAbsentMethods(source);
     },
     lastElement: function(predicate){
-        if(!this.source.bounded()) throw NotBoundedError({
+        if(!this.source.bounded()) throw NotBoundedError(this.source, {
             message: "Failed to reduce sequence",
         });
         if(predicate){
@@ -203,7 +203,7 @@ export const ReduceSequence = defineSequence({
         }
     },
     lastElementElse: function(functions){
-        if(!this.source.bounded()) throw NotBoundedError({
+        if(!this.source.bounded()) throw NotBoundedError(this.source, {
             message: "Failed to reduce sequence",
         });
         const callback = functions[0];
@@ -397,7 +397,7 @@ export const reduce = wrap({
             hi.assert(hi.reduce(array, sum).lastElement() === 20);
         },
         "emptyInputSeeded": hi => {
-            hi.assertEqual(hi.emptySequence().reduce(() => 0).seed("!"), ["!"]);
+            hi.assertEqual(hi.emptySequence().reduce(() => 0).seed("!"), "!");
         },
         "emptyInputNotSeeded": hi => {
             hi.assertEmpty(hi.emptySequence().reduce(() => 0));
