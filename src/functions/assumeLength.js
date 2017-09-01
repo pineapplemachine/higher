@@ -139,7 +139,7 @@ export const assumeLength = wrap({
         "basicUsage": hi => {
             const seq = hi.counter().until(i => i >= 8);
             // Higher doesn't know how long this sequence is before consuming it
-            hi.assertUndefined(seq.length);
+            hi.assertUndefined(seq.nativeLength);
             // But you do! And here's how to let higher in on it.
             const withLength = seq.assumeLength(8);
             hi.assert(withLength.length() === 8);
