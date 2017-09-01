@@ -243,8 +243,6 @@ export const ForwardFindSequence = defineSequence({
         this.initialize();
         return !this.searchElement && this.source.done();
     },
-    length: null,
-    left: null,
     front: function(){
         this.initialize();
         return this.currentResult;
@@ -253,12 +251,6 @@ export const ForwardFindSequence = defineSequence({
         this.initialize();
         return this.popFront();
     },
-    back: null,
-    popBack: null,
-    index: null,
-    slice: null,
-    has: null,
-    get: null,
     copy: function(){
         const copyThreads = [];
         for(const thread of this.searchThreads){
@@ -275,16 +267,6 @@ export const ForwardFindSequence = defineSequence({
         copy.front = this.front;
         copy.popFront = this.popFront;
         return copy;
-    },
-    reset: function(){
-        this.source.reset();
-        this.index = 0;
-        this.currentResult = null;
-        this.searchThreads = [];
-        delete this.done;
-        delete this.front;
-        delete this.popFront;
-        return this;
     },
     rebase: function(source){
         this.source = source;
@@ -386,8 +368,6 @@ export const BackwardFindSequence = defineSequence({
         this.initialize();
         return !this.searchElement && this.source.done();
     },
-    length: null,
-    left: null,
     front: function(){
         this.initialize();
         return this.currentResult;
@@ -396,12 +376,6 @@ export const BackwardFindSequence = defineSequence({
         this.initialize();
         return this.popFront();
     },
-    back: null,
-    popBack: null,
-    index: null,
-    slice: null,
-    has: null,
-    get: null,
     copy: function(){
         const copyThreads = [];
         for(const thread of this.searchThreads){

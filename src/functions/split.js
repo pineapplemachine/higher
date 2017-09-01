@@ -69,10 +69,6 @@ export const SplitSequence = defineSequence({
             this.frontResult, this.findDelimiters.copy()
         );
     },
-    reset: function(){
-        this.findDelimiters.reset();
-        return this;
-    },
     rebase: function(source){
         this.source = source;
         this.findDelimiters = new ForwardFindSequence(

@@ -169,8 +169,6 @@ export const InfinitePadRightSequence = defineSequence({
     bounded: () => false,
     unbounded: () => true,
     done: () => false,
-    length: null,
-    left: null,
     front: function(){
         return this.source.done() ? this.padElement : this.source.front();
     },
@@ -207,16 +205,10 @@ export const InfinitePadRightSequence = defineSequence({
             }
         }
     },
-    has: null,
-    get: null,
     copy: function(){
         return new InfinitePadRightSequence(
             this.source.copy(), this.padElement
         );
-    },
-    reset: function(){
-        this.source.reset();
-        return this;
     },
     rebase: function(source){
         this.source = source;

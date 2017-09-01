@@ -4,7 +4,7 @@ import {wrap} from "../core/wrap";
 export const TapSequence = defineSequence({
     summary: "Enumerate elements of the input, invoking a callback per element when consumed.",
     supportsWith: [
-        "length", "left", "back", "index", "slice", "has", "get", "copy", "reset"
+        "length", "back", "index", "slice", "has", "get", "copy",
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
@@ -38,9 +38,6 @@ export const TapSequence = defineSequence({
     length: function(){
         return this.source.nativeLength();
     },
-    left: function(){
-        return this.source.left();
-    },
     front: function(){
         return this.source.front();
     },
@@ -67,10 +64,6 @@ export const TapSequence = defineSequence({
     },
     copy: function(){
         return new TapSequence(this.callback, this.source.copy());
-    },
-    reset: function(){
-        this.source.reset();
-        return this;
     },
     rebase: function(source){
         this.source = source;

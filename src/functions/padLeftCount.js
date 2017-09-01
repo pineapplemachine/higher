@@ -167,8 +167,6 @@ export const InfinitePadLeftSequence = defineSequence({
     bounded: () => false,
     unbounded: () => true,
     done: () => false,
-    length: null,
-    left: null,
     front: function(){
         return this.padElement;
     },
@@ -185,16 +183,10 @@ export const InfinitePadLeftSequence = defineSequence({
     slice: function(i, j){
         return new FiniteRepeatElementSequence(j - i, this.padElement);
     },
-    has: null,
-    get: null,
     copy: function(){
         return new InfinitePadLeftSequence(
             this.source.copy(), this.padElement
         );
-    },
-    reset: function(){
-        this.source.reset();
-        return this;
     },
     rebase: function(source){
         this.source = source;

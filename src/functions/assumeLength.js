@@ -8,10 +8,10 @@ import {EmptySequence} from "./emptySequence";
 export const AssumeLengthSequence = defineSequence({
     summary: "A known-length sequence enumerating the elements of an unknown-length sequence.",
     supportsAlways: [
-        "length", "left",
+        "length",
     ],
     supportsWith: [
-        "back", "index", "slice", "has", "get", "copy", "reset",
+        "back", "index", "slice", "has", "get", "copy",
     ],
     constructor: function AssumeLengthSequence(
         assumedLength, source, consumedElements = undefined
@@ -44,9 +44,6 @@ export const AssumeLengthSequence = defineSequence({
     length: function(){
         return this.assumedLength;
     },
-    left: function(){
-        return this.assumedLength - this.consumedElements;
-    },
     front: function(){
         return this.source.front();
     },
@@ -77,11 +74,6 @@ export const AssumeLengthSequence = defineSequence({
         return new AssumeLengthSequence(
             this.assumedLength, this.source.copy(), this.consumedElements
         );
-    },
-    reset: function(){
-        this.source.reset();
-        this.consumedElements = 0;
-        return this;
     },
     rebase: function(source){
         this.source = source;

@@ -6,11 +6,9 @@ import {FiniteRepeatElementSequence} from "./repeatElement";
 
 export const FiniteRepeatEachElementSequence = defineSequence({
     summary: "Repeat each element of an input sequence some finite number of times.",
-    supportsWith: {
-        "length": "any", "left": "any", "index": "any",
-        "has": "any", "get": "any", "copy": "any", "reset": "any",
-        "back": ["back", "left"], "slice": ["slice", "left"],
-    },
+    supportsWith: [
+        "back", "length", "index", "slice", "has", "get", "copy",
+    ],
     overrides: [
         "repeatEachElement",
     ],
@@ -107,12 +105,6 @@ export const FiniteRepeatEachElementSequence = defineSequence({
     length: function(){
         return this.source.nativeLength() * this.elementRepetitions;
     },
-    left: function(){
-        return (
-            this.source.left() * this.elementRepetitions -
-            this.frontRepetitions - this.backRepetitions
-        );
-    },
     front: function(){
         return this.source.front();
     },
@@ -159,12 +151,6 @@ export const FiniteRepeatEachElementSequence = defineSequence({
             this.frontRepetitions, this.backRepetitions
         );
     },
-    reset: function(){
-        this.source.reset();
-        this.frontRepetitions = 0;
-        this.backRepetitions = 0;
-        return this;
-    },
     rebase: function(source){
         this.source = source;
         return this;
@@ -174,7 +160,7 @@ export const FiniteRepeatEachElementSequence = defineSequence({
 export const InfiniteRepeatEachElementSequence = defineSequence({
     summary: "Infinitely repeat each element of an input sequence,",
     supportsAlways: [
-        "index", "slice", "has", "get", "copy", "reset",
+        "index", "slice", "has", "get", "copy",
     ],
     supportsWith: [
         "back",
@@ -241,9 +227,6 @@ export const InfiniteRepeatEachElementSequence = defineSequence({
         return this.source.get(i);
     },
     copy: function(){
-        return this;
-    },
-    reset: function(){
         return this;
     },
     rebase: function(source){

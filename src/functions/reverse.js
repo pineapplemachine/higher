@@ -14,8 +14,7 @@ export const ReverseSequence = defineSequence({
         "back",
     ],
     supportsWith: {
-        "length": "any", "left": "any",
-        "copy": "any", "reset": "any",
+        "length": "any", "copy": "any",
         "has": "any", "get": "any",
         "index": ["index", "length"],
         "slice": ["slice", "length"],
@@ -68,9 +67,6 @@ export const ReverseSequence = defineSequence({
     length: function(){
         return this.source.nativeLength();
     },
-    left: function(){
-        return this.source.left();
-    },
     front: function(){
         return this.source.back();
     },
@@ -100,10 +96,6 @@ export const ReverseSequence = defineSequence({
     },
     copy: function(){
         return new ReverseSequence(this.source.copy());
-    },
-    reset: function(){
-        this.source.reset();
-        return this;
     },
     rebase: function(source){
         this.source = source;

@@ -92,10 +92,6 @@ export const ShuffleSequence = defineSequence({
     length: function(){
         return this.source.nativeLength();
     },
-    left: function(){
-        this.initialize();
-        return this.backIndex - this.frontIndex;
-    },
     front: function(){
         if(!this.shuffledSource) this.initialize();
         return this.shuffledSource[this.frontIndex];
@@ -128,9 +124,6 @@ export const ShuffleSequence = defineSequence({
     },
     copy: function(){
         return new ShuffleSequence(this.random, this.source.copy());
-    },
-    reset: function(){
-        return this;
     },
     rebase: function(source){
         this.source = source;

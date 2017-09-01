@@ -12,10 +12,12 @@ import {ShuffleSequence} from "./shuffle";
 // This algorithm is always less performant when shuffling an entire array,
 // but is often faster than acquiring the first few elements of a longer
 // shuffled sequence.
+// Can't copy since result is nondeterministic.
+// TODO: Use resettable RNG objects instead of e.g. Math.random?
 export const DistinctRandomIndexSequence = defineSequence({
     summary: "Enumerate unique indexes in random order.",
     supportsAlways: [
-        "length", "left",
+        "length",
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
@@ -48,9 +50,6 @@ export const DistinctRandomIndexSequence = defineSequence({
     },
     length: function(){
         return this.totalValues;
-    },
-    left: function(){
-        return this.totalValues - this.valueHistory.length;
     },
     front: function(){
         return this.valueHistory[this.valueHistory.length - 1];
@@ -101,26 +100,16 @@ export const DistinctRandomIndexSequence = defineSequence({
             this.valueHistory.push(undefined);
         }
     },
-    back: null,
-    popBack: null,
-    index: null,
-    slice: null,
-    has: null,
-    get: null,
-    // Can't copy or reset since result is nondeterministic.
-    // TODO: Use resettable RNG objects instead of e.g. Math.random?
-    copy: null,
-    reset: null,
-    rebase: null,
 });
 
-// Input sequence must have length and indexing.
-// TODO: This sequence probably needs a collapseBreak method.
+// Can't copy or reset since result is nondeterministic.
+// TODO: Use resettable RNG objects instead of e.g. Math.random?
 const SampleSequence = defineSequence({
     summary: "Enumerate a random subset of the elements in a sequence.",
     supportRequired: [
         "index", "length",
     ],
+    collapseOutOfPlace: true,
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         expects: (`
@@ -161,25 +150,12 @@ const SampleSequence = defineSequence({
         const sourceLength = this.source.nativeLength();
         return this.samples <= sourceLength ? this.samples : sourceLength;
     },
-    left: function(){
-        return this.samples - this.indexes.valueHistory.length;
-    },
     front: function(){
         return this.source.nativeIndex(this.indexes.front());
     },
     popFront: function(){
         return this.indexes.popFront();
     },
-    back: null,
-    popBack: null,
-    index: null,
-    slice: null,
-    has: null,
-    get: null,
-    // Can't copy or reset since result is nondeterministic.
-    // TODO: Use resettable RNG objects instead of e.g. Math.random?
-    copy: null,
-    reset: null,
     rebase: function(source){
         this.source = source;
         return this;

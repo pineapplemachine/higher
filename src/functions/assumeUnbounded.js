@@ -52,10 +52,6 @@ export const AssumeUnboundedSequence = defineSequence({
     copy: function(){
         return new AssumeUnboundedSequence(this.source.copy());
     },
-    reset: function(){
-        this.source.reset();
-        return this;
-    },
     rebase: function(source){
         this.source = source;
         return this;
