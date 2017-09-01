@@ -49,7 +49,7 @@ export const FromSequence = defineSequence({
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "exclusiveBasicUsage": hi => {
             const seq = new hi.sequence.FromSequence(i => i == 2, hi.range(6))
-            hi.assertEqual(seq.exlusive(), [3, 4, 5]);
+            hi.assertEqual(seq.exclusive(), [3, 4, 5]);
         },
         "inclusiveBasicUsage": hi => {
             const seq = new hi.sequence.FromSequence(i => i == 2, hi.range(6))
