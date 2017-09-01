@@ -80,7 +80,7 @@ export const ConcatSequence = defineSequence({
         for(const source of this.sources){
             if(source.unbounded()) return true;
         }
-        return true;
+        return false;
     },
     done: function(){
         return this.frontSourceIndex >= this.backSourceIndex;
