@@ -39,7 +39,7 @@ export const JoinSequence = defineSequence({
         if(this.initializedFront){
             return this.source.done() && this.frontSource.done();
         }else{
-            return this.source.done() && this.delimiter.done();
+            return this.source.done();
         }
     },
     front: function(){
@@ -126,10 +126,10 @@ export const join = wrap({
             hi.assertEmpty(hi.emptySequence().join(",,,,,"));
         },
         "noDelimiter": hi => {
-            hi.assertEqual(hi([[1, 2], [3, 4]]).join(), [[1, 2], [3, 4]]);
+            hi.assertEqual(hi([[1, 2], [3, 4]]).join(), [1, 2, 3, 4]);
         },
         "emptyDelimiter": hi => {
-            hi.assertEqual(hi([[1, 2], [3, 4]]).join([]), [[1, 2], [3, 4]]);
+            hi.assertEqual(hi([[1, 2], [3, 4]]).join([]), [1, 2, 3, 4]);
         },
     },
 });
