@@ -5,7 +5,7 @@ export const NonSlicingSequence = process.env.NODE_ENV !== "development" ? undef
     summary: "A non-native-slicing sequence wrapping another sequence.",
     devOnly: true,
     supportsWith: [
-        "length", "back", "index", "has", "get", "copy",
+        "length", "back", "index", "indexNegative", "has", "get", "copy",
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
@@ -47,6 +47,9 @@ export const NonSlicingSequence = process.env.NODE_ENV !== "development" ? undef
     },
     index: function(i){
         return this.source.nativeIndex(i);
+    },
+    indexNegative: function(i){
+        return this.source.nativeNegativeIndex(i);
     },
     has: function(i){
         return this.source.has(i);
@@ -383,7 +386,11 @@ export const makeNonSlicing = process.env.NODE_ENV !== "development" ? undefined
         one: wrap.expecting.sequence,
     },
     implementation: function makeNonSlicing(source){
-        if(!source.nativeSlice){
+        if(
+            !source.nativeSlice &&
+            !source.nativeSliceNegative &&
+            !source.nativeSliceMixed
+        ){
             return source;
         }else{
             return new NonSlicingSequence(source);
@@ -445,7 +452,7 @@ export const makeNonIndexing = process.env.NODE_ENV !== "development" ? undefine
             const indexSeq = hi.range(10);
             hi.assert(indexSeq.nativeIndex);
             hi.assert(indexSeq.nativeIndex(1) === 1);
-            const nonIndexSeq = slicingSeq.makeNonIndexing();
+            const nonIndexSeq = indexSeq.makeNonIndexing();
             hi.assertUndefined(nonIndexSeq.nativeIndex);
         },
         "nonIndexingInput": hi => {
@@ -493,10 +500,18 @@ export const boundsUnknown = process.env.NODE_ENV !== "development" ? undefined 
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {
-            const boundedSeq = hi.counter(10);
+            const boundedSeq = hi.range(10);
             hi.assert(boundedSeq.bounded());
-            hi.asssertNot(boundedSeq.unbounded());
+            hi.assertNot(boundedSeq.unbounded());
             const boundsUnknownSeq = boundedSeq.boundsUnknown();
+            hi.assertNot(boundsUnknownSeq.bounded());
+            hi.assertNot(boundsUnknownSeq.unbounded());
+        },
+        "unboundedInput": hi => {
+            const unboundedSeq = hi.counter(10);
+            hi.assertNot(unboundedSeq.bounded());
+            hi.assert(unboundedSeq.unbounded());
+            const boundsUnknownSeq = unboundedSeq.boundsUnknown();
             hi.assertNot(boundsUnknownSeq.bounded());
             hi.assertNot(boundsUnknownSeq.unbounded());
         },
@@ -538,7 +553,7 @@ export const lengthUnknown = process.env.NODE_ENV !== "development" ? undefined 
         one: wrap.expecting.sequence,
     },
     implementation: function lengthUnknown(source){
-        if(!source.length){
+        if(!source.nativeLength){
             return source;
         }else{
             return new LengthUnknownSequence(source);
@@ -546,13 +561,18 @@ export const lengthUnknown = process.env.NODE_ENV !== "development" ? undefined 
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {
-            const knownLengthSeq = hi.counter(10);
+            const knownLengthSeq = hi.range(10);
             hi.assert(knownLengthSeq.nativeLength);
             hi.assert(knownLengthSeq.nativeLength() === 10);
             const unknownLengthSeq = knownLengthSeq.lengthUnknown();
             hi.assertUndefined(unknownLengthSeq.nativeLength);
         },
-        "lengthUnknownInput": hi => {
+        "unboundedInput": hi => {
+            const seq = hi.counter();
+            hi.assertUndefined(seq.nativeLength);
+            hi.assert(seq.lengthUnknown() === seq);
+        },
+        "boundedLengthUnknownInput": hi => {
             const seq = hi.recur(i => i + 1).seed(0).until(i => i >= 8);
             hi.assertUndefined(seq.nativeLength);
             hi.assert(seq.lengthUnknown() === seq);
@@ -638,8 +658,8 @@ export const makeUncopyable = process.env.NODE_ENV !== "development" ? undefined
     arguments: {
         one: wrap.expecting.sequence,
     },
-    implementation: function makeUnidirectional(source){
-        if(!source.copy){
+    implementation: function makeUncopyable(source){
+        if(!source.nativeCopy){
             return source;
         }else{
             return new UncopyableSequence(source);
@@ -650,7 +670,7 @@ export const makeUncopyable = process.env.NODE_ENV !== "development" ? undefined
             const copyableSeq = hi.range(6);
             hi.assertEqual(copyableSeq.copy(), [0, 1, 2, 3, 4, 5]);
             const uncopyableSeq = copyableSeq.makeUncopyable();
-            hi.assertUndefined(copyableSeq.copy);
+            hi.assertUndefined(uncopyableSeq.copy);
         },
         "uncopyableInput": hi => {
             const seq = hi((function*(){})());
