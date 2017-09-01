@@ -157,10 +157,15 @@ export const InfinitePadRightSequence = defineSequence({
     ){
         this.source = source;
         this.padElement = padElement;
-        if(!source.index || (!source.length && !source.unbounded())) this.index = null;
-        if(!source.slice || (!source.length && !source.unbounded())) this.slice = null;
-        if(!source.copy) this.copy = null;
-        if(!source.reset) this.reset = null;
+        if(!source.nativeIndex || (!source.nativeLength && !source.unbounded())){
+            this.nativeIndex = undefined;
+        }
+        if(!source.nativeSlice || (!source.nativeLength && !source.unbounded())){
+            this.nativeSlice = undefined;
+        }
+        if(!source.copy){
+            this.copy = undefined;
+        }
     },
     padWith: function(element){
         this.padElement = element;

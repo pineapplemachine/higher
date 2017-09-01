@@ -26,10 +26,10 @@ export const ShuffleSequence = defineSequence({
         this.highIndex = highIndex;
         this.frontIndex = frontIndex;
         this.backIndex = backIndex;
-        if(!source.length) this.length = null;
-        if(!source.has) this.has = null;
-        if(!source.get) this.get = null;
-        if(!source.copy) this.copy = null;
+        if(!source.nativeLength) this.nativeLength = undefined;
+        if(!source.has) this.has = undefined;
+        if(!source.get) this.get = undefined;
+        if(!source.copy) this.copy = undefined;
     },
     initialize: function(){
         this.shuffledSource = [];

@@ -156,9 +156,8 @@ export const InfinitePadLeftSequence = defineSequence({
     ){
         this.source = source;
         this.padElement = padElement;
-        if(!source.back) this.back = null;
-        if(!source.copy) this.copy = null;
-        if(!source.reset) this.reset = null;
+        if(!source.back) this.back = undefined;
+        if(!source.copy) this.copy = undefined;
     },
     padWith: function(element){
         this.padElement = element;

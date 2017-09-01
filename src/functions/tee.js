@@ -10,14 +10,13 @@ export const TeeSequence = defineSequence({
         this.bufferIndex = bufferIndex || 0;
         // TODO: Don't do this
         if(!source.nativeLength) this.nativeLength = undefined;
-        if(!source.nativeLeft) this.nativeLeft = undefined;
         if(!source.nativeIndex) this.nativeIndex = undefined;
         if(!source.nativeIndexNegative) this.nativeIndexNegative = undefined;
         if(!source.nativeSlice) this.nativeSlice = undefined;
         if(!source.nativeSliceNegative) this.nativeSliceNegative = undefined;
         if(!source.nativeSliceMixed) this.nativeSliceMixed = undefined;
-        if(!source.nativeHas) this.nativeHas = undefined;
-        if(!source.nativeGet) this.nativeGet = undefined;
+        if(!source.has) this.has = undefined;
+        if(!source.get) this.get = undefined;
     },
     bounded: function(){
         return this.source.bounded();

@@ -43,7 +43,7 @@ export const DistinctSequence = defineSequence({
         hi => new DistinctSequence(i => i, hi.counter()),
     ],
     constructor: function DistinctSequence(
-        transform, source, history = null
+        transform, source, history = undefined
     ){
         this.transform = transform;
         this.source = source;

@@ -47,9 +47,10 @@ export const ReverseSequence = defineSequence({
         this.source = source;
         this.maskAbsentMethods(source);
         // Length property is required to support index and slice operations.
+        // TODO: Handle this differently
         if(!source.length){
-            this.index = null;
-            this.slice = null;
+            this.nativeIndex = undefined;
+            this.nativeSlice = undefined;
         }
     },
     reverse: function(){

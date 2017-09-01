@@ -514,8 +514,8 @@ export const InfiniteRepeatSequence = defineSequence({
     },
     rebase: function(source){
         this.source = source;
-        this.frontSource = null;
-        this.backSource = null;
+        this.frontSource = undefined;
+        this.backSource = undefined;
         return this;
     },
 });

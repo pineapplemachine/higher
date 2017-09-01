@@ -45,6 +45,7 @@ export const ConcatSequence = defineSequence({
         this.initializeSourceIndexes(
             frontSourceIndex === undefined, backSourceIndex === undefined
         );
+        // TODO: Handle this differently
         let noLength = false;
         for(const source of sources){
             this.maskAbsentMethods(source);
@@ -52,8 +53,8 @@ export const ConcatSequence = defineSequence({
         }
         // All sources must have known length for index and slice to be supported.
         if(noLength){
-            this.index = null;
-            this.slice = null;
+            this.nativeIndex = undefined;
+            this.nativeSlice = undefined;
         }
     },
     initializeSourceIndexes: function(front, back){

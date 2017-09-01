@@ -28,8 +28,8 @@ export const EagerSequence = defineSequence({
         this.source = source;
         this.originalSource = originalSource || source;
         this.initialized = initialized;
-        if(!source.has) this.has = null;
-        if(!source.get) this.get = null;
+        if(!source.has) this.has = undefined;
+        if(!source.get) this.get = undefined;
     },
     initialize: function(){
         const array = [];

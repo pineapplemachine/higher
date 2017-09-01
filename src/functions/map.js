@@ -126,8 +126,9 @@ export const PluralMapSequence = defineSequence({
         for(const source of sources){
             this.maskAbsentMethods(source);
         }
+        // TODO: Is there a better way to handle this?
         if(sources.length === 0){
-            this.rebase = null;
+            this.rebase = undefined;
         }
     },
     bounded: function(){
