@@ -7,7 +7,7 @@ import {EmptySequence} from "./emptySequence";
 export const HeadSequence = defineSequence({
     summary: "Enumerate only the first so many elements of a sequence.",
     supportsWith: [
-        "length", "left", "get", "copy", "reset"
+        "length", "get", "copy",
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
@@ -44,13 +44,8 @@ export const HeadSequence = defineSequence({
         return this.frontIndex >= this.headLength || this.source.done();
     },
     length: function(){
-        const sourceLength = this.source.length();
+        const sourceLength = this.source.nativeLength();
         return sourceLength < this.headLength ? sourceLength : this.headLength;
-    },
-    left: function(){
-        const sourceLeft = this.source.left();
-        const indexLeft = this.headLength - this.frontIndex;
-        return sourceLeft < indexLeft ? sourceLeft : indexLeft;
     },
     front: function(){
         return this.source.front();
@@ -59,25 +54,16 @@ export const HeadSequence = defineSequence({
         this.source.popFront();
         this.frontIndex++;
     },
-    back: null,
-    popBack: null,
     index: function(i){
-        return this.source.index(i);
+        return this.source.nativeIndex(i);
     },
     slice: function(i, j){
-        return this.source.slice(i, j);
+        return this.source.nativeSlice(i, j);
     },
-    has: null,
-    get: null,
     copy: function(){
         return new HeadSequence(
             this.headLength, this.source.copy(), this.frontIndex
         );
-    },
-    reset: function(){
-        this.source.reset();
-        this.frontIndex = 0;
-        return this;
     },
     rebase: function(source){
         this.source = source;
@@ -85,9 +71,6 @@ export const HeadSequence = defineSequence({
     },
 });
 
-// Get a sequence for enumerating the first so many elements of the input.
-// The resulting sequence may be shorter than the length specified, but
-// will never be longer.
 export const head = wrap({
     names: ["head", "take"],
     summary: "Get a sequence enumerating the first so many elements of an input.",
@@ -115,15 +98,17 @@ export const head = wrap({
     arguments: {
         unordered: {
             numbers: 1,
-            sequences: 1
-        }
+            sequences: 1,
+        },
     },
     implementation: (count, source) => {
         if(count <= 0){
             return new EmptySequence();
-        }else if(source.length && source.slice){
-            const sourceLength = source.length();
-            return sourceLength <= count ? source : source.slice(0, count);
+        }else if(!isFinite(count)){
+            return source;
+        }else if(source.nativeLength && source.nativeSlice){
+            const sourceLength = source.nativeLength();
+            return sourceLength <= count ? source : source.nativeSlice(0, count);
         }else{
             return new HeadSequence(count, source);
         }
@@ -141,6 +126,10 @@ export const head = wrap({
         "emptyInput": hi => {
             hi.assertEmpty(hi.head(1, hi.emptySequence()));
             hi.assertEmpty(hi.head(10, hi.emptySequence()));
+        },
+        "infiniteInput": hi => {
+            const seq = hi.range(100);
+            hi.assert(seq.head(Infinity) === seq);
         },
         "boundedInputs": hi => {
             hi.assertEqual(hi.head(1, [0, 1, 2, 3, 4]), [0]);

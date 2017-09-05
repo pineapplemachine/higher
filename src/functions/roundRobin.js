@@ -7,7 +7,7 @@ import {EmptySequence} from "./emptySequence";
 export const RoundRobinSequence = defineSequence({
     summary: "Enumerate elements of several input sequences in turn.",
     supportsWith: {
-        "length": "all", "left": "all", "copy": "all", "reset": "all",
+        "length": "all", "copy": "all",
     },
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
@@ -56,12 +56,7 @@ export const RoundRobinSequence = defineSequence({
     },
     length: function(){
         let sum = 0;
-        for(const source of this.sources) sum += source.length();
-        return sum;
-    },
-    left: function(){
-        let sum = 0;
-        for(const source of this.activeSources) sum += source.left();
+        for(const source of this.sources) sum += source.nativeLength();
         return sum;
     },
     front: function(){
@@ -92,15 +87,6 @@ export const RoundRobinSequence = defineSequence({
         return new RoundRobinSequence(
             sourceCopies, this.sourceIndex, activeCopies
         );
-    },
-    reset: function(){
-        this.sourceIndex = 0;
-        this.activeSources = [];
-        for(const source of this.sources){
-            source.reset();
-            if(!source.done()) this.activeSources.push(source);
-        }
-        return this;
     },
     rebase: function(source){
         this.source = source;

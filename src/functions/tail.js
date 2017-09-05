@@ -11,7 +11,7 @@ import {ReverseSequence} from "./reverse";
 
 // Get an on-demand sequence for retrieving the tail of a bidirectional sequence.
 export const BidirectionalOnDemandTailSequence = (count, source) => {
-    return new OnDemandSequence({
+    return new OnDemandSequence(ReverseSequence.appliedTo(ArraySequence), {
         bounded: () => true,
         unbounded: () => false,
         done: () => source.done(),
@@ -26,27 +26,10 @@ export const BidirectionalOnDemandTailSequence = (count, source) => {
     });
 };
 
-// Get an on-demand sequence for retrieving the tail of a reversible sequence.
-export const ReversibleOnDemandTailSequence = (count, source) => {
-    const reversed = source.reverse();
-    return new OnDemandSequence({
-        bounded: () => true,
-        unbounded: () => false,
-        done: () => reversed.done(),
-        dump: () => {
-            const array = [];
-            while(array.length < count && !reversed.done()){
-                array.push(reversed.nextFront());
-            }
-            return new ReverseSequence(new ArraySequence(array));
-        },
-    });
-};
-
 // Get an on-demand sequence for retrieving the tail of a unidirectional 
 // but known-bounded sequence.
 export const UnidirectionalOnDemandTailSequence = (count, source) => {
-    return new OnDemandSequence({
+    return new OnDemandSequence(ArraySequence, {
         bounded: () => true,
         unbounded: () => false,
         done: () => source.done(),
@@ -55,7 +38,7 @@ export const UnidirectionalOnDemandTailSequence = (count, source) => {
             for(const element of source) array.push(element);
             const sequence = new ArraySequence(array);
             return (array.length <= count ? sequence :
-                sequence.slice(array.length - count, array.length)
+                sequence.nativeSlice(array.length - count, array.length)
             );
         },
     });
@@ -95,7 +78,7 @@ export const tail = wrap({
             numbers: 1,
             sequences: {one: wrap.expecting.either(
                 wrap.expecting.boundedSequence,
-                wrap.expecting.reversibleSequence
+                wrap.expecting.bidirectionalSequence
             )},
         }
     },
@@ -104,17 +87,15 @@ export const tail = wrap({
             return new EmptySequence();
         }else if(!isFinite(count)){
             return source;
-        }else if(source.length && source.slice){
-            const sourceLength = source.length();
+        }else if(source.nativeLength && source.nativeSlice){
+            const sourceLength = source.nativeLength();
             return (sourceLength <= count ?
-                source : source.slice(sourceLength - count, sourceLength)
+                source : source.nativeSlice(sourceLength - count, sourceLength)
             );
-        }else if(source.length && source.length() <= count){
+        }else if(source.nativeLength && source.nativeLength() <= count){
             return source;
         }else if(source.back){
             return BidirectionalOnDemandTailSequence(count, source);
-        }else if(source.overrides.reverse){
-            return ReversibleOnDemandTailSequence(count, source);
         }else{ // Argument validation implies source.bounded()
             return UnidirectionalOnDemandTailSequence(count, source);
         }
@@ -149,9 +130,7 @@ export const tail = wrap({
             hi.assertEqual(hi.tail(20, array), [0, 1, 2, 3, 4, 5, 6, 7]);
         },
         "boundedNonSlicingInput": hi => {
-            const seq = () => (
-                hi.recur(i => i + 1).seed(0).until(i => i >= 8).assumeBounded()
-            );
+            const seq = () => hi.range(8).makeNonSlicing();
             hi.assertEmpty(seq().tail(0));
             hi.assertEqual(seq().tail(1), [7]);
             hi.assertEqual(seq().tail(2), [6, 7]);
@@ -169,16 +148,6 @@ export const tail = wrap({
         },
         "unboundedUnidirectionalInput": hi => {
             hi.assertFail(() => hi.recur(i => i + 1).seed(0).tail(10));
-        },
-        "boundedReverseOverrideInput": hi => {
-            const seq = () => hi.repeat(4, [[1, 2, 3], [4, 5]]).flatten();
-            const even = i => i % 2 === 0;
-            hi.assertEqual(seq().tail(7), [4, 5, 1, 2, 3, 4, 5]);
-        },
-        "unboundedReverseOverrideInput": hi => {
-            const seq = () => hi.repeat([[1, 2, 3], [4, 5]]).flatten();
-            const even = i => i % 2 === 0;
-            hi.assertEqual(seq().tail(7), [4, 5, 1, 2, 3, 4, 5]);
         },
     },
 });

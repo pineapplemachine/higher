@@ -2,11 +2,13 @@ import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
 import {NumberRangeSequence} from "./range";
+import {FiniteRepeatElementSequence} from "./repeatElement";
 
 export const CounterSequence = defineSequence({
     summary: "Count up from a number, continuously incrementing by one.",
     supportsAlways: [
-        "back", "index", "slice", "copy", "reset"
+        "back", "index", "indexNegative", "slice",
+        "sliceNegative", "sliceMixed", "copy", "reset"
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
@@ -22,33 +24,37 @@ export const CounterSequence = defineSequence({
         hi => new CounterSequence(0.5),
         hi => new CounterSequence(-0.5),
     ],
-    constructor: function CounterSequence(startValue, currentValue = undefined){
-        this.startValue = startValue || 0;
-        this.currentValue = currentValue === undefined ? this.startValue : currentValue;
+    constructor: function CounterSequence(frontValue = undefined){
+        this.frontValue = frontValue || 0;
     },
     bounded: () => false,
     unbounded: () => true,
     done: () => false,
     front: function(){
-        return this.currentValue;
+        return this.frontValue;
     },
     popFront: function(){
-        return this.currentValue++;
+        return this.frontValue++;
     },
     back: () => Infinity,
     popBack: () => {},
     index: function(i){
-        return this.startValue + i;
+        return i;
+    },
+    indexNegative: function(i){
+        return Infinity;
     },
     slice: function(i, j){
-        return new NumberRangeSequence(this.startValue + i, this.startValue + j);
+        return new NumberRangeSequence(i, j);
+    },
+    sliceNegative: function(i, j){
+        return new FiniteRepeatElementSequence(j - i, Infinity);
+    },
+    sliceMixed: function(i, j){
+        return new CounterSequence(i);
     },
     copy: function(){
-        return new CounterSequence(this.startValue, this.currentValue);
-    },
-    reset: function(){
-        this.currentValue = this.startValue;
-        return this;
+        return new CounterSequence(this.frontValue);
     },
 });
 
@@ -58,8 +64,7 @@ export const counter = wrap({
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         detail: (`
-            Get a sequence counting up by one from a given number, or from zero
-            if no number was given.
+            Get a sequence counting up by one from zero.
         `),
         expects: (`
             The function expects an optional number to count up from. When no
@@ -81,33 +86,16 @@ export const counter = wrap({
     attachSequence: false,
     async: false,
     arguments: {
-        unordered: {
-            numbers: "?"
-        }
+        none: true,
     },
-    implementation: (start) => {
-        return new CounterSequence(start || 0);
+    implementation: function counter(){
+        return new CounterSequence();
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {
             const seq = hi.counter();
-            hi.assertEqual(seq.head(5), [0, 1, 2, 3, 4]);
-        },
-        "positiveInput": hi => {
-            const seq = hi.counter(40);
-            hi.assertEqual(seq.head(5), [40, 41, 42, 43, 44]);
-        },
-        "negativeInput": hi => {
-            const seq = hi.counter(-5);
-            hi.assertEqual(seq.head(5), [-5, -4, -3, -2, -1]);
-        },
-        "fractionalInput": hi => {
-            const seq = hi.counter(0.5);
-            hi.assertEqual(seq.head(5), [0.5, 1.5, 2.5, 3.5, 4.5]);
-        },
-        "bidirectionality": hi => {
-            hi.assert(hi.counter().startsWith([0, 1, 2]));
-            hi.assert(hi.counter().endsWith([Infinity, Infinity, Infinity]));
+            hi.assertEqual(seq.startsWith([0, 1, 2, 3, 4, 5]));
+            hi.assertEqual(seq.endsWith([Infinity, Infinity, Infinity]));
         },
     },
 });

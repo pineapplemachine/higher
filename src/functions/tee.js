@@ -8,12 +8,15 @@ export const TeeSequence = defineSequence({
         this.source = source;
         this.elementBuffer = elementBuffer;
         this.bufferIndex = bufferIndex || 0;
-        if(!source.length) this.length = null;
-        if(!source.left) this.left = null;
-        if(!source.index) this.index = null;
-        if(!source.slice) this.slice = null;
-        if(!source.has) this.has = null;
-        if(!source.get) this.get = null;
+        // TODO: Don't do this
+        if(!source.nativeLength) this.nativeLength = undefined;
+        if(!source.nativeIndex) this.nativeIndex = undefined;
+        if(!source.nativeIndexNegative) this.nativeIndexNegative = undefined;
+        if(!source.nativeSlice) this.nativeSlice = undefined;
+        if(!source.nativeSliceNegative) this.nativeSliceNegative = undefined;
+        if(!source.nativeSliceMixed) this.nativeSliceMixed = undefined;
+        if(!source.has) this.has = undefined;
+        if(!source.get) this.get = undefined;
     },
     bounded: function(){
         return this.source.bounded();
@@ -25,12 +28,7 @@ export const TeeSequence = defineSequence({
         return this.bufferIndex >= (this.elementBuffer.elements.length + this.elementBuffer.offset) && this.source.done();
     },
     length: function(){
-        return this.source.length();
-    },
-    left: function(){
-        return this.source.left() + (this.elementBuffer.length - (
-            this.bufferIndex - this.elementBuffer.offset
-        ));
+        return this.source.nativeLength();
     },
     front: function(){
         const index = this.bufferIndex - this.elementBuffer.offset;
@@ -40,7 +38,7 @@ export const TeeSequence = defineSequence({
             return this.source.front();
         }
     },
-    popFront(){
+    popFront: function(){
         this.bufferIndex++;
         const index = this.bufferIndex - this.elementBuffer.offset;
         if(index >= this.elementBuffer.elements.length && !this.source.done()){
@@ -52,13 +50,20 @@ export const TeeSequence = defineSequence({
         this.elementBuffer.elements.shift();
         this.elementBuffer.offset++;
     },
-    back: null,
-    popBack: null,
     index: function(i){
-        return this.source.index(i);
+        return this.source.nativeIndex(i);
+    },
+    indexNegative: function(i){
+        return this.source.nativeIndexNegative(i);
     },
     slice: function(i, j){
-        return this.source.slice(i, j);
+        return this.source.nativeSlice(i, j);
+    },
+    sliceNegative: function(i, j){
+        return this.source.nativeSliceNegative(i, j);
+    },
+    sliceMixed: function(i, j){
+        return this.source.nativeSliceMixed(i, j);
     },
     has: function(i){
         return this.source.has(i);
@@ -73,7 +78,6 @@ export const TeeSequence = defineSequence({
         this.elementBuffer.sequences.push(sequence);
         return sequence;
     },
-    reset: null,
     // Implementation is weird because rebasing this sequence must not affect
     // the state of its companion TeeSequences.
     rebase: function(source){

@@ -66,10 +66,7 @@ export const FinitePadLeftSequence = defineSequence({
         return this.padCount >= this.padTotal && this.source.done();
     },
     length: function(){
-        return this.source.length() + this.padTotal;
-    },
-    left: function(){
-        return this.source.left() + (this.padTotal - this.padCount);
+        return this.source.nativeLength() + this.padTotal;
     },
     front: function(){
         return (this.padCount >= this.padTotal ?
@@ -94,33 +91,26 @@ export const FinitePadLeftSequence = defineSequence({
     },
     index: function(i){
         return (i < this.padTotal ?
-            this.padElement : this.source.index(i - this.padTotal)
+            this.padElement : this.source.nativeIndex(i - this.padTotal)
         );
     },
     slice: function(i, j){
         if(j < this.padTotal){
             return new FiniteRepeatElementSequence(j - i, this.padElement);
         }else if(i >= this.padTotal){
-            return this.source.slice(i - this.padTotal, j - this.padTotal);
+            return this.source.nativeSlice(i - this.padTotal, j - this.padTotal);
         }else{
             return new PadLeftSequence(
-                this.source.slice(0, j - this.padTotal),
+                this.source.nativeSlice(0, j - this.padTotal),
                 this.padElement, this.padTotal - i
             );
         }
     },
-    has: null,
-    get: null,
     copy: function(){
         return new FinitePadLeftSequence(
             this.source.copy(), this.padElement,
             this.padTotal, this.padCount
         );
-    },
-    reset: function(){
-        this.source.reset();
-        this.padCount = 0;
-        return this;
     },
     rebase: function(source){
         this.source = source;
@@ -166,9 +156,8 @@ export const InfinitePadLeftSequence = defineSequence({
     ){
         this.source = source;
         this.padElement = padElement;
-        if(!source.back) this.back = null;
-        if(!source.copy) this.copy = null;
-        if(!source.reset) this.reset = null;
+        if(!source.back) this.back = undefined;
+        if(!source.copy) this.copy = undefined;
     },
     padWith: function(element){
         this.padElement = element;
@@ -177,8 +166,6 @@ export const InfinitePadLeftSequence = defineSequence({
     bounded: () => false,
     unbounded: () => true,
     done: () => false,
-    length: null,
-    left: null,
     front: function(){
         return this.padElement;
     },
@@ -195,16 +182,10 @@ export const InfinitePadLeftSequence = defineSequence({
     slice: function(i, j){
         return new FiniteRepeatElementSequence(j - i, this.padElement);
     },
-    has: null,
-    get: null,
     copy: function(){
         return new InfinitePadLeftSequence(
             this.source.copy(), this.padElement
         );
-    },
-    reset: function(){
-        this.source.reset();
-        return this;
     },
     rebase: function(source){
         this.source = source;

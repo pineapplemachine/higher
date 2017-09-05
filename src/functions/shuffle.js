@@ -26,10 +26,10 @@ export const ShuffleSequence = defineSequence({
         this.highIndex = highIndex;
         this.frontIndex = frontIndex;
         this.backIndex = backIndex;
-        if(!source.length) this.length = null;
-        if(!source.has) this.has = null;
-        if(!source.get) this.get = null;
-        if(!source.copy) this.copy = null;
+        if(!source.nativeLength) this.nativeLength = undefined;
+        if(!source.has) this.has = undefined;
+        if(!source.get) this.get = undefined;
+        if(!source.copy) this.copy = undefined;
     },
     initialize: function(){
         this.shuffledSource = [];
@@ -90,11 +90,7 @@ export const ShuffleSequence = defineSequence({
         return this.source.done();
     },
     length: function(){
-        return this.source.length();
-    },
-    left: function(){
-        this.initialize();
-        return this.backIndex - this.frontIndex;
+        return this.source.nativeLength();
     },
     front: function(){
         if(!this.shuffledSource) this.initialize();
@@ -128,9 +124,6 @@ export const ShuffleSequence = defineSequence({
     },
     copy: function(){
         return new ShuffleSequence(this.random, this.source.copy());
-    },
-    reset: function(){
-        return this;
     },
     rebase: function(source){
         this.source = source;

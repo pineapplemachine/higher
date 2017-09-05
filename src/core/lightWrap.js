@@ -52,6 +52,7 @@ export const lightWrap = function lightWrap(info){
 };
 
 // Make lightWrap behave like any wrapped function that it would return
+lightWrap.names = [lightWrap.name];
 lightWrap.summary = "Get a lightly wrapped function from a function descriptor.";
 if(process.env.NODE_ENV === "development"){
     lightWrap.docs = {

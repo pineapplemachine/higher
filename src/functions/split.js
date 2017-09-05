@@ -4,21 +4,14 @@ import {wrap} from "../core/wrap";
 
 import {copyable} from "./copyable";
 import {ForwardFindSequence, BackwardFindSequence} from "./findAll";
-import {mustSupport} from "./mustSupport";
 
 // TODO: It may be feasible to support splitting for sequences without slicing
-export const ForwardSplitSequence = defineSequence({
-    constructor: function ForwardSplitSequence(
+export const SplitSequence = defineSequence({
+    constructor: function SplitSequence(
         compare, source, delimiter, beginDelimiter = undefined,
         endDelimiter = undefined, frontValue = undefined,
         frontResult = undefined, findDelimiters = undefined
     ){
-        if(!source.slice || !source.length){
-            throw "Error splitting sequence: Input must support slicing and length.";
-        }
-        if(!delimiter.copy){
-            throw "Error splitting sequence: Delimiter must support copying.";
-        }
         this.compare = compare;
         this.source = source;
         this.delimiter = delimiter;
@@ -30,12 +23,6 @@ export const ForwardSplitSequence = defineSequence({
             compare, source, delimiter.copy()
         );
     },
-    reverse: function(){
-        return new BackwardSplitSequence(
-            this.compare, this.source, this.delimiter,
-            this.beginDelimiter, this.endDelimiter
-        );
-    },
     // Include the delimiter sequence at the beginning of every element
     beginWithDelimiter: function(){
         this.beginDelimiter = true;
@@ -55,44 +42,32 @@ export const ForwardSplitSequence = defineSequence({
     done: function(){
         return !this.frontValue && this.findDelimiters.done();
     },
-    length: null,
-    left: null,
     front: function(){
         if(!this.frontValue) this.popFront();
         return this.frontValue;
     },
     popFront: function(){
         if(this.findDelimiters.done()){
-            this.frontValue = !this.frontResult ? null : this.source.slice(
+            this.frontValue = !this.frontResult ? null : this.source.nativeSlice(
                 this.beginDelimiter ? this.frontResult.low : this.frontResult.high,
-                this.source.length()
+                this.source.nativeLength()
             );
             this.frontResult = null;
         }else{
             const result = this.findDelimiters.nextFront();
-            this.frontValue = this.source.slice(
+            this.frontValue = this.source.nativeSlice(
                 this.beginDelimiter ? this.frontResult.low : this.frontResult.high,
                 this.endDelimiter ? result.high : result.low
             );
             this.frontResult = result;
         }
     },
-    back: null,
-    popBack: null,
-    index: null,
-    slice: null,
-    has: null,
-    get: null,
     copy: function(){
-        return new ForwardSplitSequence(
+        return new SplitSequence(
             this.compare, this.source, this.delimiter,
             this.beginDelimiter, this.endDelimiter, this.frontValue,
             this.frontResult, this.findDelimiters.copy()
         );
-    },
-    reset: function(){
-        this.findDelimiters.reset();
-        return this;
     },
     rebase: function(source){
         this.source = source;
@@ -103,122 +78,23 @@ export const ForwardSplitSequence = defineSequence({
     },
 });
 
-export const BackwardSplitSequence = defineSequence({
-    constructor: function BackwardSplitSequence(
-        compare, source, delimiter, beginDelimiter = undefined,
-        endDelimiter = undefined, frontValue = undefined,
-        frontResult = undefined, findDelimiters = undefined
-    ){
-        if(!source.slice || !source.length){
-            throw "Error splitting sequence: Input must support slicing and length.";
-        }
-        if(!delimiter.copy){
-            throw "Error splitting sequence: Delimiter must support copying.";
-        }
-        this.compare = compare;
-        this.source = source;
-        this.delimiter = delimiter;
-        this.beginDelimiter = beginDelimiter;
-        this.endDelimiter = endDelimiter;
-        this.frontValue = frontValue;
-        const sourceLength = source.length();
-        this.frontResult = frontResult || {low: sourceLength, high: sourceLength};
-        this.findDelimiters = findDelimiters || new BackwardFindSequence(
-            compare, source, delimiter.copy()
-        );
-    },
-    reverse: function(){
-        return new ForwardSplitSequence(
-            this.compare, this.source, this.delimiter,
-            this.beginDelimiter, this.endDelimiter
-        );
-    },
-    // Include the delimiter sequence at the beginning of every element
-    beginWithDelimiter: function(){
-        this.beginDelimiter = true;
-        return this;
-    },
-    // Include the delimiter sequence at the end of every element
-    endWithDelimiter: function(){
-        this.endDelimiter = true;
-        return this;
-    },
-    bounded: function(){
-        return this.source.bounded();
-    },
-    unbounded: function(){
-        return this.source.unbounded();
-    },
-    done: function(){
-        return !this.frontValue && this.findDelimiters.done();
-    },
-    length: null,
-    left: null,
-    front: function(){
-        if(!this.frontValue) this.popFront();
-        return this.frontValue;
-    },
-    popFront: function(){
-        if(this.findDelimiters.done()){
-            this.frontValue = !this.frontResult ? null : this.source.slice(
-                0, this.endDelimiter ? this.frontResult.high : this.frontResult.low
-            );
-            this.frontResult = null;
-        }else{
-            const result = this.findDelimiters.nextFront();
-            this.frontValue = this.source.slice(
-                this.beginDelimiter ? result.low : result.high,
-                this.endDelimiter ? this.frontResult.high : this.frontResult.low
-            );
-            this.frontResult = result;
-        }
-    },
-    back: null,
-    popBack: null,
-    index: null,
-    slice: null,
-    has: null,
-    get: null,
-    copy: function(){
-        return new BackwardSplitSequence(
-            this.compare, this.source, this.delimiter,
-            this.beginDelimiter, this.endDelimiter, this.frontValue,
-            this.frontResult, this.findDelimiters.copy()
-        );
-    },
-    reset: function(){
-        this.findDelimiters.reset();
-        return this;
-    },
-    rebase: function(source){
-        this.source = source;
-        this.findDelimiters = new BackwardFindSequence(
-            this.compare, source, this.delimiter.copy()
-        );
-        return this;
-    },
-});
-
 export const split = wrap({
     name: "split",
     attachSequence: true,
     async: false,
-    sequences: [
-        ForwardSplitSequence,
-        BackwardSplitSequence
-    ],
     arguments: {
+        // TODO: Better argument validation
         unordered: {
             functions: "?",
-            sequences: 2
-        }
+            sequences: 2,
+        },
     },
     implementation: (compare, sequences) => {
         const compareFunc = compare || constants.defaults.comparisonFunction;
         const source = sequences[0];
         const delimiter = sequences[1];
-        return new ForwardSplitSequence(
-            compareFunc, source.mustSupport("slice", "length"), copyable(delimiter)
+        return new SplitSequence(
+            compareFunc, source, copyable(delimiter)
         );
     },
 });

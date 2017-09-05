@@ -38,12 +38,12 @@ const pushSorted = (value, array) => {
 export const ObjectSequence = defineSequence({
     summary: "Enumerate the key, value pairs of an object.",
     supportsAlways: [
-        "length", "left", "back", "index", "slice", "has", "get", "copy", "reset",
+        "length", "back", "index", "slice", "has", "get", "copy",
     ],
     overrides: {
         object: {none: true},
         newObject: {none: true},
-        key: {none: true},
+        keys: {none: true},
         values: {none: true},
     },
     docs: process.env.NODE_ENV !== "development" ? undefined : {
@@ -164,9 +164,6 @@ export const ObjectSequence = defineSequence({
     length: function(){
         return this.highIndex - this.lowIndex;
     },
-    left: function(){
-        return this.backIndex - this.frontIndex;
-    },
     front: function(){
         const key = this.objectKeys[this.frontIndex];
         return {key: key, value: this.source[key]};
@@ -205,17 +202,12 @@ export const ObjectSequence = defineSequence({
             this.highIndex, this.frontIndex, this.backIndex
         );
     },
-    reset: function(){
-        this.frontIndex = this.lowIndex;
-        this.backIndex = this.highIndex;
-        return this;
-    },
 });
 
 export const ObjectValuesSequence = defineSequence({
     summary: "Enumerate the values of an object.",
     supportsAlways: [
-        "length", "left", "back", "index", "slice", "copy", "reset",
+        "length", "back", "index", "slice", "copy",
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
@@ -258,9 +250,6 @@ export const ObjectValuesSequence = defineSequence({
     length: function(){
         return this.highIndex - this.lowIndex;
     },
-    left: function(){
-        return this.backIndex - this.frontIndex;
-    },
     front: function(){
         return this.source[this.objectKeys[this.frontIndex]];
     },
@@ -286,11 +275,6 @@ export const ObjectValuesSequence = defineSequence({
             this.source, this.objectKeys, this.lowIndex,
             this.highIndex, this.frontIndex, this.backIndex
         );
-    },
-    reset: function(){
-        this.frontIndex = this.lowIndex;
-        this.backIndex = this.highIndex;
-        return this;
     },
 });
 

@@ -1,4 +1,8 @@
 import {lightWrap} from "./lightWrap";
+import {isNumber} from "./types";
+
+import {BoundsUnknownError} from "../errors/BoundsUnknownError";
+import {NotBoundedError} from "../errors/NotBoundedError";
 
 export const isSequence = lightWrap({
     summary: "Determine whether a value is some @Sequence.",
@@ -81,6 +85,75 @@ Sequence.prototype.nextBack = function(){
     return value;
 };
 
+Sequence.prototype.cacheUntilIndex = function(i){
+    if(i <= 0){
+        return undefined;
+    }else if(!this.elementCache){
+        this.elementCache = [];
+        this.elementCacheFrontIndex = 0;
+    }else if(this.done() || this.elementCache.length >= i){
+        return this.elementCache;
+    }
+    while(!this.nativeDone()){
+        this.elementCache.push(this.nativeFront());
+        this.nativePopFront();
+        if(this.elementCache.length >= i) break;
+    }
+    this.elementCacheBackIndex = this.elementCache.length;
+    this.done = function(){
+        return (
+            this.elementCacheFrontIndex >= this.elementCacheBackIndex &&
+            this.nativeDone()
+        );
+    };
+    this.front = function(){
+        if(this.elementCacheFrontIndex < this.elementCache.length){
+            return this.elementCache[this.elementCacheFrontIndex];
+        }else{
+            return this.nativeFront();
+        }
+    };
+    this.popFront = function(){
+        this.elementCacheFrontIndex++;
+        if(this.elementCacheFrontIndex >= this.elementCache.length){
+            return this.nativePopFront();
+        }
+    };
+    if(this.back){
+        this.back = function(){
+            if(this.nativeDone()){
+                return this.elementCache[this.elementCacheBackIndex - 1];
+            }else{
+                return this.nativeBack();
+            }
+        };
+        this.popBack = function(){
+            if(this.nativeDone()){
+                this.elementCacheBackIndex--;
+            }else{
+                return this.nativePopBack();
+            }
+        };
+    }
+    if(this.copy){
+        const copyMethod = function(){
+            const copy = this.nativeCopy();
+            copy.elementCache = this.elementCache.slice();
+            copy.elementCacheFrontIndex = this.elementCacheFrontIndex;
+            copy.elementCacheBackIndex = this.elementCacheBackIndex;
+            copy.done = this.done;
+            copy.front = this.front;
+            copy.popFront = this.popFront;
+            copy.back = this.back;
+            copy.popBack = this.popBack;
+            copy.copy = copyMethod;
+            return copy;
+        };
+        this.copy = copyMethod;
+    }
+    return this.elementCache;
+};
+
 // TODO: Stop using this
 // https://github.com/pineapplemachine/higher/issues/53
 Sequence.prototype.maskAbsentMethods = function(source){
@@ -89,14 +162,18 @@ Sequence.prototype.maskAbsentMethods = function(source){
         this.popBack = undefined;
         this.nextBack = undefined;
     }
-    if(this.length && !source.length) this.length = undefined;
-    if(this.left && !source.left) this.left = undefined;
-    if(this.index && !source.index) this.index = undefined;
-    if(this.slice && !source.slice) this.slice = undefined;
+    if(this.length && !source.nativeLength){
+        this.nativeLength = undefined;
+    }
+    if(this.index && !source.nativeIndex){
+        this.nativeIndex = undefined;
+    }
+    if(this.slice && !source.nativeSlice){
+        this.nativeSlice = undefined;
+    }
     if(this.has && !source.has) this.has = undefined;
     if(this.get && !source.get) this.get = undefined;
     if(this.copy && !source.copy) this.copy = undefined;
-    if(this.reset && !source.reset) this.reset = undefined;
 };
 
 // Get the root of a sequence.
@@ -122,6 +199,93 @@ Sequence.prototype.typeChainString = function(){
     }else{
         return this.constructor.name;
     }
+};
+
+export const nativeMethodNameMap = {
+    "done": "nativeDone",
+    "front": "nativeFront",
+    "popFront": "nativePopFront",
+    "back": "nativeBack",
+    "popBack": "nativePopBack",
+    "copy": "nativeCopy",
+    "length": "nativeLength",
+    "index": "nativeIndex",
+    "indexNegative": "nativeIndexNegative",
+    "slice": "nativeSlice",
+    "sliceNegative": "nativeSliceNegative",
+    "sliceMixed": "nativeSliceMixed",
+};
+
+export const appliedSequenceSupportsMethod = function(
+    methodName, sequenceType, sourceTypes
+){
+    const nativeMethodName = nativeMethodNameMap[methodName];
+    const supportedMethod = sequenceType[nativeMethodName];
+    for(const supportsAlways of sequenceType.supportsAlways){
+        if(methodName === supportsAlways) return supportedMethod;
+    }
+    const supportsWith = sequenceType.supportsWith[methodName];
+    if(supportsWith === "any"){
+        const nativeMethodName = nativeMethodNameMap[methodName];
+        for(const sourceType of sourceTypes){
+            if(sourceType[nativeMethodName]) return supportedMethod;
+        }
+        return undefined;
+    }else if(supportsWith === "all"){
+        const nativeMethodName = nativeMethodNameMap[methodName];
+        for(const sourceType of sourceTypes){
+            if(!sourceType[nativeMethodName]) return undefined;
+        }
+        return supportedMethod;
+    }else if(supportsWith && supportsWith instanceof Array){
+        for(const withMethodName of supportsWith){
+            const withNativeMethodName = nativeMethodNameMap[withMethodName];
+            for(const sourceType of sourceTypes){
+                if(!sourceType[withNativeMethodName]) return undefined;
+            }
+        }
+        return supportedMethod;
+    }else if(supportsWith && typeof(supportsWith) !== "string"){
+        for(const withMethodName in supportsWith){
+            const withNativeMethodName = nativeMethodNameMap[withMethodName];
+            if(supportsWith[withMethodName] === "any"){
+                for(const sourceType of sourceTypes){
+                    if(sourceType[withNativeMethodName]) return supportedMethod;
+                }
+                return undefined;
+            }else if(supportsWith[withMethodName] === "all"){
+                for(const sourceType of sourceTypes){
+                    if(!sourceType[withNativeMethodName]) return undefined;
+                }
+                return supportedMethod;
+            }else{
+                return undefined;
+            }
+        }
+        return supportedMethod;
+    }else{
+        return undefined;
+    }
+};
+
+export const appliedSequenceSupports = function(sequenceType, sourceTypes){
+    return {
+        nativeDone: sequenceType.nativeDone,
+        nativeFront: sequenceType.nativeFront,
+        nativePopFront: sequenceType.nativePopFront,
+        nativeCopy: appliedSequenceSupportsMethod("copy", sequenceType, sourceTypes),
+        nativeLength: appliedSequenceSupportsMethod("length", sequenceType, sourceTypes),
+        nativeIndex: appliedSequenceSupportsMethod("index", sequenceType, sourceTypes),
+        nativeIndexNegative: appliedSequenceSupportsMethod("indexNegative", sequenceType, sourceTypes),
+        nativeSlice: appliedSequenceSupportsMethod("slice", sequenceType, sourceTypes),
+        nativeSliceNegative: appliedSequenceSupportsMethod("sliceNegative", sequenceType, sourceTypes),
+        nativeSliceMixed: appliedSequenceSupportsMethod("sliceMixed", sequenceType, sourceTypes),
+        nativeBack: appliedSequenceSupportsMethod("back", sequenceType, sourceTypes),
+        nativePopBack: (
+            appliedSequenceSupportsMethod("back", sequenceType, sourceTypes) &&
+            sequenceType.nativePopBack
+        ),
+    };
 };
 
 export default Sequence;

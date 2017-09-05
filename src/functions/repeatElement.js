@@ -10,7 +10,8 @@ import {defaultUniqComparison} from "./uniq";
 
 export const FiniteRepeatElementSequence = defineSequence({
     supportsAlways: [
-        "back", "index", "slice", "copy", "reset",
+        "back", "length", "index", "indexNegative", "slice",
+        "sliceNegative", "sliceMixed", "copy",
     ],
     overrides: {
         filter: {one: wrap.expecting.predicate},
@@ -205,9 +206,6 @@ export const FiniteRepeatElementSequence = defineSequence({
     length: function(){
         return this.targetRepetitions;
     },
-    left: function(){
-        return this.finishedRepetitions - this.targetRepetitions;
-    },
     front: function(){
         return this.element;
     },
@@ -231,15 +229,12 @@ export const FiniteRepeatElementSequence = defineSequence({
             this.element, this.targetRepetitions, this.finishedRepetitions
         );
     },
-    reset: function(){
-        this.finishedRepetitions = 0;
-        return this;
-    },
 });
 
 export const InfiniteRepeatElementSequence = defineSequence({
     supportsAlways: [
-        "back", "index", "slice", "copy", "reset",
+        "back", "index", "indexNegative", "slice",
+        "sliceNegative", "sliceMixed", "copy",
     ],
     overrides: {
         filter: {one: wrap.expecting.predicate},
@@ -425,14 +420,20 @@ export const InfiniteRepeatElementSequence = defineSequence({
     index: function(i){
         return this.element;
     },
+    indexNegative: function(i){
+        return this.element;
+    },
     slice: function(i, j){
         return new FiniteRepeatElementSequence(this.element, j - i);
     },
+    sliceNegative: function(i, j){
+        return new FiniteRepeatElementSequence(this.element, j - i);
+    },
+    sliceMixed: function(i, j){
+        return this;
+    },
     copy: function(){
         return new InfiniteRepeatElementSequence(this.element);
-    },
-    reset: function(){
-        return this;
     },
 });
 

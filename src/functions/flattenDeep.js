@@ -1,38 +1,26 @@
 import {asSequence} from "../core/asSequence";
 import {defineSequence} from "../core/defineSequence";
-import {isSequence, Sequence} from "../core/sequence";
-import {isArray, isIterable, isString} from "../core/types";
 import {wrap} from "../core/wrap";
 
-// TODO: Also write a backwards version of this sequence
-// TODO: This sequence probably needs a collapseBreak method
 export const FlattenDeepSequence = defineSequence({
+    summary: "Enumerate recursively and in series the elements of a sequence's subsequences.",
+    collapseOutOfPlace: true,
     constructor: function FlattenDeepSequence(source){
         this.source = source;
         this.sourceStack = [source];
         this.frontSource = source;
-    },
-    // True when an element is a sequence which should be flattened.
-    flattenElement: function(element){
-        return !isString(element) && (
-            isArray(element) ||
-            isIterable(element) ||
-            isSequence(element)
-        );
+        this.initializedFront = undefined;
     },
     // Used internally to handle progression to the next element.
     // Dive into the lowest possible sequence.
     diveStack: function(){
         while(!this.frontSource.done()){
             const front = this.frontSource.front();
-            if(!this.flattenElement(front)){
-                break;
-            }else{
-                this.frontSource.popFront();
-                const source = asSequence(front);
-                this.sourceStack.push(source);
-                this.frontSource = source;
-            }
+            const source = asSequence(front);
+            if(!source) break;
+            this.frontSource.popFront();
+            this.sourceStack.push(source);
+            this.frontSource = source;
         }
     },
     // Used internally to handle progression to the next element.
@@ -47,41 +35,29 @@ export const FlattenDeepSequence = defineSequence({
             if(this.frontSource.done()) this.bubbleStack();
         }
     },
-    initialize: function(){
+    initializeFront: function(){
+        this.initializedFront = true;
         this.diveStack();
         if(this.frontSource.done()) this.bubbleStack();
-        this.front = function(){
-            return this.frontSource.front();
-        };
-        this.popFront = function(){
-            this.frontSource.popFront();
-            this.diveStack();
-            if(this.frontSource.done()) this.bubbleStack();
-        };
     },
     bounded: () => false,
-    unbounded: () => false,
-    done: function(){
-        return this.sourceStack[0].done();
+    unbounded: function(){
+        return this.source.unbounded();
     },
-    length: null,
-    left: null,
+    done: function(){
+        if(!this.initializedFront) this.initializeFront();
+        return this.frontSource.done() && this.sourceStack[0].done();
+    },
     front: function(){
-        this.initialize();
+        if(!this.initializedFront) this.initializeFront();
         return this.frontSource.front();
     },
     popFront: function(){
-        this.initialize();
-        return this.popFront();
+        if(!this.initializedFront) this.initializeFront();
+        this.frontSource.popFront();
+        this.diveStack();
+        if(this.frontSource.done()) this.bubbleStack();
     },
-    // Can't support many operations because a sub-sequence might not support them.
-    // TODO: Allow user to insist that the sequence should be bidirectional etc?
-    back: null,
-    popBack: null,
-    index: null,
-    slice: null,
-    copy: null,
-    reset: null,
     rebase: function(source){
         this.source = source;
         this.sourceStack = [source];
@@ -94,16 +70,47 @@ export const FlattenDeepSequence = defineSequence({
 // Flattens arrays, iterables except strings, and sequences.
 export const flattenDeep = wrap({
     name: "flattenDeep",
+    summary: "Recursively get the elements of a sequence of sequences as one flat sequence.",
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The function expects a single sequence as input.
+        `),
+        returns: (`
+            The function returns a sequence which enumerates in series the
+            elements of the input that are not themselves sequences, and the
+            elements of those that are sequences, and their elements, and so on.
+        `),
+        returnType: "sequence",
+        examples: [
+            "basicUsage",
+        ],
+        related: [
+            "flatten", "concat",
+        ],
+    },
     attachSequence: true,
     async: false,
-    sequences: [
-        FlattenDeepSequence
-    ],
     arguments: {
-        one: wrap.expecting.sequence
+        one: wrap.expecting.sequence,
     },
     implementation: (source) => {
         return new FlattenDeepSequence(source);
+    },
+    tests: process.env.NODE_ENV !== "development" ? undefined : {
+        "basicUsage": hi => {
+            const numbers = [0, [1], [2, [3, 4]], [], [[5]]];
+            hi.assertEqual(hi.flattenDeep(numbers), [0, 1, 2, 3, 4, 5]);
+        },
+        "emptyInput": hi => {
+            hi.assertEmpty(hi.emptySequence().flattenDeep());
+        },
+        "emptySequenceElements": hi => {
+            hi.assertEmpty(hi([[]]).flattenDeep());
+            hi.assertEmpty(hi([[], []]).flattenDeep());
+            hi.assertEmpty(hi([[], [[], [[]]], [[]], []]).flattenDeep());
+            hi.assertEqual(hi([[], [1, 2, 3]]).flattenDeep(), [1, 2, 3]);
+        },
     },
 });
 

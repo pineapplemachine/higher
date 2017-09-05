@@ -1,8 +1,6 @@
 import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
-import {ArgumentsError} from "../errors/ArgumentsError";
-
 import {copyable} from "./copyable";
 import {HeadSequence} from "./head";
 import {SingularMapSequence} from "./map";
@@ -16,7 +14,7 @@ export const ForwardChunkSequence = defineSequence({
         "copy"
     ],
     supportsWith: [
-        "length", "left", "reset"
+        "length",
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
@@ -38,11 +36,6 @@ export const ForwardChunkSequence = defineSequence({
         hi => new ForwardChunkSequence(3, hi.repeat("hello")),
     ],
     constructor: function ForwardChunkSequence(chunkLength, source){
-        ArgumentsError.assert(chunkLength >= 1, {
-            isConstructor: true,
-            message: "Failed to create sequence",
-            detail: "Expected a numeric chunk length of at least 1.",
-        });
         this.chunkLength = chunkLength;
         this.source = source;
         this.maskAbsentMethods(source);
@@ -57,14 +50,9 @@ export const ForwardChunkSequence = defineSequence({
         return this.source.done();
     },
     length: function(){
-        const sourceLength = this.source.length();
+        const sourceLength = this.source.nativeLength();
         const remLength = sourceLength % this.chunkLength;
         return 1 + Math.floor(sourceLength / this.chunkLength) - (remLength === 0);
-    },
-    left: function(){
-        const sourceLeft = this.source.left();
-        const remLeft = sourceLeft % this.chunkLength;
-        return 1 + Math.floor(sourceLeft / this.chunkLength) - (remLeft === 0);
     },
     front: function(){
         return new HeadSequence(this.chunkLength, this.source.copy());
@@ -74,18 +62,8 @@ export const ForwardChunkSequence = defineSequence({
             this.source.popFront();
         }
     },
-    back: null,
-    popBack: null,
-    index: null,
-    slice: null,
-    has: null,
-    get: null,
     copy: function(){
         return new ForwardChunkSequence(this.chunkLength, this.source.copy());
-    },
-    reset: function(){
-        this.source.reset();
-        return this;
     },
     rebase: function(source){
         this.source = source;
@@ -103,7 +81,7 @@ export const BidirectionalChunkSequence = defineSequence({
         "index",
     ],
     supportsAlways: [
-        "length", "left", "back", "slice", "copy", "reset",
+        "length", "back", "slice", "copy",
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
@@ -125,17 +103,12 @@ export const BidirectionalChunkSequence = defineSequence({
         lowIndex = undefined, highIndex = undefined,
         frontIndex = undefined, backIndex = undefined
     ){
-        ArgumentsError.assert(chunkLength >= 1, {
-            isConstructor: true,
-            message: "Failed to create sequence",
-            detail: "Expected a numeric chunk length of at least 1.",
-        });
         this.chunkLength = chunkLength;
         this.source = source;
         this.lowIndex = lowIndex || 0;
         this.frontIndex = frontIndex || 0;
         if(highIndex === undefined){
-            const sourceLength = source.length();
+            const sourceLength = source.nativeLength();
             const remLength = sourceLength % chunkLength;
             this.highIndex = 1 + Math.floor(sourceLength / chunkLength) - (remLength === 0);
         }else{
@@ -155,25 +128,22 @@ export const BidirectionalChunkSequence = defineSequence({
     length: function(){
         return this.highIndex - this.lowIndex;
     },
-    left: function(){
-        return this.backIndex - this.frontIndex;
-    },
     front: function(){
-        return this.index(this.frontIndex);
+        return this.nativeIndex(this.frontIndex);
     },
     popFront: function(){
         this.frontIndex++;
     },
     back: function(){
-        return this.index(this.backIndex - 1);
+        return this.nativeIndex(this.backIndex - 1);
     },
     popBack: function(){
         this.backIndex--;
     },
     index: function(i){
         const low = i * this.chunkLength;
-        return this.source.slice(
-            low, Math.min(low + this.chunkLength, this.source.length())
+        return this.source.nativeSlice(
+            low, Math.min(low + this.chunkLength, this.source.nativeLength())
         );
     },
     slice: function(i, j){
@@ -181,19 +151,12 @@ export const BidirectionalChunkSequence = defineSequence({
             this.chunkLength, this.source, i, j, i, j
         );
     },
-    has: null,
-    get: null,
     copy: function(){
         return new BidirectionalChunkSequence(
             this.chunkLength, this.source,
             this.lowIndex, this.highIndex,
             this.frontIndex, this.backIndex
         );
-    },
-    reset: function(){
-        this.frontIndex = this.lowIndex;
-        this.backIndex = this.highIndex;
-        return this;
     },
     rebase: function(source){
         this.source = source;
@@ -237,7 +200,9 @@ export const chunk = wrap({
             return new InfiniteRepeatElementSequence([]);
         }else if(chunkLength === 1){
             return new SingularMapSequence(element => [element], source);
-        }else if(source.slice && source.length){
+        }else if(!isFinite(chunkLength)){
+            return [source];
+        }else if(source.nativeSlice && source.nativeLength){
             return new BidirectionalChunkSequence(chunkLength, source);
         }else{
             return new ForwardChunkSequence(chunkLength, copyable(source));
@@ -251,6 +216,10 @@ export const chunk = wrap({
         },
         "emptyInput": hi => {
             hi.assertEmpty(hi.emptySequence().chunk(3));
+        },
+        "notKnownBoundedInput": hi => {
+            const seq = hi.recur(i => i + 1).seed(0).until(i => i >= 8);
+            hi.assertEqual(seq.chunk(3), [[0, 1, 2], [3, 4, 5], [6, 7]]);
         },
         "unboundedInput": hi => {
             const seq = hi.counter().chunk(4);
@@ -267,6 +236,10 @@ export const chunk = wrap({
         "singleChunkLength": hi => {
             const seq = hi.chunk(1, ["how", "are", "you", "?"]);
             hi.assertEqual(seq, [["how"], ["are"], ["you"], ["?"]]);
+        },
+        "infiniteChunkLength": hi => {
+            const seq = hi.range(6).chunk(Infinity);
+            hi.assertEqual(seq, [[0, 1, 2, 3, 4, 5]]);
         },
     },
 });

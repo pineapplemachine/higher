@@ -18,19 +18,23 @@ hi.register = lightWrap({
     },
     implementation: function register(...functions){
         for(const wrapped of functions){
+            // This check required because some functions are exclusively for
+            // testing/development use and so are undefined in production builds.
+            if(!wrapped) continue;
+            // Add the function to to the dictionary under its primary name.
             this.function[wrapped.name] = wrapped;
-            if(wrapped.internal){
-                // Do nothing
-            }else if(wrapped.names){
-                for(const name of wrapped.names){
-                    this[name] = wrapped;
-                    if(wrapped.async) this[name + "Async"] = wrapped.async;
+            // And then handle all of its names.
+            if(wrapped.names) for(const name of wrapped.names){
+                // Property chicanery made necessary by functions like "length".
+                Object.defineProperty(this, name, {
+                    value: wrapped, writable: false
+                });
+                // Add async function variants where indicated.
+                if(wrapped.async){
+                    this[name + "Async"] = wrapped.async;
                 }
-            }else{
-                this[wrapped.name] = wrapped;
             }
         }
-        return functions[0];
     },
 });
 
@@ -156,6 +160,10 @@ import {isNaN} from "./core/types"; hi.register(isNaN);
 import {isInfinity} from "./core/types"; hi.register(isInfinity);
 import {isPositiveInfinity} from "./core/types"; hi.register(isPositiveInfinity);
 import {isNegativeInfinity} from "./core/types"; hi.register(isNegativeInfinity);
+import {isPositiveZero} from "./core/types"; hi.register(isPositiveZero);
+import {isNegativeZero} from "./core/types"; hi.register(isNegativeZero);
+import {isPositive} from "./core/types"; hi.register(isPositive);
+import {isNegative} from "./core/types"; hi.register(isNegative);
 import {isString} from "./core/types"; hi.register(isString);
 import {isArray} from "./core/types"; hi.register(isArray);
 import {isSymbol} from "./core/types"; hi.register(isSymbol);
@@ -173,6 +181,13 @@ import {glossary} from "./docs/glossary"; hi.glossary = glossary;
 // test/contracts
 import {contractTypes} from "./test/contracts"; hi.contract = contractTypes;
 import {defineContract} from "./test/contracts"; hi.register(defineContract);
+// test/sequenceTools
+import {boundsUnknown} from "./test/sequenceTools"; hi.register(boundsUnknown);
+import {lengthUnknown} from "./test/sequenceTools"; hi.register(lengthUnknown);
+import {makeNonIndexing} from "./test/sequenceTools"; hi.register(makeNonIndexing);
+import {makeNonSlicing} from "./test/sequenceTools"; hi.register(makeNonSlicing);
+import {makeUncopyable} from "./test/sequenceTools"; hi.register(makeUncopyable);
+import {makeUnidirectional} from "./test/sequenceTools"; hi.register(makeUnidirectional);
 
 // Core sequence types
 import {arrayAsSequence} from "./functions/arrayAsSequence"; hi.register(arrayAsSequence);
@@ -228,16 +243,17 @@ import {from} from "./functions/from"; hi.register(from);
 import {groupBy} from "./functions/groupBy"; hi.register(groupBy);
 import {head} from "./functions/head"; hi.register(head);
 import {identity} from "./functions/identity"; hi.register(identity);
+import {index} from "./functions/index"; hi.register(index);
 import {isSorted} from "./functions/isSorted"; hi.register(isSorted);
 import {join} from "./functions/join"; hi.register(join);
 import {last} from "./functions/last"; hi.register(last);
 import {lastElement} from "./functions/lastElement"; hi.register(lastElement);
 import {lastElementElse} from "./functions/lastElementElse"; hi.register(lastElementElse);
+import {length} from "./functions/length"; hi.register(length);
 import {lexOrder} from "./functions/lexOrder"; hi.register(lexOrder);
 import {limit} from "./functions/limit"; hi.register(limit);
 import {map} from "./functions/map"; hi.register(map);
 import {mapIndex} from "./functions/mapIndex"; hi.register(mapIndex);
-import {match} from "./functions/match"; hi.register(match);
 import {max} from "./functions/max"; hi.register(max);
 import {min} from "./functions/min"; hi.register(min);
 import {negate} from "./functions/negate"; hi.register(negate);
@@ -271,6 +287,7 @@ import {reverse} from "./functions/reverse"; hi.register(reverse);
 import {roundRobin} from "./functions/roundRobin"; hi.register(roundRobin);
 import {sample} from "./functions/sample"; hi.register(sample);
 import {shuffle} from "./functions/shuffle"; hi.register(shuffle);
+import {slice} from "./functions/slice"; hi.register(slice);
 import {split} from "./functions/split"; hi.register(split);
 import {startsWith} from "./functions/startsWith"; hi.register(startsWith);
 import {stride} from "./functions/stride"; hi.register(stride);

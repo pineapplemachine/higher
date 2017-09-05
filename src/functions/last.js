@@ -12,7 +12,7 @@ import {UnidirectionalOnDemandTailSequence} from "./tail";
 
 // Get an on-demand sequence for the last elements of a bidirectional sequence.
 const BidirectionalOnDemandLastSequence = (count, predicate, source) => {
-    return new OnDemandSequence({
+    return new OnDemandSequence(ReverseSequence.appliedTo(ArraySequence), {
         bounded: () => true,
         unbounded: () => false,
         dump: () => {
@@ -28,7 +28,7 @@ const BidirectionalOnDemandLastSequence = (count, predicate, source) => {
 
 // Get an on-demand sequence for the last elements of a reversible sequence.
 const ReversibleOnDemandLastSequence = (count, predicate, source) => {
-    return new OnDemandSequence({
+    return new OnDemandSequence(ReverseSequence.appliedTo(ArraySequence), {
         bounded: () => true,
         unbounded: () => false,
         dump: () => {
@@ -45,7 +45,7 @@ const ReversibleOnDemandLastSequence = (count, predicate, source) => {
 
 // Get an on-demand sequence for the last elements of a unidirectional sequence.
 const UnidirectionalOnDemandLastSequence = (count, predicate, source) => {
-    return new OnDemandSequence({
+    return new OnDemandSequence(ArraySequence, {
         bounded: () => true,
         unbounded: () => false,
         dump: () => {
@@ -56,7 +56,7 @@ const UnidirectionalOnDemandLastSequence = (count, predicate, source) => {
             }
             const sequence = new ArraySequence(array);
             return (array.length <= count ? sequence :
-                sequence.slice(array.length - count, array.length)
+                sequence.nativeSlice(array.length - count, array.length)
             );
         },
     });
@@ -98,7 +98,7 @@ export const last = wrap({
             functions: {optional: wrap.expecting.predicate},
             sequences: {one: wrap.expecting.either(
                 wrap.expecting.boundedSequence,
-                wrap.expecting.reversibleSequence
+                wrap.expecting.bidirectionalSequence
             )},
         }
     },
@@ -107,27 +107,23 @@ export const last = wrap({
         if(lastCount <= 0){
             return new EmptySequence();
         }else if(predicate){
-            if(!isFinite(count) || (source.length && source.length() <= count)){
+            if(!isFinite(count) || (source.nativeLength && source.nativeLength() <= count)){
                 return new FilterSequence(predicate, source);
             }else if(source.back){
                 return BidirectionalOnDemandLastSequence(count, predicate, source);
-            }else if(source.overrides.reverse){
-                return ReversibleOnDemandLastSequence(count, predicate, source);
             }else{ // Argument validation implies that source.bounded()
                 return UnidirectionalOnDemandLastSequence(count, predicate, source);
             }
         }else if(!isFinite(count)){
             return source;
-        }else if(source.length && source.slice){
-            const sourceLength = source.length();
+        }else if(source.nativeLength && source.nativeSlice){
+            const sourceLength = source.nativeLength();
             if(sourceLength <= count) return source;
-            else return source.slice(sourceLength - count, sourceLength);
-        }else if(source.length && source.length() <= count){
+            else return source.nativeSlice(sourceLength - count, sourceLength);
+        }else if(source.nativeLength && source.nativeLength() <= count){
             return source;
         }else if(source.back){
             return BidirectionalOnDemandTailSequence(count, source);
-        }else if(source.overrides.reverse){
-            return ReversibleOnDemandTailSequence(count, source);
         }else{ // Argument validation implies that source.bounded()
             return UnidirectionalOnDemandTailSequence(count, source);
         }
@@ -188,14 +184,14 @@ export const last = wrap({
             hi.assertEmpty(hi.emptySequence().last(10, i => false));
         },
         "knownLengthNonSlicingInput": hi => {
-            const seq = () => hi.recur(i => i + 1).seed(0).until(i => i >= 8).assumeLength(8);
+            const seq = () => hi.range(8).makeNonSlicing().assumeLength(8);
             hi.assertEqual(seq().last(4), [4, 5, 6, 7]);
             hi.assertEqual(seq().last(8), [0, 1, 2, 3, 4, 5, 6, 7]);
             hi.assertEqual(seq().last(10), [0, 1, 2, 3, 4, 5, 6, 7]);
             hi.assertEqual(seq().last(Infinity), [0, 1, 2, 3, 4, 5, 6, 7]);
         },
         "knownLengthNonSlicingInputPredicate": hi => {
-            const seq = () => hi.recur(i => i + 1).seed(0).until(i => i >= 8).assumeLength(8);
+            const seq = () => hi.range(8).makeNonSlicing().assumeLength(8);
             const even = i => i % 2 === 0;
             hi.assertEqual(seq().last(2, even), [4, 6]);
             hi.assertEqual(seq().last(8, even), [0, 2, 4, 6]);
@@ -203,9 +199,7 @@ export const last = wrap({
             hi.assertEqual(seq().last(Infinity, even), [0, 2, 4, 6]);
         },
         "boundedNonSlicingInput": hi => {
-            const seq = () => (
-                hi.recur(i => i + 1).seed(0).until(i => i >= 8).assumeBounded()
-            );
+            const seq = () => hi.range(8).makeNonSlicing();
             hi.assertEmpty(seq().last(0));
             hi.assertEqual(seq().last(1), [7]);
             hi.assertEqual(seq().last(4), [4, 5, 6, 7]);
@@ -213,9 +207,7 @@ export const last = wrap({
             hi.assertEqual(seq().last(20), [0, 1, 2, 3, 4, 5, 6, 7]);
         },
         "boundedNonSlicingInputPredicate": hi => {
-            const seq = () => (
-                hi.recur(i => i + 1).seed(0).until(i => i >= 8).assumeBounded()
-            );
+            const seq = () => hi.range(8).makeNonSlicing();
             const even = i => i % 2 === 0;
             hi.assertEmpty(seq().last(0, even));
             hi.assertEqual(seq().last(1, even), [6]);
@@ -236,18 +228,6 @@ export const last = wrap({
         "noneSatisfyPredicate": hi => {
             hi.assertEmpty(hi.range(10).last(i => false));
             hi.assertEmpty(hi("hello").last(i => false));
-        },
-        "boundedReverseOverrideInput": hi => {
-            const seq = () => hi.repeat(4, [[1, 2, 3], [4, 5]]).flatten();
-            const even = i => i % 2 === 0;
-            hi.assertEqual(seq().last(7), [4, 5, 1, 2, 3, 4, 5]);
-            hi.assertEqual(seq().last(5, even), [4, 2, 4, 2, 4]);
-        },
-        "unboundedReverseOverrideInput": hi => {
-            const seq = () => hi.repeat([[1, 2, 3], [4, 5]]).flatten();
-            const even = i => i % 2 === 0;
-            hi.assertEqual(seq().last(7), [4, 5, 1, 2, 3, 4, 5]);
-            hi.assertEqual(seq().last(5, even), [4, 2, 4, 2, 4]);
         },
     },
 });

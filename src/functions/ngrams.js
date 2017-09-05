@@ -46,7 +46,7 @@ export const SlicingNgramSequence = defineSequence({
         this.source = source;
         this.lowIndex = lowIndex || 0;
         this.highIndex = (highIndex !== undefined ?
-            highIndex : Math.max(this.lowIndex, 1 + source.length() - ngramSize)
+            highIndex : Math.max(this.lowIndex, 1 + source.nativeLength() - ngramSize)
         );
         this.frontIndex = frontIndex !== undefined ? frontIndex : this.lowIndex;
         this.backIndex = backIndex !== undefined ? backIndex : this.highIndex;
@@ -59,11 +59,8 @@ export const SlicingNgramSequence = defineSequence({
     length: function(){
         return this.highIndex - this.lowIndex;
     },
-    left: function(){
-        return this.backIndex - this.frontIndex;
-    },
     front: function(){
-        return this.source.slice(
+        return this.source.nativeSlice(
             this.frontIndex, this.frontIndex + this.ngramSize
         );
     },
@@ -71,7 +68,7 @@ export const SlicingNgramSequence = defineSequence({
         this.frontIndex++;
     },
     back: function(){
-        return this.source.slice(
+        return this.source.nativeSlice(
             this.backIndex - 1, this.backIndex - 1 + this.ngramSize
         );
     },
@@ -79,25 +76,18 @@ export const SlicingNgramSequence = defineSequence({
         this.backIndex--;
     },
     index: function(i){
-        return this.source.slice(i, i + this.ngramSize);
+        return this.source.nativeSlice(i, i + this.ngramSize);
     },
     slice: function(i, j){
         return new SlicingNgramSequence(
             this.ngramSize, this.source, this.lowIndex + i, this.lowIndex + j
         );
     },
-    has: null,
-    get: null,
     copy: function(){
         return new SlicingNgramSequence(
             this.ngramSize, this.source, this.lowIndex,
             this.highIndex, this.frontIndex, this.backIndex
         );
-    },
-    reset: function(){
-        this.frontIndex = this.lowIndex;
-        this.backIndex = this.highIndex;
-        return this;
     },
     rebase: function(source){
         this.source = source;
@@ -140,7 +130,7 @@ export const TrackingNgramSequence = defineSequence({
         this.currentNgram = currentNgram;
         this.maskAbsentMethods(source);
     },
-    initialize: function(){
+    initializeFront: function(){
         this.currentNgram = [];
         while(!this.source.done() && this.currentNgram.length < this.ngramSize){
             this.currentNgram.push(this.source.nextFront());
@@ -153,24 +143,18 @@ export const TrackingNgramSequence = defineSequence({
         return this.source.unbounded();
     },
     done: function(){
-        if(!this.currentNgram) this.initialize();
+        if(!this.currentNgram) this.initializeFront();
         return this.source.done() && this.currentNgram.length < this.ngramSize;
     },
     length: function(){
-        const length = 1 + this.source.length() - this.ngramSize;
-        return length >= 0 ? length : 0;
-    },
-    left: function(){
-        if(!this.currentNgram) this.initialize();
-        const left = (this.currentNgram.length >= this.ngramSize) + this.source.left();
-        return left >= 0 ? left : 0;
+        return Math.max(0, 1 + this.source.nativeLength() - this.ngramSize);
     },
     front: function(){
-        if(!this.currentNgram) this.initialize();
+        if(!this.currentNgram) this.initializeFront();
         return new ArraySequence(this.currentNgram);
     },
     popFront: function(){
-        if(!this.currentNgram) this.initialize();
+        if(!this.currentNgram) this.initializeFront();
         this.currentNgram = this.currentNgram.slice(1);
         if(!this.source.done()){
             if(this.source.front() === undefined) console.log(this.source.frontSource);
@@ -180,13 +164,13 @@ export const TrackingNgramSequence = defineSequence({
     index: function(i){
         const ngram = [];
         for(let j = i; j < i + this.ngramSize; j++){
-            ngram.push(this.source.index(i));
+            ngram.push(this.source.nativeIndex(i));
         }
         return ngram;
     },
     slice: function(i, j){
         return new NgramSequence(
-            this.ngramSize, this.source.slice(i, j + this.ngramSize)
+            this.ngramSize, this.source.nativeSlice(i, j + this.ngramSize)
         );
     },
     copy: function(){
@@ -194,11 +178,6 @@ export const TrackingNgramSequence = defineSequence({
             this.ngramSize, this.source.copy(),
             this.currentNgram ? this.currentNgram.slice() : undefined
         );
-    },
-    reset: function(){
-        this.source.reset();
-        this.currentNgram = undefined;
-        return this;
     },
     rebase: function(source){
         this.source = source;
@@ -243,7 +222,7 @@ export const ngrams = wrap({
     implementation: (ngramSize, source) => {
         if(ngramSize < 1){
             return new InfiniteRepeatElementSequence(new EmptySequence());
-        }else if(source.length && source.slice){
+        }else if(source.nativeLength && source.nativeSlice){
             return new SlicingNgramSequence(ngramSize, source);
         }else{
             return new TrackingNgramSequence(ngramSize, source);

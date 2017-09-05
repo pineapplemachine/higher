@@ -145,19 +145,19 @@ export const LengthContract = defineContract({
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
     },
-    predicate: (sequence) => (sequence.length),
+    predicate: (sequence) => (sequence.nativeLength),
     test: function LengthContract(sequence){
         const a = sequence();
         if(!a.bounded()) throw ContractError(sequence(), this, {
             message: "Unbounded sequences must not implement a length method."
         });
         if(a.done()){
-            if(a.length() !== 0) throw ContractError(sequence(), this, {
+            if(a.nativeLength() !== 0) throw ContractError(sequence(), this, {
                 message: "An empty sequence must have a length of zero."
             });
             return true;
         }
-        const length = a.length();
+        const length = a.nativeLength();
         if(!Number.isInteger(length)) throw ContractError(sequence(), this, {
             message: "Sequence length must be an integer."
         });
@@ -168,7 +168,7 @@ export const LengthContract = defineContract({
             if(aCount > length) return false;
         }
         if(length !== aCount) return false;
-        if(a.length() !== aCount) return false;
+        if(a.nativeLength() !== aCount) return false;
         const b = sequence();
         let bCount = 0;
         while(!b.done()){
@@ -178,7 +178,7 @@ export const LengthContract = defineContract({
             if(bCount > length) return false;
         }
         if(bCount !== aCount) return false;
-        if(b.length() !== bCount) return false;
+        if(b.nativeLength() !== bCount) return false;
         return true;
     },
 });

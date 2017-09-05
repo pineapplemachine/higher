@@ -6,8 +6,8 @@ import {EmptySequence} from "./emptySequence";
 export const ConcatSequence = defineSequence({
     summary: "Concatenate the contents of some input sequences.",
     supportsWith: {
-        "length": "all", "left": "all", "back": "all",
-        "index": "all", "slice": "all", "copy": "all", "reset": "all",
+        "length": "all", "back": "all", "index": "all",
+        "slice": "all", "copy": "all",
     },
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
@@ -45,6 +45,7 @@ export const ConcatSequence = defineSequence({
         this.initializeSourceIndexes(
             frontSourceIndex === undefined, backSourceIndex === undefined
         );
+        // TODO: Handle this differently
         let noLength = false;
         for(const source of sources){
             this.maskAbsentMethods(source);
@@ -52,8 +53,8 @@ export const ConcatSequence = defineSequence({
         }
         // All sources must have known length for index and slice to be supported.
         if(noLength){
-            this.index = null;
-            this.slice = null;
+            this.nativeIndex = undefined;
+            this.nativeSlice = undefined;
         }
     },
     initializeSourceIndexes: function(front, back){
@@ -80,21 +81,14 @@ export const ConcatSequence = defineSequence({
         for(const source of this.sources){
             if(source.unbounded()) return true;
         }
-        return true;
+        return false;
     },
     done: function(){
         return this.frontSourceIndex >= this.backSourceIndex;
     },
     length: function(){
         let sum = 0;
-        for(const source of this.sources) sum += source.length();
-        return sum;
-    },
-    left: function(){
-        let sum = 0;
-        for(let i = this.frontSourceIndex; i < this.backSourceIndex; i++){
-            sum += this.sources[i].left();
-        }
+        for(const source of this.sources) sum += source.nativeLength();
         return sum;
     },
     front: function(){
@@ -124,17 +118,18 @@ export const ConcatSequence = defineSequence({
     index: function(i){
         let offset = 0;
         for(const source of this.sources){
-            const nextOffset = offset + source.length();
-            if(nextOffset > i) return source.index(i - offset);
+            const nextOffset = offset + source.nativeLength();
+            if(nextOffset > i) return source.nativeIndex(i - offset);
             offset = nextOffset;
         }
-        return this.sources[this.sources.length - 1].index(i - offset);
+        return this.sources[this.sources.length - 1].nativeIndex(i - offset);
     },
     slice: function(i, j){
+        // TODO: Fix this
         let offset = 0;
         const sliceSources = [];
         for(const source of this.sources){
-            const nextOffset = offset + source.length();
+            const nextOffset = offset + source.nativeLength();
             if(nextOffset > i){
                 if(!sliceSources.length){
                     for(let k = offset; k < i; k++) source.popFront();
@@ -157,13 +152,6 @@ export const ConcatSequence = defineSequence({
         return new ConcatSequence(
             copies, this.frontSourceIndex, this.backSourceIndex
         );
-    },
-    reset: function(){
-        for(const source of this.sources) source.reset();
-        this.frontSourceIndex = 0;
-        this.backSourceIndex = this.sources.length;
-        this.initializeSourceIndexes(true, true);
-        return this;
     },
     rebase: function(source){
         this.source = source;
@@ -227,13 +215,18 @@ export const concat = wrap({
             hi.assertEqual(hi.concat([1, 2, 3]), [1, 2, 3]);
             hi.assertEqual(hi.concat("hello"), "hello");
         },
-        "emptyInputs": hi => {
+        "emptyInput": hi => {
             hi.assertEmpty(hi.concat(hi.emptySequence()));
             hi.assertEmpty(hi.concat(hi.emptySequence(), hi.emptySequence()));
             hi.assertEmpty(hi.concat(hi.emptySequence(), hi.emptySequence(), [], []));
             hi.assertEqual(hi.concat([], [1, 2, 3]), [1, 2, 3]);
             hi.assertEqual(hi.concat([1, 2, 3], []), [1, 2, 3]);
             hi.assertEqual(hi.concat([1, 2], [], [3, 4]), [1, 2, 3, 4]);
+        },
+        "notKnownBoundedInput": hi => {
+            const recurSeq = hi.recur(i => i + 1).seed(0).until(i => i >= 6);
+            const concatSeq = hi.concat([-3, -2, -1], recurSeq, [6, 7, 8]);
+            hi.assertEqual(concatSeq, [-3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8]);
         },
         "unboundedInput": hi => {
             const seq = hi.concat("abc", hi.repeat("def"), "ghi");

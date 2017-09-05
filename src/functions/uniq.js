@@ -72,10 +72,6 @@ export const UniqSequence = defineSequence({
             this.compare, this.source.copy(), this.lastElement
         );
     },
-    reset: function(){
-        this.source.reset();
-        return this;
-    },
     rebase: function(source){
         this.source = source;
         return this;

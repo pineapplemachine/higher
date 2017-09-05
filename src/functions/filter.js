@@ -49,9 +49,14 @@ export const FilterSequence = defineSequence({
         hi => new FilterSequence(i => i % 2, hi.counter()),
         hi => new FilterSequence(i => i !== 27, hi.recur(j => j * j).seed(3)),
     ],
-    constructor: function FilterSequence(predicate, source){
+    constructor: function FilterSequence(
+        predicate, source, initializedFront = undefined,
+        initializedBack = undefined
+    ){
         this.predicate = predicate;
         this.source = source;
+        this.initializedFront = initializedFront;
+        this.initializedBack = initializedBack;
         this.maskAbsentMethods(source);
     },
     filter: function(predicate){
@@ -67,38 +72,16 @@ export const FilterSequence = defineSequence({
         );
     },
     initializeFront: function(){
+        this.initializedFront = true;
         while(!this.source.done() && !this.predicate(this.source.front())){
             this.source.popFront();
         }
-        this.done = function(){
-            return this.source.done();
-        };
-        this.front = function(){
-            return this.source.front();
-        };
-        this.popFront = function(){
-            this.source.popFront();
-            while(!this.source.done() && !this.predicate(this.source.front())){
-                this.source.popFront();
-            }
-        };
     },
     initializeBack: function(){
+        this.initializedBack = true;
         while(!this.source.done() && !this.predicate(this.source.back())){
             this.source.popBack();
         }
-        this.done = function(){
-            return this.source.done();
-        };
-        this.back = function(){
-            return this.source.back();
-        };
-        this.popBack = function(){
-            this.source.popBack();
-            while(!this.source.done() && !this.predicate(this.source.back())){
-                this.source.popBack();
-            }
-        };
     },
     // These methods assume that if the input is unbounded, then so will be the
     // number of elements satisfying the predicate.
@@ -112,29 +95,31 @@ export const FilterSequence = defineSequence({
         return this.source.unbounded();
     },
     done: function(){
-        this.initializeFront();
+        if(!this.initializedFront) this.initializeFront();
         return this.source.done();
     },
-    length: null,
-    left: null,
     front: function(){
-        this.initializeFront();
+        if(!this.initializedFront) this.initializeFront();
         return this.source.front();
     },
     popFront: function(){
-        this.initializeFront();
-        return this.popFront();
+        if(!this.initializedFront) this.initializeFront();
+        this.source.popFront();
+        while(!this.source.done() && !this.predicate(this.source.front())){
+            this.source.popFront();
+        }
     },
     back: function(){
-        this.initializeBack();
+        if(!this.initializedBack) this.initializeBack();
         return this.source.back();
     },
     popBack: function(){
-        this.initializeBack();
-        return this.popBack();
+        if(!this.initializedBack) this.initializeBack();
+        this.source.popBack();
+        while(!this.source.done() && !this.predicate(this.source.back())){
+            this.source.popBack();
+        }
     },
-    index: null,
-    slice: null,
     has: function(i){
         return this.source.has(i) && this.predicate({
             key: i, value: this.source.get(i)
@@ -144,19 +129,10 @@ export const FilterSequence = defineSequence({
         return this.source.get(i);
     },
     copy: function(){
-        const copy = new FilterSequence(
-            this.predicate, this.source.copy(), false
+        return new FilterSequence(
+            this.predicate, this.source.copy(),
+            this.initializedFront, this.initializedBack
         );
-        copy.done = this.done;
-        copy.front = this.front;
-        copy.popFront = this.popFront;
-        copy.back = this.back;
-        copy.popBack = this.popBack;
-        return copy;
-    },
-    reset: function(){
-        this.source.reset();
-        return this;
     },
     rebase: function(source){
         this.source = source;

@@ -1,41 +1,38 @@
 import {defineSequence} from "../core/defineSequence";
 import {wrap} from "../core/wrap";
 
-// A chronically empty sequence.
 export const EmptySequence = defineSequence({
     summary: "An absolutely empty sequence",
+    supportsAlways: [
+        "length", "back", "index", "slice", "has", "get", "copy",
+    ],
+    docs: process.env.NODE_ENV !== "development" ? undefined : {
+        introduced: "higher@1.0.0",
+        expects: (`
+            The constructor accepts no arguments.
+        `),
+    },
     getSequence: process.env.NODE_ENV !== "development" ? undefined : [
         hi => new EmptySequence(),
     ],
     constructor: function EmptySequence(){},
-    repeat: function(repetitions){
-        return this;
-    },
-    reverse: function(){
-        return this;
-    },
     bounded: () => true,
     unbounded: () => false,
     done: () => true,
     length: () => 0,
-    left: () => 0,
     front: () => undefined,
     popFront: () => {},
     back: () => undefined,
     popBack: () => {},
     index: (i) => undefined,
-    has: (i) => false,
-    get: (i) => undefined,
     slice: function(i, j){
         return this;
     },
+    has: (i) => false,
+    get: (i) => undefined,
     copy: function(){
         return this;
     },
-    reset: function(){
-        return this;
-    },
-    rebase: null,
 });
 
 export const emptySequence = wrap({
@@ -46,6 +43,7 @@ export const emptySequence = wrap({
         returns: (`
             The function returns an empty sequence.
         `),
+        returnType: "sequence",
         examples: [
             "basicUsage"
         ],
@@ -53,11 +51,8 @@ export const emptySequence = wrap({
     attachSequence: false,
     async: false,
     arguments: {
-        none: true
+        none: true,
     },
-    sequences: [
-        EmptySequence
-    ],
     implementation: () => {
         return new EmptySequence();
     },
@@ -67,7 +62,6 @@ export const emptySequence = wrap({
             hi.assert(seq.bounded());
             hi.assert(seq.done());
             hi.assert(seq.length() === 0);
-            hi.assert(seq.left() === 0);
         },
     },
 });

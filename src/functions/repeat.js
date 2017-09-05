@@ -33,9 +33,10 @@ export const FiniteRepeatSequence = defineSequence({
     supportRequired: [
         "copy",
     ],
-    supportsWith: [
-        "length", "left", "back", "index", "slice", "copy", "reset",
-    ],
+    supportsWith: {
+        "length": "any", "back": "any", "slice": "any", "copy": "any",
+        "index": ["index", "length"], "indexNegative": ["index", "length"],
+    },
     overrides: {
         repeat: {optional: wrap.expecting.number},
         distinct: {optional: wrap.expecting.transformation},
@@ -168,7 +169,9 @@ export const FiniteRepeatSequence = defineSequence({
     repeat: function(repetitions){
         if(repetitions <= 0){
             return new EmptySequence();
-        }else if(!repetitions || !isFinite(repetitions)){
+        }else if(repetitions === 1){
+            return this;
+        }else if(!isFinite(repetitions)){
             return new InfiniteRepeatSequence(this.source);
         }else{
             return new FiniteRepeatSequence(
@@ -219,12 +222,7 @@ export const FiniteRepeatSequence = defineSequence({
         );
     },
     length: function(){
-        return this.source.length() * this.targetRepetitions;
-    },
-    left: function(){
-        return this.source.left() + this.source.length() * (
-            this.targetRepetitions - this.finishedRepetitions() - 1
-        );
+        return this.source.nativeLength() * this.targetRepetitions;
     },
     front: function(){
         return this.frontSource ? this.frontSource.front() : this.source.front();
@@ -269,23 +267,28 @@ export const FiniteRepeatSequence = defineSequence({
         }
     },
     index: function(i){
-        return this.source.index(i % this.source.length());
+        return this.source.nativeIndex(i % this.source.nativeLength());
+    },
+    indexNegative: function(i){
+        const sourceLength = this.source.nativeLength();
+        const index = sourceLength + (i % sourceLength);
+        return this.source.nativeIndex(index === sourceLength ? 0 : index);
     },
     slice: function(i, j){
-        const length = this.source.length();
+        const length = this.source.nativeLength();
         const lowIndex = i % length;
         const highIndex = j % length;
         if(j - i < length && highIndex >= lowIndex){
-            return this.source.slice(lowIndex, highIndex);
+            return this.source.nativeSlice(lowIndex, highIndex);
         }else if(lowIndex === 0 && highIndex === 0){
             return new FiniteRepeatSequence((j - i) / length, this.source);
         }else{
             const repetitions = Math.ceil(j / length) - Math.floor(i / length);
             const frontSource = (
-                lowIndex === 0 ? this.source : this.source.slice(lowIndex, length)
+                lowIndex === 0 ? this.source : this.source.nativeSlice(lowIndex, length)
             );
             const backSource = (
-                highIndex === 0 ? this.source : this.source.slice(0, highIndex)
+                highIndex === 0 ? this.source : this.source.nativeSlice(0, highIndex)
             );
             return new FiniteRepeatSequence(
                 repetitions, this.source,
@@ -306,15 +309,6 @@ export const FiniteRepeatSequence = defineSequence({
             this.frontSource ? this.frontSource.copy() : undefined,
             this.backSource ? this.backSource.copy() : undefined
         );
-    },
-    reset: function(){
-        this.frontRepetitions = 0;
-        this.frontSource = undefined;
-        if(this.back){
-            this.backRepetitions = 0;
-            this.backSource = undefined;
-        }
-        return this;
     },
     rebase: function(source){
         this.source = source;
@@ -347,11 +341,12 @@ export const InfiniteRepeatSequence = defineSequence({
     supportRequired: [
         "copy",
     ],
-    supportsWith: [
-        "back", "index", "slice", "copy", "reset",
-    ],
+    supportsWith: {
+        "back": "any", "slice": "any", "copy": "any",
+        "index": ["index", "length"], "indexNegative": ["index", "length"],
+    },
+    collapseOutOfPlace: true,
     overrides: {
-        repeat: {optional: wrap.expecting.number},
         distinct: {optional: wrap.expecting.transformation},
         uniform: {async: true, optional: wrap.expecting.comparison},
         containsElement: {async: true, one: wrap.expecting.anything},
@@ -377,13 +372,6 @@ export const InfiniteRepeatSequence = defineSequence({
         },
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
-        "repeatOverride": hi => {
-            const seq = new hi.sequence.InfiniteRepeatSequence(hi.range(10));
-            hi.assert(seq.repeat() === seq);
-            hi.assert(seq.repeat(Infinity) === seq);
-            hi.assert(seq.repeat(5) === seq);
-            hi.assertEmpty(seq.repeat(0));
-        },
         "distinctOverride": hi => {
             const seq = new hi.sequence.InfiniteRepeatSequence(hi("hello"));
             hi.assertEqual(seq.distinct(), "helo");
@@ -443,13 +431,6 @@ export const InfiniteRepeatSequence = defineSequence({
         this.backSource = backSource;
         this.maskAbsentMethods(source);
     },
-    repeat: function(repetitions){
-        if(repetitions <= 0){
-            return new EmptySequence();
-        }else{
-            return this;
-        }
-    },
     distinct: function(transform){
         return new DistinctSequence(
             transform || defaultDistinctTransform, this.source
@@ -506,13 +487,18 @@ export const InfiniteRepeatSequence = defineSequence({
         }
     },
     index: function(i){
-        return this.source.index(i % this.source.length());
+        return this.source.nativeIndex(i % this.source.nativeLength());
+    },
+    indexNegative: function(i){
+        const sourceLength = this.source.nativeLength();
+        const index = sourceLength + (i % sourceLength);
+        return this.source.nativeIndex(index === sourceLength ? 0 : index);
     },
     // This method is a bit dirty as it relies on knowing
     // the implementation details of FiniteRepeatSequence.
     slice: function(i, j){
         const finite = FiniteRepeatSequence(0, this.source, undefined, undefined);
-        return finite.slice(i, j);
+        return finite.nativeSlice(i, j);
     },
     has: function(i){
         return this.source.has(i);
@@ -526,28 +512,18 @@ export const InfiniteRepeatSequence = defineSequence({
             this.backSource ? this.backSource.copy() : undefined
         );
     },
-    reset: function(){
-        this.frontSource = null;
-        this.backSource = null;
-    },
     rebase: function(source){
         this.source = source;
-        this.frontSource = null;
-        this.backSource = null;
+        this.frontSource = undefined;
+        this.backSource = undefined;
         return this;
     },
-    // Any sequence with this type in its chain cannot be collapsed in-place.
-    collapseOutOfPlace: true,
 });
 
 export const repeat = wrap({
     name: "repeat",
     attachSequence: true,
     async: false,
-    sequences: [
-        FiniteRepeatSequence,
-        InfiniteRepeatSequence
-    ],
     arguments: {
         unordered: {
             numbers: "?",
@@ -557,9 +533,9 @@ export const repeat = wrap({
     implementation: (repetitions, source) => {
         if(repetitions <= 0){
             return new EmptySequence();
-        }else if(source.unbounded()){
+        }else if(repetitions === 1 || source.unbounded()){
             return source;
-        }else if(repetitions && isFinite(repetitions)){
+        }else if(isFinite(repetitions)){
             return new FiniteRepeatSequence(repetitions, copyable(source));
         }else{
             return new InfiniteRepeatSequence(copyable(source));
@@ -573,6 +549,35 @@ export const repeat = wrap({
             const seq = hi.repeat("abc");
             hi.assert(seq.unbounded());
             hi.assert(seq.startsWith("abcabcabcabc"));
+        },
+        "emptyInput": hi => {
+            hi.assertEmpty(hi.emptySequence().repeat(1));
+            hi.assertEmpty(hi.emptySequence().repeat(2));
+            hi.assertEmpty(hi.emptySequence().repeat(10));
+            hi.assertEmpty(hi.emptySequence().repeat(Infinity));
+            hi.assertEmpty(hi.emptySequence().repeat());
+        },
+        "unboundedInput": hi => {
+            const seq = hi.counter();
+            hi.assert(seq.repeat(1) === seq);
+            hi.assert(seq.repeat(10) === seq);
+            hi.assert(seq.repeat(Infinity) === seq);
+            hi.assert(seq.repeat() === seq);
+        },
+        "zeroRepetitions": hi => {
+            hi.assertEmpty(hi.emptySequence().repeat(0));
+            hi.assertEmpty(hi.range(10).repeat(0));
+            hi.assertEmpty(hi.counter().repeat(0));
+        },
+        "oneRepetition": hi => {
+            const seq = hi.range(10);
+            hi.assert(seq.repeat(1) === seq);
+        },
+        "infiniteRepetitions": hi => {
+            const seq = hi.repeat([0, 1, 2], Infinity);
+            hi.assert(seq.unbounded());
+            hi.assert(seq.startsWith([0, 1, 2, 0, 1]));
+            hi.assert(seq.endsWith([1, 2, 0, 1, 2]));
         },
     },
 });

@@ -9,7 +9,7 @@ import {NotBoundedError} from "../errors/NotBoundedError";
 export const ReduceSequence = defineSequence({
     summary: "Enumerate the combinations of elements with their predecessors in a source sequence.",
     supportsWith: [
-        "length", "left", "copy", "reset",
+        "length", "copy",
     ],
     overrides: {
         seed: {one: wrap.expecting.anything},
@@ -141,19 +141,20 @@ export const ReduceSequence = defineSequence({
         },
     },
     constructor: function ReduceSequence(
-        combine, source, seedValue = undefined,
-        hasSeed = undefined, isDone = undefined
+        combine, source, seedValue = undefined, hasSeed = undefined,
+        isDone = undefined, initializedFront = undefined
     ){
         this.combine = combine;
         this.source = source;
         this.accumulator = seedValue;
         this.seedValue = seedValue;
-        this.hasSeed = hasSeed || false;
-        this.isDone = isDone || false;
+        this.hasSeed = hasSeed;
+        this.isDone = isDone;
+        this.initializedFront = initializedFront;
         this.maskAbsentMethods(source);
     },
     lastElement: function(predicate){
-        if(!this.source.bounded()) throw NotBoundedError({
+        if(!this.source.bounded()) throw NotBoundedError(this.source, {
             message: "Failed to reduce sequence",
         });
         if(predicate){
@@ -203,7 +204,7 @@ export const ReduceSequence = defineSequence({
         }
     },
     lastElementElse: function(functions){
-        if(!this.source.bounded()) throw NotBoundedError({
+        if(!this.source.bounded()) throw NotBoundedError(this.source, {
             message: "Failed to reduce sequence",
         });
         const callback = functions[0];
@@ -262,7 +263,8 @@ export const ReduceSequence = defineSequence({
             }
         }
     },
-    initialize: function(){
+    initializeFront: function(){
+        this.initializedFront = true;
         if(!this.hasSeed){
             if(this.source.done()){
                 this.isDone = true;
@@ -270,21 +272,6 @@ export const ReduceSequence = defineSequence({
                 this.accumulator = this.source.nextFront();
             }
         }
-        this.done = function(){
-            return this.isDone && this.source.done();
-        };
-        this.front = function(){
-            return this.accumulator;
-        };
-        this.popFront = function(){
-            if(this.source.done()){
-                this.isDone = true;
-            }else{
-                this.accumulator = this.combine(
-                    this.accumulator, this.source.nextFront()
-                );
-            }
-        };
     },
     seed: function(value){
         this.accumulator = value;
@@ -303,40 +290,35 @@ export const ReduceSequence = defineSequence({
         return this.source.unbounded();
     },
     done: function(){
-        this.initialize();
+        if(!this.initializedFront) this.initializeFront();
         return this.isDone && this.source.done();
     },
     length: function(){
-        return Math.max(0, this.source.length() - 1 + this.hasSeed);
-    },
-    left: function(){
-        return Math.max(0, this.source.left() - 1 + this.hasSeed);
+        return Math.max(0, this.source.nativeLength() - 1 + this.hasSeed);
     },
     front: function(){
-        this.initialize();
+        if(!this.initializedFront) this.initializeFront();
         return this.accumulator;
     },
     popFront: function(){
-        this.initialize();
-        return this.popFront();
+        if(!this.initializedFront) this.initializeFront();
+        if(this.source.done()){
+            this.isDone = true;
+        }else{
+            this.accumulator = this.combine(
+                this.accumulator, this.source.nextFront()
+            );
+        }
     },
     copy: function(){
         const copy = new ReduceSequence(
-            this.combine, this.source.copy(),
-            this.seedValue, this.hasSeed, this.isDone
+            this.combine, this.source.copy(), this.seedValue,
+            this.hasSeed, this.isDone, this.initializedFront
         );
         copy.done = this.done;
         copy.front = this.front;
         copy.popFront = this.popFront;
         return copy;
-    },
-    reset: function(){
-        this.source.reset();
-        this.accumulator = this.seedValue;
-        delete this.done;
-        delete this.front;
-        delete this.popFront;
-        return this;
     },
     rebase: function(source){
         this.source = source;
@@ -397,7 +379,7 @@ export const reduce = wrap({
             hi.assert(hi.reduce(array, sum).lastElement() === 20);
         },
         "emptyInputSeeded": hi => {
-            hi.assertEqual(hi.emptySequence().reduce(() => 0).seed("!"), ["!"]);
+            hi.assertEqual(hi.emptySequence().reduce(() => 0).seed("!"), "!");
         },
         "emptyInputNotSeeded": hi => {
             hi.assertEmpty(hi.emptySequence().reduce(() => 0));

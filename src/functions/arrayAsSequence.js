@@ -6,7 +6,7 @@ export const ArraySequence = defineSequence({
     summary: "Enumerate the contents of an array.",
     supportsWith: [],
     supportsAlways: [
-        "length", "left", "back", "index", "slice", "has", "get", "copy", "reset"
+        "length", "back", "index", "slice", "has", "get", "copy"
     ],
     overrides: [
         Symbol.iterator, "array", "newArray"
@@ -82,9 +82,6 @@ export const ArraySequence = defineSequence({
     length: function(){
         return this.highIndex - this.lowIndex;
     },
-    left: function(){
-        return this.backIndex - this.frontIndex;
-    },
     front: function(){
         return this.source[this.frontIndex];
     },
@@ -106,7 +103,7 @@ export const ArraySequence = defineSequence({
         );
     },
     has: function(i){
-        return isInteger(i) && i >= 0 && i < this.length();
+        return isInteger(i) && i >= 0 && i < this.nativeLength();
     },
     get: function(i){
         return this.source[i - this.lowIndex];
@@ -117,12 +114,6 @@ export const ArraySequence = defineSequence({
             this.frontIndex, this.backIndex
         );
     },
-    reset: function(){
-        this.frontIndex = this.lowIndex;
-        this.backIndex = this.highIndex;
-        return this;
-    },
-    rebase: null,
 });
 
 export const arrayAsSequence = wrap({

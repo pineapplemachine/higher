@@ -5,7 +5,7 @@ import {wrap} from "../core/wrap";
 export const StringSequence = defineSequence({
     summary: "Enumerate the characters in a string.",
     supportsAlways: [
-        "length", "left", "back", "index", "slice", "has", "get", "copy", "reset",
+        "length", "back", "index", "slice", "has", "get", "copy",
     ],
     overrides: [
         Symbol.iterator, "string",
@@ -72,9 +72,6 @@ export const StringSequence = defineSequence({
     length: function(){
         return this.source.length;
     },
-    left: function(){
-        return this.backIndex - this.frontIndex;
-    },
     front: function(){
         return this.source[this.frontIndex];
     },
@@ -96,7 +93,7 @@ export const StringSequence = defineSequence({
         );
     },
     has: function(i){
-        return isInteger(i) && i >= 0 && i < this.length();
+        return isInteger(i) && i >= 0 && i < this.nativeLength();
     },
     get: function(i){
         return this.source[i - this.lowIndex];
@@ -106,11 +103,6 @@ export const StringSequence = defineSequence({
             this.source, this.lowIndex, this.highIndex,
             this.frontIndex, this.backIndex
         );
-    },
-    reset: function(){
-        this.frontIndex = this.lowIndex;
-        this.backIndex = this.highIndex;
-        return this;
     },
 });
 

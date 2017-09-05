@@ -53,6 +53,10 @@ export const groupBy = wrap({
         "unboundedInput": hi => {
             hi.assertFail(() => hi.counter().groupBy(i => i));
         },
+        "notKnownBoundedInput": hi => {
+            const seq = hi.recur(i => i + 1).seed(0).until(i => i >= 8);
+            hi.assertFail(() => seq.groupBy(i => i));
+        },
     },
 });
 

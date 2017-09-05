@@ -28,8 +28,8 @@ export const EagerSequence = defineSequence({
         this.source = source;
         this.originalSource = originalSource || source;
         this.initialized = initialized;
-        if(!source.has) this.has = null;
-        if(!source.get) this.get = null;
+        if(!source.has) this.has = undefined;
+        if(!source.get) this.get = undefined;
     },
     initialize: function(){
         const array = [];
@@ -50,15 +50,7 @@ export const EagerSequence = defineSequence({
     },
     length: function(){
         if(!this.source.length) this.initialize();
-        return this.source.length();
-    },
-    left: function(){
-        if(!this.source.left){
-            // If the source doesn't support left, it hasn't been consumed either
-            if(this.source.length) return this.source.length()
-            else this.initialize();
-        }
-        return this.source.left();
+        return this.source.nativeLength();
     },
     front: function(){
         return this.source.front();
@@ -76,12 +68,12 @@ export const EagerSequence = defineSequence({
         return this.source.popBack();
     },
     index: function(i){
-        if(!this.source.index) this.initialize();
-        return this.source.index(i);
+        if(!this.source.nativeIndex) this.initialize();
+        return this.source.nativeIndex(i);
     },
     slice: function(i, j){
         if(!this.initialized) this.initialize();
-        return this.source.slice(i, j);
+        return this.source.nativeSlice(i, j);
     },
     has: function(i){
         return this.originalSource.has(i);
@@ -94,11 +86,6 @@ export const EagerSequence = defineSequence({
         return new EagerSequence(
             this.source, this.originalSource, this.initialized
         );
-    },
-    reset: function(){
-        // If the source can't be reset then it hasn't been consumed either
-        if(this.source.reset) this.source.reset();
-        return this;
     },
     rebase: function(source){
         this.source = source;

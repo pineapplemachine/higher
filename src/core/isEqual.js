@@ -116,9 +116,9 @@ export const sequencesEqual = lightWrap({
     summary: "Get whether some input sequences are deeply equal.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
-        throws: (`
-            The function throws a @NotBoundedError if none of the inputs
-            were known to be bounded.
+        warnings: (`
+            If all of the input sequences were in fact unbounded without being
+            known-unbounded, then the function will produce an infinite loop.
         `),
         returnType: "boolean",
         examples: [
@@ -126,31 +126,53 @@ export const sequencesEqual = lightWrap({
         ],
     },
     implementation: function sequencesEqual(...sources){
+        // Return true for zero or one input sequences.
         if(sources.length <= 1) return true;
+        // Check that the lengths of known-length sequences are equal.
+        // Return false if any input was known-unbounded.
         const sequences = [];
         let anyBounded = false;
+        let sameLength = undefined;
         for(const source of sources){
             const sequence = asSequence(source);
             anyBounded = anyBounded || sequence.bounded();
             sequences.push(sequence);
-        }
-        if(!anyBounded) throw NotBoundedError(sources[0], {
-            message: "Failed to compare sequences",
-        });
-        while(!sequences[0].done()){
-            const elements = [sequences[0].nextFront()];
-            for(let i = 1; i < sequences.length; i++){
-                if(sequences[i].done()) return false;
-                elements.push(sequences[i].nextFront());
-            }
-            if(!isEqual(...elements)){
+            if(sequence.nativeLength){
+                if(sameLength === undefined){
+                    sameLength = sequence.nativeLength();
+                }else if(sequence.nativeLength() !== sameLength){
+                    return false;
+                }
+            }else if(sequence.unbounded()){
                 return false;
             }
         }
-        for(const sequence of sequences){
-            if(!sequence.done()) return false;
+        // Optimized implementation for the very common case where there are
+        // exactly two inputs.
+        if(sequences.length === 2){
+            while(!sequences[0].done() && !sequences[1].done()){
+                if(!isEqual(sequences[0].nextFront(), sequences[1].nextFront())){
+                    return false;
+                }
+            }
+            return sequences[0].done() && sequences[1].done();
+        // Generalized implementation when any number of sources greater than two.
+        }else{
+            while(!sequences[0].done()){
+                const elements = [sequences[0].nextFront()];
+                for(let i = 1; i < sequences.length; i++){
+                    if(sequences[i].done()) return false;
+                    elements.push(sequences[i].nextFront());
+                }
+                if(!isEqual(...elements)){
+                    return false;
+                }
+            }
+            for(const sequence of sequences){
+                if(!sequence.done()) return false;
+            }
+            return true;
         }
-        return true;
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {
@@ -178,8 +200,8 @@ export const stringsEqual = lightWrap({
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
         throws: (`
-            The function throws a @NotBoundedError if any of the inputs
-            were not known to be bounded.
+            The function throws a @NotBoundedError if none of the inputs
+            were known to be bounded.
         `),
         returnType: "boolean",
         examples: [
@@ -187,46 +209,92 @@ export const stringsEqual = lightWrap({
         ],
     },
     implementation: function stringsEqual(...sources){
-        // TODO: It should be possible to do these comparisons lazily and
-        // with potentially unbounded sequences, just kind of tedious to
-        // implement.
         if(sources.length <= 1) return true;
         const strings = [];
+        const boundedSources = [];
+        const notBoundedSources = [];
         for(const source of sources){
             if(isString(source)){
                 strings.push(source);
             }else{
-                NotBoundedError.enforce(source, {
-                    message: "Failed to compare strings",
-                });
-                let sequenceString = "";
-                for(const element of source) sequenceString += element;
-                strings.push(sequenceString);
+                const sequence = asSequence(source);
+                if(!sequence){
+                    strings.push(String(source));
+                }else if(sequence.bounded()){
+                    boundedSources.push(sequence);
+                }else{
+                    notBoundedSources.push(sequence);
+                }
             }
         }
         for(let i = 1; i < strings.length; i++){
             if(strings[i] !== strings[0]) return false;
         }
+        if(boundedSources.length){
+            for(const source of boundedSources){
+                let string = "";
+                if(!strings.length){
+                    for(const element of source){
+                        string += String(element);
+                    }
+                    strings.push(string);
+                }else{
+                    const stringLength = strings[0].length;
+                    for(const element of source){
+                        string += String(element);
+                        if(string.length > stringLength) return false;
+                    }
+                    if(string !== strings[0]) return false;
+                }
+            }
+        }
+        if(notBoundedSources.length){
+            if(!strings.length) throw NotBoundedError(notBoundedSources[0],
+                {message: "Failed to compare strings for equality"}
+            );
+            for(const source of notBoundedSources){
+                if(source.unbounded()) return false;
+            }
+            const stringLength = strings[0].length;
+            for(const source of notBoundedSources){
+                let string = "";
+                for(const element of source){
+                    string += String(element);
+                    if(string.length > stringLength) return false;
+                }
+                if(string !== strings[0]) return false;
+            }
+        }
         return true;
     },
     tests: process.env.NODE_ENV !== "development" ? undefined : {
         "basicUsage": hi => {
-            hi.assert(stringsEqual("hello", "hello"));
-            hi.assertNot(stringsEqual("hello", "world"));
+            hi.assert(hi.stringsEqual("hello", "hello"));
+            hi.assertNot(hi.stringsEqual("hello", "world"));
         },
         "sequenceInputs": hi => {
-            hi.assert(stringsEqual("hello", hi("hello")));
-            hi.assert(stringsEqual(hi("hello"), hi("hello")));
-            hi.assert(stringsEqual("hello", "hello", hi("hello")));
-            hi.assert(stringsEqual("hello", hi("hello"), hi("hello")));
-            hi.assert(stringsEqual(hi("hello"), hi("hello"), hi("hello")));
+            hi.assert(hi.stringsEqual("hello", hi("hello")));
+            hi.assert(hi.stringsEqual(hi("hello"), hi("hello")));
+            hi.assert(hi.stringsEqual("hello", "hello", hi("hello")));
+            hi.assert(hi.stringsEqual("hello", hi("hello"), hi("hello")));
+            hi.assert(hi.stringsEqual(hi("hello"), hi("hello"), hi("hello")));
+        },
+        "sequenceElementsToStrings": hi => {
+            hi.assert(hi.stringsEqual(hi([1, 2, 3]), "123"));
         },
         "noInputs": hi => {
-            hi.assert(stringsEqual());
+            hi.assert(hi.stringsEqual());
         },
         "oneInput": hi => {
-            hi.assert(stringsEqual("?"));
-            hi.assert(stringsEqual(hi("!")));
+            hi.assert(hi.stringsEqual("?"));
+            hi.assert(hi.stringsEqual(hi("!")));
+        },
+        "notKnownBoundedInput": hi => {
+            const seq = hi.recur(i => i + "!").seed("hi").until(i => i.length > 5);
+            hi.assertNot(hi.stringsEqual(seq, "hihi!hi!!"));
+        },
+        "unboundedInput": hi => {
+            hi.assertNot(hi.stringsEqual("hello", hi.repeat("hello")));
         },
     },
 });

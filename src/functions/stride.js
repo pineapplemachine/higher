@@ -89,7 +89,7 @@ export const PoppingStrideSequence = defineSequence({
         }
     },
     initializeBack: function(){
-        const sourceLength = this.source.length();
+        const sourceLength = this.source.nativeLength();
         const remainder = sourceLength % this.strideLength;
         const pop = (remainder || this.strideLength) - 1;
         for(let i = 0; i < pop && !this.source.done(); i++){
@@ -114,10 +114,7 @@ export const PoppingStrideSequence = defineSequence({
         return this.source.done();
     },
     length: function(){
-        return Math.ceil(this.source.length() / this.strideLength);
-    },
-    left: function(){
-        return Math.ceil(this.source.left() / this.strideLength);
+        return Math.ceil(this.source.nativeLength() / this.strideLength);
     },
     front: function(){
         return this.source.front();
@@ -140,12 +137,6 @@ export const PoppingStrideSequence = defineSequence({
         copy.back = this.back;
         copy.popBack = this.popBack;
         return copy;
-    },
-    reset: function(){
-        this.source.reset();
-        delete this.back;
-        delete this.popBack;
-        return this;
     },
     rebase: function(source){
         this.source = source;
@@ -196,7 +187,7 @@ export const IndexStrideSequence = defineSequence({
         if(highIndex !== undefined){
             this.highIndex = highIndex;
         }else{
-            const sourceLength = source.length();
+            const sourceLength = source.nativeLength();
             const remainder = sourceLength % strideLength;
             this.highIndex = Math.floor(sourceLength - (remainder || strideLength) + 1);
         }
@@ -258,25 +249,22 @@ export const IndexStrideSequence = defineSequence({
         return this.frontIndex >= this.backIndex;
     },
     length: function(){
-        return Math.ceil(this.source.length() / this.strideLength);
-    },
-    left: function(){
-        return Math.ceil(this.source.left() / this.strideLength);
+        return Math.ceil(this.source.nativeLength() / this.strideLength);
     },
     front: function(){
-        return this.source.index(Math.floor(this.frontIndex));
+        return this.source.nativeIndex(Math.floor(this.frontIndex));
     },
     popFront: function(){
         this.frontIndex += this.strideLength;
     },
     back: function(){
-        return this.source.index(Math.floor(this.backIndex - 1));
+        return this.source.nativeIndex(Math.floor(this.backIndex - 1));
     },
     popBack: function(){
         this.backIndex -= this.strideLength;
     },
     index: function(i){
-        return this.source.index(Math.floor(i * this.strideLength));
+        return this.source.nativeIndex(Math.floor(i * this.strideLength));
     },
     slice: function(i, j){
         return new IndexStrideSequence(
@@ -290,11 +278,6 @@ export const IndexStrideSequence = defineSequence({
             this.strideLength, this.source, this.lowIndex,
             this.highIndex, this.frontIndex, this.backIndex
         );
-    },
-    reset: function(){
-        this.frontIndex = this.lowIndex;
-        this.backIndex = this.highIndex;
-        return this;
     },
     rebase: function(source){
         this.source = source;
@@ -345,7 +328,7 @@ export const stride = wrap({
                 new EmptySequence() :
                 new OneElementSequence(source.front())
             );
-        }else if(source.index && source.length){
+        }else if(source.nativeIndex && source.nativeLength){
             return new IndexStrideSequence(strideLength, source);
         }else{
             return new PoppingStrideSequence(strideLength, source);

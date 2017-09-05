@@ -4,7 +4,7 @@ import {wrap} from "../core/wrap";
 export const UntilSequence = defineSequence({
     summary: "Enumerate elements in the input sequence until one satisfying a predicate is found.",
     supportsWith: [
-        "index", "copy", "reset",
+        "index", "copy",
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
@@ -90,18 +90,16 @@ export const UntilSequence = defineSequence({
         }
     },
     index: function(i){
-        return this.source.index(i);
+        return this.source.nativeIndex(i);
+    },
+    slice: function(i, j){
+        return this.source.nativeSlice(i, j);
     },
     copy: function(){
         return new UntilSequence(
             this.predicate, this.source.copy(),
             this.isInclusive, this.included
         );
-    },
-    reset: function(){
-        this.source.reset();
-        this.included = false;
-        return this;
     },
     rebase: function(source){
         this.source = source;

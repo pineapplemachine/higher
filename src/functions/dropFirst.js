@@ -7,7 +7,7 @@ import {FilterSequence} from "./filter";
 export const DropFirstSequence = defineSequence({
     summary: "Enumerate the contents of a sequence, omitting the first so many elements.",
     supportsWith: [
-        "length", "left", "index", "slice", "copy", "reset",
+        "length", "index", "back", "slice", "copy",
     ],
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
@@ -30,27 +30,19 @@ export const DropFirstSequence = defineSequence({
         hi => new DropFirstSequence(1, hi.counter()),
         hi => new DropFirstSequence(10, hi.counter()),
     ],
-    constructor: function DropFirstSequence(dropTarget, source){
+    constructor: function DropFirstSequence(
+        dropTarget, source, initializedFront = undefined
+    ){
         this.dropTarget = dropTarget;
         this.source = source;
+        this.initializedFront = initializedFront;
         this.maskAbsentMethods(source);
     },
-    initialize: function(){
+    initializeFront: function(){
+        this.initializedFront = true;
         for(let i = 0; i < this.dropTarget && !this.source.done(); i++){
             this.source.popFront();
         }
-        this.done = function(){
-            return this.source.done();
-        };
-        this.front = function(){
-            return this.source.front();
-        };
-        this.popFront = function(){
-            return this.source.popFront();
-        };
-        if(this.source.left) this.left = function(){
-            return this.source.left();
-        };
     },
     bounded: function(){
         return this.source.bounded();
@@ -59,46 +51,36 @@ export const DropFirstSequence = defineSequence({
         return this.source.unbounded();
     },
     done: function(){
-        this.initialize();
+        if(!this.initializedFront) this.initializeFront();
         return this.source.done();
     },
     length: function(){
-        const length = this.source.length() - this.dropTarget;
-        return length >= 0 ? length : 0;
-    },
-    left: function(){
-        const left = this.source.left() - this.dropTarget;
-        return left >= 0 ? left : 0;
+        return Math.max(0, this.source.nativeLength() - this.dropTarget);
     },
     front: function(){
-        this.initialize();
+        if(!this.initializedFront) this.initializeFront();
         return this.source.front();
     },
     popFront: function(){
-        this.initialize();
+        if(!this.initializedFront) this.initializeFront();
         return this.source.popFront();
     },
+    back: function(){
+        return this.source.back();
+    },
+    popBack: function(){
+        return this.source.popBack();
+    },
     index: function(i){
-        return this.source.index(i + this.dropTarget);
+        return this.source.nativeIndex(i + this.dropTarget);
     },
     slice: function(i, j){
-        return this.source.slice(i + this.dropTarget, j + this.dropTarget);
+        return this.source.nativeSlice(i + this.dropTarget, j + this.dropTarget);
     },
     copy: function(){
-        const copy = new DropFirstSequence(this.dropTarget, this.source.copy());
-        copy.done = this.done;
-        copy.front = this.front;
-        copy.popFront = this.popFront;
-        copy.left = this.left;
-        return copy;
-    },
-    reset: function(){
-        this.source.reset();
-        delete this.done;
-        delete this.front;
-        delete this.popFront;
-        delete this.left;
-        return this;
+        return new DropFirstSequence(
+            this.dropTarget, this.source.copy(), this.initializedFront
+        );
     },
     rebase: function(source){
         this.source = source;
@@ -139,15 +121,18 @@ export const DropFirstPredicateSequence = defineSequence({
         hi => new DropFirstPredicateSequence(5, i => false, hi.counter()),
     ],
     constructor: function DropFirstPredicateSequence(
-        dropTarget, predicate, source, droppedElements = undefined
+        dropTarget, predicate, source,
+        droppedElements = undefined, initializedFront = undefined
     ){
         this.dropTarget = dropTarget;
         this.predicate = predicate;
         this.source = source;
         this.droppedElements = droppedElements || 0;
+        this.initializedFront = initializedFront;
         this.maskAbsentMethods(source);
     },
-    initialize: function(){
+    initializeFront: function(){
+        this.initializedFront = true;
         while(
             this.droppedElements < this.dropTarget && !this.source.done() &&
             this.predicate(this.source.front())
@@ -155,22 +140,6 @@ export const DropFirstPredicateSequence = defineSequence({
             this.source.popFront();
             this.droppedElements++;
         }
-        this.done = function(){
-            return this.source.done();
-        };
-        this.front = function(){
-            return this.source.front();
-        };
-        this.popFront = function(){
-            this.source.popFront();
-            while(
-                this.droppedElements < this.dropTarget && !this.source.done() &&
-                this.predicate(this.source.front())
-            ){
-                this.source.popFront();
-                this.droppedElements++;
-            }
-        };
     },
     bounded: function(){
         return this.source.bounded();
@@ -179,34 +148,29 @@ export const DropFirstPredicateSequence = defineSequence({
         return this.source.unbounded();
     },
     done: function(){
-        this.initialize();
+        if(!this.initializedFront) this.initializeFront();
         return this.source.done();
     },
     front: function(){
-        this.initialize();
+        if(!this.initializedFront) this.initializeFront();
         return this.source.front();
     },
     popFront: function(){
-        this.initialize();
-        return this.source.popFront();
+        if(!this.initializedFront) this.initializeFront();
+        this.source.popFront();
+        while(
+            this.droppedElements < this.dropTarget && !this.source.done() &&
+            this.predicate(this.source.front())
+        ){
+            this.source.popFront();
+            this.droppedElements++;
+        }
     },
     copy: function(){
-        const copy = new DropFirstPredicateSequence(
-            this.dropTarget, this.predicate, this.source.copy(), this.droppedElements
+        return new DropFirstPredicateSequence(
+            this.dropTarget, this.predicate, this.source.copy(),
+            this.droppedElements, this.initializedFront
         );
-        copy.done = this.done;
-        copy.front = this.front;
-        copy.popFront = this.popFront;
-        copy.left = this.left;
-        return copy;
-    },
-    reset: function(){
-        this.source.reset();
-        delete this.done;
-        delete this.front;
-        delete this.popFront;
-        delete this.left;
-        return this;
     },
     rebase: function(source){
         this.source = source;
@@ -248,7 +212,7 @@ export const dropFirst = wrap({
             sequences: 1,
         },
     },
-    implementation: (dropTarget, predicate, source) => {
+    implementation: function dropFirst(dropTarget, predicate, source){
         // TODO: Write optimized sequence implementations for dropTarget === 1
         const drop = dropTarget || 1;
         if(dropTarget <= 0){
@@ -258,17 +222,17 @@ export const dropFirst = wrap({
                 new FilterSequence(element => !predicate(element), source) :
                 new EmptySequence()
             );
-        }else if(!predicate && source.slice && source.length){
-            return (source.length() <= drop ?
-                new EmptySequence() : source.slice(drop, source.length())
+        }else if(!predicate && source.nativeSlice && source.nativeLength){
+            return (source.nativeLength() <= drop ?
+                new EmptySequence() : source.nativeSlice(drop, source.nativeLength())
             );
         }else if(predicate){
-            return (source.length && source.length() <= drop ?
+            return (source.nativeLength && source.nativeLength() <= drop ?
                 new FilterSequence(element => !predicate(element), source) :
                 new DropFirstPredicateSequence(drop, predicate, source)
             );
         }else{
-            return (source.length && source.length() <= drop ?
+            return (source.nativeLength && source.nativeLength() <= drop ?
                 new EmptySequence() :
                 new DropFirstSequence(drop, source)
             );

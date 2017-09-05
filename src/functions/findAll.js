@@ -19,7 +19,7 @@ export const FindSequenceResult = function(source, low, high){
 FindSequenceResult.prototype.constructor = FindSequenceResult;
 Object.assign(FindSequenceResult.prototype, {
     slice: function(){
-        return this.source.slice(this.low, this.high);
+        return this.source.nativeSlice(this.low, this.high);
     },
     array: function(...args){
         return this.slice().array(...args);
@@ -155,13 +155,12 @@ export const ForwardFindSequence = defineSequence({
         this.compare = compare;
         this.source = source;
         this.search = search;
-        this.currentResult = null;
-        this.searchElement = null;
-        this.nextSearchElement = null;
+        this.currentResult = undefined;
+        this.searchElement = undefined;
+        this.nextSearchElement = undefined;
         this.searchThreads = searchThreads || [];
         this.index = 0;
-        if(!source.copy) this.copy = null;
-        if(!source.reset) this.reset = null;
+        if(!source.copy) this.copy = undefined;
         if(!source.back || !search.back || !source.length) this.reverse = function(){
             // TODO: Fall back on eager eval where possible
             throw "Failed to reverse find sequence: An input is unidirectional.";
@@ -243,8 +242,6 @@ export const ForwardFindSequence = defineSequence({
         this.initialize();
         return !this.searchElement && this.source.done();
     },
-    length: null,
-    left: null,
     front: function(){
         this.initialize();
         return this.currentResult;
@@ -253,12 +250,6 @@ export const ForwardFindSequence = defineSequence({
         this.initialize();
         return this.popFront();
     },
-    back: null,
-    popBack: null,
-    index: null,
-    slice: null,
-    has: null,
-    get: null,
     copy: function(){
         const copyThreads = [];
         for(const thread of this.searchThreads){
@@ -275,16 +266,6 @@ export const ForwardFindSequence = defineSequence({
         copy.front = this.front;
         copy.popFront = this.popFront;
         return copy;
-    },
-    reset: function(){
-        this.source.reset();
-        this.index = 0;
-        this.currentResult = null;
-        this.searchThreads = [];
-        delete this.done;
-        delete this.front;
-        delete this.popFront;
-        return this;
     },
     rebase: function(source){
         this.source = source;
@@ -306,9 +287,8 @@ export const BackwardFindSequence = defineSequence({
         this.searchElement = null;
         this.nextSearchElement = null;
         this.searchThreads = searchThreads || [];
-        this.index = source.length();
-        if(!source.copy) this.copy = null;
-        if(!source.reset) this.reset = null;
+        this.index = source.nativeLength();
+        if(!source.copy) this.copy = undefined;
     },
     threadType: BackwardFindSequenceThread,
     stepThreads: stepFindThreads,
@@ -386,8 +366,6 @@ export const BackwardFindSequence = defineSequence({
         this.initialize();
         return !this.searchElement && this.source.done();
     },
-    length: null,
-    left: null,
     front: function(){
         this.initialize();
         return this.currentResult;
@@ -396,12 +374,6 @@ export const BackwardFindSequence = defineSequence({
         this.initialize();
         return this.popFront();
     },
-    back: null,
-    popBack: null,
-    index: null,
-    slice: null,
-    has: null,
-    get: null,
     copy: function(){
         const copyThreads = [];
         for(const thread of this.searchThreads){
@@ -418,16 +390,6 @@ export const BackwardFindSequence = defineSequence({
         copy.front = this.front;
         copy.popFront = this.popFront;
         return copy;
-    },
-    reset: function(){
-        this.source.reset();
-        this.index = this.source.length();
-        this.currentResult = null;
-        this.searchThreads = [];
-        delete this.done;
-        delete this.front;
-        delete this.popFront;
-        return this;
     },
     rebase: function(source){
         this.source = source;

@@ -1,6 +1,4 @@
-import {sequenceConverters} from "../core/asSequence";
 import {error} from "../core/error";
-import {isSequence} from "../core/sequence";
 import {isArray, isString} from "../core/types";
 
 export const BoundsUnknownError = error({
@@ -10,42 +8,25 @@ export const BoundsUnknownError = error({
         expects: (`
             The error function expects as an argument the sequence which was
             required to be known to be bounded or unbounded, but was not.
-            The function also accepts an options object which may have a message
-            attribute providing additional error information.
         `),
     },
     constructor: function BoundsUnknownError(source, options){
         this.source = source;
         this.options = options || {};
-        const sourceType = (isSequence(source) ?
-            source.typeChainString() + " sequence" : "iterable"
-        );
         this.message = (
             "The action requires knowing whether the input is bounded or " +
-            "unbounded, but the ${sourceType} is not known to be either. " +
-            "Try using a method such as 'head', 'limit', 'assumeBounded', or " +
-            "'assumeUnbounded' to resolve this error."
+            "unbounded, but the sequence is not known to be either. " +
+            "The \`head\`, \`limit\`, \`assumeBounded\` and \`assumeBounded\` " +
+            "functions are some options for resolving this error by acquiring a " +
+            "known-bounded or known-unbounded sequence from one whose bounds " +
+            "are not otherwise known."
         );
         if(this.options.message){
             this.message = this.options.message + ": " + this.message;
         }
     },
     enforce: function(source, options){
-        if(
-            (isSequence(source) && (source.bounded() || source.unbounded())) ||
-            isArray(source) || isString(source)
-        ){
-            return source;
-        }
-        for(const converter of sequenceConverters){
-            if(converter.predicate(source)){
-                if(converter.bounded(source) || converter.unbounded(source)){
-                    return source;
-                }else{
-                    break;
-                }
-            }
-        }
+        if(source.bounded() || source.unbounded()) return source;
         throw BoundsUnknownError(source, options);
     },
 });
