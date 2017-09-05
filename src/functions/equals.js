@@ -15,17 +15,22 @@ export const equals = wrap({
         expects: (`
             The function expects any number of sequences and an optional
             comparison function as input.
-            At least one of the input sequences must be known-bounded.
             When no comparison function was provided, @isEqual is used as
             a default.
         `),
         returns: (`
             The function returns #true when the input sequences were all
             equal and #false otherwise.
+            The function returns #false when any of the input sequences were
+            known to be unbounded.
             Equality is determined by invoking the comparison function for
             every corresponding group of elements.
             When there was one input sequence or no input sequences, the
             function always returns #true.
+        `),
+        warnings: (`
+            If all of the input sequences were in fact unbounded without being
+            known-unbounded, then the function will produce an infinite loop.
         `),
         returnType: "boolean",
         examples: [
@@ -40,23 +45,20 @@ export const equals = wrap({
     arguments: {
         unordered: {
             functions: {optional: wrap.expecting.comparison},
-            sequences: {
-                amount: "*",
-                any: wrap.expecting.boundedSequence,
-            },
+            sequences: "*",
         }
     },
     implementation: (compare, sources) => {
+        // Return true for zero or one input sequences.
+        if(sources.length <= 1) return true;
         const compareFunc = compare || isEqual;
-        if(sources.length <= 1){
-            return true;
         // Optimized implementation for the very common case where there are
         // exactly two inputs.
-        }else if(sources.length === 2){
-            if(
+        if(sources.length === 2){
+            if((sources[0].unbounded() || sources[1].unbounded()) || (
                 sources[0].nativeLength && sources[1].nativeLength &&
                 sources[0].nativeLength() !== sources[1].nativeLength()
-            ){
+            )){
                 return false;
             }
             while(!sources[0].done() && !sources[1].done()){
@@ -136,7 +138,7 @@ export const equals = wrap({
             hi.assertNot(hi("hello").equals("he"));
         },
         "allUnboundedInputs": hi => {
-            hi.assertFail(() => hi.repeat("ok").equals(hi.repeat("okok")));
+            hi.assertNot(hi.repeat("ok").equals(hi.repeat("okok")));
         },
     },
 });

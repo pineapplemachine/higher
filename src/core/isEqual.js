@@ -116,9 +116,9 @@ export const sequencesEqual = lightWrap({
     summary: "Get whether some input sequences are deeply equal.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
-        throws: (`
-            The function throws a @NotBoundedError if none of the inputs
-            were known to be bounded.
+        warnings: (`
+            If all of the input sequences were in fact unbounded without being
+            known-unbounded, then the function will produce an infinite loop.
         `),
         returnType: "boolean",
         examples: [
@@ -126,7 +126,10 @@ export const sequencesEqual = lightWrap({
         ],
     },
     implementation: function sequencesEqual(...sources){
+        // Return true for zero or one input sequences.
         if(sources.length <= 1) return true;
+        // Check that the lengths of known-length sequences are equal.
+        // Return false if any input was known-unbounded.
         const sequences = [];
         let anyBounded = false;
         let sameLength = undefined;
@@ -144,9 +147,8 @@ export const sequencesEqual = lightWrap({
                 return false;
             }
         }
-        if(!anyBounded) throw NotBoundedError(sources[0], {
-            message: "Failed to compare sequences",
-        });
+        // Optimized implementation for the very common case where there are
+        // exactly two inputs.
         if(sequences.length === 2){
             while(!sequences[0].done() && !sequences[1].done()){
                 if(!isEqual(sequences[0].nextFront(), sequences[1].nextFront())){
@@ -154,6 +156,7 @@ export const sequencesEqual = lightWrap({
                 }
             }
             return sequences[0].done() && sequences[1].done();
+        // Generalized implementation when any number of sources greater than two.
         }else{
             while(!sequences[0].done()){
                 const elements = [sequences[0].nextFront()];
