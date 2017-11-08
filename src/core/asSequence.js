@@ -107,21 +107,40 @@ export const asImplicitSequence = lightWrap({
     },
 });
 
+// TODO: Document sequence converters somewhere
 export const addSequenceConverter = lightWrap({
     summary: "Register a new sequence converter.",
-    internal: true,
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
     },
     implementation: function addSequenceConverter(converter){
-        // Insert new converters in ascending order of priority,
-        // i.e. first priority is given the first position in the list.
-        let i = 0;
-        for(; i < sequenceConverters.length; i++){
-            if(sequenceConverters[i].priority > converter.priority) break;
+        let lowest = undefined;
+        let highest = undefined;
+        for(let i = 0; i < sequenceConverters.length; i++){
+            const existing = sequenceConverters[i];
+            if(
+                (converter.after && converter.after[existing.name]) ||
+                (existing.before && existing.before[converter.name])
+            ){
+                lowest = i + 1;
+            }
+            if(highest === undefined && (
+                (converter.before && converter.before[existing.name]) ||
+                (existing.after && existing.after[converter.name])
+            )){
+                highest = i;
+            }
         }
-        sequenceConverters.splice(i, 0, converter);
-        return converter;
+        if(highest === undefined){
+            sequenceConverters.push(converter);
+        }else if(lowest === undefined || highest >= lowest){
+            sequenceConverters.splice(highest, 0, converter);
+        }else{
+            throw new Exception(
+                `Unable to place sequence converter ${converter.name} because ` +
+                "of conflicting ordering information."
+            );
+        }
     },
 });
 

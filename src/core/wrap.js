@@ -66,9 +66,11 @@ export const wrap = lightWrap({
             attachSequenceMethods(fancy);
         }
         if(info.asSequence){
-            const converter = Object.assign(
-                {transform: info.implementation}, info.asSequence
-            );
+            const converterData = {
+                name: fancy.name,
+                transform: info.implementation
+            };
+            const converter = Object.assign(converterData, info.asSequence);
             addSequenceConverter(converter);
         }
         if(process.env.NODE_ENV === "development"){
