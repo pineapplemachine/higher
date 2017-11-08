@@ -14,6 +14,7 @@ import {cleanDocs, cleanString} from "../docs/cleanString";
 
 export const sequenceTypes = {};
 
+// TODO: Thoroughly document sequence type creation somewhere
 export const defineSequence = lightWrap({
     summary: "Extend the @Sequence prototype.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {

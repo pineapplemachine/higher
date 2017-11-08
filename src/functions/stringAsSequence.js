@@ -132,7 +132,9 @@ export const stringAsSequence = wrap({
     asSequence: {
         // Comes after only array conversion and before generic iterable conversion.
         implicit: false,
-        priority: -800,
+        after: {
+            arrayAsSequence: true,
+        },
         predicate: isString,
         bounded: () => true,
         unbounded: () => false,

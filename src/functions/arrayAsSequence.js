@@ -141,7 +141,6 @@ export const arrayAsSequence = wrap({
     asSequence: {
         // First priority core converter
         implicit: true,
-        priority: -1000,
         predicate: isArray,
         bounded: () => true,
         unbounded: () => false,
