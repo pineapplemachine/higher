@@ -163,7 +163,9 @@ export const ForwardFindSequence = defineSequence({
         if(!source.copy) this.copy = undefined;
         if(!source.back || !search.back || !source.length) this.reverse = function(){
             // TODO: Fall back on eager eval where possible
-            throw "Failed to reverse find sequence: An input is unidirectional.";
+            throw new Exception(
+                "Failed to reverse find sequence: An input is unidirectional."
+            );
         };
     },
     threadType: ForwardFindSequenceThread,
