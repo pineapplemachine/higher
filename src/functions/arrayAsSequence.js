@@ -47,6 +47,12 @@ export const ArraySequence = defineSequence({
         hi => new ArraySequence([0, 1, 2, 3, 4, 5, 6]),
         hi => new ArraySequence([[0, 1], [1, 2]]),
     ],
+    converter: {
+        implicit: true,
+        predicate: isArray,
+        bounded: () => true,
+        unbounded: () => false,
+    },
     constructor: function ArraySequence(
         source, lowIndex = undefined, highIndex = undefined,
         frontIndex = undefined, backIndex = undefined
@@ -138,13 +144,6 @@ export const arrayAsSequence = wrap({
     },
     attachSequence: false,
     async: false,
-    asSequence: {
-        // First priority core converter
-        implicit: true,
-        predicate: isArray,
-        bounded: () => true,
-        unbounded: () => false,
-    },
     arguments: {
         one: wrap.expecting.array
     },

@@ -40,6 +40,15 @@ export const StringSequence = defineSequence({
             hi.assert(seq.slice(1, 5).string() === "ello");
         },
     },
+    converter: {
+        implicit: false,
+        after: {
+            arrayAsSequence: true,
+        },
+        predicate: isString,
+        bounded: () => true,
+        unbounded: () => false,
+    },
     constructor: function StringSequence(
         source, lowIndex = undefined, highIndex = undefined,
         frontIndex = undefined, backIndex = undefined
@@ -129,16 +138,6 @@ export const stringAsSequence = wrap({
     },
     attachSequence: false,
     async: false,
-    asSequence: {
-        // Comes after only array conversion and before generic iterable conversion.
-        implicit: false,
-        after: {
-            arrayAsSequence: true,
-        },
-        predicate: isString,
-        bounded: () => true,
-        unbounded: () => false,
-    },
     arguments: {
         one: wrap.expecting.anything
     },

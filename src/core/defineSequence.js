@@ -1,3 +1,4 @@
+import {addSequenceConverter} from "./asSequence";
 import {callAsync} from "./callAsync";
 import {constants} from "./constants";
 import {normalizeExpecting} from "./expecting";
@@ -7,12 +8,119 @@ import {appliedSequenceSupports} from "./sequence";
 import {isArray, isNumber} from "./types";
 import {getWrappedFunction, getWrappedFunctionAsync} from "./wrapFunction";
 
-import {ArgumentsError} from "../errors/ArgumentsError";
-import {NotBoundedError} from "../errors/NotBoundedError";
-
 import {cleanDocs, cleanString} from "../docs/cleanString";
 
 export const sequenceTypes = {};
+
+const sequenceTypeAttributes = {
+    done: {
+        native: "nativeDone",
+        constructor: false,
+        prototype: true,
+    },
+    length: {
+        native: "nativeLength",
+        constructor: false,
+        prototype: true,
+    },
+    front: {
+        native: "nativeFront",
+        constructor: false,
+        prototype: true,
+    },
+    popFront: {
+        native: "nativePopFront",
+        constructor: false,
+        prototype: true,
+    },
+    back: {
+        native: "nativeBack",
+        constructor: false,
+        prototype: true,
+    },
+    popBack: {
+        native: "nativePopBack",
+        constructor: false,
+        prototype: true,
+    },
+    index: {
+        native: "nativeIndex",
+        constructor: false,
+        prototype: true,
+    },
+    indexNegative: {
+        native: "nativeIndexNegative",
+        constructor: false,
+        prototype: true,
+    },
+    slice: {
+        native: "nativeSlice",
+        constructor: false,
+        prototype: true,
+    },
+    sliceNegative: {
+        native: "nativeSliceNegative",
+        constructor: false,
+        prototype: true,
+    },
+    sliceMixed: {
+        native: "nativeSliceMixed",
+        constructor: false,
+        prototype: true,
+    },
+    has: {
+        native: "nativeHas",
+        constructor: false,
+        prototype: true,
+    },
+    get: {
+        native: "nativeGet",
+        constructor: false,
+        prototype: true,
+    },
+    copy: {
+        native: "nativeCopy",
+        constructor: false,
+        prototype: true,
+    },
+    overrides: {
+        constructor: true,
+        prototype: true,
+    },
+    supportRequired: {
+        constructor: true,
+        supportObject: true,
+    },
+    supportsWith: {
+        constructor: true,
+        supportObject: true,
+    },
+    summary: {
+        constructor: true,
+    },
+    docs: {
+        constructor: true,
+    },
+    tests: {
+        constructor: true,
+    },
+    getSequence: {
+        constructor: true,
+    },
+    supportsAlways: {
+        constructor: true,
+    },
+    supportComplicated: {
+        constructor: true,
+    },
+    converter: {
+        constructor: true,
+    },
+    supportDescription: {
+        constructor: true,
+        clean: true,
+    },
+};
 
 // TODO: Thoroughly document sequence type creation somewhere
 export const defineSequence = lightWrap({
@@ -103,7 +211,8 @@ export const defineSequence = lightWrap({
                 attributeName === "tests" ||
                 attributeName === "getSequence" ||
                 attributeName === "supportsAlways" ||
-                attributeName === "supportComplicated"
+                attributeName === "supportComplicated" ||
+                attributeName === "converter"
             ){
                 constructor[attributeName] = attribute;
             }else if(attributeName === "supportDescription"){
@@ -115,6 +224,9 @@ export const defineSequence = lightWrap({
         wrapSequenceOverrides(constructor, attributes.overrides);
         constructor.test = sequenceTestRunner(constructor);
         sequenceTypes[constructor.name] = constructor;
+        if(constructor.converter){
+            addSequenceConverter(constructor);
+        }
         return constructor;
     },
 });

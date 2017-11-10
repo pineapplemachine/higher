@@ -115,6 +115,17 @@ export const ObjectSequence = defineSequence({
         hi => new ObjectSequence({a: 0, b: 1}),
         hi => new ObjectSequence({x: "hello", y: "world", z: "how", w: "do"}),
     ],
+    converter: {
+        implicit: false,
+        after: {
+            arrayAsSequence: true,
+            stringAsSequence: true,
+            iterableAsSequence: true,
+        },
+        predicate: isPlainObject,
+        bounded: () => true,
+        unbounded: () => false,
+    },
     constructor: function ObjectSequence(
         source, objectKeys = undefined, lowIndex = undefined,
         highIndex = undefined, frontIndex = undefined, backIndex = undefined
@@ -283,19 +294,6 @@ export const objectAsSequence = wrap({
     summary: "Get a sequence enumerating the key, value pairs of an object.",
     attachSequence: false,
     async: false,
-    asSequence: {
-        // Extremely low priority converter due to how generic it is.
-        // Last priority of all core converters.
-        implicit: false,
-        after: {
-            arrayAsSequence: true,
-            stringAsSequence: true,
-            iterableAsSequence: true,
-        },
-        predicate: isPlainObject,
-        bounded: () => true,
-        unbounded: () => false,
-    },
     arguments: {
         one: wrap.expecting.object
     },

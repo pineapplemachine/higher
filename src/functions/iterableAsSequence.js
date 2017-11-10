@@ -28,6 +28,16 @@ export const IterableSequence = defineSequence({
             hi.assertEqual(acc, [0, 1, 2]);
         },
     },
+    converter: {
+        implicit: true,
+        after: {
+            arrayAsSequence: true,
+            stringAsSequence: true,
+        },
+        predicate: isIterable,
+        bounded: () => false,
+        unbounded: () => false,
+    },
     constructor: function IterableSequence(
         source, first = true, item = undefined
     ){
@@ -89,18 +99,6 @@ export const iterableAsSequence = wrap({
     },
     attachSequence: false,
     async: false,
-    asSequence: {
-        // Extremely low priority converter due to how generic it is.
-        // Second-last priority of all core converters, before objectAsSequence.
-        implicit: true,
-        after: {
-            arrayAsSequence: true,
-            stringAsSequence: true,
-        },
-        predicate: isIterable,
-        bounded: () => false,
-        unbounded: () => false,
-    },
     arguments: {
         one: wrap.expecting.iterable,
     },

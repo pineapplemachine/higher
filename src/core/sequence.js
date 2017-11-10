@@ -1,8 +1,4 @@
 import {lightWrap} from "./lightWrap";
-import {isNumber} from "./types";
-
-import {BoundsUnknownError} from "../errors/BoundsUnknownError";
-import {NotBoundedError} from "../errors/NotBoundedError";
 
 export const isSequence = lightWrap({
     summary: "Determine whether a value is some @Sequence.",
@@ -23,7 +19,7 @@ export const isSequence = lightWrap({
         ],
     },
     implementation: function isSequence(value){
-        return value instanceof Sequence;
+        return value && value instanceof Sequence;
     },
     tests: {
         "basicUsage": hi => {
@@ -31,6 +27,11 @@ export const isSequence = lightWrap({
             hi.assert(hi.isSequence(seq));
             const array = [1, 2, 3, 4];
             hi.assertNot(hi.isSequence(array));
+        },
+        "nilInput": hi => {
+            hi.assertNot(hi.isSequence(null));
+            hi.assertNot(hi.isSequence(undefined));
+            hi.assertNot(hi.isSequence(NaN));
         },
     },
 });
