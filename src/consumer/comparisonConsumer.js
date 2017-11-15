@@ -9,6 +9,12 @@ export const ComparisonConsumer = defineConsumer({
     summary: "Match a sequence of elements equal to the corresponding elements of another sequence.",
     docs: process.env.NODE_ENV !== "development" ? undefined : {
         introduced: "higher@1.0.0",
+        expects: (`
+            The constructor expects a sequence and an optional comparison
+            function as input.
+            When no comparison function was given, @isEqual is used as a
+            default.
+        `),
     },
     converter: {
         predicate: validAsSequence,
@@ -22,10 +28,21 @@ export const ComparisonConsumer = defineConsumer({
         this.source = source;
         this.compare = compare || defaultConsumerComparison;
         this.anyFail = anyFail;
+        if(!source.back){
+            this.pushBack = undefined;
+        }
     },
-    push: function(element){
+    pushFront: function(element){
         if(!this.anyFail){
             const match = this.compare(element, this.source.nextFront());
+            if(!match){
+                this.anyFail = true;
+            }
+        }
+    },
+    pushBack: function(element){
+        if(!this.anyFail){
+            const match = this.compare(element, this.source.nextBack());
             if(!match){
                 this.anyFail = true;
             }

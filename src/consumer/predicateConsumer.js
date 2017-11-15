@@ -31,7 +31,13 @@ export const PredicateConsumer = defineConsumer({
         this.lastMatch = lastMatch;
         this.anyMatch = anyMatch;
     },
-    push: function(element){
+    pushFront: function(element){
+        this.lastMatch = this.predicate(element);
+        if(this.lastMatch){
+            this.anyMatch = this.lastMatch;
+        }
+    },
+    pushBack: function(element){
         this.lastMatch = this.predicate(element);
         if(this.lastMatch){
             this.anyMatch = this.lastMatch;

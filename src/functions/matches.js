@@ -36,7 +36,7 @@ export const matches = wrap({
     implementation: function matches(source, consumer){
         const currentConsumer = consumer.copy();
         for(const element of source){
-            currentConsumer.push(element);
+            currentConsumer.pushFront(element);
             if(currentConsumer.done()){
                 return false;
             }
