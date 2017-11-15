@@ -46,27 +46,27 @@ const sequenceTypeAttributes = {
     index: {
         native: "nativeIndex",
         constructor: false,
-        prototype: true,
+        prototype: false,
     },
     indexNegative: {
         native: "nativeIndexNegative",
         constructor: false,
-        prototype: true,
+        prototype: false,
     },
     slice: {
         native: "nativeSlice",
         constructor: false,
-        prototype: true,
+        prototype: false,
     },
     sliceNegative: {
         native: "nativeSliceNegative",
         constructor: false,
-        prototype: true,
+        prototype: false,
     },
     sliceMixed: {
         native: "nativeSliceMixed",
         constructor: false,
-        prototype: true,
+        prototype: false,
     },
     has: {
         native: "nativeHas",
@@ -118,7 +118,7 @@ const sequenceTypeAttributes = {
     },
     supportDescription: {
         constructor: true,
-        clean: true,
+        cleanString: true,
     },
 };
 
@@ -140,85 +140,33 @@ export const defineSequence = lightWrap({
         };
         for(const attributeName in attributes){
             const attribute = attributes[attributeName];
-            if(attributeName === "done"){
-                constructor.nativeDone = attribute;
-                constructor.prototype.nativeDone = attribute;
-                constructor.prototype.done = attribute;
-            }else if(attributeName === "length"){
-                constructor.nativeLength = attribute;
-                constructor.prototype.nativeLength = attribute;
-                constructor.prototype.length = attribute;
-            }else if(attributeName === "front"){
-                constructor.nativeFront = attribute;
-                constructor.prototype.nativeFront = attribute;
-                constructor.prototype.front = attribute;
-            }else if(attributeName === "popFront"){
-                constructor.nativePopFront = attribute;
-                constructor.prototype.nativePopFront = attribute;
-                constructor.prototype.popFront = attribute;
-            }else if(attributeName === "back"){
-                constructor.nativeBack = attribute;
-                constructor.prototype.nativeBack = attribute;
-                constructor.prototype.back = attribute;
-            }else if(attributeName === "popBack"){
-                constructor.nativePopBack = attribute;
-                constructor.prototype.nativePopBack = attribute;
-                constructor.prototype.popBack = attribute;
-            }else if(attributeName === "index"){
-                constructor.nativeIndex = attribute;
-                constructor.prototype.nativeIndex = attribute;
-            }else if(attributeName === "indexNegative"){
-                constructor.nativeIndexNegative = attribute;
-                constructor.prototype.nativeIndexNegative = attribute;
-            }else if(attributeName === "slice"){
-                constructor.nativeSlice = attribute;
-                constructor.prototype.nativeSlice = attribute;
-            }else if(attributeName === "sliceNegative"){
-                constructor.nativeSliceNegative = attribute;
-                constructor.prototype.nativeSliceNegative = attribute;
-            }else if(attributeName === "sliceMixed"){
-                constructor.nativeSliceMixed = attribute;
-                constructor.prototype.nativeSliceMixed = attribute;
-            }else if(attributeName === "has"){
-                constructor.nativeHas = attribute;
-                constructor.prototype.nativeHas = attribute;
-                constructor.prototype.has = attribute;
-            }else if(attributeName === "get"){
-                constructor.nativeGet = attribute;
-                constructor.prototype.nativeGet = attribute;
-                constructor.prototype.get = attribute;
-            }else if(attributeName === "copy"){
-                constructor.nativeCopy = attribute;
-                constructor.prototype.nativeCopy = attribute;
-                constructor.prototype.copy = attribute;
-            }else if(attributeName === "overrides"){
-                constructor.prototype.overrides = attribute;
-                constructor.overrides = attribute;
-            }else if(
-                attributeName === "supportRequired" ||
-                attributeName === "supportsWith"
-            ){
-                if(isArray(attribute)){
-                    const obj = {};
-                    for(const methodName of attribute) obj[methodName] = "any";
-                    constructor[attributeName] = obj;
-                }else{
-                    constructor[attributeName] = attribute;
-                }
-            }else if(
-                attributeName === "summary" ||
-                attributeName === "docs" ||
-                attributeName === "tests" ||
-                attributeName === "getSequence" ||
-                attributeName === "supportsAlways" ||
-                attributeName === "supportComplicated" ||
-                attributeName === "converter"
-            ){
-                constructor[attributeName] = attribute;
-            }else if(attributeName === "supportDescription"){
-                constructor[attributeName] = cleanString(attribute);
-            }else{
+            const info = sequenceTypeAttributes[attributeName];
+            let value;
+            if(!info){
                 constructor.prototype[attributeName] = attribute;
+            }else{
+                if(info.supportObject){
+                    if(isArray(attribute)){
+                        value = {};
+                        for(const methodName of attribute) value[methodName] = "any";
+                    }else{
+                        value = attribute;
+                    }
+                }else if(info.cleanString){
+                    value = cleanString(attribute);
+                }else{
+                    value = attribute;
+                }
+                if(info.native){
+                    constructor[info.native] = value;
+                    constructor.prototype[info.native] = value;
+                }
+                if(info.constructor){
+                    constructor[attributeName] = value;
+                }
+                if(info.prototype){
+                    constructor.prototype[attributeName] = value;
+                }
             }
         }
         wrapSequenceOverrides(constructor, attributes.overrides);
