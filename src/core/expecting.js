@@ -1,4 +1,4 @@
-import {addSequenceConverter, asSequence, validAsSequence} from "./asSequence";
+import {asSequence, validAsSequence} from "./asSequence";
 import {callAsync} from "./callAsync";
 import {constants} from "./constants";
 import {joinSeries} from "./english";

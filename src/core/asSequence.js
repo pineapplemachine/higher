@@ -1,3 +1,4 @@
+import {addConverter} from "./addConverter";
 import {lightWrap} from "./lightWrap";
 import {isSequence} from "./sequence";
 
@@ -13,8 +14,9 @@ export const asSequence = lightWrap({
         returns: (`
             The function returns a @Sequence object when there was any applicable
             converter, such as if the input was an array, string, object, or
-            other iterable. If no sequence could be acquired for the input, then
-            the function returns \`undefined\`.
+            other iterable.
+            If no sequence could be acquired for the input, then the function
+            returns #undefined.
         `),
         developers: (`
             Note that every converter that is registered slightly increases the
@@ -32,8 +34,10 @@ export const asSequence = lightWrap({
     },
     implementation: function asSequence(value){
         if(isSequence(value)) return value;
-        for(const converter of sequenceConverters){
-            if(converter.predicate(value)) return converter.transform(value);
+        for(const sequenceType of sequenceConverters){
+            if(sequenceType.converter.predicate(value)){
+                return new sequenceType(value);
+            }
         }
         return undefined;
     },
@@ -88,9 +92,9 @@ export const asImplicitSequence = lightWrap({
     },
     implementation: function asImplicitSequence(value){
         if(isSequence(value)) return value;
-        for(const converter of sequenceConverters){
-            if(converter.implicit && converter.predicate(value)){
-                return converter.transform(value);
+        for(const sequenceType of sequenceConverters){
+            if(sequenceType.converter.implicit && sequenceType.converter.predicate(value)){
+                return new sequenceType(value);
             }
         }
         return undefined;
@@ -114,33 +118,8 @@ export const addSequenceConverter = lightWrap({
         introduced: "higher@1.0.0",
     },
     implementation: function addSequenceConverter(converter){
-        let lowest = undefined;
-        let highest = undefined;
-        for(let i = 0; i < sequenceConverters.length; i++){
-            const existing = sequenceConverters[i];
-            if(
-                (converter.after && converter.after[existing.name]) ||
-                (existing.before && existing.before[converter.name])
-            ){
-                lowest = i + 1;
-            }
-            if(highest === undefined && (
-                (converter.before && converter.before[existing.name]) ||
-                (existing.after && existing.after[converter.name])
-            )){
-                highest = i;
-            }
-        }
-        if(highest === undefined){
-            sequenceConverters.push(converter);
-        }else if(lowest === undefined || highest >= lowest){
-            sequenceConverters.splice(highest, 0, converter);
-        }else{
-            throw new Exception(
-                `Unable to place sequence converter ${converter.name} because ` +
-                "of conflicting ordering information."
-            );
-        }
+        console.log("Adding a converter.");
+        addConverter(converter, sequenceConverters);
     },
 });
 
@@ -155,8 +134,8 @@ export const validAsSequence = lightWrap({
     },
     implementation: function validAsSequence(value){
         if(isSequence(value)) return true;
-        for(const converter of sequenceConverters){
-            if(converter.predicate(value)) return true;
+        for(const sequenceType of sequenceConverters){
+            if(sequenceType.converter.predicate(value)) return true;
         }
         return false;
     },
@@ -180,8 +159,10 @@ export const validAsImplicitSequence = lightWrap({
     },
     implementation: function validAsImplicitSequence(value){
         if(isSequence(value)) return true;
-        for(const converter of sequenceConverters){
-            if(converter.predicate(value)) return converter.implicit;
+        for(const sequenceType of sequenceConverters){
+            if(sequenceType.converter.predicate(value)){
+                return sequenceType.converter.implicit;
+            }
         }
         return false;
     },
@@ -203,8 +184,10 @@ export const validAsBoundedSequence = lightWrap({
     },
     implementation: function validAsBoundedSequence(value){
         if(isSequence(value)) return value.bounded();
-        for(const converter of sequenceConverters){
-            if(converter.predicate(value)) return converter.bounded(value);
+        for(const sequenceType of sequenceConverters){
+            if(sequenceType.converter.predicate(value)){
+                return sequenceType.converter.bounded(value);
+            }
         }
         return false;
     },
@@ -226,8 +209,10 @@ export const validAsUnboundedSequence = lightWrap({
     },
     implementation: function validAsUnboundedSequence(value){
         if(isSequence(value)) return value.unbounded();
-        for(const converter of sequenceConverters){
-            if(converter.predicate(value)) return converter.unbounded(value);
+        for(const sequenceType of sequenceConverters){
+            if(sequenceType.converter.predicate(value)){
+                return sequenceType.converter.unbounded(value);
+            }
         }
         return false;
     },

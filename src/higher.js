@@ -101,6 +101,22 @@ if(process.env.NODE_ENV === "development") hi.test = lightWrap({
     },
 });
 
+// consumer/asConsumer
+import {asConsumer} from "./consumer/asConsumer"; hi.register(asConsumer);
+import {addConsumerConverter} from "./consumer/asConsumer"; hi.register(addConsumerConverter);
+import {validAsConsumer} from "./consumer/asConsumer"; hi.register(validAsConsumer);
+import {consumerConverters} from "./consumer/asConsumer"; hi.consumerConverters = consumerConverters;
+// consumer/consumer
+import {Consumer} from "./consumer/consumer"; hi.Consumer = Consumer;
+import {isConsumer} from "./consumer/consumer"; hi.register(isConsumer);
+// consumer/defineConsumer
+import {consumerTypes} from "./consumer/defineConsumer"; hi.consumer = consumerTypes;
+import {defineConsumer} from "./consumer/defineConsumer"; hi.register(defineConsumer);
+
+// Core consumer types
+import {PredicateConsumer} from "./consumer/predicateConsumer";
+import {ComparisonConsumer} from "./consumer/comparisonConsumer";
+
 // core/asSequence
 import {asSequence} from "./core/asSequence"; hi.register(asSequence);
 import {asImplicitSequence} from "./core/asSequence"; hi.register(asImplicitSequence);
@@ -109,6 +125,7 @@ import {validAsSequence} from "./core/asSequence"; hi.register(validAsSequence);
 import {validAsImplicitSequence} from "./core/asSequence"; hi.register(validAsImplicitSequence);
 import {validAsBoundedSequence} from "./core/asSequence"; hi.register(validAsBoundedSequence);
 import {validAsUnboundedSequence} from "./core/asSequence"; hi.register(validAsUnboundedSequence);
+import {sequenceConverters} from "./core/asSequence"; hi.sequenceConverters = sequenceConverters;
 // core/assert
 import {assert} from "./core/assert"; hi.register(assert);
 import {assertNot} from "./core/assert"; hi.register(assertNot);
@@ -140,8 +157,8 @@ import {sequencesEqual} from "./core/isEqual"; hi.register(sequencesEqual);
 import {stringsEqual} from "./core/isEqual"; hi.register(stringsEqual);
 import {objectsEqual} from "./core/isEqual"; hi.register(objectsEqual);
 import {valuesEqual} from "./core/isEqual"; hi.register(valuesEqual);
-// core/lightWrap
-/* imported above */ hi.register(lightWrap);
+// core/lightWrap (imported above)
+hi.register(lightWrap);
 // core/partial
 import {partial} from "./core/partial"; hi.register(partial);
 import {partialRight} from "./core/partial"; hi.register(partialRight);
@@ -254,6 +271,7 @@ import {lexOrder} from "./functions/lexOrder"; hi.register(lexOrder);
 import {limit} from "./functions/limit"; hi.register(limit);
 import {map} from "./functions/map"; hi.register(map);
 import {mapIndex} from "./functions/mapIndex"; hi.register(mapIndex);
+import {matches} from "./functions/matches"; hi.register(matches);
 import {max} from "./functions/max"; hi.register(max);
 import {min} from "./functions/min"; hi.register(min);
 import {negate} from "./functions/negate"; hi.register(negate);

@@ -1,4 +1,3 @@
-import {addSequenceConverter} from "./asSequence";
 import {expecting, Expecting, normalizeExpecting} from "./expecting";
 import {lightWrap, wrappedTestRunner} from "./lightWrap";
 import {partialLeft, partialRight} from "./partial";
@@ -64,14 +63,6 @@ export const wrap = lightWrap({
             fancy.method.implementation = info.methodImplementation || info.implementation;
             if(info.async) fancy.method.async = getWrappedFunctionAsync(fancy.method);
             attachSequenceMethods(fancy);
-        }
-        if(info.asSequence){
-            const converterData = {
-                name: fancy.name,
-                transform: info.implementation
-            };
-            const converter = Object.assign(converterData, info.asSequence);
-            addSequenceConverter(converter);
         }
         if(process.env.NODE_ENV === "development"){
             fancy.docs = cleanDocs(info.docs);
