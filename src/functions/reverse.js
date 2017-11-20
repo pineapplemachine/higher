@@ -151,6 +151,11 @@ export const reverse = wrap({
             the input sequence in reverse order.
         `),
         returnType: "sequence",
+        warnings: (`
+            This function will produce an infinite loop if attempting to reverse
+            a unidirectional input sequence that is unbounded without having
+            known bounds.
+        `),
         examples: [
             "basicUsage",
         ],
