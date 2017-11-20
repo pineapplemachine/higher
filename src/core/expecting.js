@@ -534,6 +534,23 @@ export const expecting = {
             return sequence;
         },
     }),
+    notUnidirectionalUnboundedSequence: Expecting({
+        type: "sequence",
+        article: "a",
+        singular: "bidirectional or not-known-unbounded sequence",
+        plural: "bidirectional or not-known-unbounded sequences",
+        adjective: "bidirectional or not-known-unbounded",
+        short: "sequence",
+        sequence: true,
+        transforms: true,
+        validate: value => {
+            const sequence = asSequence(value);
+            if(!sequence || (sequence.unbounded() && !sequence.back)){
+                throw new Error();
+            }
+            return sequence;
+        },
+    }),
     exactly: option => Expecting({
         article: "exactly",
         singular: String(option),
