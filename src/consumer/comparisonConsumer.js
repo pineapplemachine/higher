@@ -54,7 +54,7 @@ export const ComparisonConsumer = defineConsumer({
     done: function(){
         return this.anyFail || this.source.done();
     },
-    matched: function(){
+    match: function(){
         return !this.anyFail && this.source.done();
     },
     copy: function(){
