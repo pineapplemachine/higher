@@ -120,8 +120,8 @@ export const ReverseSequence = defineSequence({
 // Implementation for reversing a known-bounded unidirectional sequence.
 export const ReverseOnDemandSequence = function(source){
     return new OnDemandSequence(ReverseSequence.appliedTo(ArraySequence), {
-        bounded: () => true,
-        unbounded: () => false,
+        bounded: () => source.bounded(),
+        unbounded: () => source.unbounded(),
         done: () => source.done(),
         back: () => source.front(),
         length: source.nativeLength ? () => source.nativeLength() : undefined,
@@ -151,6 +151,11 @@ export const reverse = wrap({
             the input sequence in reverse order.
         `),
         returnType: "sequence",
+        warnings: (`
+            This function will produce an infinite loop if attempting to reverse
+            a unidirectional input sequence that is unbounded without having
+            known bounds.
+        `),
         examples: [
             "basicUsage",
         ],
@@ -161,15 +166,12 @@ export const reverse = wrap({
         ReverseSequence
     ],
     arguments: {
-        one: wrap.expecting.either(
-            wrap.expecting.bidirectionalSequence,
-            wrap.expecting.boundedSequence
-        ),
+        one: wrap.expecting.notUnidirectionalUnboundedSequence,
     },
     implementation: function reverse(source){
         if(source.back){
             return new ReverseSequence(source);
-        }else{ // Argument validation implies source.bounded()
+        }else{
             return ReverseOnDemandSequence(source);
         }
     },
@@ -197,12 +199,13 @@ export const reverse = wrap({
             hi.assert(seq.startsWith("olleholleholleh"));
             hi.assert(seq.endsWith("olleholleholleh"));
         },
+        "notKnownBoundedUnidirectionalInput": hi => {
+            const seq = () => hi.recur(i => i + 1).seed(1).until(i => i >= 8);
+            hi.assertEqual(seq(), [1, 2, 3, 4, 5, 6, 7]);
+            hi.assertEqual(seq().reverse(), [7, 6, 5, 4, 3, 2, 1]);
+        },
         "unboundedUnidirectionalInput": hi => {
             const seq = hi.recur(i => i + "!").seed("hello");
-            hi.assertFail(() => seq.reverse());
-        },
-        "notKnownBoundedUnidirectionalInput": hi => {
-            const seq = hi.recur(i => i + 1).seed(1).until(i => i >= 8);
             hi.assertFail(() => seq.reverse());
         },
     },
